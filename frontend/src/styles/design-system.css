@@ -1,0 +1,218 @@
+:root {
+  --primary: #2563EB;      /* Blau - Trust, Professionell */
+  --secondary: #1E40AF;    /* Dunkelblau */
+  --accent: #10B981;       /* Grün - Success */
+  --text: #1F2937;         /* Dunkelgrau */
+  --bg: #F9FAFB;            /* Light Gray */
+  --white: #FFFFFF;
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+}
+
+body, p, span, a, button, input, textarea {
+  font-weight: 400;
+}
+
+button, .button {
+  font-weight: 500;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Komponenten-Stil */
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-secondary {
+  color: var(--secondary);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.text-white {
+  color: var(--white);
+}
+
+/* Abgerundete Ecken */
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* Schatten */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Abstand */
+p-4, .p-4 {
+  padding: 1rem;
+}
+
+p-6, .p-6 {
+  padding: 1.5rem;
+}
+
+p-8, .p-8 {
+  padding: 2rem;
+}
+
+/* Typografie */
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-base {
+  font-size: 1rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+}
+
+.text-5xl {
+  font-size: 3rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--white);
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #1e3a8a;
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--white);
+  border: none;
+}
+
+.btn-accent:hover {
+  background-color: #0d9488;
+}
+
+.btn-white {
+  background-color: var(--white);
+  color: var(--text);
+  border: 1px solid #e5e7eb;
+}
+
+.btn-white:hover {
+  background-color: #f3f4f6;
+}
+
+/* Formular-Elemente */
+.input, .textarea {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Karten */
+.card {
+  background-color: var(--white);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .text-6xl {
+    font-size: 2.25rem;
+  }
+  .text-5xl {
+    font-size: 1.875rem;
+  }
+  .text-4xl {
+    font-size: 1.5rem;
+  }
+}

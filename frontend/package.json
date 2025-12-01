@@ -1,0 +1,53 @@
+{
+  "name": "jn-automation-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "JN Automation - Salon & Company Management System Frontend",
+  "author": "Julius & Niels",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.jsx",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.0.18",
+    "@stripe/react-stripe-js": "^2.4.0",
+    "@stripe/stripe-js": "^3.0.0",
+    "axios": "^1.6.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "i18next": "^25.6.3",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^16.3.5",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.8.0",
+    "recharts": "^3.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.6",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.54.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.5",
+    "postcss": "^8.5.6",
+    "prettier": "^3.1.0",
+    "tailwindcss": "^3.4.0",
+    "terser": "^5.44.1",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

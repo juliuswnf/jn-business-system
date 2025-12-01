@@ -1,0 +1,80 @@
+# ==================== NODE ====================
+
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# ==================== ENV ====================
+
+.env
+.env.local
+.env.*.local
+
+# ==================== GIT ====================
+
+.git
+.gitignore
+.gitattributes
+.github
+
+# ==================== IDE ====================
+
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+
+# ==================== BUILD ====================
+
+dist/
+build/
+.next/
+
+# ==================== LOGS ====================
+
+logs/
+*.log
+
+# ==================== TESTS ====================
+
+coverage/
+.nyc_output/
+__tests__/
+*.test.js
+*.spec.js
+
+# ==================== DOCS ====================
+
+README.md
+CHANGELOG.md
+docs/
+
+# ==================== CI/CD ====================
+
+.circleci/
+.gitlab-ci.yml
+.travis.yml
+.github/
+
+# ==================== OS ====================
+
+.DS_Store
+Thumbs.db
+*.exe
+
+# ==================== DEVELOPMENT ====================
+
+.editorconfig
+.eslintrc
+.prettierrc
+jest.config.js
+vite.config.js
+
+# ==================== MISC ====================
+
+*.md
+.env.example
+.env.test
+public/

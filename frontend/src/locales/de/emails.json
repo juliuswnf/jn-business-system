@@ -1,0 +1,36 @@
+{
+  "booking_confirmation": {
+    "subject": "Buchungsbestätigung - {{salonName}}",
+    "title": "Ihr Termin wurde gebucht!",
+    "greeting": "Hallo {{customerName}},",
+    "body": "Vielen Dank für Ihre Buchung! Hier sind Ihre Buchungsdetails:",
+    "service_label": "Service:",
+    "date_time_label": "Datum und Zeit:",
+    "employee_label": "Mitarbeiter:",
+    "location_label": "Ort:",
+    "cancellation_note": "Wenn Sie Ihren Termin absagen möchten, kontaktieren Sie uns bitte {{cancelationDeadline}} Stunden vorher.",
+    "footer": "Wir freuen uns, Sie bei {{salonName}} begrüßen zu dürfen!"
+  },
+  "appointment_reminder": {
+    "subject": "Erinnerung: Ihr Termin morgen bei {{salonName}}",
+    "title": "Erinnerung an Ihren Termin",
+    "greeting": "Hallo {{customerName}},",
+    "body": "Dies ist eine freundliche Erinnerung an Ihren bevorstehenden Termin morgen:",
+    "service_label": "Service:",
+    "time_label": "Zeit:",
+    "duration_label": "Dauer:",
+    "employee_label": "Mitarbeiter:",
+    "location_label": "Ort:",
+    "arrival_note": "Bitte kommen Sie {{arrivalTime}} Minuten früher an.",
+    "footer": "Wir freuen uns, Sie zu sehen!"
+  },
+  "review_request": {
+    "subject": "Wie war Ihr Termin bei {{salonName}}?",
+    "title": "Hinterlassen Sie eine Bewertung",
+    "greeting": "Hallo {{customerName}},",
+    "body": "Danke, dass Sie {{salonName}} besucht haben! Uns würde Ihre Meinung interessieren.",
+    "review_link_text": "Bewertung auf Google schreiben",
+    "review_intro": "Helfen Sie uns, andere Kunden zu finden, indem Sie Ihre Erfahrung auf Google teilen:",
+    "footer": "Vielen Dank für Ihre Unterstützung!"
+  }
+}

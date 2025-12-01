@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erinnerung an Termin</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background-color: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    .content { background-color: white; padding: 20px; border: 1px solid #e5e7eb; }
+    .footer { background-color: #f3f4f6; color: #6b7280; padding: 10px; text-align: center; font-size: 12px; }
+    .button { background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Erinnerung an Termin</h1>
+    </div>
+    <div class="content">
+      <p>Sehr geehrter {{customerName}},</p>
+      <p>morgen findet Ihr Termin bei {{salonName}} statt.</p>
+      <p><strong>Service:</strong> {{serviceName}}</p>
+      <p><strong>Datum:</strong> {{date}}</p>
+      <p><strong>Adresse:</strong> {{address}}</p>
+      <p>Sie können Ihren Termin jederzeit absagen oder verschieben. Klicken Sie dafür auf den folgenden Link:</p>
+      <p><a href="{{cancelUrl}}" class="button">Termin absagen</a></p>
+    </div>
+    <div class="footer">
+      <p>© 2025 JN Business System. Alle Rechte vorbehalten.</p>
+    </div>
+  </div>
+</body>
+</html>

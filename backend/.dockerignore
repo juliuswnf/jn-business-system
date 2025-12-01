@@ -1,0 +1,139 @@
+# ==================== NODE ====================
+
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+.pnpm-lock.yaml
+
+# ==================== ENV ====================
+
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.test.local
+
+# ==================== GIT ====================
+
+.git
+.gitignore
+.gitattributes
+.github
+
+# ==================== IDE & EDITORS ====================
+
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ==================== BUILD & DIST ====================
+
+dist/
+build/
+.next/
+out/
+.cache/
+
+# ==================== LOGS ====================
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==================== TEMPORARY ====================
+
+tmp/
+temp/
+.tmp/
+*.tmp
+*.bak
+*.swp
+
+# ==================== TESTING ====================
+
+coverage/
+.nyc_output/
+*.test.js
+*.spec.js
+__tests__/
+jest.config.js
+
+# ==================== DOCUMENTATION ====================
+
+README.md
+CHANGELOG.md
+docs/
+*.md
+
+# ==================== CI/CD ====================
+
+.circleci/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+.github/workflows/
+
+# ==================== DATABASE ====================
+
+*.db
+*.sqlite
+*.sqlite3
+.mongo/
+
+# ==================== DOCKER ====================
+
+Dockerfile.dev
+docker-compose.dev.yml
+.dockerignore
+
+# ==================== MISC ====================
+
+.editorconfig
+.prettierrc
+.eslintrc
+.eslintignore
+tsconfig.json
+jest.config.js
+rollup.config.js
+webpack.config.js
+vite.config.js
+.env.example
+.env.test
+
+# ==================== OS ====================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+*.exe
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ==================== PROJECT SPECIFIC ====================
+
+uploads/
+backups/
+certificates/
+ssl/
+cache/
+sessions/
+
+# ==================== OPTIONAL ====================
+
+# Uncomment to exclude specific files
+
+# frontend/node_modules/
+# backend/node_modules/
+# frontend/dist/
+# backend/logs/
