@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     const services = await Service.find({ salonId: req.user.salonId || req.user._id })
       .select('-__v')
       .limit(100);
-    
+
     res.json({
       success: true,
       data: services,
@@ -29,11 +29,11 @@ router.get('/:id', async (req, res) => {
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
     const service = await Service.findById(req.params.id);
-    
+
     if (!service) {
       return res.status(404).json({ success: false, message: 'Service not found' });
     }
-    
+
     res.json({ success: true, data: service });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -48,7 +48,7 @@ router.post('/', async (req, res) => {
       ...req.body,
       salonId: req.user.salonId || req.user._id
     });
-    
+
     await service.save();
     res.status(201).json({ success: true, data: service });
   } catch (error) {
@@ -65,11 +65,11 @@ router.put('/:id', async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    
+
     if (!service) {
       return res.status(404).json({ success: false, message: 'Service not found' });
     }
-    
+
     res.json({ success: true, data: service });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -81,11 +81,11 @@ router.delete('/:id', async (req, res) => {
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
     const service = await Service.findByIdAndDelete(req.params.id);
-    
+
     if (!service) {
       return res.status(404).json({ success: false, message: 'Service not found' });
     }
-    
+
     res.json({ success: true, message: 'Service deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
