@@ -518,13 +518,45 @@ export const adminAPI = {
 
 export const ceoAPI = {
   getDashboard: () => api.get('/ceo/dashboard'),
+  getStats: () => api.get('/ceo/stats'),
   getAnalytics: (params) => api.get('/ceo/analytics', { params }),
   getFinancials: (params) => api.get('/ceo/financials', { params }),
   getReports: (params) => api.get('/ceo/reports', { params }),
   generateCustomReport: (data) => api.post('/ceo/reports/generate', data),
+  // User Management
+  getUsers: (params) => api.get('/ceo/users', { params }),
+  banUser: (userId) => api.post(`/ceo/users/${userId}/ban`),
+  unbanUser: (userId) => api.post(`/ceo/users/${userId}/unban`),
   impersonateUser: (userId) => api.post('/ceo/users/impersonate', { userId }),
+  // Customer/Business Management
+  getCustomers: (params) => api.get('/ceo/customers', { params }),
+  getBusinesses: (params) => api.get('/ceo/businesses', { params }),
+  createBusiness: (data) => api.post('/ceo/businesses', data),
+  updateBusiness: (id, data) => api.put(`/ceo/businesses/${id}`, data),
+  deleteBusiness: (id) => api.delete(`/ceo/businesses/${id}`),
+  suspendBusiness: (id) => api.post(`/ceo/businesses/${id}/suspend`),
+  reactivateBusiness: (id) => api.post(`/ceo/businesses/${id}/reactivate`),
+  // Subscriptions
+  getSubscriptions: (params) => api.get('/ceo/subscriptions', { params }),
+  getSubscriptionStats: () => api.get('/ceo/subscriptions/stats'),
+  toggleSalonStatus: (salonId, data) => api.patch(`/ceo/subscriptions/${salonId}/toggle`, data),
+  updateSubscriptionStatus: (salonId, data) => api.patch(`/ceo/subscriptions/${salonId}/status`, data),
+  // Error Logs
+  getErrorLogs: (params) => api.get('/ceo/errors', { params }),
+  resolveError: (errorId, data) => api.patch(`/ceo/errors/${errorId}/resolve`, data),
+  createErrorLog: (data) => api.post('/ceo/errors', data),
+  // System Control
+  getSystemStatus: () => api.get('/ceo/system/status'),
+  getServiceStatus: (serviceId) => api.get(`/ceo/system/status/${serviceId}`),
+  startService: (serviceId) => api.post(`/ceo/system/start/${serviceId}`),
+  stopService: (serviceId) => api.post(`/ceo/system/stop/${serviceId}`),
+  startAllServices: () => api.post('/ceo/system/start-all'),
+  stopAllServices: () => api.post('/ceo/system/stop-all'),
+  // Settings
   getFeatureFlags: () => api.get('/ceo/settings/features'),
   toggleFeature: (featureName, enabled) => api.post('/ceo/settings/features/toggle', { featureName, enabled }),
+  getSettings: () => api.get('/ceo/settings'),
+  updateSettings: (data) => api.put('/ceo/settings', data),
   getHealthStatus: () => api.get('/ceo/system/health'),
   getCEOStats: () => api.get('/ceo/system/stats'),
   toggleMaintenanceMode: (enabled) => api.post('/ceo/system/maintenance', { enabled }),

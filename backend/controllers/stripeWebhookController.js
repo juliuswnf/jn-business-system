@@ -219,7 +219,18 @@ const handleSubscriptionDeleted = async (subscription) => {
     
     logger.log(`✅ Subscription deleted for salon: ${salon.slug}`);
     
-    // TODO: Send email notification to salon owner
+    // Send email notification to salon owner
+    try {
+      const { sendEmail } = await import('../services/emailService.js');
+      await sendEmail({
+        to: salon.email,
+        subject: 'Ihr Abonnement wurde gekündigt - JN Business',
+        body: `Hallo,\n\nIhr JN Business Abonnement für "${salon.name}" wurde gekündigt.\n\nSie können jederzeit ein neues Abonnement abschließen, um alle Premium-Funktionen wieder zu nutzen.\n\nBei Fragen stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
+        type: 'subscription_canceled'
+      });
+    } catch (emailError) {
+      logger.error('❌ Failed to send subscription canceled email:', emailError.message);
+    }
   } catch (error) {
     logger.error('Error handling subscription deleted:', error);
   }
@@ -241,7 +252,19 @@ const handleTrialWillEnd = async (subscription) => {
     
     logger.log(`⚠️ Trial ending soon for salon: ${salon.slug}`);
     
-    // TODO: Send email notification to salon owner about trial ending
+    // Send email notification about trial ending
+    try {
+      const { sendEmail } = await import('../services/emailService.js');
+      const trialEndDate = new Date(subscription.trial_end * 1000).toLocaleDateString('de-DE');
+      await sendEmail({
+        to: salon.email,
+        subject: 'Ihre Testphase endet bald - JN Business',
+        body: `Hallo,\n\nIhre kostenlose Testphase für "${salon.name}" endet am ${trialEndDate}.\n\nUm alle Premium-Funktionen weiterhin nutzen zu können, stellen Sie bitte sicher, dass eine gültige Zahlungsmethode hinterlegt ist.\n\nNach Ende der Testphase wird Ihr gewähltes Abonnement automatisch aktiviert.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
+        type: 'trial_ending'
+      });
+    } catch (emailError) {
+      logger.error('❌ Failed to send trial ending email:', emailError.message);
+    }
   } catch (error) {
     logger.error('Error handling trial will end:', error);
   }
@@ -269,7 +292,18 @@ const handlePaymentActionRequired = async (invoice) => {
     
     logger.log(`⚠️ Payment action required for salon: ${salon.slug}`);
     
-    // TODO: Send email notification to salon owner about payment action required
+    // Send email notification about payment action required
+    try {
+      const { sendEmail } = await import('../services/emailService.js');
+      await sendEmail({
+        to: salon.email,
+        subject: 'Zahlungsaktion erforderlich - JN Business',
+        body: `Hallo,\n\nFür Ihr JN Business Abonnement für "${salon.name}" ist eine Zahlungsaktion erforderlich.\n\nBitte überprüfen Sie Ihre Zahlungsmethode und bestätigen Sie die Zahlung, um eine Unterbrechung Ihres Services zu vermeiden.\n\nSie können dies in Ihren Kontoeinstellungen tun.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
+        type: 'payment_action_required'
+      });
+    } catch (emailError) {
+      logger.error('❌ Failed to send payment action email:', emailError.message);
+    }
   } catch (error) {
     logger.error('Error handling payment action required:', error);
   }

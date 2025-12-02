@@ -1001,6 +1001,183 @@ export const getCEOSubscriptions = async (req, res) => {
   }
 };
 
+// ==================== GET ALL USERS ====================
+export const getAllUsers = async (req, res) => {
+  try {
+    if (req.user.role !== 'ceo') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - CEO only'
+      });
+    }
+
+    const { role, search, page = 1, limit = 20 } = req.query;
+    
+    let filter = {};
+    
+    if (role && role !== 'all') {
+      filter.role = role;
+    }
+    
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    const skip = (page - 1) * limit;
+    const total = await User.countDocuments(filter);
+    
+    const users = await User.find(filter)
+      .select('name email role companyName isActive isBanned createdAt lastLogin')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Count by role
+    const roleCounts = await User.aggregate([
+      { $group: { _id: '$role', count: { $sum: 1 } } }
+    ]);
+    
+    const counts = {
+      total: await User.countDocuments(),
+      admins: 0,
+      employees: 0,
+      customers: 0,
+      salon_owners: 0,
+      ceo: 0
+    };
+    
+    roleCounts.forEach(rc => {
+      if (rc._id === 'admin') counts.admins = rc.count;
+      else if (rc._id === 'employee') counts.employees = rc.count;
+      else if (rc._id === 'customer') counts.customers = rc.count;
+      else if (rc._id === 'salon_owner') counts.salon_owners = rc.count;
+      else if (rc._id === 'ceo') counts.ceo = rc.count;
+    });
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      counts,
+      users: users.map(u => ({
+        id: u._id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        companyName: u.companyName,
+        isActive: u.isActive,
+        banned: u.isBanned || false,
+        createdAt: u.createdAt,
+        lastLogin: u.lastLogin
+      }))
+    });
+  } catch (error) {
+    logger.error('GetAllUsers Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
+// ==================== BAN USER ====================
+export const banUser = async (req, res) => {
+  try {
+    if (req.user.role !== 'ceo') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - CEO only'
+      });
+    }
+
+    const { userId } = req.params;
+    
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    if (user.role === 'ceo') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot ban CEO user'
+      });
+    }
+    
+    user.isBanned = true;
+    user.isActive = false;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User banned successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        banned: true
+      }
+    });
+  } catch (error) {
+    logger.error('BanUser Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
+// ==================== UNBAN USER ====================
+export const unbanUser = async (req, res) => {
+  try {
+    if (req.user.role !== 'ceo') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - CEO only'
+      });
+    }
+
+    const { userId } = req.params;
+    
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    user.isBanned = false;
+    user.isActive = true;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User unbanned successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        banned: false
+      }
+    });
+  } catch (error) {
+    logger.error('UnbanUser Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
 // ==================== DEFAULT EXPORT ====================
 
 export default {
@@ -1023,5 +1200,9 @@ export default {
   resolveError,
   createErrorLog,
   getAllCustomers,
-  getCEOSubscriptions
+  getCEOSubscriptions,
+  // User management
+  getAllUsers,
+  banUser,
+  unbanUser
 };

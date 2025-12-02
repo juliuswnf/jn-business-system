@@ -516,9 +516,25 @@ export const forgotPassword = async (req, res) => {
     const resetToken = user.getPasswordResetToken();
     await user.save();
 
-    // TODO: Send email with reset link
+    // Send email with reset link
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    logger.log(`📧 Password reset link: ${resetUrl}`);
+    
+    try {
+      const { sendEmail } = await import('../services/emailService.js');
+      await sendEmail({
+        to: user.email,
+        subject: 'Passwort zurücksetzen - JN Business',
+        body: `Hallo ${user.name},\n\nSie haben eine Passwort-Zurücksetzung angefordert.\n\nKlicken Sie auf den folgenden Link, um Ihr Passwort zurückzusetzen:\n${resetUrl}\n\nDer Link ist 10 Minuten gültig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
+        type: 'password_reset'
+      });
+      logger.log(`📧 Password reset email sent to: ${user.email}`);
+    } catch (emailError) {
+      logger.error('❌ Failed to send password reset email:', emailError.message);
+      // Don't fail the request if email fails in development
+      if (process.env.NODE_ENV === 'production') {
+        throw emailError;
+      }
+    }
 
     res.status(200).json({
       success: true,
@@ -636,9 +652,24 @@ export const sendVerificationEmail = async (req, res) => {
     const verificationToken = user.getEmailVerificationToken();
     await user.save();
 
-    // TODO: Send email
+    // Send verification email
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-    logger.log(`📧 Verification link: ${verificationUrl}`);
+    
+    try {
+      const { sendEmail } = await import('../services/emailService.js');
+      await sendEmail({
+        to: user.email,
+        subject: 'E-Mail bestätigen - JN Business',
+        body: `Hallo ${user.name},\n\nBitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie auf den folgenden Link klicken:\n${verificationUrl}\n\nDer Link ist 24 Stunden gültig.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
+        type: 'email_verification'
+      });
+      logger.log(`📧 Verification email sent to: ${user.email}`);
+    } catch (emailError) {
+      logger.error('❌ Failed to send verification email:', emailError.message);
+      if (process.env.NODE_ENV === 'production') {
+        throw emailError;
+      }
+    }
 
     res.status(200).json({
       success: true,

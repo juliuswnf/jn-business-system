@@ -28,6 +28,11 @@ router.get('/errors', ceoMiddleware.verifyCEOAuth, ceoController.getErrorLogs);
 router.post('/errors', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, ceoController.createErrorLog);
 router.patch('/errors/:errorId/resolve', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, ceoController.resolveError);
 
+// User Management
+router.get('/users', ceoMiddleware.verifyCEOAuth, ceoController.getAllUsers);
+router.post('/users/:userId/ban', ceoMiddleware.verifyCEOAuth, ceoController.banUser);
+router.post('/users/:userId/unban', ceoMiddleware.verifyCEOAuth, ceoController.unbanUser);
+
 // ==================== EXISTING ENDPOINTS ====================
 
 // CEO Dashboard
