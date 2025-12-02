@@ -47,12 +47,12 @@ class MemoryStoreAdapter {
 
   resetKey(key, cb) {
     this.hits.delete(key);
-    if (cb) cb(null);
+    if (cb) {cb(null);}
   }
 
   resetAll(cb) {
     this.hits.clear();
-    if (cb) cb(null);
+    if (cb) {cb(null);}
   }
 
   cleanup() {

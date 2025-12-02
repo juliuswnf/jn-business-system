@@ -1,5 +1,4 @@
 import cron from 'node-cron';
-import errorHandlerService from './errorHandlerService.js';
 import logger from '../utils/logger.js';
 
 // ==================== CLEANUP JOBS ====================
@@ -43,7 +42,7 @@ const performDatabaseMaintenance = async () => {
 const generateSystemReport = async () => {
   try {
     // MVP: Simple console report
-    logger.log(`✅ System Report: System running normally`);
+    logger.log('✅ System Report: System running normally');
   } catch (err) {
     logger.error('❌ System report generation failed:', err.message);
   }

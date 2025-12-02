@@ -11,17 +11,17 @@
  * @returns {String} - Rendered template
  */
 const replacePlaceholders = (template, data) => {
-  if (!template) return '';
-  
+  if (!template) {return '';}
+
   let rendered = template;
-  
+
   // Replace all {{placeholder}} with actual values
   Object.keys(data).forEach(key => {
     const placeholder = `{{${key}}}`;
     const value = data[key] || '';
     rendered = rendered.split(placeholder).join(value);
   });
-  
+
   return rendered;
 };
 
@@ -33,14 +33,14 @@ const replacePlaceholders = (template, data) => {
  */
 const formatDate = (date, language = 'de') => {
   const d = new Date(date);
-  
+
   const options = {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   };
-  
+
   const locale = language === 'de' ? 'de-DE' : 'en-US';
   return d.toLocaleDateString(locale, options);
 };
@@ -53,12 +53,12 @@ const formatDate = (date, language = 'de') => {
  */
 const formatTime = (date, language = 'de') => {
   const d = new Date(date);
-  
+
   const options = {
     hour: '2-digit',
     minute: '2-digit'
   };
-  
+
   const locale = language === 'de' ? 'de-DE' : 'en-US';
   return d.toLocaleTimeString(locale, options);
 };
@@ -72,11 +72,11 @@ const formatTime = (date, language = 'de') => {
  */
 const renderConfirmationEmail = (salon, booking, language = 'de') => {
   const template = salon.getEmailTemplate('confirmation', language);
-  
+
   if (!template) {
     throw new Error(`Confirmation email template not found for language: ${language}`);
   }
-  
+
   const data = {
     customer_name: booking.customerName,
     salon_name: salon.name,
@@ -89,7 +89,7 @@ const renderConfirmationEmail = (salon, booking, language = 'de') => {
     salon_phone: salon.phone || '',
     booking_id: booking._id.toString()
   };
-  
+
   return {
     subject: replacePlaceholders(template.subject, data),
     body: replacePlaceholders(template.body, data)
@@ -105,11 +105,11 @@ const renderConfirmationEmail = (salon, booking, language = 'de') => {
  */
 const renderReminderEmail = (salon, booking, language = 'de') => {
   const template = salon.getEmailTemplate('reminder', language);
-  
+
   if (!template) {
     throw new Error(`Reminder email template not found for language: ${language}`);
   }
-  
+
   const data = {
     customer_name: booking.customerName,
     salon_name: salon.name,
@@ -122,7 +122,7 @@ const renderReminderEmail = (salon, booking, language = 'de') => {
     salon_phone: salon.phone || '',
     booking_id: booking._id.toString()
   };
-  
+
   return {
     subject: replacePlaceholders(template.subject, data),
     body: replacePlaceholders(template.body, data)
@@ -138,11 +138,11 @@ const renderReminderEmail = (salon, booking, language = 'de') => {
  */
 const renderReviewEmail = (salon, booking, language = 'de') => {
   const template = salon.getEmailTemplate('review', language);
-  
+
   if (!template) {
     throw new Error(`Review email template not found for language: ${language}`);
   }
-  
+
   const data = {
     customer_name: booking.customerName,
     salon_name: salon.name,
@@ -153,7 +153,7 @@ const renderReviewEmail = (salon, booking, language = 'de') => {
     salon_email: salon.email,
     salon_phone: salon.phone || ''
   };
-  
+
   return {
     subject: replacePlaceholders(template.subject, data),
     body: replacePlaceholders(template.body, data)
@@ -171,11 +171,11 @@ const getEmailLanguage = (salon, booking = null) => {
   if (booking && booking.language) {
     return booking.language;
   }
-  
+
   if (salon && salon.defaultLanguage) {
     return salon.defaultLanguage;
   }
-  
+
   return 'de';
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
@@ -12,7 +13,7 @@ const testAndFixCEO = async () => {
 
     // Get CEO with password field
     const ceo = await User.findOne({ email: 'julius@jn-automation.de' }).select('+password');
-    
+
     if (!ceo) {
       console.log('❌ CEO not found');
       process.exit(1);
@@ -33,17 +34,17 @@ const testAndFixCEO = async () => {
 
     if (!isMatch) {
       console.log('\n🔧 Fixing password...');
-      
+
       // Generate new hash
       const salt = await bcrypt.genSalt(10);
       const newHash = await bcrypt.hash(testPassword, salt);
-      
+
       // Update directly in DB
       await User.updateOne(
         { email: 'julius@jn-automation.de' },
         { $set: { password: newHash } }
       );
-      
+
       // Verify
       const updated = await User.findOne({ email: 'julius@jn-automation.de' }).select('+password');
       const verifyMatch = await bcrypt.compare(testPassword, updated.password);

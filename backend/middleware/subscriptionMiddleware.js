@@ -14,7 +14,7 @@ export const requireActiveSubscription = async (req, res, next) => {
   try {
     // Get salon ID from various sources
     let salonId = req.salon?._id || req.body.salonId || req.params.salonId;
-    
+
     // For salon owners, get their salon
     if (!salonId && req.user && req.user.role === 'salon_owner') {
       const salon = await Salon.findOne({ owner: req.user._id });
@@ -22,40 +22,40 @@ export const requireActiveSubscription = async (req, res, next) => {
         salonId = salon._id;
       }
     }
-    
+
     if (!salonId) {
       return res.status(400).json({
         success: false,
         message: 'Salon ID not provided'
       });
     }
-    
+
     const salon = await Salon.findById(salonId);
-    
+
     if (!salon) {
       return res.status(404).json({
         success: false,
         message: 'Salon not found'
       });
     }
-    
+
     // Check if subscription is active
     if (!salon.hasActiveSubscription()) {
       const trialEnded = salon.subscription?.trialEndsAt && new Date() > salon.subscription.trialEndsAt;
-      
+
       return res.status(403).json({
         success: false,
-        message: trialEnded 
-          ? 'Your trial period has ended. Please subscribe to continue.' 
+        message: trialEnded
+          ? 'Your trial period has ended. Please subscribe to continue.'
           : 'No active subscription found. Please subscribe to continue.',
         subscriptionStatus: salon.subscription?.status || 'none',
         trialEndsAt: salon.subscription?.trialEndsAt
       });
     }
-    
+
     // Attach salon to request for use in controllers
     req.salon = salon;
-    
+
     next();
   } catch (error) {
     logger.error('Subscription middleware error:', error);
@@ -73,14 +73,14 @@ export const requireActiveSubscription = async (req, res, next) => {
 export const checkSubscriptionStatus = async (req, res, next) => {
   try {
     let salonId = req.salon?._id || req.body.salonId || req.params.salonId;
-    
+
     if (!salonId && req.user && req.user.role === 'salon_owner') {
       const salon = await Salon.findOne({ owner: req.user._id });
       if (salon) {
         salonId = salon._id;
       }
     }
-    
+
     if (salonId) {
       const salon = await Salon.findById(salonId);
       if (salon) {
@@ -94,7 +94,7 @@ export const checkSubscriptionStatus = async (req, res, next) => {
         req.salon = salon;
       }
     }
-    
+
     next();
   } catch (error) {
     logger.error('Check subscription status error:', error);
@@ -110,40 +110,40 @@ export const checkSubscriptionStatus = async (req, res, next) => {
 export const requireTrialOrActive = async (req, res, next) => {
   try {
     let salonId = req.salon?._id || req.body.salonId || req.params.salonId;
-    
+
     if (!salonId && req.user && req.user.role === 'salon_owner') {
       const salon = await Salon.findOne({ owner: req.user._id });
       if (salon) {
         salonId = salon._id;
       }
     }
-    
+
     if (!salonId) {
       return res.status(400).json({
         success: false,
         message: 'Salon ID not provided'
       });
     }
-    
+
     const salon = await Salon.findById(salonId);
-    
+
     if (!salon) {
       return res.status(404).json({
         success: false,
         message: 'Salon not found'
       });
     }
-    
+
     const status = salon.subscription?.status;
     const isTrialOrActive = ['trial', 'active'].includes(status);
-    
+
     // Check if trial is still valid
     if (status === 'trial') {
       const trialEndsAt = salon.subscription?.trialEndsAt;
       if (trialEndsAt && new Date() > trialEndsAt) {
         salon.subscription.status = 'inactive';
         await salon.save();
-        
+
         return res.status(403).json({
           success: false,
           message: 'Your trial period has ended. Please subscribe to continue.',
@@ -151,7 +151,7 @@ export const requireTrialOrActive = async (req, res, next) => {
         });
       }
     }
-    
+
     if (!isTrialOrActive) {
       return res.status(403).json({
         success: false,
@@ -159,7 +159,7 @@ export const requireTrialOrActive = async (req, res, next) => {
         subscriptionStatus: status
       });
     }
-    
+
     req.salon = salon;
     next();
   } catch (error) {
@@ -177,18 +177,18 @@ export const requireTrialOrActive = async (req, res, next) => {
 export const isInTrial = async (req, res, next) => {
   try {
     const salon = req.salon;
-    
+
     if (!salon) {
       return res.status(400).json({
         success: false,
         message: 'Salon not found in request'
       });
     }
-    
+
     const inTrial = salon.subscription?.status === 'trial';
     req.isInTrial = inTrial;
     req.trialEndsAt = salon.subscription?.trialEndsAt;
-    
+
     next();
   } catch (error) {
     logger.error('Trial check error:', error);

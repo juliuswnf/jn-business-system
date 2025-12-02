@@ -8,9 +8,17 @@ import Stripe from 'stripe';
 import Booking from '../models/Booking.js';
 import Payment from '../models/Payment.js';
 
-const stripe = new Stripe(
-  process.env.STRIPE_SECRET_KEY || 'sk_test_51SNcw8Cfgv8Lqc0aIuiqkWJTF6gC8ibUitGgjuMvZTusB42OBdCUAXar25ToIazQQKbbNKwIb3PerXQu4sAmrpLa00ddDk0Ify'
-);
+// Lazy initialization of Stripe (after dotenv is loaded)
+let stripe = null;
+const getStripe = () => {
+  if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is required');
+    }
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+  return stripe;
+};
 
 const validateAmount = (amount) => {
   return !isNaN(amount) && amount > 0 && amount <= 999999.99;
@@ -44,7 +52,7 @@ export const createPaymentIntent = async (req, res) => {
       });
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: Math.round(amount * 100),
       currency: 'eur',
       metadata: {
@@ -79,7 +87,7 @@ export const processPayment = async (req, res) => {
       });
     }
 
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== 'succeeded') {
       return res.status(400).json({
@@ -90,7 +98,7 @@ export const processPayment = async (req, res) => {
 
     const booking = await Booking.findByIdAndUpdate(
       bookingId,
-      { 
+      {
         status: 'confirmed',
         paymentStatus: 'paid',
         paymentId: paymentIntentId
@@ -137,7 +145,7 @@ export const getPaymentHistory = async (req, res) => {
     const { bookingId, salonId } = req.query;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    
+
     if (page < 1 || limit < 1 || limit > 100) {
       return res.status(400).json({
         success: false,
@@ -217,11 +225,11 @@ export const refundPayment = async (req, res) => {
     // Calculate refundable amount
     const alreadyRefunded = payment.refundedAmount || 0;
     const maxRefundable = payment.amount - alreadyRefunded;
-    
+
     // Determine refund amount (partial or full)
     let refundAmount;
     const isPartialRefund = amount && amount < maxRefundable;
-    
+
     if (amount) {
       // Partial refund requested
       if (!validateAmount(amount)) {
@@ -243,7 +251,7 @@ export const refundPayment = async (req, res) => {
     }
 
     // Create refund with Stripe
-    const refund = await stripe.refunds.create({
+    const refund = await getStripe().refunds.create({
       payment_intent: payment.stripePaymentIntentId,
       amount: Math.round(refundAmount * 100), // Convert to cents
       reason: reason || 'requested_by_customer'
@@ -256,7 +264,7 @@ export const refundPayment = async (req, res) => {
     // Update payment record
     const updatedPayment = await Payment.findByIdAndUpdate(
       paymentId,
-      { 
+      {
         status: isFullyRefunded ? 'refunded' : 'partially_refunded',
         refundId: refund.id,
         refundedAmount: newRefundedAmount,
@@ -277,7 +285,7 @@ export const refundPayment = async (req, res) => {
     if (isFullyRefunded) {
       await Booking.findByIdAndUpdate(
         payment.bookingId,
-        { 
+        {
           status: 'cancelled',
           paymentStatus: 'refunded'
         }
@@ -285,7 +293,7 @@ export const refundPayment = async (req, res) => {
     } else {
       await Booking.findByIdAndUpdate(
         payment.bookingId,
-        { 
+        {
           paymentStatus: 'partially_refunded'
         }
       );
@@ -293,7 +301,7 @@ export const refundPayment = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: isPartialRefund 
+      message: isPartialRefund
         ? `Partial refund of ${refundAmount.toFixed(2)} EUR processed successfully`
         : 'Full refund processed successfully',
       payment: updatedPayment,
@@ -393,7 +401,7 @@ export const getRevenueAnalytics = async (req, res) => {
 export const handleStripeWebhook = async (req, res) => {
   try {
     const sig = req.headers['stripe-signature'];
-    
+
     if (!sig) {
       logger.error('❌ Missing Stripe signature header');
       return res.status(401).json({
@@ -412,7 +420,7 @@ export const handleStripeWebhook = async (req, res) => {
 
     let event;
     try {
-      event = stripe.webhooks.constructEvent(
+      event = getStripe().webhooks.constructEvent(
         req.body,
         sig,
         process.env.STRIPE_WEBHOOK_SECRET
@@ -428,47 +436,50 @@ export const handleStripeWebhook = async (req, res) => {
     logger.log(`✅ Stripe webhook received: ${event.type}`);
 
     switch (event.type) {
-      case 'payment_intent.succeeded':
-        const paymentIntentSucceeded = event.data.object;
-        logger.log('✅ Payment succeeded:', paymentIntentSucceeded.id);
-        
-        if (paymentIntentSucceeded.metadata?.bookingId) {
-          await Booking.findOneAndUpdate(
-            { _id: paymentIntentSucceeded.metadata.bookingId },
-            { 
-              status: 'confirmed',
-              paymentStatus: 'paid'
-            }
-          );
-        }
-        break;
+    case 'payment_intent.succeeded': {
+      const paymentIntentSucceeded = event.data.object;
+      logger.log('✅ Payment succeeded:', paymentIntentSucceeded.id);
 
-      case 'payment_intent.payment_failed':
-        const paymentIntentFailed = event.data.object;
-        logger.log('❌ Payment failed:', paymentIntentFailed.id);
-        
-        if (paymentIntentFailed.metadata?.bookingId) {
-          await Booking.findOneAndUpdate(
-            { _id: paymentIntentFailed.metadata.bookingId },
-            { paymentStatus: 'failed' }
-          );
-        }
-        break;
+      if (paymentIntentSucceeded.metadata?.bookingId) {
+        await Booking.findOneAndUpdate(
+          { _id: paymentIntentSucceeded.metadata.bookingId },
+          {
+            status: 'confirmed',
+            paymentStatus: 'paid'
+          }
+        );
+      }
+      break;
+    }
 
-      case 'charge.refunded':
-        const chargeRefunded = event.data.object;
-        logger.log('💰 Charge refunded:', chargeRefunded.id);
-        
-        if (chargeRefunded.payment_intent) {
-          await Payment.findOneAndUpdate(
-            { stripePaymentIntentId: chargeRefunded.payment_intent },
-            { status: 'refunded' }
-          );
-        }
-        break;
+    case 'payment_intent.payment_failed': {
+      const paymentIntentFailed = event.data.object;
+      logger.log('❌ Payment failed:', paymentIntentFailed.id);
 
-      default:
-        logger.log(`⚠️ Unhandled webhook event type: ${event.type}`);
+      if (paymentIntentFailed.metadata?.bookingId) {
+        await Booking.findOneAndUpdate(
+          { _id: paymentIntentFailed.metadata.bookingId },
+          { paymentStatus: 'failed' }
+        );
+      }
+      break;
+    }
+
+    case 'charge.refunded': {
+      const chargeRefunded = event.data.object;
+      logger.log('💰 Charge refunded:', chargeRefunded.id);
+
+      if (chargeRefunded.payment_intent) {
+        await Payment.findOneAndUpdate(
+          { stripePaymentIntentId: chargeRefunded.payment_intent },
+          { status: 'refunded' }
+        );
+      }
+      break;
+    }
+
+    default:
+      logger.log(`⚠️ Unhandled webhook event type: ${event.type}`);
     }
 
     res.status(200).json({ received: true });

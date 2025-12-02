@@ -1,27 +1,27 @@
 const paginationMiddleware = (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
-  
+
   if (page < 1 || limit < 1) {
     return res.status(400).json({
       success: false,
       message: 'Page und Limit müssen größer als 0 sein'
     });
   }
-  
+
   if (limit > 100) {
     return res.status(400).json({
       success: false,
       message: 'Limit kann maximal 100 sein'
     });
   }
-  
+
   req.pagination = {
     page,
     limit,
     skip: (page - 1) * limit
   };
-  
+
   next();
 };
 

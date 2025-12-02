@@ -16,7 +16,7 @@ export const generalLimiter = (req, res, next) => {
   const timeWindow = 15 * 60 * 1000; // 15 min
   const maxRequests = 100;
 
-  if (!requestCounts.has(key)) requestCounts.set(key, []);
+  if (!requestCounts.has(key)) {requestCounts.set(key, []);}
 
   let requests = requestCounts.get(key);
   requests = requests.filter(time => now - time < timeWindow);
@@ -40,7 +40,7 @@ export const authLimiter = (req, res, next) => {
   const timeWindow = 15 * 60 * 1000;
   const maxRequests = 5;
 
-  if (!requestCounts.has(key)) requestCounts.set(key, []);
+  if (!requestCounts.has(key)) {requestCounts.set(key, []);}
 
   let requests = requestCounts.get(key);
   requests = requests.filter(time => now - time < timeWindow);
@@ -64,7 +64,7 @@ export const passwordResetLimiter = (req, res, next) => {
   const timeWindow = 60 * 60 * 1000;
   const maxRequests = 5;
 
-  if (!requestCounts.has(key)) requestCounts.set(key, []);
+  if (!requestCounts.has(key)) {requestCounts.set(key, []);}
 
   let requests = requestCounts.get(key);
   requests = requests.filter(time => now - time < timeWindow);
@@ -88,7 +88,7 @@ export const apiLimiter = (req, res, next) => {
   const timeWindow = 15 * 60 * 1000;
   const maxRequests = 1000;
 
-  if (!requestCounts.has(key)) requestCounts.set(key, []);
+  if (!requestCounts.has(key)) {requestCounts.set(key, []);}
 
   let requests = requestCounts.get(key);
   requests = requests.filter(time => now - time < timeWindow);

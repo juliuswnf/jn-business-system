@@ -2,15 +2,10 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import readline from 'readline';
-import { fileURLToPath } from 'url';
-import path from 'path';
 
 import User from '../models/User.js';
 import BusinessSettings from '../models/BusinessSettings.js';
 import logger from './logger.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -65,7 +60,7 @@ export const createCEO = async () => {
     if (existingCEO) {
       logger.log('⚠️  CEO already exists!');
       logger.log(`   Email: ${existingCEO.email}\n`);
-      
+
       const override = await question('Do you want to create another CEO? (yes/no): ');
       if (override.toLowerCase() !== 'yes') {
         logger.log('\n❌ Operation cancelled\n');
@@ -78,7 +73,7 @@ export const createCEO = async () => {
     let name = '';
     while (!name) {
       name = await question('Full Name: ');
-      if (!name) logger.log('❌ Name is required');
+      if (!name) {logger.log('❌ Name is required');}
     }
 
     let email = '';
@@ -160,7 +155,7 @@ export const createBusinessSettings = async (ceo) => {
     let businessName = '';
     while (!businessName) {
       businessName = await question('Business Name: ');
-      if (!businessName) logger.log('❌ Business name is required');
+      if (!businessName) {logger.log('❌ Business name is required');}
     }
 
     let businessEmail = '';
@@ -176,19 +171,19 @@ export const createBusinessSettings = async (ceo) => {
     let businessPhone = '';
     while (!businessPhone) {
       businessPhone = await question('Business Phone (e.g., +49123456789): ');
-      if (!businessPhone) logger.log('❌ Phone is required');
+      if (!businessPhone) {logger.log('❌ Phone is required');}
     }
 
     let businessCity = '';
     while (!businessCity) {
       businessCity = await question('Business City: ');
-      if (!businessCity) logger.log('❌ City is required');
+      if (!businessCity) {logger.log('❌ City is required');}
     }
 
     let businessZipCode = '';
     while (!businessZipCode) {
       businessZipCode = await question('Business Zip Code: ');
-      if (!businessZipCode) logger.log('❌ Zip code is required');
+      if (!businessZipCode) {logger.log('❌ Zip code is required');}
     }
 
     const businessSettings = await BusinessSettings.create({
@@ -272,4 +267,3 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export default { createCEO, createBusinessSettings };
- 

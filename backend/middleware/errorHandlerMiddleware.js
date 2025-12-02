@@ -248,7 +248,7 @@ const asyncHandler = (fn) => (req, res, next) => {
 
 // ==================== GLOBAL ERROR HANDLER ====================
 
-const globalErrorHandler = (err, req, res, next) => {
+const globalErrorHandler = (err, req, res, _next) => {
   err.statusCode = err.statusCode || 500;
   err.message = err.message || 'Interner Serverfehler';
 

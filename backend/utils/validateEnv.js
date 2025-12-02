@@ -46,7 +46,7 @@ const optionalEnvVars = [
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   mongoUri: /^mongodb(\+srv)?:\/\/.+/,
-  url: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+  url: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
   jwtSecret: /^.{32,}$/, // Min 32 characters
   port: /^\d{4,5}$/,
   uuid: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

@@ -138,7 +138,7 @@ emailLogSchema.index({ companyId: 1, status: 1, attempts: -1 });
 // ✅ TTL Index - auto-delete after 90 days
 emailLogSchema.index(
   { createdAt: 1 },
-  { 
+  {
     expireAfterSeconds: 7776000  // 90 days in seconds
   }
 );
@@ -163,7 +163,7 @@ emailLogSchema.virtual('canRetry').get(function() {
 });
 
 emailLogSchema.virtual('successRate').get(function() {
-  if (this.attempts === 0) return 0;
+  if (this.attempts === 0) {return 0;}
   return ((this.attempts - 1) / this.attempts * 100).toFixed(1);
 });
 
@@ -244,7 +244,7 @@ emailLogSchema.methods.toJSON = function() {
 
 emailLogSchema.statics.getFailedEmails = function(companyId, limit = 50) {
   try {
-    return this.find({ 
+    return this.find({
       companyId,
       status: 'failed',
       canRetry: true  // ✅ Only retry-able emails

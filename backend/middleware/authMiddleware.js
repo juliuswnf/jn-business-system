@@ -33,21 +33,21 @@ const protect = async (req, res, next) => {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
       logger.error('❌ JWT Verification Error:', error.name);
-      
+
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({
           success: false,
           message: 'Token abgelaufen'
         });
       }
-      
+
       if (error.name === 'JsonWebTokenError') {
         return res.status(401).json({
           success: false,
           message: 'Token ungültig'
         });
       }
-      
+
       throw error;
     }
 
@@ -298,14 +298,14 @@ const rateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
   return (req, res, next) => {
     const key = req.user?.id || req.ip;
     const now = Date.now();
-    
+
     if (!requestCounts.has(key)) {
       requestCounts.set(key, []);
     }
 
     const requests = requestCounts.get(key);
     const recentRequests = requests.filter(time => now - time < windowMs);
-    
+
     if (recentRequests.length >= maxRequests) {
       return res.status(429).json({
         success: false,

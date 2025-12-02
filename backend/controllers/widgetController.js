@@ -138,9 +138,9 @@ export const getWidgetByApiKey = async (req, res) => {
     await widget.incrementView();
 
     // Get services for this salon
-    const services = await Service.find({ 
-      salonId: widget.salonId._id, 
-      isActive: true 
+    const services = await Service.find({
+      salonId: widget.salonId._id,
+      isActive: true
     }).select('name description duration price category');
 
     res.status(200).json({
@@ -189,10 +189,10 @@ export const updateWidget = async (req, res) => {
     }
 
     // Update fields
-    if (theme) await widget.updateTheme(theme);
-    if (settings) await widget.updateSettings(settings);
-    if (layout) widget.layout = layout;
-    if (allowedDomains) widget.allowedDomains = allowedDomains;
+    if (theme) {await widget.updateTheme(theme);}
+    if (settings) {await widget.updateSettings(settings);}
+    if (layout) {widget.layout = layout;}
+    if (allowedDomains) {widget.allowedDomains = allowedDomains;}
 
     await widget.save();
 

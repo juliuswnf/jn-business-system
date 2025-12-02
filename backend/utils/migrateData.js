@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import readline from 'readline';
-import { fileURLToPath } from 'url';
-import path from 'path';
 
 import User from '../models/User.js';
 import Customer from '../models/Customer.js';
@@ -10,9 +8,6 @@ import Booking from '../models/Booking.js';
 import Payment from '../models/Payment.js';
 import Review from '../models/Review.js';
 import logger from './logger.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -95,7 +90,7 @@ export const consolidateCustomerData = async () => {
 
     for (let i = 0; i < customers.length; i++) {
       const customer = customers[i];
-      
+
       const duplicates = await Customer.find({
         email: customer.email,
         _id: { $ne: customer._id }

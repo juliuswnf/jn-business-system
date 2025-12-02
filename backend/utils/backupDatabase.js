@@ -270,7 +270,7 @@ export const restoreFromBackup = async (backupFile) => {
       }
     }
 
-    logger.log(`\n✅ Restore completed!\n`);
+    logger.log('\n✅ Restore completed!\n');
     logger.log('📊 Restore Summary:');
     logger.log(`   Backup: ${backupFile}`);
     logger.log(`   Total Documents Restored: ${totalRestored}`);

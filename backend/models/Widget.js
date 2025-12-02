@@ -189,8 +189,8 @@ widgetSchema.methods.removeAllowedDomain = function(domain) {
 // Check if domain is allowed
 widgetSchema.methods.isDomainAllowed = function(domain) {
   // If no domains specified, allow all (for testing)
-  if (this.allowedDomains.length === 0) return true;
-  
+  if (this.allowedDomains.length === 0) {return true;}
+
   const cleanDomain = domain.toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
   return this.allowedDomains.includes(cleanDomain) || this.allowedDomains.includes('*');
 };
@@ -255,15 +255,15 @@ widgetSchema.statics.createForSalon = async function(salonId, config = {}) {
 // Get widget statistics
 widgetSchema.statics.getStats = async function(salonId) {
   const widget = await this.findOne({ salonId });
-  if (!widget) return null;
+  if (!widget) {return null;}
 
   return {
     totalBookings: widget.stats.totalBookings,
     totalViews: widget.stats.totalViews,
     lastBookingAt: widget.stats.lastBookingAt,
     lastViewAt: widget.stats.lastViewAt,
-    conversionRate: widget.stats.totalViews > 0 
-      ? (widget.stats.totalBookings / widget.stats.totalViews * 100).toFixed(2) 
+    conversionRate: widget.stats.totalViews > 0
+      ? (widget.stats.totalBookings / widget.stats.totalViews * 100).toFixed(2)
       : 0
   };
 };

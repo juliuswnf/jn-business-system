@@ -131,7 +131,7 @@ emailQueueSchema.methods.retry = function() {
   if (this.attempts >= this.maxAttempts) {
     return Promise.reject(new Error('Max attempts reached'));
   }
-  
+
   this.status = 'pending';
   this.attempts += 1;
   this.lastAttemptAt = new Date();
@@ -147,8 +147,8 @@ emailQueueSchema.methods.cancel = function() {
 // Check if email is ready to send
 emailQueueSchema.methods.isReadyToSend = function() {
   const now = new Date();
-  return this.status === 'pending' && 
-         this.scheduledFor <= now && 
+  return this.status === 'pending' &&
+         this.scheduledFor <= now &&
          this.attempts < this.maxAttempts;
 };
 
@@ -162,10 +162,10 @@ emailQueueSchema.statics.getReadyToSend = function(limit = 100) {
     scheduledFor: { $lte: now },
     attempts: { $lt: 3 }
   })
-  .sort({ priority: -1, scheduledFor: 1 })
-  .limit(limit)
-  .populate('salon', 'name email')
-  .populate('booking', 'serviceId date startTime');
+    .sort({ priority: -1, scheduledFor: 1 })
+    .limit(limit)
+    .populate('salon', 'name email')
+    .populate('booking', 'serviceId date startTime');
 };
 
 // Schedule a new email
@@ -176,12 +176,12 @@ emailQueueSchema.statics.scheduleEmail = function(emailData) {
 // Cancel all pending emails for a booking
 emailQueueSchema.statics.cancelBookingEmails = function(bookingId) {
   return this.updateMany(
-    { 
-      booking: bookingId, 
-      status: 'pending' 
+    {
+      booking: bookingId,
+      status: 'pending'
     },
-    { 
-      status: 'cancelled' 
+    {
+      status: 'cancelled'
     }
   );
 };
@@ -198,7 +198,7 @@ emailQueueSchema.statics.getPendingCountBySalon = function(salonId) {
 emailQueueSchema.statics.cleanup = function(daysOld = 30) {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysOld);
-  
+
   return this.deleteMany({
     $or: [
       { status: 'sent', sentAt: { $lt: cutoffDate } },

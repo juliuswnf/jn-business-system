@@ -14,24 +14,24 @@ import stripeService from '../services/stripeService.js';
 export const getAllSubscriptions = async (req, res) => {
   try {
     const { status, page = 1, limit = 20 } = req.query;
-    
+
     let filter = {};
-    
+
     if (status) {
       filter['subscription.status'] = status;
     }
-    
+
     const skip = (page - 1) * limit;
-    
+
     const salons = await Salon.find(filter)
       .populate('owner', 'name email')
       .select('name slug email subscription isActive createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
-    
+
     const total = await Salon.countDocuments(filter);
-    
+
     res.status(200).json({
       success: true,
       count: salons.length,
@@ -79,11 +79,10 @@ export const getSubscriptionStats = async (req, res) => {
     const pastDue = await Salon.countDocuments({ 'subscription.status': 'past_due' });
     const canceled = await Salon.countDocuments({ 'subscription.status': 'canceled' });
     const inactive = await Salon.countDocuments({ 'subscription.status': 'inactive' });
-    
+
     // Calculate MRR (Monthly Recurring Revenue)
-    // This is a simplified calculation - you'd need to get actual price from Stripe
-    const activeSalons = await Salon.find({ 'subscription.status': 'active' });
-    
+    // TODO: Get actual price from Stripe for MRR calculation
+
     res.status(200).json({
       success: true,
       stats: {
@@ -113,17 +112,17 @@ export const getSubscriptionStats = async (req, res) => {
 export const getSalonSubscription = async (req, res) => {
   try {
     const { salonId } = req.params;
-    
+
     const salon = await Salon.findById(salonId)
       .populate('owner', 'name email phone');
-    
+
     if (!salon) {
       return res.status(404).json({
         success: false,
         message: 'Salon not found'
       });
     }
-    
+
     // Get live status from Stripe if subscription exists
     let stripeStatus = null;
     if (salon.subscription?.stripeSubscriptionId) {
@@ -133,7 +132,7 @@ export const getSalonSubscription = async (req, res) => {
         logger.error('Error fetching Stripe status:', error);
       }
     }
-    
+
     res.status(200).json({
       success: true,
       salon: {
@@ -167,19 +166,19 @@ export const toggleSalonStatus = async (req, res) => {
   try {
     const { salonId } = req.params;
     const { isActive } = req.body;
-    
+
     const salon = await Salon.findById(salonId);
-    
+
     if (!salon) {
       return res.status(404).json({
         success: false,
         message: 'Salon not found'
       });
     }
-    
+
     salon.isActive = isActive;
     await salon.save();
-    
+
     res.status(200).json({
       success: true,
       message: `Salon ${isActive ? 'activated' : 'deactivated'} successfully`,
@@ -206,28 +205,28 @@ export const updateSubscriptionStatus = async (req, res) => {
   try {
     const { salonId } = req.params;
     const { status } = req.body;
-    
+
     const validStatuses = ['trial', 'active', 'past_due', 'canceled', 'inactive'];
-    
+
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
         message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
       });
     }
-    
+
     const salon = await Salon.findById(salonId);
-    
+
     if (!salon) {
       return res.status(404).json({
         success: false,
         message: 'Salon not found'
       });
     }
-    
+
     salon.subscription.status = status;
     await salon.save();
-    
+
     res.status(200).json({
       success: true,
       message: 'Subscription status updated',
@@ -253,10 +252,10 @@ export const updateSubscriptionStatus = async (req, res) => {
 export const getExpiringSoon = async (req, res) => {
   try {
     const { days = 7 } = req.query;
-    
+
     const now = new Date();
     const futureDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-    
+
     // Find trials ending soon
     const trialsExpiring = await Salon.find({
       'subscription.status': 'trial',
@@ -265,7 +264,7 @@ export const getExpiringSoon = async (req, res) => {
         $lte: futureDate
       }
     }).populate('owner', 'name email');
-    
+
     // Find subscriptions ending soon
     const subscriptionsExpiring = await Salon.find({
       'subscription.status': 'active',
@@ -275,7 +274,7 @@ export const getExpiringSoon = async (req, res) => {
         $lte: futureDate
       }
     }).populate('owner', 'name email');
-    
+
     res.status(200).json({
       success: true,
       expiringIn: `${days} days`,

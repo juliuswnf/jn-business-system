@@ -153,22 +153,22 @@ export const validateAll = (bodySchema, paramsSchema, querySchema) => {
 // ==================== SANITIZE INPUT ====================
 
 const sanitizeValue = (value) => {
-  if (typeof value !== 'string') return value;
-  
+  if (typeof value !== 'string') {return value;}
+
   // Trim whitespace
   let sanitized = value.trim();
-  
+
   // Remove HTML/script tags
   sanitized = validator.stripLow(sanitized);
   sanitized = validator.escape(sanitized);
-  
+
   return sanitized;
 };
 
 export const sanitizeInput = (req, res, next) => {
   try {
     const sanitize = (obj) => {
-      if (!obj || typeof obj !== 'object') return;
+      if (!obj || typeof obj !== 'object') {return;}
 
       Object.keys(obj).forEach(key => {
         if (typeof obj[key] === 'string') {
@@ -185,9 +185,9 @@ export const sanitizeInput = (req, res, next) => {
       });
     };
 
-    if (req.body) sanitize(req.body);
-    if (req.query) sanitize(req.query);
-    if (req.params) sanitize(req.params);
+    if (req.body) {sanitize(req.body);}
+    if (req.query) {sanitize(req.query);}
+    if (req.params) {sanitize(req.params);}
 
     next();
   } catch (error) {

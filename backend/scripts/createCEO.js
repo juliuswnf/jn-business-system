@@ -30,7 +30,7 @@ const createCEO = async () => {
     logger.log(`   Email: ${ceo.email}`);
     logger.log(`   Name: ${ceo.name}`);
     logger.log(`   Role: ${ceo.role}`);
-    logger.log(`   Password: CEO@12345`);
+    logger.log('   Password: CEO@12345');
 
     process.exit(0);
   } catch (error) {

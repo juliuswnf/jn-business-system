@@ -1,12 +1,12 @@
-import { body, param, query, validationResult } from 'express-validator';
+import { body, param, validationResult } from 'express-validator';
 import { ValidationError } from '../services/errorHandlerService.js';
 
 // ==================== REGEX PATTERNS ====================
 
 export const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^\+?[0-9\s\-\(\)]{7,20}$/,
-  url: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+  phone: /^\+?[0-9\s\-()]{7,20}$/,
+  url: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
   password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
   mongoId: /^[0-9a-fA-F]{24}$/,
   zipCode: /^[0-9]{5}$/,

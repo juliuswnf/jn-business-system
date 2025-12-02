@@ -127,7 +127,7 @@ export const getAllBusinesses = async (req, res) => {
     }
 
     const { page = 1, limit = 20, status } = req.query;
-    
+
     let filter = {};
     if (status) {
       filter['subscription.status'] = status;
@@ -598,7 +598,7 @@ export const getCEOStats = async (req, res) => {
 
     // Gesamte Kunden (Salons/Unternehmen)
     const totalCustomers = await Salon.countDocuments();
-    
+
     // Starter Abos (planId enthält 'starter' oder subscription.planId)
     const starterAbos = await Salon.countDocuments({
       'subscription.status': 'active',
@@ -608,7 +608,7 @@ export const getCEOStats = async (req, res) => {
         { isPremium: false, 'subscription.status': 'active' }
       ]
     });
-    
+
     // Pro Abos
     const proAbos = await Salon.countDocuments({
       'subscription.status': 'active',
@@ -618,17 +618,17 @@ export const getCEOStats = async (req, res) => {
         { isPremium: true }
       ]
     });
-    
+
     // Trial Abos
     const trialAbos = await Salon.countDocuments({
       'subscription.status': 'trial'
     });
-    
+
     // Berechne tatsächliche Starter/Pro basierend auf verfügbaren Daten
     const activeSalons = await Salon.find({ 'subscription.status': 'active' });
     let calculatedStarter = 0;
     let calculatedPro = 0;
-    
+
     activeSalons.forEach(salon => {
       if (salon.isPremium || (salon.subscription?.planId && salon.subscription.planId.toLowerCase().includes('pro'))) {
         calculatedPro++;
@@ -636,14 +636,14 @@ export const getCEOStats = async (req, res) => {
         calculatedStarter++;
       }
     });
-    
+
     // Fallback: wenn keine planId gesetzt, alle aktiven als Starter zählen
     const finalStarter = calculatedStarter || starterAbos || (activeSalons.length - calculatedPro);
     const finalPro = calculatedPro || proAbos;
-    
+
     // MRR Berechnung (Monthly Recurring Revenue)
     const totalRevenue = (finalStarter * PRICING.starter) + (finalPro * PRICING.pro);
-    
+
     // Ungelöste Fehler
     const unresolvedErrors = await ErrorLog.countDocuments({ resolved: false });
 
@@ -678,20 +678,20 @@ export const getErrorLogs = async (req, res) => {
     }
 
     const { resolved, type, limit = 50, page = 1 } = req.query;
-    
+
     let filter = {};
-    
+
     if (resolved !== undefined) {
       filter.resolved = resolved === 'true';
     }
-    
+
     if (type) {
       filter.type = type;
     }
-    
+
     const skip = (page - 1) * limit;
     const total = await ErrorLog.countDocuments(filter);
-    
+
     const errors = await ErrorLog.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -742,16 +742,16 @@ export const resolveError = async (req, res) => {
 
     const { errorId } = req.params;
     const { notes } = req.body;
-    
+
     const errorLog = await ErrorLog.findById(errorId);
-    
+
     if (!errorLog) {
       return res.status(404).json({
         success: false,
         message: 'Error log not found'
       });
     }
-    
+
     await errorLog.resolve(req.user._id, notes || '');
 
     res.status(200).json({
@@ -783,14 +783,14 @@ export const createErrorLog = async (req, res) => {
     }
 
     const { type, message, details, source, salonId } = req.body;
-    
+
     if (!message) {
       return res.status(400).json({
         success: false,
         message: 'Error message is required'
       });
     }
-    
+
     const errorLog = await ErrorLog.logError({
       type: type || 'error',
       message,
@@ -830,9 +830,9 @@ export const getAllCustomers = async (req, res) => {
     }
 
     const { status, plan, search, page = 1, limit = 20 } = req.query;
-    
+
     let filter = {};
-    
+
     // Filter by subscription status
     if (status === 'active') {
       filter['subscription.status'] = 'active';
@@ -841,7 +841,7 @@ export const getAllCustomers = async (req, res) => {
     } else if (status === 'inactive') {
       filter['subscription.status'] = { $in: ['inactive', 'canceled', 'past_due'] };
     }
-    
+
     // Filter by plan type
     if (plan === 'starter') {
       filter.$or = [
@@ -854,7 +854,7 @@ export const getAllCustomers = async (req, res) => {
         { isPremium: true }
       ];
     }
-    
+
     // Search by name or email
     if (search) {
       const searchFilter = {
@@ -865,10 +865,10 @@ export const getAllCustomers = async (req, res) => {
       };
       filter = { ...filter, ...searchFilter };
     }
-    
+
     const skip = (page - 1) * limit;
     const total = await Salon.countDocuments(filter);
-    
+
     const customers = await Salon.find(filter)
       .populate('owner', 'name email')
       .select('name email phone address isActive isPremium subscription createdAt')
@@ -888,7 +888,7 @@ export const getAllCustomers = async (req, res) => {
         if (c.isPremium || (c.subscription?.planId && c.subscription.planId.toLowerCase().includes('pro'))) {
           planType = 'pro';
         }
-        
+
         // Determine status
         let customerStatus = 'inactive';
         if (c.subscription?.status === 'active') {
@@ -896,7 +896,7 @@ export const getAllCustomers = async (req, res) => {
         } else if (c.subscription?.status === 'trial') {
           customerStatus = 'trial';
         }
-        
+
         return {
           id: c._id,
           name: c.name,
@@ -931,18 +931,18 @@ export const getCEOSubscriptions = async (req, res) => {
     }
 
     const { status, page = 1, limit = 20 } = req.query;
-    
+
     let filter = {};
-    
+
     if (status === 'active') {
       filter['subscription.status'] = 'active';
     } else if (status === 'trial') {
       filter['subscription.status'] = 'trial';
     }
-    
+
     const skip = (page - 1) * limit;
     const total = await Salon.countDocuments(filter);
-    
+
     const salons = await Salon.find(filter)
       .populate('owner', 'name email')
       .select('name email isPremium subscription createdAt')
@@ -952,16 +952,16 @@ export const getCEOSubscriptions = async (req, res) => {
 
     // Calculate MRR
     let totalMRR = 0;
-    
+
     const subscriptions = salons.map(s => {
       const isPro = s.isPremium || (s.subscription?.planId && s.subscription.planId.toLowerCase().includes('pro'));
       const planName = isPro ? 'Pro' : 'Starter';
       const amount = s.subscription?.status === 'active' ? (isPro ? PRICING.pro : PRICING.starter) : 0;
-      
+
       if (s.subscription?.status === 'active') {
         totalMRR += amount;
       }
-      
+
       // Calculate next billing date
       let nextBilling = null;
       if (s.subscription?.currentPeriodEnd) {
@@ -969,7 +969,7 @@ export const getCEOSubscriptions = async (req, res) => {
       } else if (s.subscription?.status === 'trial' && s.subscription?.trialEndsAt) {
         nextBilling = s.subscription.trialEndsAt;
       }
-      
+
       return {
         id: s._id,
         customer: s.name,
@@ -1012,23 +1012,23 @@ export const getAllUsers = async (req, res) => {
     }
 
     const { role, search, page = 1, limit = 20 } = req.query;
-    
+
     let filter = {};
-    
+
     if (role && role !== 'all') {
       filter.role = role;
     }
-    
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     const skip = (page - 1) * limit;
     const total = await User.countDocuments(filter);
-    
+
     const users = await User.find(filter)
       .select('name email role companyName isActive isBanned createdAt lastLogin')
       .sort({ createdAt: -1 })
@@ -1039,7 +1039,7 @@ export const getAllUsers = async (req, res) => {
     const roleCounts = await User.aggregate([
       { $group: { _id: '$role', count: { $sum: 1 } } }
     ]);
-    
+
     const counts = {
       total: await User.countDocuments(),
       admins: 0,
@@ -1048,13 +1048,13 @@ export const getAllUsers = async (req, res) => {
       salon_owners: 0,
       ceo: 0
     };
-    
+
     roleCounts.forEach(rc => {
-      if (rc._id === 'admin') counts.admins = rc.count;
-      else if (rc._id === 'employee') counts.employees = rc.count;
-      else if (rc._id === 'customer') counts.customers = rc.count;
-      else if (rc._id === 'salon_owner') counts.salon_owners = rc.count;
-      else if (rc._id === 'ceo') counts.ceo = rc.count;
+      if (rc._id === 'admin') {counts.admins = rc.count;}
+      else if (rc._id === 'employee') {counts.employees = rc.count;}
+      else if (rc._id === 'customer') {counts.customers = rc.count;}
+      else if (rc._id === 'salon_owner') {counts.salon_owners = rc.count;}
+      else if (rc._id === 'ceo') {counts.ceo = rc.count;}
     });
 
     res.status(200).json({
@@ -1096,23 +1096,23 @@ export const banUser = async (req, res) => {
     }
 
     const { userId } = req.params;
-    
+
     const user = await User.findById(userId);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     if (user.role === 'ceo') {
       return res.status(400).json({
         success: false,
         message: 'Cannot ban CEO user'
       });
     }
-    
+
     user.isBanned = true;
     user.isActive = false;
     await user.save();
@@ -1146,16 +1146,16 @@ export const unbanUser = async (req, res) => {
     }
 
     const { userId } = req.params;
-    
+
     const user = await User.findById(userId);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     user.isBanned = false;
     user.isActive = true;
     await user.save();

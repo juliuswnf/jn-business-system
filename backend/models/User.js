@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Valid email required'],
+      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Valid email required'],
       index: true
     },
 
@@ -154,9 +154,9 @@ const userSchema = new mongoose.Schema(
     // Only for role: 'employee'
     availability: [
       {
-        day: { 
-          type: String, 
-          enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] 
+        day: {
+          type: String,
+          enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
         },
         start: { type: String, match: /^\d{2}:\d{2}$/ },
         end: { type: String, match: /^\d{2}:\d{2}$/ }
@@ -294,7 +294,7 @@ userSchema.statics.findByEmail = function(email) {
 
 userSchema.statics.findBySalon = function(salonId, role = null) {
   const filter = { salonId, isActive: true };
-  if (role) filter.role = role;
+  if (role) {filter.role = role;}
   return this.find(filter);
 };
 

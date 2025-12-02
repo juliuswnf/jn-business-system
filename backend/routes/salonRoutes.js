@@ -1,6 +1,5 @@
 import express from 'express';
 import salonController from '../controllers/salonController.js';
-import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 

@@ -175,12 +175,12 @@ salonSchema.virtual('bookingUrl').get(function() {
 // Check if subscription is valid
 salonSchema.methods.hasActiveSubscription = function() {
   const now = new Date();
-  
+
   // Trial is valid if not expired
   if (this.subscription.status === 'trial') {
     return !this.subscription.trialEndsAt || this.subscription.trialEndsAt > now;
   }
-  
+
   // Active subscription
   return this.subscription.status === 'active';
 };
@@ -188,17 +188,17 @@ salonSchema.methods.hasActiveSubscription = function() {
 // Get email template with fallback
 salonSchema.methods.getEmailTemplate = function(type, language) {
   const lang = language || this.defaultLanguage;
-  
+
   // Try to get template for requested language
   if (this.emailTemplates[type] && this.emailTemplates[type][lang]) {
     return this.emailTemplates[type][lang];
   }
-  
+
   // Fallback to default language
   if (this.emailTemplates[type] && this.emailTemplates[type][this.defaultLanguage]) {
     return this.emailTemplates[type][this.defaultLanguage];
   }
-  
+
   // Return null if no template found
   return null;
 };
@@ -344,13 +344,13 @@ salonSchema.pre('save', function(next) {
   if (!this.emailTemplates || !this.emailTemplates.confirmation) {
     this.initializeDefaultTemplates();
   }
-  
+
   // Set trial end date if new trial
   if (this.isNew && this.subscription.status === 'trial' && !this.subscription.trialEndsAt) {
     const trialDays = 14; // 14 day trial
     this.subscription.trialEndsAt = new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000);
   }
-  
+
   next();
 });
 

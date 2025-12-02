@@ -18,25 +18,20 @@ import emailTemplateService from '../services/emailTemplateService.js';
 const processEmailQueue = async () => {
   try {
     const now = new Date();
-    
     // Get all pending emails that are due
     const pendingEmails = await EmailQueue.find({
       status: 'pending',
       scheduledFor: { $lte: now },
       retries: { $lt: 3 } // Max 3 retries
     }).limit(50); // Process in batches
-    
     if (pendingEmails.length === 0) {
       return;
     }
-    
     logger.log(`📧 Processing ${pendingEmails.length} pending emails...`);
-    
     for (const queueItem of pendingEmails) {
       await processEmailQueueItem(queueItem);
     }
-    
-    logger.log(`✅ Finished processing email queue`);
+    logger.log('✅ Finished processing email queue');
   } catch (error) {
     logger.error('❌ Error processing email queue:', error);
   }
@@ -52,7 +47,6 @@ const processEmailQueueItem = async (queueItem) => {
     const booking = await Booking.findById(queueItem.bookingId)
       .populate('salonId')
       .populate('serviceId');
-    
     if (!booking) {
       logger.warn(`⚠️  Booking not found: ${queueItem.bookingId}`);
       queueItem.status = 'failed';
@@ -60,41 +54,32 @@ const processEmailQueueItem = async (queueItem) => {
       await queueItem.save();
       return;
     }
-    
     // Get salon
     const salon = await Salon.findById(booking.salonId || queueItem.salonId);
-    
     if (!salon) {
-      logger.warn(`⚠️  Salon not found`);
+      logger.warn('⚠️  Salon not found');
       queueItem.status = 'failed';
       queueItem.error = 'Salon not found';
       await queueItem.save();
       return;
     }
-    
     // Get language preference
     const language = emailTemplateService.getEmailLanguage(salon, booking);
-    
     let emailData;
-    
     // Render email based on type
     switch (queueItem.type) {
-      case 'reminder':
-        emailData = emailTemplateService.renderReminderEmail(salon, booking, language);
-        break;
-      
-      case 'review':
-        emailData = emailTemplateService.renderReviewEmail(salon, booking, language);
-        break;
-      
-      case 'confirmation':
-        emailData = emailTemplateService.renderConfirmationEmail(salon, booking, language);
-        break;
-      
-      default:
-        throw new Error(`Unknown email type: ${queueItem.type}`);
+    case 'reminder':
+      emailData = emailTemplateService.renderReminderEmail(salon, booking, language);
+      break;
+    case 'review':
+      emailData = emailTemplateService.renderReviewEmail(salon, booking, language);
+      break;
+    case 'confirmation':
+      emailData = emailTemplateService.renderConfirmationEmail(salon, booking, language);
+      break;
+    default:
+      throw new Error(`Unknown email type: ${queueItem.type}`);
     }
-    
     // Send email
     await emailService.sendEmail({
       to: booking.customerEmail,
@@ -102,12 +87,10 @@ const processEmailQueueItem = async (queueItem) => {
       text: emailData.body,
       html: emailData.body.replace(/\n/g, '<br>') // Simple HTML conversion
     });
-    
     // Mark as sent
     queueItem.status = 'sent';
     queueItem.sentAt = new Date();
     await queueItem.save();
-    
     // Log successful send
     await EmailLog.create({
       salonId: salon._id,
@@ -118,21 +101,16 @@ const processEmailQueueItem = async (queueItem) => {
       status: 'sent',
       sentAt: new Date()
     });
-    
     logger.log(`✉️  Sent ${queueItem.type} email to ${booking.customerEmail}`);
-    
   } catch (error) {
     logger.error(`❌ Failed to send email ${queueItem._id}:`, error.message);
-    
     // Increment retry counter
     queueItem.retries = (queueItem.retries || 0) + 1;
     queueItem.error = error.message;
-    
     // If max retries reached, mark as failed
     if (queueItem.retries >= 3) {
       queueItem.status = 'failed';
       logger.error(`💀 Email ${queueItem._id} failed after ${queueItem.retries} retries`);
-      
       // Log failed send
       await EmailLog.create({
         salonId: queueItem.salonId,
@@ -150,7 +128,6 @@ const processEmailQueueItem = async (queueItem) => {
       queueItem.scheduledFor = new Date(Date.now() + backoffMinutes * 60 * 1000);
       logger.log(`🔄 Scheduled retry #${queueItem.retries} in ${backoffMinutes} minutes`);
     }
-    
     await queueItem.save();
   }
 };
@@ -164,13 +141,11 @@ const scheduleReminderEmail = async (booking, salon) => {
   try {
     const reminderHours = salon.reminderHoursBefore || 24;
     const scheduledFor = new Date(booking.bookingDate.getTime() - reminderHours * 60 * 60 * 1000);
-    
     // Don't schedule if booking date is in the past or too soon
     if (scheduledFor < new Date()) {
       logger.log('⏭️  Skipping reminder - booking is too soon or in the past');
       return null;
     }
-    
     const queueItem = await EmailQueue.create({
       salonId: salon._id,
       bookingId: booking._id,
@@ -179,7 +154,6 @@ const scheduleReminderEmail = async (booking, salon) => {
       scheduledFor,
       status: 'pending'
     });
-    
     logger.log(`⏰ Scheduled reminder email for ${booking.customerEmail} at ${scheduledFor}`);
     return queueItem;
   } catch (error) {
@@ -197,7 +171,6 @@ const scheduleReviewEmail = async (booking, salon) => {
   try {
     const reviewHours = salon.reviewHoursAfter || 2;
     const scheduledFor = new Date(booking.bookingDate.getTime() + reviewHours * 60 * 60 * 1000);
-    
     const queueItem = await EmailQueue.create({
       salonId: salon._id,
       bookingId: booking._id,
@@ -206,7 +179,6 @@ const scheduleReviewEmail = async (booking, salon) => {
       scheduledFor,
       status: 'pending'
     });
-    
     logger.log(`⭐ Scheduled review email for ${booking.customerEmail} at ${scheduledFor}`);
     return queueItem;
   } catch (error) {
@@ -231,7 +203,6 @@ const cancelScheduledEmails = async (bookingId) => {
         error: 'Booking was cancelled'
       }
     );
-    
     logger.log(`🚫 Cancelled ${result.modifiedCount} pending emails for booking ${bookingId}`);
     return result;
   } catch (error) {
@@ -247,16 +218,13 @@ const cancelScheduledEmails = async (bookingId) => {
 const cleanupOldEmails = async () => {
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    
     const result = await EmailQueue.deleteMany({
       status: { $in: ['sent', 'failed', 'cancelled'] },
       updatedAt: { $lt: thirtyDaysAgo }
     });
-    
     if (result.deletedCount > 0) {
       logger.log(`🧹 Cleaned up ${result.deletedCount} old email queue items`);
     }
-    
     return result;
   } catch (error) {
     logger.error('Error cleaning up old emails:', error);
@@ -270,16 +238,15 @@ const cleanupOldEmails = async () => {
  */
 const startWorker = () => {
   logger.log('🚀 Starting email queue worker...');
-  
   // Process queue immediately on startup
   processEmailQueue();
-  
+
   // Then process every minute
   const intervalId = setInterval(processEmailQueue, 60 * 1000);
-  
+
   // Cleanup old emails once per day
   const cleanupIntervalId = setInterval(cleanupOldEmails, 24 * 60 * 60 * 1000);
-  
+
   // Return interval IDs so they can be cleared if needed
   return { intervalId, cleanupIntervalId };
 };

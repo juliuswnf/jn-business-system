@@ -104,7 +104,7 @@ export const sendBookingConfirmation = async (booking) => {
     });
 
     // Format address
-    const addressStr = salon.address 
+    const addressStr = salon.address
       ? `${salon.address.street || ''}\n${salon.address.postalCode || ''} ${salon.address.city || ''}`.trim()
       : '';
 
@@ -170,7 +170,7 @@ export const sendBookingReminder = async (booking) => {
     });
 
     // Format address
-    const addressStr = salon.address 
+    const addressStr = salon.address
       ? `${salon.address.street || ''}\n${salon.address.postalCode || ''} ${salon.address.city || ''}`.trim()
       : '';
 
@@ -306,12 +306,12 @@ export const processEmailQueue = async () => {
 
 const replacePlaceholders = (text, data) => {
   let result = text;
-  
+
   Object.keys(data).forEach(key => {
     const regex = new RegExp(`{{${key}}}`, 'g');
     result = result.replace(regex, data[key] || '');
   });
-  
+
   return result;
 };
 

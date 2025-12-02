@@ -26,7 +26,6 @@ import serviceRoutes from './routes/serviceRoutes.js';
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
-import ceoMiddleware from './middleware/ceoMiddleware.js';
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import { generalLimiter, getRateLimitStatus, resetRateLimiter } from './middleware/rateLimiterMiddleware.js';
 import webhookMiddleware from './middleware/webhookMiddleware.js';

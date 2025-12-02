@@ -8,17 +8,17 @@ import bcrypt from 'bcryptjs';
 
 export const stringHelpers = {
   capitalize: (str) => {
-    if (!str) return '';
+    if (!str) {return '';}
     return str.charAt(0).toUpperCase() + str.slice(1);
   },
 
   capitalizeWords: (str) => {
-    if (!str) return '';
+    if (!str) {return '';}
     return str.split(' ').map(word => stringHelpers.capitalize(word)).join(' ');
   },
 
   toSlug: (str) => {
-    if (!str) return '';
+    if (!str) {return '';}
     return str
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
@@ -31,17 +31,17 @@ export const stringHelpers = {
   },
 
   truncate: (str, length = 100, suffix = '...') => {
-    if (!str || str.length <= length) return str;
+    if (!str || str.length <= length) {return str;}
     return str.substring(0, length - suffix.length) + suffix;
   },
 
   removeSpecialChars: (str) => {
-    if (!str) return '';
+    if (!str) {return '';}
     return str.replace(/[^a-zA-Z0-9äöüÄÖÜß\s-]/g, '');
   },
 
   toCamelCase: (str) => {
-    if (!str) return '';
+    if (!str) {return '';}
     return str
       .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
         return index === 0 ? word.toLowerCase() : word.toUpperCase();
@@ -84,8 +84,8 @@ export const arrayHelpers = {
 
   sortBy: (arr, key, order = 'asc') => {
     return [...arr].sort((a, b) => {
-      if (a[key] < b[key]) return order === 'asc' ? -1 : 1;
-      if (a[key] > b[key]) return order === 'asc' ? 1 : -1;
+      if (a[key] < b[key]) {return order === 'asc' ? -1 : 1;}
+      if (a[key] > b[key]) {return order === 'asc' ? 1 : -1;}
       return 0;
     });
   },
@@ -113,7 +113,7 @@ export const arrayHelpers = {
   uniqueBy: (arr, key) => {
     const seen = new Set();
     return arr.filter(item => {
-      if (seen.has(item[key])) return false;
+      if (seen.has(item[key])) {return false;}
       seen.add(item[key]);
       return true;
     });
@@ -138,7 +138,7 @@ export const objectHelpers = {
   setNestedProperty: (obj, path, value) => {
     const keys = path.split('.');
     let current = obj;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
       if (!current[key] || typeof current[key] !== 'object') {
@@ -146,7 +146,7 @@ export const objectHelpers = {
       }
       current = current[key];
     }
-    
+
     current[keys[keys.length - 1]] = value;
     return obj;
   },
@@ -266,11 +266,11 @@ export const numberHelpers = {
   },
 
   isPrime: (num) => {
-    if (num <= 1) return false;
-    if (num <= 3) return true;
-    if (num % 2 === 0 || num % 3 === 0) return false;
+    if (num <= 1) {return false;}
+    if (num <= 3) {return true;}
+    if (num % 2 === 0 || num % 3 === 0) {return false;}
     for (let i = 5; i * i <= num; i += 6) {
-      if (num % i === 0 || num % (i + 2) === 0) return false;
+      if (num % i === 0 || num % (i + 2) === 0) {return false;}
     }
     return true;
   },
@@ -343,7 +343,7 @@ export const validationHelpers = {
   },
 
   isValidPhone: (phone) => {
-    const regex = /^\+?[0-9\s\-\(\)]{7,20}$/;
+    const regex = /^\+?[0-9\s\-()]{7,20}$/;
     return regex.test(phone);
   },
 

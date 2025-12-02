@@ -214,7 +214,7 @@ bookingSchema.statics.findBySalon = function(salonId, filters = {}) {
 
 bookingSchema.statics.findByEmail = function(email, salonId = null) {
   const query = { customerEmail: email.toLowerCase() };
-  if (salonId) query.salonId = salonId;
+  if (salonId) {query.salonId = salonId;}
   return this.find(query).sort({ bookingDate: -1 });
 };
 
@@ -223,7 +223,7 @@ bookingSchema.statics.findUpcoming = function(salonId = null) {
     bookingDate: { $gte: new Date() },
     status: { $in: ['pending', 'confirmed'] }
   };
-  if (salonId) query.salonId = salonId;
+  if (salonId) {query.salonId = salonId;}
   return this.find(query).sort({ bookingDate: 1 });
 };
 
@@ -284,7 +284,7 @@ bookingSchema.statics.getNeedingReviewEmail = function(hoursAfterDefault = 2) {
 // Get statistics for salon
 bookingSchema.statics.getStats = async function(salonId, startDate = null, endDate = null) {
   const query = { salonId };
-  
+
   if (startDate && endDate) {
     query.bookingDate = {
       $gte: new Date(startDate),

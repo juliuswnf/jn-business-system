@@ -1,11 +1,12 @@
-import logger from '../utils/logger.js';
 #!/usr/bin/env node
+import logger from '../utils/logger.js';
+
 const required = [
   'NODE_ENV',
   'PORT',
   'MONGODB_URI',
   'JWT_SECRET',
-  'JWT_REFRESH_SECRET',
+  'JWT_REFRESH_SECRET'
 ];
 
 const missing = required.filter((k) => !process.env[k]);

@@ -7,9 +7,17 @@ import logger from '../utils/logger.js';
 import Stripe from 'stripe';
 import Salon from '../models/Salon.js';
 
-const stripe = new Stripe(
-  process.env.STRIPE_SECRET_KEY || 'sk_test_51SNcw8Cfgv8Lqc0aIuiqkWJTF6gC8ibUitGgjuMvZTusB42OBdCUAXar25ToIazQQKbbNKwIb3PerXQu4sAmrpLa00ddDk0Ify'
-);
+// Lazy initialization of Stripe (after dotenv is loaded)
+let stripe = null;
+const getStripe = () => {
+  if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is required');
+    }
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+  return stripe;
+};
 
 /**
  * Create Stripe customer for salon
@@ -19,7 +27,7 @@ const stripe = new Stripe(
  */
 export const createStripeCustomer = async (salon, ownerData) => {
   try {
-    const customer = await stripe.customers.create({
+    const customer = await getStripe().customers.create({
       email: salon.email,
       name: salon.name,
       metadata: {
@@ -28,7 +36,7 @@ export const createStripeCustomer = async (salon, ownerData) => {
         ownerId: ownerData._id?.toString() || 'unknown'
       }
     });
-    
+
     logger.log(`✅ Created Stripe customer: ${customer.id}`);
     return customer.id;
   } catch (error) {
@@ -48,9 +56,9 @@ export const createSubscription = async (salon, priceId, trialDays = 14) => {
   try {
     // Create Stripe customer if not exists
     let customerId = salon.subscription?.stripeCustomerId;
-    
+
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email: salon.email,
         name: salon.name,
         metadata: {
@@ -59,14 +67,14 @@ export const createSubscription = async (salon, priceId, trialDays = 14) => {
         }
       });
       customerId = customer.id;
-      
+
       // Update salon with customer ID
       salon.subscription.stripeCustomerId = customerId;
       await salon.save();
     }
-    
+
     // Create subscription with trial
-    const subscription = await stripe.subscriptions.create({
+    const subscription = await getStripe().subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       trial_period_days: trialDays,
@@ -80,7 +88,7 @@ export const createSubscription = async (salon, priceId, trialDays = 14) => {
       },
       expand: ['latest_invoice.payment_intent']
     });
-    
+
     // Update salon subscription data
     salon.subscription.stripeSubscriptionId = subscription.id;
     salon.subscription.status = 'trial';
@@ -88,11 +96,11 @@ export const createSubscription = async (salon, priceId, trialDays = 14) => {
     salon.subscription.trialEndsAt = new Date(subscription.trial_end * 1000);
     salon.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
-    
+
     await salon.save();
-    
+
     logger.log(`✅ Created subscription for salon ${salon.slug}`);
-    
+
     return subscription;
   } catch (error) {
     logger.error('Error creating subscription:', error);
@@ -109,29 +117,29 @@ export const createSubscription = async (salon, priceId, trialDays = 14) => {
 export const cancelSubscription = async (salon, immediately = false) => {
   try {
     const subscriptionId = salon.subscription?.stripeSubscriptionId;
-    
+
     if (!subscriptionId) {
       throw new Error('No active subscription found');
     }
-    
+
     let subscription;
-    
+
     if (immediately) {
       // Cancel immediately
-      subscription = await stripe.subscriptions.cancel(subscriptionId);
+      subscription = await getStripe().subscriptions.cancel(subscriptionId);
       salon.subscription.status = 'canceled';
     } else {
       // Cancel at period end
-      subscription = await stripe.subscriptions.update(subscriptionId, {
+      subscription = await getStripe().subscriptions.update(subscriptionId, {
         cancel_at_period_end: true
       });
       salon.subscription.cancelAtPeriodEnd = true;
     }
-    
+
     await salon.save();
-    
+
     logger.log(`✅ Cancelled subscription for salon ${salon.slug}`);
-    
+
     return subscription;
   } catch (error) {
     logger.error('Error cancelling subscription:', error);
@@ -147,21 +155,21 @@ export const cancelSubscription = async (salon, immediately = false) => {
 export const reactivateSubscription = async (salon) => {
   try {
     const subscriptionId = salon.subscription?.stripeSubscriptionId;
-    
+
     if (!subscriptionId) {
       throw new Error('No subscription found');
     }
-    
-    const subscription = await stripe.subscriptions.update(subscriptionId, {
+
+    const subscription = await getStripe().subscriptions.update(subscriptionId, {
       cancel_at_period_end: false
     });
-    
+
     salon.subscription.cancelAtPeriodEnd = false;
     salon.subscription.status = 'active';
     await salon.save();
-    
+
     logger.log(`✅ Reactivated subscription for salon ${salon.slug}`);
-    
+
     return subscription;
   } catch (error) {
     logger.error('Error reactivating subscription:', error);
@@ -178,26 +186,26 @@ export const reactivateSubscription = async (salon) => {
 export const updateSubscriptionPlan = async (salon, newPriceId) => {
   try {
     const subscriptionId = salon.subscription?.stripeSubscriptionId;
-    
+
     if (!subscriptionId) {
       throw new Error('No active subscription found');
     }
-    
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-    
-    const updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
+
+    const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
+
+    const updatedSubscription = await getStripe().subscriptions.update(subscriptionId, {
       items: [{
         id: subscription.items.data[0].id,
         price: newPriceId
       }],
       proration_behavior: 'create_prorations'
     });
-    
+
     salon.subscription.planId = newPriceId;
     await salon.save();
-    
+
     logger.log(`✅ Updated subscription plan for salon ${salon.slug}`);
-    
+
     return updatedSubscription;
   } catch (error) {
     logger.error('Error updating subscription plan:', error);
@@ -213,7 +221,7 @@ export const updateSubscriptionPlan = async (salon, newPriceId) => {
 export const getSubscriptionStatus = async (salon) => {
   try {
     const subscriptionId = salon.subscription?.stripeSubscriptionId;
-    
+
     if (!subscriptionId) {
       return {
         hasSubscription: false,
@@ -221,9 +229,9 @@ export const getSubscriptionStatus = async (salon) => {
         isActive: false
       };
     }
-    
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-    
+
+    const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
+
     return {
       hasSubscription: true,
       status: subscription.status,
@@ -245,28 +253,28 @@ export const getSubscriptionStatus = async (salon) => {
 export const handleSuccessfulPayment = async (invoice) => {
   try {
     const subscriptionId = invoice.subscription;
-    
+
     if (!subscriptionId) {
       logger.warn('Invoice has no subscription ID');
       return;
     }
-    
+
     const salon = await Salon.findOne({
       'subscription.stripeSubscriptionId': subscriptionId
     });
-    
+
     if (!salon) {
       logger.warn(`No salon found for subscription: ${subscriptionId}`);
       return;
     }
-    
+
     // Update subscription status
     salon.subscription.status = 'active';
     salon.subscription.currentPeriodStart = new Date(invoice.period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(invoice.period_end * 1000);
-    
+
     await salon.save();
-    
+
     logger.log(`✅ Updated subscription after successful payment for salon ${salon.slug}`);
   } catch (error) {
     logger.error('Error handling successful payment:', error);
@@ -281,28 +289,28 @@ export const handleSuccessfulPayment = async (invoice) => {
 export const handleFailedPayment = async (invoice) => {
   try {
     const subscriptionId = invoice.subscription;
-    
+
     if (!subscriptionId) {
       logger.warn('Invoice has no subscription ID');
       return;
     }
-    
+
     const salon = await Salon.findOne({
       'subscription.stripeSubscriptionId': subscriptionId
     });
-    
+
     if (!salon) {
       logger.warn(`No salon found for subscription: ${subscriptionId}`);
       return;
     }
-    
+
     // Update subscription status to past_due
     salon.subscription.status = 'past_due';
-    
+
     await salon.save();
-    
+
     logger.log(`⚠️ Updated subscription after failed payment for salon ${salon.slug}`);
-    
+
     // TODO: Send email notification to salon owner
   } catch (error) {
     logger.error('Error handling failed payment:', error);
@@ -321,10 +329,10 @@ export const handleFailedPayment = async (invoice) => {
 export const createCheckoutSession = async (salon, priceId, successUrl, cancelUrl) => {
   try {
     let customerId = salon.subscription?.stripeCustomerId;
-    
+
     // Create customer if doesn't exist
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email: salon.email,
         name: salon.name,
         metadata: {
@@ -333,12 +341,12 @@ export const createCheckoutSession = async (salon, priceId, successUrl, cancelUr
         }
       });
       customerId = customer.id;
-      
+
       salon.subscription.stripeCustomerId = customerId;
       await salon.save();
     }
-    
-    const session = await stripe.checkout.sessions.create({
+
+    const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -362,9 +370,9 @@ export const createCheckoutSession = async (salon, priceId, successUrl, cancelUr
         salonSlug: salon.slug
       }
     });
-    
+
     logger.log(`✅ Created checkout session for salon ${salon.slug}`);
-    
+
     return session;
   } catch (error) {
     logger.error('Error creating checkout session:', error);
@@ -381,16 +389,16 @@ export const createCheckoutSession = async (salon, priceId, successUrl, cancelUr
 export const createBillingPortalSession = async (salon, returnUrl) => {
   try {
     const customerId = salon.subscription?.stripeCustomerId;
-    
+
     if (!customerId) {
       throw new Error('No Stripe customer found for this salon');
     }
-    
-    const session = await stripe.billingPortal.sessions.create({
+
+    const session = await getStripe().billingPortal.sessions.create({
       customer: customerId,
       return_url: returnUrl
     });
-    
+
     return session;
   } catch (error) {
     logger.error('Error creating billing portal session:', error);

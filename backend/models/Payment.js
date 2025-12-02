@@ -441,13 +441,13 @@ paymentSchema.methods.markAsFailed = async function(errorCode, errorMessage) {
     this.errorMessage = errorMessage;
     this.retryCount += 1;
     this.lastRetryAt = new Date();
-    
+
     if (this.retryCount >= 5) {
       logger.error(`❌ Payment failed (Max retries): ${this._id}`);
     } else {
       logger.warn(`⚠️ Payment failed (Retry ${this.retryCount}): ${errorCode}`);
     }
-    
+
     return await this.save();
   } catch (err) {
     logger.error('❌ Mark as failed error:', err.message);
@@ -486,7 +486,6 @@ paymentSchema.methods.refundPayment = async function(amount = null, reason = 'Cu
 paymentSchema.methods.generateInvoiceNumber = function() {
   try {
     const date = new Date();
-    const timestamp = date.getTime();
     const random = Math.floor(Math.random() * 10000);
     this.invoiceNumber = `INV-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}-${String(random).padStart(5, '0')}`;
     return this.invoiceNumber;
@@ -500,7 +499,7 @@ paymentSchema.methods.markInvoiceGenerated = async function(invoiceUrl = null) {
   try {
     this.invoiceGenerated = true;
     this.invoiceGeneratedAt = new Date();
-    if (invoiceUrl) this.invoiceUrl = invoiceUrl;
+    if (invoiceUrl) {this.invoiceUrl = invoiceUrl;}
     logger.log(`📄 Invoice generated: ${this.invoiceNumber}`);
     return await this.save();
   } catch (err) {
@@ -513,7 +512,7 @@ paymentSchema.methods.markReceiptSent = async function(receiptUrl = null) {
   try {
     this.receiptSent = true;
     this.receiptSentAt = new Date();
-    if (receiptUrl) this.receiptUrl = receiptUrl;
+    if (receiptUrl) {this.receiptUrl = receiptUrl;}
     logger.log(`📧 Receipt sent: ${this.transactionId}`);
     return await this.save();
   } catch (err) {

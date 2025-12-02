@@ -6,5 +6,5 @@ export default {
   log: (...args) => console.log('[LOG]', ...args),
   warn: (...args) => console.warn('[WARN]', ...args),
   error: (...args) => console.error('[ERROR]', ...args),
-  debug: (...args) => console.debug('[DEBUG]', ...args),
+  debug: (...args) => console.debug('[DEBUG]', ...args)
 };

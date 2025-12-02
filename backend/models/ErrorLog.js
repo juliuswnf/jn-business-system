@@ -113,7 +113,7 @@ errorLogSchema.statics.logError = async function(data) {
     stackTrace: data.stackTrace,
     requestInfo: data.requestInfo
   });
-  
+
   return await errorLog.save();
 };
 

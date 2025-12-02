@@ -2,8 +2,6 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import readline from 'readline';
-import { fileURLToPath } from 'url';
-import path from 'path';
 
 import User from '../models/User.js';
 import Customer from '../models/Customer.js';
@@ -15,9 +13,6 @@ import Employee from '../models/Employee.js';
 import Appointment from '../models/Appointment.js';
 import logger from './logger.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 dotenv.config();
 
 const rl = readline.createInterface({
@@ -25,13 +20,8 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const question = (query) => {
-  return new Promise((resolve) => {
-    rl.question(query, (answer) => {
-      resolve(answer);
-    });
-  });
-};
+// Helper function for readline questions (available if needed)
+// const question = (query) => new Promise((resolve) => rl.question(query, resolve));
 
 const connectDB = async () => {
   try {

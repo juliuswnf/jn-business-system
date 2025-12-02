@@ -1,4 +1,3 @@
-import User from '../models/User.js';
 import logger from '../utils/logger.js';
 
 // ==================== ERROR TYPES ====================
@@ -101,7 +100,7 @@ class ErrorHandlerService {
 
       // MVP: Console logging instead of DB
       logger.error('📝 Error logged:', errorData);
-      
+
       return errorData;
     } catch (err) {
       logger.error('❌ Failed to log error:', err);
@@ -110,7 +109,7 @@ class ErrorHandlerService {
   }
 
   static sanitizeBody(body) {
-    if (!body) return {};
+    if (!body) {return {};}
 
     const sanitized = { ...body };
     const sensitiveFields = [
@@ -153,12 +152,12 @@ class ErrorHandlerService {
   }
 
   static getStatusCode(error) {
-    if (error.statusCode) return error.statusCode;
+    if (error.statusCode) {return error.statusCode;}
 
-    if (error.name === 'ValidationError') return 400;
-    if (error.name === 'CastError') return 400;
-    if (error.name === 'JsonWebTokenError') return 401;
-    if (error.name === 'TokenExpiredError') return 401;
+    if (error.name === 'ValidationError') {return 400;}
+    if (error.name === 'CastError') {return 400;}
+    if (error.name === 'JsonWebTokenError') {return 401;}
+    if (error.name === 'TokenExpiredError') {return 401;}
 
     return 500;
   }
@@ -212,7 +211,7 @@ class ErrorHandlerService {
 
 // ==================== GLOBAL ERROR HANDLER MIDDLEWARE ====================
 
-const globalErrorHandler = (err, req, res, next) => {
+const globalErrorHandler = (err, req, res, _next) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   let error = err;

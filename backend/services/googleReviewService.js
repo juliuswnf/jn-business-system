@@ -95,12 +95,12 @@ export const processCompletedBookings = async () => {
 
 const replacePlaceholders = (text, data) => {
   let result = text;
-  
+
   Object.keys(data).forEach(key => {
     const regex = new RegExp(`{{${key}}}`, 'g');
     result = result.replace(regex, data[key] || '');
   });
-  
+
   return result;
 };
 

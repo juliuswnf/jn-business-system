@@ -65,9 +65,9 @@ router.get('/services/:slug', async (req, res) => {
       });
     }
 
-    const services = await Service.find({ 
+    const services = await Service.find({
       salonId: salon._id,
-      isActive: true 
+      isActive: true
     }).select('name description price duration category');
 
     res.status(200).json({
@@ -127,7 +127,7 @@ router.get('/timeslots/:slug', async (req, res) => {
     const dayName = dayNames[dayOfWeek];
 
     const openingHours = salon.openingHours?.[dayName];
-    
+
     if (!openingHours?.isOpen) {
       return res.status(200).json({
         success: true,
@@ -144,11 +144,11 @@ router.get('/timeslots/:slug', async (req, res) => {
     let currentMinute = openMinute;
 
     while (
-      currentHour < closeHour || 
+      currentHour < closeHour ||
       (currentHour === closeHour && currentMinute < closeMinute)
     ) {
       const timeString = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
-      
+
       const slotTime = new Date(requestedDate);
       slotTime.setHours(currentHour, currentMinute, 0, 0);
 
@@ -208,7 +208,7 @@ router.post('/book/:slug', validateBooking, async (req, res) => {
     }
 
     let customer = await User.findOne({ email: customerEmail });
-    
+
     if (!customer) {
       customer = await User.create({
         name: customerName,

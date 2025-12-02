@@ -78,14 +78,14 @@ export const getBookings = async (req, res) => {
     const { status, startDate, endDate, salonId } = req.query;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    
+
     if (page < 1 || limit < 1 || limit > 100) {
       return res.status(400).json({
         success: false,
         message: 'Invalid pagination parameters'
       });
     }
-    
+
     let filter = {};
 
     // Filter by salon if not CEO
@@ -376,7 +376,7 @@ export const getBookingsByDate = async (req, res) => {
 
     const startDate = new Date(date);
     startDate.setHours(0, 0, 0, 0);
-    
+
     const endDate = new Date(date);
     endDate.setHours(23, 59, 59, 999);
 

@@ -360,7 +360,7 @@ serviceSchema.index({ isNewService: 1, newUntil: -1 });
 
 serviceSchema.virtual('finalPrice').get(function() {
   try {
-    if (!this.discount || this.discount === 0) return this.price;
+    if (!this.discount || this.discount === 0) {return this.price;}
     const discountAmount = (this.price * this.discount) / 100;
     return Math.round((this.price - discountAmount) * 100) / 100;  // ✅ Fixed rounding
   } catch (err) {
@@ -407,7 +407,7 @@ serviceSchema.virtual('hasDiscount').get(function() {
 
 serviceSchema.virtual('isOnSale').get(function() {
   try {
-    if (!this.discountValidUntil) return false;
+    if (!this.discountValidUntil) {return false;}
     return this.discountValidUntil > new Date();
   } catch (err) {
     logger.error('❌ Check is on sale error:', err.message);
@@ -444,9 +444,9 @@ serviceSchema.methods.generateSlug = function() {
 
 serviceSchema.methods.isCurrentlyAvailable = function() {
   try {
-    if (!this.isAvailable || this.status !== 'active') return false;
-    if (this.availableFrom && new Date() < this.availableFrom) return false;
-    if (this.availableUntil && new Date() > this.availableUntil) return false;
+    if (!this.isAvailable || this.status !== 'active') {return false;}
+    if (this.availableFrom && new Date() < this.availableFrom) {return false;}
+    if (this.availableUntil && new Date() > this.availableUntil) {return false;}
     return true;
   } catch (err) {
     logger.error('❌ Check is currently available error:', err.message);
@@ -533,7 +533,7 @@ serviceSchema.methods.markAsNew = async function(daysValid = 30) {
 serviceSchema.methods.getPriceWithVariation = function(variationName) {
   try {
     const variation = this.variations?.find(v => v.name === variationName);
-    if (!variation) return this.finalPrice;
+    if (!variation) {return this.finalPrice;}
     const modifiedPrice = this.finalPrice + (variation.priceModifier || 0);
     return Math.max(0, modifiedPrice);
   } catch (err) {
@@ -545,7 +545,7 @@ serviceSchema.methods.getPriceWithVariation = function(variationName) {
 serviceSchema.methods.getDurationWithVariation = function(variationName) {
   try {
     const variation = this.variations?.find(v => v.name === variationName);
-    if (!variation) return this.duration;
+    if (!variation) {return this.duration;}
     return this.duration + (variation.durationModifier || 0);
   } catch (err) {
     logger.error('❌ Get duration with variation error:', err.message);
@@ -755,7 +755,7 @@ serviceSchema.statics.getTopRated = function(companyId, limit = 5) {
 serviceSchema.statics.getPriceRange = async function(companyId, category = null) {
   try {
     const match = { companyId: new mongoose.Types.ObjectId(companyId), status: 'active' };
-    if (category) match.category = category;
+    if (category) {match.category = category;}
 
     const result = await this.aggregate([
       { $match: match },

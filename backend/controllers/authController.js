@@ -66,8 +66,12 @@ export const register = async (req, res) => {
     };
 
     // Add optional fields
-    if (phone) userData.phone = phone;
-    if (companyName) userData.companyName = companyName;
+    if (phone) {
+      userData.phone = phone;
+    }
+    if (companyName) {
+      userData.companyName = companyName;
+    }
 
     // Create user (password auto-hashed by mongoose pre-hook)
     const user = await User.create(userData);
@@ -363,10 +367,18 @@ export const updateProfile = async (req, res) => {
 
     // Build update object
     const updateData = {};
-    if (name) updateData.name = name;
-    if (phone) updateData.phone = phone;
-    if (avatar) updateData.avatar = avatar;
-    if (language) updateData.language = language;
+    if (name) {
+      updateData.name = name;
+    }
+    if (phone) {
+      updateData.phone = phone;
+    }
+    if (avatar) {
+      updateData.avatar = avatar;
+    }
+    if (language) {
+      updateData.language = language;
+    }
     updateData.updatedAt = new Date();
 
     // Update user
@@ -518,7 +530,6 @@ export const forgotPassword = async (req, res) => {
 
     // Send email with reset link
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    
     try {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
@@ -654,7 +665,6 @@ export const sendVerificationEmail = async (req, res) => {
 
     // Send verification email
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-    
     try {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
@@ -742,7 +752,6 @@ export const healthCheck = async (req, res) => {
 export const refreshToken = async (req, res) => {
   try {
     const { refreshToken: token } = req.body;
-    
     // Also accept token from Authorization header
     const headerToken = req.headers.authorization?.replace('Bearer ', '');
     const tokenToVerify = token || headerToken;
@@ -835,7 +844,6 @@ export const enable2FA = async (req, res) => {
 
     // Generate secret
     const secret = authenticator.generateSecret();
-    
     // Generate backup codes
     const backupCodes = [];
     for (let i = 0; i < 10; i++) {
@@ -876,7 +884,6 @@ export const enable2FA = async (req, res) => {
 export const verify2FA = async (req, res) => {
   try {
     const { code } = req.body;
-    
     if (!code) {
       return res.status(400).json({
         success: false,
@@ -910,13 +917,10 @@ export const verify2FA = async (req, res) => {
       const backupCode = user.twoFactorBackupCodes?.find(
         bc => bc.code === code.toUpperCase() && !bc.used
       );
-      
       if (backupCode) {
         backupCode.used = true;
         await user.save();
-        
         logger.log(`🔐 Backup code used for: ${user.email}`);
-        
         return res.status(200).json({
           success: true,
           message: '2FA verified with backup code',
@@ -934,7 +938,6 @@ export const verify2FA = async (req, res) => {
     if (!user.twoFactorEnabled) {
       user.twoFactorEnabled = true;
       await user.save();
-      
       logger.log(`🔐 2FA enabled for: ${user.email}`);
     }
 
@@ -956,7 +959,6 @@ export const verify2FA = async (req, res) => {
 export const disable2FA = async (req, res) => {
   try {
     const { password, code } = req.body;
-    
     if (!password) {
       return res.status(400).json({
         success: false,
@@ -987,7 +989,6 @@ export const disable2FA = async (req, res) => {
         token: code,
         secret: user.twoFactorSecret
       });
-      
       if (!isValid) {
         return res.status(400).json({
           success: false,
@@ -1050,7 +1051,6 @@ export const get2FAStatus = async (req, res) => {
 export const regenerateBackupCodes = async (req, res) => {
   try {
     const { password } = req.body;
-    
     if (!password) {
       return res.status(400).json({
         success: false,

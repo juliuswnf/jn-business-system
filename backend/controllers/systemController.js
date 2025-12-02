@@ -112,7 +112,7 @@ const startDockerContainer = async (service) => {
       } else if (service.containerName === 'jn-automation-redis') {
         runCommand = `docker run -d --name ${service.containerName} -p ${service.port}:6379 ${service.image}`;
       }
-      
+
       await execAsync(runCommand, { timeout: 60000 });
       return { success: true, message: 'Container created and started' };
     } catch (error) {
@@ -138,7 +138,7 @@ const stopDockerContainer = async (containerName) => {
 // Start Node.js service (Frontend) - Windows optimized
 const startNodeService = async (service, serviceId) => {
   const isWindows = process.platform === 'win32';
-  
+
   try {
     if (isWindows) {
       // Windows: Start in a new PowerShell window that stays open
@@ -148,12 +148,12 @@ const startNodeService = async (service, serviceId) => {
         Write-Host 'Starting ${service.name}...' -ForegroundColor Cyan
         npm run dev
       `;
-      
+
       // Use Start-Process to create a completely independent process
       const startCommand = `Start-Process powershell -ArgumentList '-NoExit', '-Command', "${psScript.replace(/"/g, '\\"').replace(/\n/g, '; ')}" -WindowStyle Normal`;
-      
+
       await execAsync(`powershell -Command "${startCommand}"`, { timeout: 10000 });
-      
+
       return { success: true, message: 'Process started in new window' };
     } else {
       // Unix: Use nohup
@@ -163,10 +163,10 @@ const startNodeService = async (service, serviceId) => {
         stdio: 'ignore',
         env: { ...process.env }
       });
-      
+
       child.unref();
       runningProcesses[serviceId] = child.pid;
-      
+
       return { success: true, pid: child.pid };
     }
   } catch (error) {
@@ -178,14 +178,14 @@ const startNodeService = async (service, serviceId) => {
 // Stop Node.js service by port - Windows optimized
 const stopNodeService = async (port) => {
   const isWindows = process.platform === 'win32';
-  
+
   try {
     if (isWindows) {
       // Windows: Find all PIDs on this port and kill them
       try {
         const { stdout } = await execAsync(`netstat -ano | findstr ":${port}" | findstr "LISTENING"`, { timeout: 5000 });
         const lines = stdout.trim().split('\n');
-        
+
         const pidsKilled = new Set();
         for (const line of lines) {
           const parts = line.trim().split(/\s+/);
@@ -273,7 +273,7 @@ export const startService = async (req, res) => {
           status: 'running'
         });
       }
-      
+
       const result = await startDockerContainer(service);
       if (result.success) {
         logger.log(`✅ Started Docker container: ${service.containerName}`);
@@ -311,12 +311,12 @@ export const startService = async (req, res) => {
       const result = await startNodeService(service, serviceId);
       if (result.success) {
         logger.log(`✅ Started ${service.name}`);
-        
+
         // Wait a bit for the service to start
         await new Promise(resolve => setTimeout(resolve, 4000));
-        
+
         const nowRunning = await checkPortInUse(service.port);
-        
+
         return res.status(200).json({
           success: true,
           message: `${service.name} ${nowRunning ? 'started successfully' : 'is starting...'}`,
@@ -374,10 +374,10 @@ export const stopService = async (req, res) => {
         });
       }
     } else {
-      const result = await stopNodeService(service.port);
+      await stopNodeService(service.port);
       delete runningProcesses[serviceId];
       logger.log(`⏹ Stopped ${service.name}`);
-      
+
       return res.status(200).json({
         success: true,
         message: `${service.name} stopped successfully`,
@@ -402,7 +402,7 @@ export const startAllServices = async (req, res) => {
 
     for (const serviceId of startOrder) {
       const service = SERVICES[serviceId];
-      
+
       try {
         // Check if already running
         let isRunning = false;
@@ -492,7 +492,7 @@ export const stopAllServices = async (req, res) => {
 
     for (const serviceId of stopOrder) {
       const service = SERVICES[serviceId];
-      
+
       try {
         if (service.type === 'docker') {
           const result = await stopDockerContainer(service.containerName);
@@ -553,7 +553,7 @@ export const getAllServicesStatus = async (req, res) => {
 
     for (const [serviceId, service] of Object.entries(SERVICES)) {
       let status = 'unknown';
-      
+
       try {
         if (service.type === 'docker') {
           const isRunning = await checkDockerContainer(service.containerName);
