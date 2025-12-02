@@ -471,6 +471,22 @@ export const appointmentAPI = {
   getCancelled: (params) => api.get('/appointments/cancelled', { params })
 };
 
+export const salonAPI = {
+  getDashboard: () => api.get('/salon/dashboard'),
+  getInfo: () => api.get('/salon/info'),
+  update: (data) => api.put('/salon/update', data),
+  getServices: () => api.get('/salon/services'),
+  getBookings: (params) => api.get('/salon/bookings', { params }),
+  getStats: () => api.get('/salon/stats')
+};
+
+export const widgetAPI = {
+  getConfig: () => api.get('/widget/config'),
+  updateConfig: (data) => api.put('/widget/config', data),
+  getPublicConfig: (studioId) => api.get(`/widget/public/${studioId}`),
+  getEmbedCode: () => api.get('/widget/embed-code')
+};
+
 export const dashboardAPI = {
   getOverview: () => api.get('/dashboard'),
   getRecentBookings: (params) => api.get('/dashboard/recent-bookings', { params }),
