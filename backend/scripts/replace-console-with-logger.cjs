@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const fs = require('fs');
 const path = require('path');
 
@@ -12,10 +13,10 @@ function walk(dir) {
     const stat = fs.statSync(fp);
     if (stat && stat.isDirectory()) {
       // skip node_modules if accidentally present
-      if (file === 'node_modules') return;
+      if (file === 'node_modules') { return; }
       results.push(...walk(fp));
     } else {
-      if (file.endsWith('.js')) results.push(fp);
+      if (file.endsWith('.js')) { results.push(fp); }
     }
   });
   return results;
@@ -30,7 +31,7 @@ const modified = [];
 files.forEach(file => {
   try {
     let content = fs.readFileSync(file, 'utf8');
-    if (!consoles.test(content)) return;
+    if (!consoles.test(content)) { return; }
     // reset regex state
     consoles.lastIndex = 0;
 
