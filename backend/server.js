@@ -22,6 +22,7 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import ceoRoutes from './routes/ceoRoutes.js';
 import widgetRoutes from './routes/widgetRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
+import serviceRoutes from './routes/serviceRoutes.js';
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
@@ -148,6 +149,7 @@ app.use('/api/widget', widgetRoutes); // NEW: Embeddable Widget API
 app.use('/api/salon', authMiddleware.protect, salonRoutes);
 app.use('/api/bookings', authMiddleware.protect, bookingRoutes);
 app.use('/api/payments', authMiddleware.protect, paymentRoutes);
+app.use('/api/services', authMiddleware.protect, serviceRoutes);
 app.use('/api/employees', authMiddleware.protect, employeeRoutes);
 app.use('/api/ceo', authMiddleware.protect, ceoMiddleware.verifyCEOAuth, ceoRoutes);
 
