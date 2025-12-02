@@ -7,6 +7,11 @@ const router = express.Router();
 // All routes require authentication (handled by server.js)
 // Routes are protected by authMiddleware.protect in server.js
 
+// ==================== DASHBOARD ====================
+
+// Salon dashboard - returns complete dashboard with stats, recent bookings
+router.get('/dashboard', salonController.getSalonDashboard);
+
 // ==================== SALON MANAGEMENT ====================
 
 // Get salon info
@@ -28,29 +33,5 @@ router.get('/:salonId/bookings', salonController.getSalonBookings);
 // Get salon stats
 router.get('/stats', salonController.getSalonStats);
 router.get('/:salonId/stats', salonController.getSalonStats);
-
-// ==================== DASHBOARD (SIMPLE) ====================
-
-// Salon dashboard - returns basic salon info + stats
-router.get('/dashboard', async (req, res) => {
-  try {
-    const salonId = req.user.salonId;
-    
-    if (!salonId) {
-      return res.status(404).json({
-        success: false,
-        message: 'No salon associated with this user'
-      });
-    }
-
-    // Reuse existing controllers
-    const salon = await salonController.getSalonInfo(req, res);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error'
-    });
-  }
-});
 
 export default router;

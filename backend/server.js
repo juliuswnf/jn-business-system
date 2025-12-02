@@ -21,6 +21,7 @@ import bookingRoutes from './routes/bookingRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import ceoRoutes from './routes/ceoRoutes.js';
 import widgetRoutes from './routes/widgetRoutes.js';
+import employeeRoutes from './routes/employeeRoutes.js';
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
@@ -147,6 +148,7 @@ app.use('/api/widget', widgetRoutes); // NEW: Embeddable Widget API
 app.use('/api/salon', authMiddleware.protect, salonRoutes);
 app.use('/api/bookings', authMiddleware.protect, bookingRoutes);
 app.use('/api/payments', authMiddleware.protect, paymentRoutes);
+app.use('/api/employees', authMiddleware.protect, employeeRoutes);
 app.use('/api/ceo', authMiddleware.protect, ceoMiddleware.verifyCEOAuth, ceoRoutes);
 
 // ==================== 404 HANDLER (BEFORE ERROR HANDLER) ====================
@@ -217,7 +219,7 @@ const connectDatabase = async () => {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000
-      });
+    });
 
     logger.info('✅ MongoDB Connected Successfully');
     return true;

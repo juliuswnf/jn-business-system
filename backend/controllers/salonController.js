@@ -183,6 +183,107 @@ export const getSalonStats = async (req, res) => {
   }
 };
 
+// ==================== GET SALON DASHBOARD ====================
+
+export const getSalonDashboard = async (req, res) => {
+  try {
+    const salonId = req.user.salonId;
+
+    if (!salonId) {
+      return res.status(404).json({
+        success: false,
+        message: 'No salon associated with this user'
+      });
+    }
+
+    // Get salon info
+    const salon = await Salon.findById(salonId)
+      .populate('owner', 'name email')
+      .populate('services');
+
+    if (!salon) {
+      return res.status(404).json({
+        success: false,
+        message: 'Salon not found'
+      });
+    }
+
+    // Get today's bookings
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todayBookings = await Booking.countDocuments({
+      salonId,
+      bookingDate: { $gte: today, $lt: tomorrow }
+    });
+
+    // Get upcoming bookings (next 7 days)
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    const upcomingBookings = await Booking.countDocuments({
+      salonId,
+      bookingDate: { $gte: today, $lt: nextWeek },
+      status: { $in: ['confirmed', 'pending'] }
+    });
+
+    // Get stats
+    const totalBookings = await Booking.countDocuments({ salonId });
+    const totalServices = await Service.countDocuments({ salonId });
+    const completedBookings = await Booking.countDocuments({ salonId, status: 'completed' });
+    const cancelledBookings = await Booking.countDocuments({ salonId, status: 'cancelled' });
+
+    // Get revenue (sum of completed bookings)
+    const revenueData = await Booking.aggregate([
+      { $match: { salonId: require('mongoose').Types.ObjectId(salonId), status: 'completed' } },
+      {
+        $lookup: {
+          from: 'services',
+          localField: 'serviceId',
+          foreignField: '_id',
+          as: 'service'
+        }
+      },
+      { $unwind: '$service' },
+      { $group: { _id: null, totalRevenue: { $sum: '$service.price' } } }
+    ]);
+
+    const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
+
+    // Get recent bookings
+    const recentBookings = await Booking.find({ salonId })
+      .populate('serviceId', 'name price')
+      .populate('employeeId', 'name')
+      .sort({ bookingDate: -1 })
+      .limit(5);
+
+    res.status(200).json({
+      success: true,
+      dashboard: {
+        salon,
+        stats: {
+          todayBookings,
+          upcomingBookings,
+          totalBookings,
+          totalServices,
+          completedBookings,
+          cancelledBookings,
+          totalRevenue
+        },
+        recentBookings
+      }
+    });
+  } catch (error) {
+    logger.error('GetSalonDashboard Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
 // ==================== DEFAULT EXPORT ====================
 
 export default {
@@ -190,5 +291,6 @@ export default {
   updateSalon,
   getSalonServices,
   getSalonBookings,
-  getSalonStats
+  getSalonStats,
+  getSalonDashboard
 };
