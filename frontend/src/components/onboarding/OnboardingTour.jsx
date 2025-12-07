@@ -136,7 +136,7 @@ export default function OnboardingTour({ onComplete, onSkip }) {
 
   if (!isVisible) return null;
 
-  // Calculate tooltip position
+  // Calculate tooltip position - ensure it stays within viewport
   const getTooltipStyle = () => {
     if (!targetRect || step.position === 'center') {
       return {
@@ -148,33 +148,33 @@ export default function OnboardingTour({ onComplete, onSkip }) {
 
     const padding = 16;
     const tooltipWidth = 360;
-    const tooltipHeight = 200;
+    const tooltipHeight = 280; // Approximate height
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let top, left, transform;
 
     switch (step.position) {
       case 'bottom':
-        return {
-          top: targetRect.bottom + padding,
-          left: targetRect.left + targetRect.width / 2,
-          transform: 'translateX(-50%)',
-        };
+        top = targetRect.bottom + padding;
+        left = targetRect.left + targetRect.width / 2;
+        transform = 'translateX(-50%)';
+        break;
       case 'top':
-        return {
-          top: targetRect.top - tooltipHeight - padding,
-          left: targetRect.left + targetRect.width / 2,
-          transform: 'translateX(-50%)',
-        };
+        top = targetRect.top - tooltipHeight - padding;
+        left = targetRect.left + targetRect.width / 2;
+        transform = 'translateX(-50%)';
+        break;
       case 'right':
-        return {
-          top: targetRect.top + targetRect.height / 2,
-          left: targetRect.right + padding,
-          transform: 'translateY(-50%)',
-        };
+        top = targetRect.top + targetRect.height / 2;
+        left = targetRect.right + padding;
+        transform = 'translateY(-50%)';
+        break;
       case 'left':
-        return {
-          top: targetRect.top + targetRect.height / 2,
-          left: targetRect.left - tooltipWidth - padding,
-          transform: 'translateY(-50%)',
-        };
+        top = targetRect.top + targetRect.height / 2;
+        left = targetRect.left - tooltipWidth - padding;
+        transform = 'translateY(-50%)';
+        break;
       default:
         return {
           top: '50%',
@@ -182,6 +182,30 @@ export default function OnboardingTour({ onComplete, onSkip }) {
           transform: 'translate(-50%, -50%)',
         };
     }
+
+    // Boundary checks - ensure tooltip stays within viewport
+    // Check bottom boundary
+    if (top + tooltipHeight > viewportHeight - padding) {
+      top = viewportHeight - tooltipHeight - padding;
+      transform = 'none';
+    }
+    // Check top boundary
+    if (top < padding) {
+      top = padding;
+      transform = transform.replace('translateY(-50%)', '');
+    }
+    // Check right boundary
+    if (left + tooltipWidth / 2 > viewportWidth - padding) {
+      left = viewportWidth - tooltipWidth - padding;
+      transform = transform.replace('translateX(-50%)', '');
+    }
+    // Check left boundary
+    if (left - tooltipWidth / 2 < padding) {
+      left = padding;
+      transform = transform.replace('translateX(-50%)', '');
+    }
+
+    return { top, left, transform: transform || 'none' };
   };
 
   return (

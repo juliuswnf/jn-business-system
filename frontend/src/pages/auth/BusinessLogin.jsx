@@ -28,6 +28,16 @@ const BusinessLogin = () => {
       console.log('Login response:', data);
 
       if (data.success && data.token) {
+        const role = data.user?.role || 'salon_owner';
+        
+        // Block customers from business login - they should use customer login
+        if (role === 'customer') {
+          setError('Dieser Login ist nur für Geschäftskunden. Bitte nutzen Sie den Kunden-Login.');
+          notification.error('Bitte nutzen Sie den Kunden-Login für Ihr Konto.');
+          setLoading(false);
+          return;
+        }
+        
         // Store auth data (both new and legacy keys for compatibility)
         localStorage.setItem('jnAuthToken', data.token);
         localStorage.setItem('jnUser', JSON.stringify(data.user));
@@ -37,13 +47,10 @@ const BusinessLogin = () => {
         console.log('Auth data saved, redirecting...');
         
         // Redirect based on role
-        const role = data.user?.role || 'salon_owner';
-        
-        if (role === 'customer') {
-          window.location.replace('/customer/dashboard');
-        } else if (role === 'ceo') {
+        if (role === 'ceo') {
           window.location.replace('/ceo/dashboard');
         } else {
+          // salon_owner, employee, etc.
           window.location.replace('/dashboard');
         }
         return; // Stop execution after redirect

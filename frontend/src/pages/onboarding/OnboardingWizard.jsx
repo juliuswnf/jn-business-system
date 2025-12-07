@@ -177,18 +177,33 @@ export default function OnboardingWizard() {
           break;
 
         case 4:
-          const validServices = services.filter(s => s.name && s.price > 0);
+          const validServices = services.filter(s => s.name && s.name.trim() && s.price > 0);
           if (validServices.length === 0) {
-            showNotification('Füge mindestens einen Service hinzu', 'error');
+            showNotification('Füge mindestens einen Service mit Name und Preis hinzu', 'error');
             setSaving(false);
             return;
           }
-          for (const service of validServices) {
-            if (!service._id) {
-              await serviceAPI.create(service);
-            } else {
-              await serviceAPI.update(service._id, service);
+          try {
+            for (const service of validServices) {
+              if (!service._id) {
+                await serviceAPI.create({
+                  name: service.name.trim(),
+                  duration: service.duration || 30,
+                  price: service.price
+                });
+              } else {
+                await serviceAPI.update(service._id, {
+                  name: service.name.trim(),
+                  duration: service.duration || 30,
+                  price: service.price
+                });
+              }
             }
+          } catch (serviceError) {
+            console.error('Service save error:', serviceError);
+            showNotification('Fehler beim Speichern der Services: ' + (serviceError.response?.data?.message || serviceError.message), 'error');
+            setSaving(false);
+            return;
           }
           break;
 

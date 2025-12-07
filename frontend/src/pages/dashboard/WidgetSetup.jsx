@@ -93,7 +93,7 @@ export default function WidgetSetup() {
         {/* Configuration Panel */}
         <div className="space-y-6">
           {/* Colors */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 overflow-visible">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
                 <Palette className="w-5 h-5 text-purple-400" />
@@ -101,7 +101,7 @@ export default function WidgetSetup() {
               <h2 className="text-lg font-semibold text-white">Farben</h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 overflow-visible">
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Primärfarbe</label>
                 <div className="flex items-center gap-2">
@@ -277,7 +277,7 @@ export default function WidgetSetup() {
         </div>
 
         {/* Live Preview */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 h-fit sticky top-24">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 h-fit xl:fixed xl:top-32 xl:right-8 xl:w-[calc(50%-4rem)] xl:max-w-xl">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
               <Eye className="w-5 h-5 text-cyan-400" />
