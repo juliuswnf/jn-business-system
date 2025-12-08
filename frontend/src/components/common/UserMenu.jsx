@@ -83,7 +83,7 @@ const UserMenu = () => {
         className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-white/5 transition"
       >
         {/* User Avatar */}
-        <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+        <div className="w-9 h-9 bg-zinc-800 border border-zinc-700 rounded-full flex items-center justify-center text-white text-sm font-semibold">
           {user?.name?.charAt(0)?.toUpperCase() || 'U'}
         </div>
         

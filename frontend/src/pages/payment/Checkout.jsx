@@ -57,14 +57,14 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 to-black border border-purple-600 rounded-2xl p-8">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
       <h2 className="text-2xl font-bold mb-6">Checkout</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Amount */}
         <div>
           <label className="block text-sm font-medium mb-2">Amount</label>
-          <div className="text-3xl font-bold text-purple-400">
+          <div className="text-3xl font-bold text-white">
             ${formData.amount}
           </div>
           <p className="text-gray-400 text-sm mt-1">per month</p>
@@ -77,7 +77,7 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
             name="serviceType"
             value={formData.serviceType}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:border-purple-600 focus:outline-none"
+            className="w-full px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:border-zinc-500 focus:outline-none"
           >
             <option value="subscription">Monthly Subscription</option>
             <option value="single">Single Payment</option>
@@ -95,7 +95,7 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
             onChange={handleChange}
             required
             placeholder="John Doe"
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-600 focus:outline-none"
+            className="w-full px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:border-zinc-500 focus:outline-none"
           />
         </div>
 
@@ -109,13 +109,13 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
             onChange={handleChange}
             required
             placeholder="john@example.com"
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-600 focus:outline-none"
+            className="w-full px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:border-zinc-500 focus:outline-none"
           />
         </div>
 
         {/* Security Note */}
-        <div className="bg-purple-900 bg-opacity-30 border border-purple-600 rounded-lg p-4">
-          <p className="text-sm text-purple-300">
+        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
+          <p className="text-sm text-gray-300">
             Ihre Zahlungsdaten sind sicher und verschlüsselt
           </p>
         </div>
@@ -124,7 +124,7 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-white hover:shadow-lg hover:shadow-purple-500/50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-6 py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Processing...' : `Pay $${formData.amount}`}
         </button>

@@ -13,10 +13,10 @@ const Success = () => {
           Your payment has been processed successfully. You will receive a confirmation email shortly.
         </p>
         <button
-          onClick={() => navigate('/customer/booking')}
-          className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-white hover:shadow-lg transition"
+          onClick={() => navigate('/customer/dashboard')}
+          className="inline-block px-8 py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition"
         >
-          Back to Dashboard
+          Zum Dashboard
         </button>
       </div>
     </div>

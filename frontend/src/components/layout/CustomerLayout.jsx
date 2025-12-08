@@ -20,13 +20,13 @@ const CustomerLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
-      <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+      <header className="bg-black border-b border-zinc-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-sm">JN</span>
+              <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+                <span className="text-black font-bold text-sm">JN</span>
               </div>
               <span className="text-white font-semibold text-lg hidden sm:block">JN Automation</span>
             </Link>
@@ -54,7 +54,7 @@ const CustomerLayout = ({ children }) => {
         </div>
         
         {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-gray-800">
+        <div className="md:hidden border-t border-zinc-800">
           <div className="px-4 py-2 flex gap-1 overflow-x-auto">
             {navLinks.map((link) => (
               <Link

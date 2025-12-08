@@ -13,10 +13,10 @@ const Cancel = () => {
           Your payment was cancelled. You can try again at any time.
         </p>
         <button
-          onClick={() => navigate('/payment')}
-          className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-white hover:shadow-lg transition"
+          onClick={() => navigate('/pricing')}
+          className="inline-block px-8 py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition"
         >
-          Try Again
+          Erneut versuchen
         </button>
       </div>
     </div>
