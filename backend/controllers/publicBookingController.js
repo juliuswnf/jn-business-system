@@ -14,6 +14,104 @@ import emailTemplateService from '../services/emailTemplateService.js';
 import emailQueueWorker from '../workers/emailQueueWorker.js';
 
 /**
+ * Get all salons for public listing
+ * GET /api/public/salons
+ */
+export const getAllSalons = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Get all salons with active subscription
+    const salons = await Salon.find({
+      'subscription.status': { $in: ['active', 'trialing'] }
+    })
+      .select('name slug address city phone businessHours createdAt')
+      .sort({ name: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Salon.countDocuments({
+      'subscription.status': { $in: ['active', 'trialing'] }
+    });
+
+    // Get service count for each salon
+    const salonsWithServices = await Promise.all(
+      salons.map(async (salon) => {
+        const serviceCount = await Service.countDocuments({
+          salonId: salon._id,
+          isActive: true
+        });
+        return {
+          ...salon.toObject(),
+          serviceCount
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      salons: salonsWithServices,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    logger.error('GetAllSalons Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
+/**
+ * Search salons by name, city, address
+ * GET /api/public/salons/search?q=...
+ */
+export const searchSalons = async (req, res) => {
+  try {
+    const { q } = req.query;
+    
+    if (!q || q.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Search query must be at least 2 characters'
+      });
+    }
+
+    const searchRegex = new RegExp(q, 'i');
+
+    const salons = await Salon.find({
+      'subscription.status': { $in: ['active', 'trialing'] },
+      $or: [
+        { name: searchRegex },
+        { city: searchRegex },
+        { 'address.street': searchRegex },
+        { 'address.city': searchRegex }
+      ]
+    })
+      .select('name slug address city phone')
+      .limit(10);
+
+    res.status(200).json({
+      success: true,
+      salons
+    });
+  } catch (error) {
+    logger.error('SearchSalons Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
+/**
  * Get salon by slug with services and availability info
  * GET /api/public/s/:slug
  */
@@ -411,6 +509,8 @@ export const createPublicBooking = async (req, res) => {
 };
 
 export default {
+  getAllSalons,
+  searchSalons,
   getSalonBySlug,
   getAvailableSlots,
   createPublicBooking

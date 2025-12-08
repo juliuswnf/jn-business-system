@@ -11,6 +11,22 @@ import { widgetLimiter, publicBookingLimiter } from '../middleware/rateLimiterMi
 
 const router = express.Router();
 
+// Get all salons (public list for customer booking)
+// GET /api/public/salons
+router.get(
+  '/salons',
+  widgetLimiter,
+  publicBookingController.getAllSalons
+);
+
+// Search salons by name, city, etc.
+// GET /api/public/salons/search?q=...
+router.get(
+  '/salons/search',
+  widgetLimiter,
+  publicBookingController.searchSalons
+);
+
 // Get salon info by slug
 // GET /api/public/s/:slug
 router.get(
