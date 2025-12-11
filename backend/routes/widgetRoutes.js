@@ -63,7 +63,7 @@ router.get('/config/:slug', async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       config: {
         salonName: salon.name,
@@ -78,7 +78,7 @@ router.get('/config/:slug', async (req, res) => {
     });
   } catch (error) {
     logger.error('Widget Config Error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error loading widget configuration'
     });
@@ -111,13 +111,13 @@ router.get('/services/:slug', async (req, res) => {
       isActive: true
     }).select('name description price duration category');
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       services
     });
   } catch (error) {
     logger.error('Widget Services Error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error loading services'
     });
@@ -229,13 +229,13 @@ router.get('/timeslots/:slug', async (req, res) => {
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       timeSlots
     });
   } catch (error) {
     logger.error('Widget Timeslots Error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error loading time slots'
     });
@@ -334,7 +334,7 @@ router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, re
       logger.error('Email sending failed:', emailError);
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Booking created successfully',
       booking: {
@@ -349,7 +349,7 @@ router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, re
     });
   } catch (error) {
     logger.error('Widget Booking Error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error creating booking'
     });

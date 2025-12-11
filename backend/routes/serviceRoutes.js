@@ -26,13 +26,13 @@ router.get('/', async (req, res) => {
       .select('-__v')
       .limit(100);
 
-    res.json({
+    return res.json({
       success: true,
       data: services,
       count: services.length
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -40,9 +40,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', checkTenantAccess('service'), async (req, res) => {
   try {
     // Resource already loaded by middleware
-    res.json({ success: true, data: req.resource });
+    return res.json({ success: true, data: req.resource });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -60,10 +60,10 @@ router.post('/', mutationLimiter, async (req, res) => {
     });
 
     await service.save();
-    logger.log(`âœ… Service created: ${service.name} for salon ${salonId}`);
-    res.status(201).json({ success: true, data: service });
+    logger.log(`✅ Service created: ${service.name} for salon ${salonId}`);
+    return res.status(201).json({ success: true, data: service });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    return res.status(400).json({ success: false, message: error.message });
   }
 });
 
@@ -98,8 +98,8 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
     // Save with version increment
     await service.save();
 
-    logger.log(`âœ… Service updated: ${service.name} (version ${service.__v})`);
-    res.json({ success: true, data: service });
+    logger.log(`✅ Service updated: ${service.name} (version ${service.__v})`);
+    return res.json({ success: true, data: service });
   } catch (error) {
     if (error.name === 'VersionError') {
       return res.status(409).json({
@@ -107,7 +107,7 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
         message: 'Conflict - Service was modified by another user. Please refresh and try again.'
       });
     }
-    res.status(400).json({ success: false, message: error.message });
+    return res.status(400).json({ success: false, message: error.message });
   }
 });
 
@@ -127,9 +127,9 @@ router.delete('/:id', mutationLimiter, checkTenantAccess('service'), async (req,
     await service.softDelete(req.user._id);
 
     logger.log(`🗑️ Service soft-deleted: ${service.name} by user ${req.user._id}`);
-    res.json({ success: true, message: 'Service deleted successfully' });
+    return res.json({ success: true, message: 'Service deleted successfully' });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 
