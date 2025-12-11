@@ -13,12 +13,12 @@ import dotenv from 'dotenv';
 import logger from './utils/logger.js';
 import structuredLogger, { addRequestContext } from './utils/structuredLogger.js';
 import { generalLimiter, getRateLimitStatus, resetRateLimiter } from './middleware/rateLimiterMiddleware.js';
-import { requestTimingMiddleware } from './services/monitoringService.js';
+import { requestTimingMiddleware, getMetrics } from './services/monitoringService.js';
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import { initializeCronJobs } from './services/cronService.js';
 import emailQueueWorker from './workers/emailQueueWorker.js';
 import lifecycleEmailWorker from './workers/lifecycleEmailWorker.js';
-import { getHealthStatus, getMetrics } from './services/healthCheckService.js';
+import { getHealthStatus } from './services/healthCheckService.js';
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +35,14 @@ import widgetRoutes from './routes/widgetRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import systemRoutes from './routes/systemRoutes.js'; // ✅ MEDIUM FIX #13 & #14
+
+// Multi-Industry Routes - Phase 2
+import artistPortfolioRoutes from './routes/artistPortfolioRoutes.js';
+import clinicalNoteRoutes from './routes/clinicalNoteRoutes.js';
+import consentFormRoutes from './routes/consentFormRoutes.js';
+import packageRoutes from './routes/packageRoutes.js';
+import progressRoutes from './routes/progressRoutes.js';
+import resourceRoutes from './routes/resourceRoutes.js';
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
@@ -169,7 +177,14 @@ app.get('/', (req, res) => {
       widget: '/api/widget',
       payments: '/api/payments',
       subscriptions: '/api/subscriptions',
-      webhooks: '/api/webhooks/stripe'
+      webhooks: '/api/webhooks/stripe',
+      // Multi-Industry Endpoints
+      portfolio: '/api/portfolio',
+      clinicalNotes: '/api/clinical-notes',
+      consentForms: '/api/consent-forms',
+      packages: '/api/packages',
+      progress: '/api/progress',
+      resources: '/api/resources'
     }
   });
 });
@@ -190,6 +205,14 @@ app.use('/api/payments', authMiddleware.protect, paymentRoutes);
 app.use('/api/services', authMiddleware.protect, serviceRoutes);
 app.use('/api/employees', authMiddleware.protect, employeeRoutes);
 app.use('/api/ceo', ceoRoutes); // Auth middleware is already in ceoRoutes
+
+// Multi-Industry Routes - Phase 2
+app.use('/api/portfolio', artistPortfolioRoutes); // Mixed: upload protected, galleries public
+app.use('/api/clinical-notes', authMiddleware.protect, clinicalNoteRoutes); // ALL PROTECTED - HIPAA
+app.use('/api/consent-forms', consentFormRoutes); // Mixed: signing public, management protected
+app.use('/api/packages', packageRoutes); // Mixed: purchase flow public/protected
+app.use('/api/progress', authMiddleware.protect, progressRoutes); // ALL PROTECTED - Client privacy
+app.use('/api/resources', resourceRoutes); // Mixed: availability public, management protected
 
 // ==================== 404 HANDLER (BEFORE ERROR HANDLER) ====================
 app.use('*', (req, res, _next) => {

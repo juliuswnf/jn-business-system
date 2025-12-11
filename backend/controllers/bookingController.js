@@ -397,12 +397,6 @@ export const updateBooking = async (req, res) => {
       }
       
       booking.bookingDate = parsedDate;
-          success: false,
-          message: 'Invalid date format'
-        });
-      }
-      
-      booking.bookingDate = parsedDate;
     }
 
     booking.updatedAt = Date.now();
@@ -561,49 +555,6 @@ export const completeBooking = async (req, res) => {
   } catch (error) {
     logger.error('CompleteBooking Error:', error);
     return res.status(500).json({
-      success: false,
-      message: 'Internal Server Error'
-    });
-  }
-};
-      success: true,
-      message: 'Booking cancelled',
-      booking
-    });
-  } catch (error) {
-    logger.error('CancelBooking Error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error'
-    });
-  }
-};
-
-// ==================== COMPLETE BOOKING ====================
-
-export const completeBooking = async (req, res) => {
-  try {
-    const booking = await Booking.findByIdAndUpdate(
-      req.params.id,
-      { status: 'completed', completedAt: Date.now() },
-      { new: true }
-    ).populate('serviceId');
-
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: 'Booking not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Booking completed',
-      booking
-    });
-  } catch (error) {
-    logger.error('CompleteBooking Error:', error);
-    res.status(500).json({
       success: false,
       message: 'Internal Server Error'
     });

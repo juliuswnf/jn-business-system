@@ -246,19 +246,6 @@ export const sendBookingReminder = async (booking) => {
     throw error;
   }
 };
-      bookingId: booking._id,
-      priority: 'normal',
-      language: booking.language
-    });
-
-    logger.log(`âœ… Reminder email queued for: ${booking.customerEmail}`);
-
-    return { success: true };
-  } catch (error) {
-    logger.error('âŒ SendBookingReminder Error:', error);
-    throw error;
-  }
-};
 
 // ==================== SEND REVIEW REQUEST ====================
 

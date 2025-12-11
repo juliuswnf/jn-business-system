@@ -355,6 +355,20 @@ bookingSchema.virtual('canCancel').get(function() {
 bookingSchema.methods.confirm = async function() {
   this.status = 'confirmed';
   this.confirmedAt = new Date();
+  return await this.save();
+};
+
+bookingSchema.methods.cancel = async function() {
+  this.status = 'cancelled';
+  this.cancelledAt = new Date();
+  return await this.save();
+};
+
+bookingSchema.methods.markNoShow = async function() {
+  this.status = 'no_show';
+  return await this.save();
+};
+
 bookingSchema.methods.markEmailSent = async function(type) {
   if (['confirmation', 'reminder', 'review'].includes(type)) {
     this.emailsSent[type] = true;
@@ -362,6 +376,7 @@ bookingSchema.methods.markEmailSent = async function(type) {
   }
 };
 
+// Soft delete method
 // Soft delete method
 bookingSchema.methods.softDelete = async function(userId) {
   this.deletedAt = new Date();
@@ -380,26 +395,6 @@ bookingSchema.methods.restore = async function() {
 // Check if soft-deleted
 bookingSchema.methods.isDeleted = function() {
   return this.deletedAt !== null;
-};
-
-// ==================== STATICS ====================
-
-bookingSchema.methods.cancel = async function() {
-  this.status = 'cancelled';
-  this.cancelledAt = new Date();
-  return await this.save();
-};
-
-bookingSchema.methods.markNoShow = async function() {
-  this.status = 'no_show';
-  return await this.save();
-};
-
-bookingSchema.methods.markEmailSent = async function(type) {
-  if (['confirmation', 'reminder', 'review'].includes(type)) {
-    this.emailsSent[type] = true;
-    return await this.save();
-  }
 };
 
 // ==================== STATICS ====================
