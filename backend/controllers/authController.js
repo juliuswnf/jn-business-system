@@ -5,6 +5,7 @@ import logger from '../utils/logger.js';
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import LifecycleEmail from '../models/LifecycleEmail.js';
+import { isValidEmail, validatePassword, sanitizeErrorMessage } from '../utils/validation.js';
 
 /**
  * Auth Controller - MVP Version
@@ -40,11 +41,20 @@ export const register = async (req, res) => {
       });
     }
 
-    // Validate password length
-    if (password.length < 8) {
+    // Validate email format
+    if (!isValidEmail(email)) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 8 characters'
+        message: 'Please provide a valid email address'
+      });
+    }
+
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message
       });
     }
 

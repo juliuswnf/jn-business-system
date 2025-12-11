@@ -1,5 +1,12 @@
 ﻿import logger from '../utils/logger.js';
 import cacheService from '../services/cacheService.js';
+import mongoose from 'mongoose';
+import { 
+  parseValidDate, 
+  isValidObjectId, 
+  sanitizePagination, 
+  sanitizeErrorMessage 
+} from '../utils/validation.js';
 /**
  * Booking Controller - MVP Simplified
  * Essential booking operations only
@@ -21,6 +28,26 @@ export const createBooking = async (req, res) => {
       });
     }
 
+    // Validate ObjectIds
+    if (!isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+    }
+    if (!isValidObjectId(serviceId)) {
+      return res.status(400).json({ success: false, message: 'Invalid service ID format' });
+    }
+    if (employeeId && !isValidObjectId(employeeId)) {
+      return res.status(400).json({ success: false, message: 'Invalid employee ID format' });
+    }
+
+    // Validate and parse date
+    const parsedDate = parseValidDate(bookingDate);
+    if (!parsedDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date format'
+      });
+    }
+
     const service = await Service.findById(serviceId);
     if (!service) {
       return res.status(404).json({
@@ -29,48 +56,64 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Check for conflicts
-    const existingBooking = await Booking.findOne({
-      salonId,
-      serviceId,
-      employeeId: employeeId || null,
-      bookingDate: new Date(bookingDate),
-      status: { $nin: ['cancelled'] }
-    });
+    // Use MongoDB transaction to prevent race condition (double booking)
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    if (existingBooking) {
-      return res.status(409).json({
-        success: false,
-        message: 'This time slot is already booked'
+    try {
+      // Check for conflicts with session lock
+      const existingBooking = await Booking.findOne({
+        salonId,
+        serviceId,
+        employeeId: employeeId || null,
+        bookingDate: parsedDate,
+        status: { $nin: ['cancelled'] }
+      }).session(session);
+
+      if (existingBooking) {
+        await session.abortTransaction();
+        return res.status(409).json({
+          success: false,
+          message: 'This time slot is already booked'
+        });
+      }
+
+      // Create booking within transaction
+      const bookingData = {
+        salonId,
+        serviceId,
+        employeeId: employeeId || null,
+        bookingDate: parsedDate,
+        customerName,
+        customerEmail: customerEmail.toLowerCase(),
+        customerPhone,
+        notes,
+        status: 'pending'
+      };
+
+      const [booking] = await Booking.create([bookingData], { session });
+      await session.commitTransaction();
+      
+      await booking.populate('serviceId');
+
+      // Invalidate related caches
+      cacheService.invalidate('bookings', booking.salonId?.toString());
+
+      res.status(201).json({
+        success: true,
+        booking
       });
+    } catch (txError) {
+      await session.abortTransaction();
+      throw txError;
+    } finally {
+      session.endSession();
     }
-
-    const booking = await Booking.create({
-      salonId,
-      serviceId,
-      employeeId: employeeId || null,
-      bookingDate: new Date(bookingDate),
-      customerName,
-      customerEmail: customerEmail.toLowerCase(),
-      customerPhone,
-      notes,
-      status: 'pending'
-    });
-
-    await booking.populate('serviceId');
-
-    // Invalidate related caches
-    cacheService.invalidate('bookings', booking.salonId?.toString());
-
-    res.status(201).json({
-      success: true,
-      booking
-    });
   } catch (error) {
     logger.error('CreateBooking Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: sanitizeErrorMessage(error, 'Failed to create booking')
     });
   }
 };
@@ -80,15 +123,11 @@ export const createBooking = async (req, res) => {
 export const getBookings = async (req, res) => {
   try {
     const { status, startDate, endDate, salonId } = req.query;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-
-    if (page < 1 || limit < 1 || limit > 100) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid pagination parameters'
-      });
-    }
+    const { page, limit, skip } = sanitizePagination(
+      req.query.page, 
+      req.query.limit, 
+      100 // Maximum 100 items per page
+    );
 
     let filter = {};
 
@@ -114,7 +153,6 @@ export const getBookings = async (req, res) => {
     }
 
     const total = await Booking.countDocuments(filter);
-    const skip = (page - 1) * limit;
     const bookings = await Booking.find(filter)
       .populate('serviceId', 'name price duration')
       .populate('employeeId', 'name')
@@ -147,6 +185,14 @@ export const getBookings = async (req, res) => {
 
 export const getBooking = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid booking ID format'
+      });
+    }
+
     const booking = await Booking.findById(req.params.id)
       .populate('serviceId')
       .populate('employeeId', 'name');
@@ -175,16 +221,33 @@ export const getBooking = async (req, res) => {
 
 export const updateBooking = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid booking ID format'
+      });
+    }
+
     const { bookingDate, status, notes } = req.body;
+
+    // Build update data with validation
+    let updateData = { status, notes, updatedAt: Date.now() };
+    
+    if (bookingDate) {
+      const parsedDate = parseValidDate(bookingDate);
+      if (!parsedDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date format'
+        });
+      }
+      updateData.bookingDate = parsedDate;
+    }
 
     const booking = await Booking.findByIdAndUpdate(
       req.params.id,
-      {
-        bookingDate,
-        status,
-        notes,
-        updatedAt: Date.now()
-      },
+      updateData,
       { new: true, runValidators: true }
     ).populate('serviceId');
 

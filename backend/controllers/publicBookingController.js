@@ -1,4 +1,12 @@
 ﻿import logger from '../utils/logger.js';
+import { 
+  escapeRegex, 
+  sanitizePagination, 
+  parseValidDate, 
+  isValidObjectId, 
+  isValidEmail,
+  sanitizeErrorMessage 
+} from '../utils/validation.js';
 /**
  * Public Booking Controller
  * Handles booking creation without customer authentication
@@ -19,9 +27,11 @@ import emailQueueWorker from '../workers/emailQueueWorker.js';
  */
 export const getAllSalons = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = sanitizePagination(
+      req.query.page,
+      req.query.limit,
+      100 // Maximum 100 items per page to prevent DoS
+    );
 
     // Debug: Log all salons count
     const allSalonsCount = await Salon.countDocuments({});
@@ -87,7 +97,8 @@ export const searchSalons = async (req, res) => {
       });
     }
 
-    const searchRegex = new RegExp(q, 'i');
+    // Escape regex special characters to prevent ReDoS attacks
+    const searchRegex = new RegExp(escapeRegex(q), 'i');
 
     const salons = await Salon.find({
       $or: [
@@ -128,7 +139,8 @@ export const getSalonsByCity = async (req, res) => {
       });
     }
 
-    const cityRegex = new RegExp(`^${city}$`, 'i');
+    // Escape regex special characters to prevent ReDoS attacks
+    const cityRegex = new RegExp(`^${escapeRegex(city)}$`, 'i');
 
     // Find salons in this city
     const salons = await Salon.find({
@@ -375,9 +387,31 @@ export const createPublicBooking = async (req, res) => {
       });
     }
 
+    // Validate ObjectIds
+    if (!isValidObjectId(serviceId)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid service ID format' 
+      });
+    }
+    if (employeeId && !isValidObjectId(employeeId)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid employee ID format' 
+      });
+    }
+
+    // Validate and parse date
+    const parsedBookingDate = parseValidDate(bookingDate);
+    if (!parsedBookingDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date format'
+      });
+    }
+
     // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerEmail)) {
+    if (!isValidEmail(customerEmail)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid email address'
@@ -454,7 +488,7 @@ export const createPublicBooking = async (req, res) => {
       salonId: salon._id,
       serviceId,
       employeeId: employeeId || null,
-      bookingDate: new Date(bookingDate),
+      bookingDate: parsedBookingDate,
       status: { $nin: ['cancelled'] }
     });
 
@@ -473,7 +507,7 @@ export const createPublicBooking = async (req, res) => {
       customerPhone,
       serviceId,
       employeeId: employeeId || null,
-      bookingDate: new Date(bookingDate),
+      bookingDate: parsedBookingDate,
       duration: service.duration,
       notes,
       language: language || salon.defaultLanguage || 'de',
