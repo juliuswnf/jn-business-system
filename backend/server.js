@@ -248,6 +248,13 @@ const connectDatabase = async () => {
       throw new Error('MONGODB_URI is not defined in environment variables');
     }
 
+    // ✅ AUDIT FIX: Validate MongoDB URI has authentication
+    if (!mongoURI.includes('@') && !mongoURI.includes('localhost')) {
+      logger.error('❌ SECURITY: MongoDB URI does not contain authentication credentials!');
+      logger.error('❌ Add username:password to connection string: mongodb://user:pass@host/db');
+      throw new Error('MongoDB authentication required for production');
+    }
+
     // Log sanitized URI for debugging (hide password)
     const sanitizedUri = mongoURI.replace(/:([^:@]+)@/, ':****@');
     logger.info(`🔌 Attempting MongoDB connection to: ${sanitizedUri}`);

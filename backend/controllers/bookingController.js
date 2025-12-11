@@ -73,14 +73,17 @@ export const createBooking = async (req, res) => {
 
       // Calculate booking time window
       const startTime = new Date(parsedDate);
-      const endTime = new Date(startTime.getTime() + (service.duration || 60) * 60 * 1000);
+      const serviceDuration = service.duration || 60;
+      const endTime = new Date(startTime.getTime() + serviceDuration * 60 * 1000);
 
       // ✅ HIGH FIX #8: Check concurrent bookings against salon capacity
+      // ✅ AUDIT FIX: Use service duration as buffer (not fixed 30 min)
+      const bufferMs = serviceDuration * 60 * 1000;
       const concurrentBookings = await Booking.countDocuments({
         salonId,
         bookingDate: {
-          $gte: new Date(startTime.getTime() - 30 * 60 * 1000), // 30 min buffer before
-          $lt: new Date(endTime.getTime() + 30 * 60 * 1000) // 30 min buffer after
+          $gte: new Date(startTime.getTime() - bufferMs),
+          $lt: new Date(endTime.getTime() + bufferMs)
         },
         status: { $nin: ['cancelled', 'no_show'] }
       }).session(session);

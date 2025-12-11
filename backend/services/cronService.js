@@ -37,7 +37,7 @@ const sendBookingReminders = async () => {
         booking.emailsSent.reminder = true;
         await booking.save();
 
-        logger.info(`âœ… Reminder sent to ${booking.customerEmail} for booking ${booking._id}`);
+        logger.info(`✅ Reminder sent for booking ${booking._id}`);
       } catch (emailError) {
         logger.error(`âŒ Failed to send reminder for booking ${booking._id}:`, emailError.message);
       }
@@ -78,7 +78,7 @@ const sendReviewRequests = async () => {
         booking.emailsSent.review = true;
         await booking.save();
 
-        logger.info(`âœ… Review request sent to ${booking.customerEmail} for booking ${booking._id}`);
+        logger.info(`✅ Review request sent for booking ${booking._id}`);
       } catch (emailError) {
         logger.error(`âŒ Failed to send review request for booking ${booking._id}:`, emailError.message);
       }

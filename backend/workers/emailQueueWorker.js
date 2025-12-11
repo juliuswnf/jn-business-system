@@ -101,7 +101,7 @@ const processEmailQueueItem = async (queueItem) => {
       status: 'sent',
       sentAt: new Date()
     });
-    logger.log(`âœ‰ï¸  Sent ${queueItem.type} email to ${booking.customerEmail}`);
+    logger.log(`✉️ Sent ${queueItem.type} email (booking: ${booking._id})`);
   } catch (error) {
     logger.error(`âŒ Failed to send email ${queueItem._id}:`, error.message);
     // Increment retry counter
