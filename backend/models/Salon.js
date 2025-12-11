@@ -38,6 +38,72 @@ const salonSchema = new mongoose.Schema({
     index: true // ✅ Performance optimization for owner queries
   },
 
+  // ==================== MULTI-INDUSTRY SUPPORT ====================
+  businessType: {
+    type: String,
+    required: true,
+    enum: [
+      'hair-salon',
+      'beauty-salon',
+      'spa-wellness',
+      'tattoo-piercing',
+      'medical-aesthetics',
+      'personal-training',
+      'physiotherapy',
+      'barbershop',
+      'nail-salon',
+      'massage-therapy',
+      'yoga-studio',
+      'pilates-studio',
+      'other'
+    ],
+    default: 'hair-salon',
+    index: true,
+    comment: 'Defines terminology and available features'
+  },
+
+  terminology: {
+    service: {
+      type: String,
+      default: 'Service',
+      comment: 'e.g., "Treatment", "Session", "Tattoo"'
+    },
+    staff: {
+      type: String,
+      default: 'Stylist',
+      comment: 'e.g., "Artist", "Practitioner", "Trainer"'
+    },
+    appointment: {
+      type: String,
+      default: 'Appointment',
+      comment: 'e.g., "Session", "Consultation", "Visit"'
+    }
+  },
+
+  // ==================== COMPLIANCE FLAGS ====================
+  compliance: {
+    hipaaEnabled: {
+      type: Boolean,
+      default: false,
+      comment: 'Enable HIPAA compliance features (USA medical)'
+    },
+    gdprEnhanced: {
+      type: Boolean,
+      default: true,
+      comment: 'Enhanced GDPR for medical data'
+    },
+    requiresConsent: {
+      type: Boolean,
+      default: false,
+      comment: 'Requires consent forms before treatment'
+    },
+    baaRequired: {
+      type: Boolean,
+      default: false,
+      comment: 'Business Associate Agreement required'
+    }
+  },
+
   // Contact & Location
   email: {
     type: String,

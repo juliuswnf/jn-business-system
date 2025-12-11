@@ -19,6 +19,137 @@ const bookingSchema = new mongoose.Schema(
       index: true
     },
 
+    // ==================== MULTI-INDUSTRY: Multi-Service Bookings ====================
+    services: [{
+      serviceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Service'
+      },
+      duration: Number,
+      price: Number
+    }],
+
+    // ==================== TATTOO STUDIO: Custom Design Request ====================
+    customDesignRequest: {
+      hasRequest: {
+        type: Boolean,
+        default: false
+      },
+      description: {
+        type: String,
+        maxlength: 2000,
+        comment: 'Customer describes desired tattoo/design'
+      },
+      referenceImages: [{
+        url: String,
+        uploadedAt: {
+          type: Date,
+          default: Date.now
+        }
+      }],
+      placement: {
+        type: String,
+        comment: 'Where on body (e.g., "left arm", "back")'
+      },
+      size: {
+        type: String,
+        enum: ['small', 'medium', 'large', 'sleeve', 'full-back'],
+        comment: 'Approximate size'
+      },
+      designApproved: {
+        type: Boolean,
+        default: false
+      },
+      approvedDesignUrl: String
+    },
+
+    // ==================== MULTI-SESSION BOOKINGS (Tattoos, PT) ====================
+    isMultiSession: {
+      type: Boolean,
+      default: false,
+      comment: 'Part of a series of sessions'
+    },
+
+    multiSessionGroup: {
+      groupId: {
+        type: String,
+        index: true,
+        comment: 'Links multiple bookings together'
+      },
+      sessionNumber: {
+        type: Number,
+        min: 1
+      },
+      totalSessions: {
+        type: Number,
+        min: 1
+      }
+    },
+
+    // ==================== PACKAGE BOOKING (Personal Training) ====================
+    packageUsage: {
+      packageId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CustomerPackage'
+      },
+      sessionsUsed: {
+        type: Number,
+        default: 0,
+        min: 0
+      }
+    },
+
+    // ==================== RECURRING APPOINTMENTS ====================
+    isRecurring: {
+      type: Boolean,
+      default: false
+    },
+
+    recurringPattern: {
+      frequency: {
+        type: String,
+        enum: ['daily', 'weekly', 'biweekly', 'monthly'],
+        comment: 'e.g., "weekly" for 3x/week training'
+      },
+      daysOfWeek: [{
+        type: Number,
+        min: 0,
+        max: 6,
+        comment: '0=Sunday, 1=Monday, etc.'
+      }],
+      endDate: Date,
+      occurrences: Number
+    },
+
+    recurringGroupId: {
+      type: String,
+      index: true,
+      comment: 'Links all recurring appointments'
+    },
+
+    // ==================== RESOURCE ASSIGNMENT (Spa/Wellness) ====================
+    resourceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Resource',
+      comment: 'Assigned room/table/equipment'
+    },
+
+    // ==================== VIDEO SESSION (Online Training) ====================
+    isVideoSession: {
+      type: Boolean,
+      default: false
+    },
+
+    videoSession: {
+      platform: {
+        type: String,
+        enum: ['zoom', 'google-meet', 'teams', 'other']
+      },
+      meetingLink: String,
+      meetingId: String,
+      password: String
+    },
+
     // ==================== Employee (Optional) ====================
     employeeId: {
       type: mongoose.Schema.Types.ObjectId,

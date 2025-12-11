@@ -25,16 +25,37 @@ const auditLogSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['auth', 'user', 'salon', 'subscription', 'payment', 'system', 'data', 'security'],
+      enum: ['auth', 'user', 'salon', 'subscription', 'payment', 'system', 'data', 'security', 'phi', 'compliance'],
       default: 'system',
       index: true
     },
     description: String,
 
+    // ==================== HIPAA COMPLIANCE ====================
+    isPHIAccess: {
+      type: Boolean,
+      default: false,
+      index: true,
+      comment: 'Protected Health Information access'
+    },
+
+    phiAccessDetails: {
+      patientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer'
+      },
+      dataType: {
+        type: String,
+        enum: ['clinical-note', 'medical-history', 'consent-form', 'treatment-record', 'other']
+      },
+      accessReason: String,
+      justification: String
+    },
+
     // Target resource
     resourceType: {
       type: String,
-      enum: ['user', 'salon', 'booking', 'payment', 'subscription', 'setting', 'system'],
+      enum: ['user', 'salon', 'booking', 'payment', 'subscription', 'setting', 'system', 'clinical-note', 'medical-history', 'consent-form'],
       index: true
     },
     resourceId: {
