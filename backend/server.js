@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -84,17 +84,17 @@ app.get('/api/rate-limit/status', getRateLimitStatus);
 app.post('/api/rate-limit/reset', resetRateLimiter);
 
 // ==================== MIDDLEWARE EXECUTION ORDER ====================
-// 1ï¸âƒ£ SECURITY FIRST
+// 1️⃣ SECURITY FIRST
 app.use(helmet());
 app.use(mongoSanitize());
 app.use(hpp());
 // Compression should be applied after security middleware
 app.use(compression());
 
-// 2ï¸âƒ£ STRIPE WEBHOOKS (MUST BE BEFORE JSON PARSING!)
+// 2️⃣ STRIPE WEBHOOKS (MUST BE BEFORE JSON PARSING!)
 app.post('/api/webhooks/stripe', webhookMiddleware, stripeWebhookController.handleStripeWebhook);
 
-// 3ï¸âƒ£ CORS & BODY PARSING
+// 3️⃣ CORS & BODY PARSING
 app.use(cors({
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
@@ -103,7 +103,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' }));
 
-// 4ï¸âƒ£ LOGGING & MONITORING
+// 4️⃣ LOGGING & MONITORING
 if (ENVIRONMENT === 'development') {
   app.use(morgan('dev'));
 } else {
@@ -200,40 +200,40 @@ app.use(errorHandlerMiddleware.globalErrorHandler);
 
 // ==================== SOCKET.IO EVENTS ====================
 io.on('connection', (socket) => {
-  logger.info(`âœ… Client connected: ${socket.id}`);
+  logger.info(`✅ Client connected: ${socket.id}`);
 
   socket.on('bookingCreated', (data) => {
-    logger.info('ðŸ“¬ Booking created:', data);
+    logger.info('📬 Booking created:', data);
     io.emit('bookingUpdate', { type: 'created', data });
   });
 
   socket.on('bookingUpdated', (data) => {
-    logger.info('ðŸ“¬ Booking updated:', data);
+    logger.info('📬 Booking updated:', data);
     io.emit('bookingUpdate', { type: 'updated', data });
   });
 
   socket.on('bookingDeleted', (data) => {
-    logger.info('ðŸ“¬ Booking deleted:', data);
+    logger.info('📬 Booking deleted:', data);
     io.emit('bookingUpdate', { type: 'deleted', data });
   });
 
   socket.on('paymentStarted', (data) => {
-    logger.info('ðŸ’³ Payment started:', data);
+    logger.info('💳 Payment started:', data);
     io.emit('paymentUpdate', { type: 'started', data });
   });
 
   socket.on('paymentCompleted', (data) => {
-    logger.info('ðŸ’³ Payment completed:', data);
+    logger.info('💳 Payment completed:', data);
     io.emit('paymentUpdate', { type: 'completed', data });
   });
 
   socket.on('paymentFailed', (data) => {
-    logger.info('ðŸ’³ Payment failed:', data);
+    logger.info('💳 Payment failed:', data);
     io.emit('paymentUpdate', { type: 'failed', data });
   });
 
   socket.on('disconnect', () => {
-    logger.info(`âŒ Client disconnected: ${socket.id}`);
+    logger.info(`❌ Client disconnected: ${socket.id}`);
   });
 });
 
@@ -246,19 +246,27 @@ const connectDatabase = async () => {
       throw new Error('MONGODB_URI is not defined in environment variables');
     }
 
+    // Log sanitized URI for debugging (hide password)
+    const sanitizedUri = mongoURI.replace(/:([^:@]+)@/, ':****@');
+    logger.info(`🔌 Attempting MongoDB connection to: ${sanitizedUri}`);
+
     await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      retryWrites: true,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+      family: 4  // Force IPv4 (Railway sometimes has IPv6 issues)
     });
 
-    logger.info('âœ… MongoDB Connected Successfully');
+    logger.info('✅ MongoDB Connected Successfully');
+    logger.info(`📦 Database: ${mongoose.connection.db.databaseName}`);
     return true;
   } catch (error) {
-    logger.error('âŒ MongoDB Connection Error:', error.message);
+    logger.error('❌ MongoDB Connection Error:', error.message);
+    logger.error(`❌ Error details: name=${error.name}, code=${error.code || 'N/A'}`);
+    if (error.reason) {
+      logger.error(`❌ Error reason: ${JSON.stringify(error.reason)}`);
+    }
+    logger.error('❌ Failed to connect to MongoDB - retrying in 5 seconds...');
     setTimeout(connectDatabase, 5000);
     return false;
   }
@@ -268,9 +276,9 @@ const connectDatabase = async () => {
 const initializeCrons = async () => {
   try {
     await initializeCronJobs();
-    logger.info('âœ… Cron jobs initialized');
+    logger.info('✅ Cron jobs initialized');
   } catch (error) {
-    logger.error('âš ï¸ Cron job initialization error:', error.message);
+    logger.error('⚠️ Cron job initialization error:', error.message);
   }
 };
 
@@ -278,9 +286,9 @@ const initializeCrons = async () => {
 const startEmailWorker = () => {
   try {
     emailWorkerIntervals = emailQueueWorker.startWorker();
-    logger.info('âœ… Email queue worker started');
+    logger.info('✅ Email queue worker started');
   } catch (error) {
-    logger.error('âš ï¸ Email worker initialization error:', error.message);
+    logger.error('⚠️ Email worker initialization error:', error.message);
   }
 };
 
@@ -288,9 +296,9 @@ const startEmailWorker = () => {
 const startLifecycleWorker = () => {
   try {
     lifecycleWorkerIntervalId = lifecycleEmailWorker.startLifecycleEmailWorker();
-    logger.info('âœ… Lifecycle email worker started');
+    logger.info('✅ Lifecycle email worker started');
   } catch (error) {
-    logger.error('âš ï¸ Lifecycle email worker initialization error:', error.message);
+    logger.error('⚠️ Lifecycle email worker initialization error:', error.message);
   }
 };
 
@@ -299,9 +307,9 @@ const startAlertingService = () => {
   try {
     // Start health checks every 60 seconds
     alertingService.startHealthChecks(getMetrics, 60000);
-    logger.info('âœ… Alerting service started');
+    logger.info('✅ Alerting service started');
   } catch (error) {
-    logger.error('âš ï¸ Alerting service initialization error:', error.message);
+    logger.error('⚠️ Alerting service initialization error:', error.message);
   }
 };
 
@@ -311,7 +319,7 @@ const startServer = async () => {
     const dbConnected = await connectDatabase();
 
     if (!dbConnected) {
-      logger.error('âŒ Failed to connect to MongoDB');
+      logger.error('❌ Failed to connect to MongoDB');
       process.exit(1);
     }
 
@@ -321,9 +329,9 @@ const startServer = async () => {
     startAlertingService();
 
     server.listen(PORT, () => {
-      logger.info('\nâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+      logger.info('\n════════════════════════════════════════');
       logger.info('  JN BUSINESS SYSTEM MVP v2.0.0 STARTED');
-      logger.info('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n');
+      logger.info('════════════════════════════════════════\n');
       logger.info(`Environment: ${ENVIRONMENT}`);
       logger.info(`Server: http://localhost:${PORT}`);
       logger.info(`Database: ${process.env.MONGODB_URI?.split('@')[1] || 'Local MongoDB'}`);
@@ -346,24 +354,24 @@ const startServer = async () => {
       logger.info('   - CEO subscription management\n');
     });
   } catch (error) {
-    logger.error('âŒ Server startup error:', error.message);
+    logger.error('❌ Server startup error:', error.message);
     process.exit(1);
   }
 };
 
 // ==================== GLOBAL ERROR HANDLERS ====================
 process.on('unhandledRejection', (reason, promise) => {
-  logger.error('âŒ Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
 process.on('uncaughtException', (error) => {
-  logger.error('âŒ Uncaught Exception:', error);
+  logger.error('❌ Uncaught Exception:', error);
   process.exit(1);
 });
 
 // ==================== GRACEFUL SHUTDOWN ====================
 process.on('SIGTERM', async () => {
-  logger.info('\nâš ï¸ SIGTERM signal received: Closing HTTP server');
+  logger.info('\n⚠️ SIGTERM signal received: Closing HTTP server');
   if (emailWorkerIntervals) {
     emailQueueWorker.stopWorker(emailWorkerIntervals);
   }
@@ -371,15 +379,15 @@ process.on('SIGTERM', async () => {
     lifecycleEmailWorker.stopLifecycleEmailWorker();
   }
   server.close(async () => {
-    logger.info('âœ… HTTP server closed');
+    logger.info('✅ HTTP server closed');
     await mongoose.connection.close();
-    logger.info('âœ… MongoDB connection closed');
+    logger.info('✅ MongoDB connection closed');
     process.exit(0);
   });
 });
 
 process.on('SIGINT', async () => {
-  logger.info('\nâš ï¸ SIGINT signal received: Closing HTTP server');
+  logger.info('\n⚠️ SIGINT signal received: Closing HTTP server');
   if (emailWorkerIntervals) {
     emailQueueWorker.stopWorker(emailWorkerIntervals);
   }
@@ -387,9 +395,9 @@ process.on('SIGINT', async () => {
     lifecycleEmailWorker.stopLifecycleEmailWorker();
   }
   server.close(async () => {
-    logger.info('âœ… HTTP server closed');
+    logger.info('✅ HTTP server closed');
     await mongoose.connection.close();
-    logger.info('âœ… MongoDB connection closed');
+    logger.info('✅ MongoDB connection closed');
     process.exit(0);
   });
 });
