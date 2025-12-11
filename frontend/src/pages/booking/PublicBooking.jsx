@@ -142,6 +142,9 @@ export default function PublicBooking() {
 
   const handleSubmit = async () => {
     try {
+      // ✅ SRE FIX #30: Generate idempotency key for double-click prevention
+      const idempotencyKey = `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await fetch(`${API_URL}/widget/${salonSlug}/book`, {
         method: 'POST',
@@ -155,7 +158,8 @@ export default function PublicBooking() {
           },
           customerName: bookingData.customerName,
           customerEmail: bookingData.customerEmail,
-          customerPhone: bookingData.customerPhone
+          customerPhone: bookingData.customerPhone,
+          idempotencyKey // ✅ SRE FIX #30
         })
       });
 

@@ -56,11 +56,20 @@ const bookingSchema = new mongoose.Schema(
       index: true
     },
 
-    // ==================== Booking Details ====================
+    // ==================== Booking Date & Time ====================
     bookingDate: {
       type: Date,
       required: true,
       index: true
+    },
+
+    // ==================== Idempotency Key (✅ SRE FIX #30) ====================
+    idempotencyKey: {
+      type: String,
+      unique: true,
+      sparse: true, // Allow null for legacy bookings
+      index: true,
+      comment: 'Prevents duplicate bookings from double-clicks'
     },
 
     duration: {

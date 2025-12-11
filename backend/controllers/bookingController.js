@@ -21,13 +21,28 @@ import Service from '../models/Service.js';
 
 export const createBooking = async (req, res) => {
   try {
-    const { salonId, serviceId, employeeId, bookingDate, customerName, customerEmail, customerPhone, notes } = req.body;
+    const { salonId, serviceId, employeeId, bookingDate, customerName, customerEmail, customerPhone, notes, idempotencyKey } = req.body;
 
     if (!salonId || !serviceId || !bookingDate || !customerEmail) {
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields: salonId, serviceId, bookingDate, customerEmail'
       });
+    }
+
+    // ✅ SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
+    if (idempotencyKey) {
+      const existingBooking = await Booking.findOne({ idempotencyKey });
+      
+      if (existingBooking) {
+        logger.info(`⚠️ Duplicate booking attempt detected: ${idempotencyKey}`);
+        return res.status(200).json({
+          success: true,
+          message: 'Booking already exists',
+          booking: existingBooking,
+          duplicate: true
+        });
+      }
     }
 
     // Validate ObjectIds
@@ -169,7 +184,8 @@ export const createBooking = async (req, res) => {
         customerEmail: customerEmail.toLowerCase(),
         customerPhone,
         notes,
-        status: 'pending'
+        status: 'pending',
+        idempotencyKey: idempotencyKey || null // ✅ SRE FIX #30: Store idempotency key
       };
 
       const [booking] = await Booking.create([bookingData], { session });

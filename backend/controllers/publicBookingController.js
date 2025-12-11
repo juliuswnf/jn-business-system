@@ -377,7 +377,8 @@ export const createPublicBooking = async (req, res) => {
       customerEmail,
       customerPhone,
       notes,
-      language
+      language,
+      idempotencyKey  // ✅ SRE FIX #30
     } = req.body;
 
     // Validation
@@ -386,6 +387,29 @@ export const createPublicBooking = async (req, res) => {
         success: false,
         message: 'Please provide all required fields: serviceId, bookingDate, customerName, customerEmail'
       });
+    }
+
+    // ✅ SRE FIX #30: Idempotency check
+    if (idempotencyKey) {
+      const existingBooking = await Booking.findOne({ idempotencyKey });
+      
+      if (existingBooking) {
+        logger.info(`⚠️ Duplicate public booking: ${idempotencyKey}`);
+        
+        // ✅ SRE FIX #38: Email status feedback
+        const warnings = [];
+        if (!existingBooking.emailsSent?.confirmation) {
+          warnings.push('Confirmation email is delayed. You will receive it within 15 minutes.');
+        }
+        
+        return res.status(200).json({
+          success: true,
+          message: 'Booking already exists',
+          booking: existingBooking,
+          duplicate: true,
+          warnings
+        });
+      }
     }
 
     // Validate ObjectIds
@@ -553,7 +577,8 @@ export const createPublicBooking = async (req, res) => {
       notes,
       language: language || salon.defaultLanguage || 'de',
       status: 'confirmed', // Auto-confirm public bookings
-      confirmedAt: new Date()
+      confirmedAt: new Date(),
+      idempotencyKey: idempotencyKey || null // ✅ SRE FIX #30
     });
 
     // Populate for email

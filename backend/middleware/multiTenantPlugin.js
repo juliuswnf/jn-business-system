@@ -1,5 +1,8 @@
 import logger from '../utils/logger.js';
 
+// ✅ SRE FIX #25: Cache NODE_ENV for performance
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
+
 /**
  * ✅ AUDIT FIX: Mongoose Multi-Tenant Plugin
  * Automatically injects salonId filter into ALL queries
@@ -38,7 +41,7 @@ export const multiTenantPlugin = (schema, options = {}) => {
         if (!filter[tenantField]) {
           this.where({ [tenantField]: this.options.salonId });
           
-          if (process.env.NODE_ENV === 'development') {
+          if (IS_DEVELOPMENT) {
             logger.debug(`[MultiTenant] Auto-injected ${tenantField}: ${this.options.salonId}`);
           }
         }
@@ -57,7 +60,7 @@ export const multiTenantPlugin = (schema, options = {}) => {
         if (!filter[tenantField]) {
           this.where({ [tenantField]: this.options.salonId });
           
-          if (process.env.NODE_ENV === 'development') {
+          if (IS_DEVELOPMENT) {
             logger.debug(`[MultiTenant] Auto-injected ${tenantField} in update: ${this.options.salonId}`);
           }
         }
@@ -76,7 +79,7 @@ export const multiTenantPlugin = (schema, options = {}) => {
         if (!filter[tenantField]) {
           this.where({ [tenantField]: this.options.salonId });
           
-          if (process.env.NODE_ENV === 'development') {
+          if (IS_DEVELOPMENT) {
             logger.debug(`[MultiTenant] Auto-injected ${tenantField} in delete: ${this.options.salonId}`);
           }
         }
@@ -148,7 +151,7 @@ export const injectTenantContext = (req, res, next) => {
     // Store in request for easy access in controllers
     req.tenantFilter = { salonId: req.user.salonId };
     
-    if (process.env.NODE_ENV === 'development') {
+    if (IS_DEVELOPMENT) {
       logger.debug(`[MultiTenant] Tenant context set: ${req.user.salonId}`);
     }
   } else if (req.user && req.user.role === 'ceo') {

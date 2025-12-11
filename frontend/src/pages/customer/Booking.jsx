@@ -185,6 +185,9 @@ export default function Booking() {
     setSubmitting(true);
 
     try {
+      // ✅ SRE FIX #30: Generate idempotency key
+      const idempotencyKey = `booking-${customerProfile.email}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await fetch(`${API_URL}/bookings/public/s/${bookingData.salonSlug}/book`, {
         method: 'POST',
@@ -199,14 +202,21 @@ export default function Booking() {
           customerName: customerProfile.name,
           customerEmail: customerProfile.email,
           customerPhone: customerProfile.phone,
-          notes: bookingData.note
+          notes: bookingData.note,
+          idempotencyKey // ✅ SRE FIX #30
         })
       });
 
       const data = await res.json();
 
       if (res.ok && data.success) {
-        showNotification('Termin erfolgreich gebucht! Bestätigung per E-Mail.', 'success');
+        // ✅ SRE FIX #38: Show email warnings if any
+        if (data.warnings && data.warnings.length > 0) {
+          showNotification('Termin gebucht! ' + data.warnings[0], 'warning');
+        } else {
+          showNotification('Termin erfolgreich gebucht! Bestätigung per E-Mail.', 'success');
+        }
+        
         // Reset form
         setBookingStep(0);
         setBookingData({
