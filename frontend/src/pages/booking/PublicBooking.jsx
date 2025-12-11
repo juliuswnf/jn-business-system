@@ -142,15 +142,17 @@ export default function PublicBooking() {
 
   const handleSubmit = async () => {
     try {
-      const bookingDateTime = new Date(`${bookingData.date}T${bookingData.time}:00`);
-      
+      // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await fetch(`${API_URL}/widget/${salonSlug}/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           serviceId: bookingData.serviceId,
           employeeId: bookingData.employeeId || undefined,
-          bookingDate: bookingDateTime.toISOString(),
+          bookingDate: {
+            date: bookingData.date, // "2025-12-15"
+            time: bookingData.time  // "14:00"
+          },
           customerName: bookingData.customerName,
           customerEmail: bookingData.customerEmail,
           customerPhone: bookingData.customerPhone

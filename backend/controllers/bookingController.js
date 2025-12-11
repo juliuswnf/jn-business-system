@@ -41,13 +41,49 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid employee ID format' });
     }
 
-    // Validate and parse date
-    const parsedDate = parseValidDate(bookingDate);
-    if (!parsedDate) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid date format'
-      });
+    // ✅ AUDIT FIX: Parse and validate date with timezone support
+    let parsedDate;
+    
+    // Support new { date, time } format OR legacy ISO string
+    if (typeof bookingDate === 'object' && bookingDate.date && bookingDate.time) {
+      // New format: { date: "2025-12-15", time: "14:00" }
+      const salon = await Salon.findById(salonId);
+      if (!salon) {
+        return res.status(404).json({
+          success: false,
+          message: 'Salon not found'
+        });
+      }
+
+      // Validate booking time (DST check)
+      const validation = timezoneHelpers.validateBookingTime(
+        bookingDate.date,
+        bookingDate.time,
+        salon.timezone
+      );
+
+      if (!validation.valid) {
+        return res.status(400).json({
+          success: false,
+          message: validation.error
+        });
+      }
+
+      // Convert to UTC for storage
+      parsedDate = timezoneHelpers.toUTC(
+        bookingDate.date,
+        bookingDate.time,
+        salon.timezone
+      );
+    } else {
+      // Legacy format: ISO string
+      parsedDate = parseValidDate(bookingDate);
+      if (!parsedDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date format'
+        });
+      }
     }
 
     const service = await Service.findById(serviceId);
@@ -299,13 +335,57 @@ export const updateBooking = async (req, res) => {
     if (notes !== undefined) booking.notes = notes;
     
     if (bookingDate) {
-      const parsedDate = parseValidDate(bookingDate);
-      if (!parsedDate) {
-        return res.status(400).json({
+      // ✅ AUDIT FIX: Parse and validate date with timezone support
+      let parsedDate;
+
+      // Support new { date, time } format OR legacy ISO string
+      if (typeof bookingDate === 'object' && bookingDate.date && bookingDate.time) {
+        // New format: { date: "2025-12-15", time: "14:00" }
+        const salon = await Salon.findById(booking.salonId);
+        if (!salon) {
+          return res.status(404).json({
+            success: false,
+            message: 'Salon not found'
+          });
+        }
+
+        // Validate booking time (DST check)
+        const validation = timezoneHelpers.validateBookingTime(
+          bookingDate.date,
+          bookingDate.time,
+          salon.timezone
+        );
+
+        if (!validation.valid) {
+          return res.status(400).json({
+            success: false,
+            message: validation.error
+          });
+        }
+
+        // Convert to UTC for storage
+        parsedDate = timezoneHelpers.toUTC(
+          bookingDate.date,
+          bookingDate.time,
+          salon.timezone
+        );
+      } else {
+        // Legacy format: ISO string
+        parsedDate = parseValidDate(bookingDate);
+        if (!parsedDate) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid date format'
+          });
+        }
+      }
+      
+      booking.bookingDate = parsedDate;
           success: false,
           message: 'Invalid date format'
         });
       }
+      
       booking.bookingDate = parsedDate;
     }
 

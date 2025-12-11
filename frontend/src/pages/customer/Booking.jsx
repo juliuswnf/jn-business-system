@@ -185,13 +185,17 @@ export default function Booking() {
     setSubmitting(true);
 
     try {
+      // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await fetch(`${API_URL}/bookings/public/s/${bookingData.salonSlug}/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           serviceId: bookingData.serviceId,
           employeeId: bookingData.employeeId || undefined,
-          bookingDate: `${bookingData.date}T${bookingData.time}:00`,
+          bookingDate: {
+            date: bookingData.date, // "2025-12-15"
+            time: bookingData.time  // "14:00"
+          },
           customerName: customerProfile.name,
           customerEmail: customerProfile.email,
           customerPhone: customerProfile.phone,
