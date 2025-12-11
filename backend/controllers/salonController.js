@@ -1,4 +1,5 @@
 ﻿import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 /**
  * Salon Controller - MVP
  * Salon owner operations for their salon
@@ -237,7 +238,7 @@ export const getSalonDashboard = async (req, res) => {
 
     // Get revenue (sum of completed bookings)
     const revenueData = await Booking.aggregate([
-      { $match: { salonId: require('mongoose').Types.ObjectId(salonId), status: 'completed' } },
+      { $match: { salonId: new mongoose.Types.ObjectId(salonId), status: 'completed' } },
       {
         $lookup: {
           from: 'services',

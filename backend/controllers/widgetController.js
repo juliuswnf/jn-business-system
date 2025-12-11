@@ -1,4 +1,4 @@
-﻿import Widget from '../models/Widget.js';
+import Widget from '../models/Widget.js';
 import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import logger from '../utils/logger.js';
@@ -27,9 +27,9 @@ export const createWidget = async (req, res) => {
     // Create widget
     const widget = await Widget.createForSalon(salonId, req.body);
 
-    logger.log(`âœ… Widget created for salon: ${salonId}`);
+    logger.log(`✅ Widget created for salon: ${salonId}`);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Widget created successfully',
       widget: {
@@ -50,8 +50,8 @@ export const createWidget = async (req, res) => {
       });
     }
 
-    logger.error('âŒ CreateWidget Error:', error);
-    res.status(500).json({
+    logger.error('� CreateWidget Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Failed to create widget'
     });
@@ -82,7 +82,7 @@ export const getWidget = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       widget: {
         id: widget._id,
@@ -98,8 +98,8 @@ export const getWidget = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('âŒ GetWidget Error:', error);
-    res.status(500).json({
+    logger.error('❌ GetWidget Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Failed to fetch widget'
     });
@@ -143,7 +143,7 @@ export const getWidgetByApiKey = async (req, res) => {
       isActive: true
     }).select('name description duration price category');
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       widget: {
         salonId: widget.salonId._id,
@@ -155,8 +155,8 @@ export const getWidgetByApiKey = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('âŒ GetWidgetByApiKey Error:', error);
-    res.status(500).json({
+    logger.error('� GetWidgetByApiKey Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Failed to fetch widget'
     });
@@ -196,16 +196,16 @@ export const updateWidget = async (req, res) => {
 
     await widget.save();
 
-    logger.log(`âœ… Widget updated: ${widget._id}`);
+    logger.log(`✅ Widget updated: ${widget._id}`);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'Widget updated successfully',
       widget
     });
   } catch (error) {
-    logger.error('âŒ UpdateWidget Error:', error);
-    res.status(500).json({
+    logger.error('� UpdateWidget Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Failed to update widget'
     });
@@ -238,9 +238,9 @@ export const regenerateApiKey = async (req, res) => {
 
     await widget.regenerateApiKey();
 
-    logger.log(`âš ï¸ API Key regenerated for salon: ${salonId}`);
+    logger.log(`⚠️ API Key regenerated for salon: ${salonId}`);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'API Key regenerated successfully',
       widget: {
@@ -250,8 +250,8 @@ export const regenerateApiKey = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('âŒ RegenerateApiKey Error:', error);
-    res.status(500).json({
+    logger.error('❌ RegenerateApiKey Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Failed to regenerate API key'
     });
@@ -284,15 +284,15 @@ export const deleteWidget = async (req, res) => {
 
     await widget.deleteOne();
 
-    logger.log(`âœ… Widget deleted: ${widget._id}`);
+    logger.log(`✅ Widget deleted: ${widget._id}`);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'Widget deleted successfully'
     });
   } catch (error) {
-    logger.error('âŒ DeleteWidget Error:', error);
-    res.status(500).json({
+    logger.error('❌ DeleteWidget Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Failed to delete widget'
     });
@@ -323,13 +323,13 @@ export const getWidgetStats = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       stats
     });
   } catch (error) {
-    logger.error('âŒ GetWidgetStats Error:', error);
-    res.status(500).json({
+    logger.error('❌ GetWidgetStats Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Failed to fetch widget stats'
     });

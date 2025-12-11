@@ -60,13 +60,17 @@ class MemoryStoreAdapter {
     let deleted = 0;
 
     for (const [key, value] of this.hits.entries()) {
-      if (now - value.timestamp > this.windowMs) {
+      // Delete if expired OR if single request older than 2x windowMs (cleanup old one-offs)
+      if (now - value.timestamp > this.windowMs || 
+          (value.count === 1 && now - value.timestamp > this.windowMs * 2)) {
         this.hits.delete(key);
         deleted++;
       }
     }
 
-    logger.log(`âœ… Cleaned up ${deleted} expired rate limit entries`);
+    if (deleted > 0) {
+      logger.log(`✅ Cleaned up ${deleted} expired rate limit entries`);
+    }
   }
 
   startCleanupInterval() {

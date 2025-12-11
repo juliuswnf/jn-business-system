@@ -7,6 +7,7 @@ import { validateBooking } from '../middleware/validationMiddleware.js';
 import { widgetLimiter, publicBookingLimiter } from '../middleware/rateLimiterMiddleware.js';
 import emailService from '../services/emailService.js';
 import logger from '../utils/logger.js';
+import { generateSecurePassword } from '../utils/validation.js';
 
 const router = express.Router();
 
@@ -222,7 +223,7 @@ router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, re
         phone: customerPhone,
         role: 'customer',
         emailVerified: false,
-        password: Math.random().toString(36).slice(-8)
+        password: generateSecurePassword(16) // Crypto-secure password, 16 chars
       });
     }
 
