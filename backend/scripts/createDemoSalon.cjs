@@ -244,15 +244,15 @@ async function createDemoSalon() {
     console.log('═══════════════════════════════════════════════════════');
     console.log('Owner Login:');
     console.log('  Email:    demo@salon-muenchen.de');
-    console.log('  Passwort: Demo123!');
+    console.log('  Passwort: (check script for default)');
     console.log('');
     console.log('Employee Login (Anna):');
     console.log('  Email:    anna@demo-salon-muenchen.de');
-    console.log('  Passwort: Demo123!');
+    console.log('  Passwort: (check script for default)');
     console.log('');
     console.log('Employee Login (Thomas):');
     console.log('  Email:    thomas@demo-salon-muenchen.de');
-    console.log('  Passwort: Demo123!');
+    console.log('  Passwort: (check script for default)');
     console.log('═══════════════════════════════════════════════════════');
     console.log('🔗 Public Booking URL:');
     console.log('   http://localhost:5173/s/demo-salon-muenchen');

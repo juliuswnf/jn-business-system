@@ -41,9 +41,9 @@ const unlockAndResetCEO = async () => {
 
     await ceo.save();
 
-    console.log('\nâœ… CEO account unlocked and password reset!');
+    console.log('\n✅ CEO account unlocked and password reset!');
     console.log('   Email: julius@jn-automation.de');
-    console.log('   Password: CEO@12345');
+    console.log('   Password: (check script for default)');
 
     await mongoose.disconnect();
     console.log('\nâœ… Done!');

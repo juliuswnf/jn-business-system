@@ -34,15 +34,15 @@ const resetCEOPassword = async () => {
         isActive: true,
         emailVerified: true
       });
-      console.log('âœ… CEO created with password: CEO@12345');
+      console.log('✅ CEO created with default password');
     } else {
-      console.log('âœ… CEO found, updating password...');
+      console.log('✅ CEO found, updating password...');
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash('CEO@12345', salt);
 
       ceo.password = hashedPassword;
       await ceo.save();
-      console.log('âœ… CEO password updated to: CEO@12345');
+      console.log('✅ CEO password updated successfully');
     }
 
     await mongoose.disconnect();

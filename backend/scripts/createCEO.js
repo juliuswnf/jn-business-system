@@ -26,11 +26,11 @@ const createCEO = async () => {
       emailVerified: true
     });
 
-    logger.log('âœ… CEO created successfully:');
+    logger.log('✅ CEO created successfully:');
     logger.log(`   Email: ${ceo.email}`);
     logger.log(`   Name: ${ceo.name}`);
     logger.log(`   Role: ${ceo.role}`);
-    logger.log('   Password: CEO@12345');
+    logger.log('   Password: (set - check script for default)');
 
     process.exit(0);
   } catch (error) {

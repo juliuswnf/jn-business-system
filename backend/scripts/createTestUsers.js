@@ -84,17 +84,17 @@ const createTestUsers = async () => {
     console.log('       TEST LOGIN CREDENTIALS');
     console.log('========================================\n');
 
-    console.log('ðŸ” CEO LOGIN (Ctrl+Shift+C oder /system/admin):');
+    console.log('🔐 CEO LOGIN (Ctrl+Shift+C oder /system/admin):');
     console.log('   Email:    julius@jn-automation.de');
-    console.log('   Passwort: CEO@12345\n');
+    console.log('   Passwort: (check script for default)\n');
 
-    console.log('ðŸ’¼ BUSINESS LOGIN (/login/business):');
+    console.log('💼 BUSINESS LOGIN (/login/business):');
     console.log('   Email:    business@test.de');
-    console.log('   Passwort: Business@123\n');
+    console.log('   Passwort: (check script for default)\n');
 
-    console.log('ðŸ‘¤ CUSTOMER LOGIN (/login/customer):');
+    console.log('👤 CUSTOMER LOGIN (/login/customer):');
     console.log('   Email:    kunde@test.de');
-    console.log('   Passwort: Kunde@123\n');
+    console.log('   Passwort: (check script for default)\n');
 
     console.log('========================================\n');
 

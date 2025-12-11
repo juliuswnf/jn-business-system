@@ -19,7 +19,7 @@ const testAndFixCEO = async () => {
       process.exit(1);
     }
 
-    console.log('\nðŸ“‹ CEO Account Info:');
+    console.log('\n📋 CEO Account Info:');
     console.log('   Email:', ceo.email);
     console.log('   Role:', ceo.role);
     console.log('   Has password:', !!ceo.password);
@@ -28,8 +28,8 @@ const testAndFixCEO = async () => {
     // Test current password
     const testPassword = 'CEO@12345';
     const isMatch = await bcrypt.compare(testPassword, ceo.password);
-    console.log('\nðŸ” Password Test:');
-    console.log('   Testing: CEO@12345');
+    console.log('\n🔐 Password Test:');
+    console.log('   Testing: (default password)');
     console.log('   Match:', isMatch);
 
     if (!isMatch) {

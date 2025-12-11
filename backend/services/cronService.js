@@ -3,6 +3,7 @@ import logger from '../utils/logger.js';
 import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';
 import { sendBookingReminder, sendReviewRequest } from './emailService.js';
+import backupService from './backupService.js';
 
 // ==================== BOOKING REMINDER & REVIEW JOBS ====================
 
@@ -174,11 +175,22 @@ const sendWeeklyDigest = async () => {
 
 export const initializeCronJobs = () => {
   try {
-    logger.log('ðŸ• Initializing Cron Jobs...');
+    logger.log('🕐 Initializing Cron Jobs...');
 
-    // âœ… Cleanup Jobs
-    // Every day at 2 AM - Clean up old error logs
-    cron.schedule('0 2 * * *', cleanupExpiredErrorLogs);
+    // ✅ MEDIUM FIX #13: Automated Database Backups
+    // Every day at 2 AM - Create database backup
+    cron.schedule(backupService.BACKUP_SCHEDULE, async () => {
+      try {
+        logger.log('🔄 Starting scheduled database backup...');
+        await backupService.runBackupJob();
+      } catch (error) {
+        logger.error('❌ Scheduled backup failed:', error);
+      }
+    });
+
+    // ✅ Cleanup Jobs
+    // Every day at 2:30 AM - Clean up old error logs
+    cron.schedule('30 2 * * *', cleanupExpiredErrorLogs);
 
     // Every day at 3 AM - Clean up expired sessions
     cron.schedule('0 3 * * *', cleanupExpiredSessions);

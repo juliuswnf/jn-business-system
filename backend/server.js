@@ -24,6 +24,7 @@ import ceoRoutes from './routes/ceoRoutes.js';
 import widgetRoutes from './routes/widgetRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
+import systemRoutes from './routes/systemRoutes.js'; // ✅ MEDIUM FIX #13 & #14
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
@@ -176,6 +177,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bookings/public', publicBookingRoutes);
 app.use('/api/widget', widgetRoutes); // Embeddable Widget API
 app.use('/api/subscriptions', subscriptionRoutes); // Stripe Subscription Management
+app.use('/api/system', systemRoutes); // ✅ MEDIUM FIX #13 & #14: Health & Backups
 
 // Protected Routes (Auth Required)
 app.use('/api/salon', authMiddleware.protect, salonRoutes);

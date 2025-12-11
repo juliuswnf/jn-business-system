@@ -51,17 +51,17 @@ async function resetPasswords() {
     console.log('🔐 CEO LOGIN:');
     console.log('   URL:      /_.admin oder Ctrl+Shift+C');
     console.log('   Email:    julius@jn-automation.de');
-    console.log('   Passwort: CEO@12345\n');
+    console.log('   Passwort: (check script for default)\n');
 
     console.log('💼 BUSINESS LOGIN:');
     console.log('   URL:      /login/business');
     console.log('   Email:    business@test.de');
-    console.log('   Passwort: Business@123\n');
+    console.log('   Passwort: (check script for default)\n');
 
     console.log('👤 CUSTOMER LOGIN:');
     console.log('   URL:      /login/customer');
     console.log('   Email:    kunde@test.de');
-    console.log('   Passwort: Kunde@123\n');
+    console.log('   Passwort: (check script for default)\n');
 
     console.log('========================================\n');
 
