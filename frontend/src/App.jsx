@@ -41,6 +41,7 @@ const WidgetSetup = lazy(() => import('./pages/dashboard/WidgetSetup'));
 const Settings = lazy(() => import('./pages/dashboard/Settings'));
 const SuccessMetrics = lazy(() => import('./pages/dashboard/SuccessMetrics'));
 const GettingStarted = lazy(() => import('./pages/help/GettingStarted'));
+const FAQ = lazy(() => import('./pages/help/FAQ'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const CEODashboard = lazy(() => import('./pages/CEODashboard'));
 const CEOSettings = lazy(() => import('./pages/ceo/CEOSettings'));
@@ -59,6 +60,8 @@ const OnboardingWizard = lazy(() => import('./pages/onboarding/OnboardingWizard'
 
 // Public Booking (no auth required)
 const PublicBooking = lazy(() => import('./pages/booking/PublicBooking'));
+const Salons = lazy(() => import('./pages/public/Salons'));
+const SalonsByCity = lazy(() => import('./pages/public/SalonsByCity'));
 
 // Error Pages
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -185,6 +188,11 @@ function App() {
         <Route path="/impressum" element={<AppLayout><LazyPage><Impressum /></LazyPage></AppLayout>} />
         <Route path="/datenschutz" element={<AppLayout><LazyPage><Datenschutz /></LazyPage></AppLayout>} />
         <Route path="/agb" element={<AppLayout><LazyPage><AGB /></LazyPage></AppLayout>} />
+        <Route path="/faq" element={<AppLayout><LazyPage><FAQ /></LazyPage></AppLayout>} />
+        
+        {/* ==================== PUBLIC SALON PAGES (SEO) ==================== */}
+        <Route path="/salons" element={<AppLayout><LazyPage><Salons /></LazyPage></AppLayout>} />
+        <Route path="/salons/:city" element={<AppLayout><LazyPage><SalonsByCity /></LazyPage></AppLayout>} />
         
         {/* ==================== HIDDEN CEO LOGIN ==================== */}
         {/* SECURITY: Only accessible via Ctrl+Shift+C on home page */}

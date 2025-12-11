@@ -27,6 +27,14 @@ router.get(
   publicBookingController.searchSalons
 );
 
+// Get salons by city (for SEO city pages)
+// GET /api/public/salons/city/:city
+router.get(
+  '/salons/city/:city',
+  widgetLimiter,
+  publicBookingController.getSalonsByCity
+);
+
 // Get salon info by slug
 // GET /api/public/s/:slug
 router.get(

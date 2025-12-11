@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../hooks/useNotification';
-import { FiClock, FiStar, FiSearch, FiMapPin, FiScissors } from 'react-icons/fi';
+import { FiClock, FiStar } from 'react-icons/fi';
+import SalonSelector from '../../components/booking/SalonSelector';
 
 // API Base URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -37,11 +38,6 @@ export default function Booking() {
     note: '',
   });
 
-  // Salon selection state
-  const [salons, setSalons] = useState([]);
-  const [salonSearch, setSalonSearch] = useState('');
-  const [loadingSalons, setLoadingSalons] = useState(true);
-
   // Service & employee state (loaded after salon selection)
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -58,7 +54,7 @@ export default function Booking() {
     return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
   };
 
-  // Initial load: fetch customer profile and all salons
+  // Initial load: fetch customer profile
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -84,50 +80,10 @@ export default function Booking() {
           }
         }
       }
-
-      // Fetch all salons (public endpoint)
-      await fetchSalons();
-
     } catch (error) {
       console.error('Error fetching initial data:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchSalons = async () => {
-    setLoadingSalons(true);
-    try {
-      const res = await fetch(`${API_URL}/public/salons`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.salons) {
-          setSalons(data.salons);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching salons:', error);
-    } finally {
-      setLoadingSalons(false);
-    }
-  };
-
-  const searchSalons = async (query) => {
-    if (query.length < 2) {
-      fetchSalons();
-      return;
-    }
-    
-    try {
-      const res = await fetch(`${API_URL}/public/salons/search?q=${encodeURIComponent(query)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.salons) {
-          setSalons(data.salons);
-        }
-      }
-    } catch (error) {
-      console.error('Error searching salons:', error);
     }
   };
 
@@ -142,7 +98,7 @@ export default function Booking() {
 
     // Fetch services and employees for this salon
     try {
-      const res = await fetch(`${API_URL}/public/s/${salon.slug}`);
+      const res = await fetch(`${API_URL}/bookings/public/s/${salon.slug}`);
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -178,7 +134,7 @@ export default function Booking() {
 
   const fetchAvailableSlots = async () => {
     try {
-      const res = await fetch(`${API_URL}/public/s/${bookingData.salonSlug}/available-slots`, {
+      const res = await fetch(`${API_URL}/bookings/public/s/${bookingData.salonSlug}/available-slots`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -229,7 +185,7 @@ export default function Booking() {
     setSubmitting(true);
 
     try {
-      const res = await fetch(`${API_URL}/public/s/${bookingData.salonSlug}/book`, {
+      const res = await fetch(`${API_URL}/bookings/public/s/${bookingData.salonSlug}/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -275,13 +231,6 @@ export default function Booking() {
   };
 
   const timeSlots = availableSlots.length > 0 ? availableSlots : defaultTimeSlots;
-
-  const filteredSalons = salonSearch.length >= 2 
-    ? salons.filter(s => 
-        s.name?.toLowerCase().includes(salonSearch.toLowerCase()) ||
-        s.city?.toLowerCase().includes(salonSearch.toLowerCase())
-      )
-    : salons;
 
   if (loading) {
     return (
@@ -350,71 +299,10 @@ export default function Booking() {
             <h2 className="text-2xl font-bold mb-2">Wähle einen Friseursalon</h2>
             <p className="text-gray-400 mb-6">Suche nach einem Salon in deiner Nähe</p>
             
-            {/* Search */}
-            <div className="relative mb-6">
-              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                value={salonSearch}
-                onChange={(e) => {
-                  setSalonSearch(e.target.value);
-                  if (e.target.value.length >= 2) {
-                    searchSalons(e.target.value);
-                  } else if (e.target.value.length === 0) {
-                    fetchSalons();
-                  }
-                }}
-                placeholder="Salon suchen (Name, Stadt...)"
-                className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:border-zinc-500 focus:outline-none"
-              />
-            </div>
-
-            {/* Salon List */}
-            {loadingSalons ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
-                <p className="text-gray-400 mt-4">Lade Salons...</p>
-              </div>
-            ) : filteredSalons.length === 0 ? (
-              <div className="text-center py-12">
-                <FiScissors className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-                <p className="text-gray-400">Keine Salons gefunden</p>
-                <p className="text-gray-500 text-sm mt-1">Versuche es mit einem anderen Suchbegriff</p>
-              </div>
-            ) : (
-              <div className="grid gap-3 max-h-96 overflow-y-auto">
-                {filteredSalons.map((salon) => (
-                  <div
-                    key={salon._id}
-                    onClick={() => handleSalonSelect(salon)}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition ${
-                      bookingData.salonId === salon._id
-                        ? 'border-white bg-zinc-800'
-                        : 'border-zinc-700 hover:border-zinc-600 bg-zinc-800'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-1">{salon.name}</h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <FiMapPin className="w-4 h-4" />
-                          <span>
-                            {salon.address?.street ? `${salon.address.street}, ` : ''}
-                            {salon.address?.city || salon.city || 'Keine Adresse'}
-                          </span>
-                        </div>
-                        {salon.serviceCount > 0 && (
-                          <p className="text-sm text-gray-500 mt-1">{salon.serviceCount} Services verfügbar</p>
-                        )}
-                      </div>
-                      <div className="w-10 h-10 bg-zinc-700 rounded-lg flex items-center justify-center">
-                        <FiScissors className="w-5 h-5 text-gray-400" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <SalonSelector
+              onSelect={handleSalonSelect}
+              selectedSalonId={bookingData.salonId}
+            />
           </div>
         )}
 

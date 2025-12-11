@@ -112,6 +112,62 @@ export const searchSalons = async (req, res) => {
 };
 
 /**
+ * Get salons by city (for SEO city pages)
+ * GET /api/public/salons/city/:city
+ */
+export const getSalonsByCity = async (req, res) => {
+  try {
+    const { city } = req.params;
+
+    if (!city) {
+      return res.status(400).json({
+        success: false,
+        message: 'City parameter is required'
+      });
+    }
+
+    const cityRegex = new RegExp(`^${city}$`, 'i');
+
+    // Find salons in this city
+    const salons = await Salon.find({
+      'subscription.status': { $in: ['active', 'trialing'] },
+      $or: [
+        { city: cityRegex },
+        { 'address.city': cityRegex }
+      ]
+    })
+      .select('name slug address city phone businessHours')
+      .sort({ name: 1 });
+
+    // Get service count for each salon
+    const salonsWithServices = await Promise.all(
+      salons.map(async (salon) => {
+        const serviceCount = await Service.countDocuments({
+          salonId: salon._id,
+          isActive: true
+        });
+        return {
+          ...salon.toObject(),
+          serviceCount
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      salons: salonsWithServices,
+      city
+    });
+  } catch (error) {
+    logger.error('GetSalonsByCity Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
+/**
  * Get salon by slug with services and availability info
  * GET /api/public/s/:slug
  */
