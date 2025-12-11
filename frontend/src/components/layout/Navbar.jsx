@@ -46,8 +46,10 @@ const Navbar = () => {
   // Always show public links - UserMenu handles user-specific navigation
   const navLinks = [
     { to: '/', label: 'Home' },
+    { to: '/salons', label: 'Salons' },
     { to: '/demo', label: 'Demo' },
     { to: '/pricing', label: 'Preise' },
+    { to: '/faq', label: 'FAQ' },
     ...(!user ? [{ to: '/login', label: 'Anmelden' }] : []),
   ];
 

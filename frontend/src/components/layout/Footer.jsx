@@ -31,8 +31,18 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/salons" className="text-gray-400 hover:text-white transition">
+                  Salons
+                </Link>
+              </li>
+              <li>
                 <Link to="/pricing" className="text-gray-400 hover:text-white transition">
                   Preise
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="text-gray-400 hover:text-white transition">
+                  FAQ
                 </Link>
               </li>
               <li>
@@ -95,6 +105,43 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Stadt-Seiten für SEO */}
+        <div className="mt-8 pt-8 border-t border-gray-800">
+          <h4 className="text-white font-medium mb-4 text-sm">Salons in deiner Stadt</h4>
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <Link to="/salons/muenchen" className="text-xs text-gray-500 hover:text-white transition">
+              München
+            </Link>
+            <Link to="/salons/berlin" className="text-xs text-gray-500 hover:text-white transition">
+              Berlin
+            </Link>
+            <Link to="/salons/hamburg" className="text-xs text-gray-500 hover:text-white transition">
+              Hamburg
+            </Link>
+            <Link to="/salons/koeln" className="text-xs text-gray-500 hover:text-white transition">
+              Köln
+            </Link>
+            <Link to="/salons/frankfurt" className="text-xs text-gray-500 hover:text-white transition">
+              Frankfurt
+            </Link>
+            <Link to="/salons/stuttgart" className="text-xs text-gray-500 hover:text-white transition">
+              Stuttgart
+            </Link>
+            <Link to="/salons/duesseldorf" className="text-xs text-gray-500 hover:text-white transition">
+              Düsseldorf
+            </Link>
+            <Link to="/salons/dortmund" className="text-xs text-gray-500 hover:text-white transition">
+              Dortmund
+            </Link>
+            <Link to="/salons/essen" className="text-xs text-gray-500 hover:text-white transition">
+              Essen
+            </Link>
+            <Link to="/salons/leipzig" className="text-xs text-gray-500 hover:text-white transition">
+              Leipzig
+            </Link>
           </div>
         </div>
 
