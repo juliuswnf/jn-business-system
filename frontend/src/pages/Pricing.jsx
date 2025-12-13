@@ -10,10 +10,10 @@ const plans = [
     yearlyPrice: 690,
     yearlyMonthlyCost: 57.50,
     features: [
-      { name: 'Mitarbeiter', value: '3', icon: '👥' },
-      { name: 'Standorte', value: '1', icon: '📍' },
-      { name: 'Buchungen/Monat', value: '200', icon: '📅' },
-      { name: 'Kunden', value: '500', icon: '👤' },
+      { name: 'Mitarbeiter', value: '3' },
+      { name: 'Standorte', value: '1' },
+      { name: 'Buchungen/Monat', value: '200' },
+      { name: 'Kunden', value: '500' },
       { name: 'Online-Buchung', included: true },
       { name: 'Kalender & Terminverwaltung', included: true },
       { name: 'E-Mail-Benachrichtigungen', included: true },
@@ -40,10 +40,10 @@ const plans = [
     yearlyMonthlyCost: 140.83,
     popular: true,
     features: [
-      { name: 'Mitarbeiter', value: '10', icon: '👥' },
-      { name: 'Standorte', value: '1', icon: '📍' },
-      { name: 'Buchungen/Monat', value: '1.000', icon: '📅' },
-      { name: 'Kunden', value: '2.500', icon: '👤' },
+      { name: 'Mitarbeiter', value: '10' },
+      { name: 'Standorte', value: '1' },
+      { name: 'Buchungen/Monat', value: '1.000' },
+      { name: 'Kunden', value: '2.500' },
       { name: 'Alles aus Starter', included: true, bold: true },
       { name: 'Marketing-Automation', included: true },
       { name: 'Erweiterte Analytics', included: true },
@@ -71,10 +71,10 @@ const plans = [
     yearlyMonthlyCost: 332.50,
     badge: 'SMS INCLUDED',
     features: [
-      { name: 'Mitarbeiter', value: 'Unbegrenzt', icon: '👥' },
-      { name: 'Standorte', value: '5', icon: '📍' },
-      { name: 'Buchungen/Monat', value: 'Unbegrenzt', icon: '📅' },
-      { name: 'Kunden', value: 'Unbegrenzt', icon: '👤' },
+      { name: 'Mitarbeiter', value: 'Unbegrenzt' },
+      { name: 'Standorte', value: '5' },
+      { name: 'Buchungen/Monat', value: 'Unbegrenzt' },
+      { name: 'Kunden', value: 'Unbegrenzt' },
       { name: 'Alles aus Professional', included: true, bold: true },
       { name: 'SMS-Benachrichtigungen', value: '500/Monat', included: true, highlight: true },
       { name: 'Multi-Standort Support', included: true },
@@ -130,7 +130,7 @@ export default function Pricing() {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4">Pricing</h1>
+          <h1 className="text-5xl font-bold mb-4">Preise</h1>
           <p className="text-gray-400 text-xl max-w-2xl mx-auto">
             Transparente Preise. Keine versteckten Kosten.
             <br />
@@ -199,7 +199,7 @@ export default function Pricing() {
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="inline-block text-xs font-bold bg-white text-black px-4 py-1.5 rounded-full">
-                    🔥 BELIEBT
+                    BELIEBT
                   </span>
                 </div>
               )}
