@@ -85,10 +85,10 @@ const checkStripe = async () => {
 
     const stripeClient = getStripe();
     const startTime = Date.now();
-    
+
     // Test API call
     await stripeClient.balance.retrieve();
-    
+
     const responseTime = Date.now() - startTime;
 
     return {
@@ -123,7 +123,7 @@ const checkEmailQueue = async () => {
       .lean();
 
     // Alert if >100 pending or oldest pending >1 hour
-    const maxPendingAge = oldestPending 
+    const maxPendingAge = oldestPending
       ? Date.now() - new Date(oldestPending.createdAt).getTime()
       : 0;
     const oneHour = 60 * 60 * 1000;
@@ -158,7 +158,7 @@ const checkMemory = () => {
     const heapUsedMB = Math.round(used.heapUsed / 1024 / 1024);
     const heapTotalMB = Math.round(used.heapTotal / 1024 / 1024);
     const rssMB = Math.round(used.rss / 1024 / 1024);
-    
+
     const heapUsagePercent = (used.heapUsed / used.heapTotal) * 100;
     const isHealthy = heapUsagePercent < 90; // Alert if >90% heap used
 
@@ -243,7 +243,7 @@ export const healthCheckEndpoint = async (req, res) => {
     const health = await getHealthStatus();
 
     // Return appropriate HTTP status code
-    const statusCode = health.status === 'healthy' ? 200 : 
+    const statusCode = health.status === 'healthy' ? 200 :
                        health.status === 'degraded' ? 200 : 503;
 
     res.status(statusCode).json({

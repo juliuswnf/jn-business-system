@@ -1,6 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import logger from '../utils/logger.js';
 
 /**
  * ? SRE FIX #33: File Upload Validation
@@ -27,12 +28,12 @@ const MAX_IMAGE_HEIGHT = 4000;
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(process.cwd(), 'uploads', 'temp');
-    
+
     // Create directory if not exists
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
-    
+
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -49,15 +50,15 @@ const fileFilter = (req, file, cb) => {
   if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     return cb(new Error(`Invalid file type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`), false);
   }
-  
+
   // Check file extension
   const ext = path.extname(file.originalname).toLowerCase();
   const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
-  
+
   if (!allowedExts.includes(ext)) {
     return cb(new Error(`Invalid file extension. Allowed: ${allowedExts.join(', ')}`), false);
   }
-  
+
   cb(null, true);
 };
 
@@ -79,19 +80,19 @@ export const validateImageDimensions = async (filePath) => {
   try {
     // Lazy load sharp (only if needed)
     const sharp = (await import('sharp')).default;
-    
+
     const metadata = await sharp(filePath).metadata();
-    
+
     if (metadata.width > MAX_IMAGE_WIDTH || metadata.height > MAX_IMAGE_HEIGHT) {
       // Delete invalid file
       fs.unlinkSync(filePath);
-      
+
       throw new Error(
         `Image dimensions too large. Max: ${MAX_IMAGE_WIDTH}x${MAX_IMAGE_HEIGHT}px, ` +
         `got: ${metadata.width}x${metadata.height}px`
       );
     }
-    
+
     return {
       valid: true,
       width: metadata.width,
@@ -104,7 +105,7 @@ export const validateImageDimensions = async (filePath) => {
       logger.warn('?? sharp not installed - skipping image dimension validation');
       return { valid: true, skipped: true };
     }
-    
+
     throw error;
   }
 };
@@ -130,35 +131,35 @@ export const handleUploadError = (err, req, res, next) => {
         message: `File too large. Max size: ${MAX_FILE_SIZE / 1024 / 1024}MB`
       });
     }
-    
+
     if (err.code === 'LIMIT_FILE_COUNT') {
       return res.status(400).json({
         success: false,
         message: 'Too many files. Max 1 file per request'
       });
     }
-    
+
     return res.status(400).json({
       success: false,
       message: `Upload error: ${err.message}`
     });
   }
-  
+
   if (err) {
     return res.status(400).json({
       success: false,
       message: err.message || 'File upload failed'
     });
   }
-  
+
   next();
 };
 
 /**
  * Example usage in route:
- * 
+ *
  * import { upload, validateImageDimensions, handleUploadError } from './middleware/fileUploadMiddleware.js';
- * 
+ *
  * router.post('/upload/logo',
  *   upload.single('logo'),
  *   handleUploadError,
@@ -166,7 +167,7 @@ export const handleUploadError = (err, req, res, next) => {
  *     try {
  *       // Validate dimensions
  *       await validateImageDimensions(req.file.path);
- *       
+ *
  *       // Process file...
  *       res.json({ success: true, file: req.file });
  *     } catch (error) {
