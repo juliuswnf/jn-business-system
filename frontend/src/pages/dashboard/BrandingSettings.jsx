@@ -387,7 +387,7 @@ export default function BrandingSettings() {
               ) : (
                 <div className="w-10 h-10 rounded-lg bg-gray-700"></div>
               )}
-              <span className="text-white font-semibold">Ihr Salon</span>
+              <span className="text-white font-semibold">Ihr Unternehmen</span>
             </div>
             <p className="text-gray-300 mb-4">Wählen Sie einen Service für Ihre Buchung.</p>
             <button

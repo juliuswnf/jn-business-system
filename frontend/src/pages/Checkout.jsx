@@ -41,7 +41,7 @@ const plans = {
     name: 'Enterprise',
     price: 199,
     yearlyPrice: 159,
-    description: 'Für Salon-Ketten & Multi-Location Unternehmen',
+    description: 'Für Multi-Location Unternehmen & Filialisten',
     features: [
       'Unbegrenzte Termine',
       'Unbegrenzte Mitarbeiter',

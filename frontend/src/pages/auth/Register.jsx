@@ -235,7 +235,7 @@ export default function Register() {
                   name="companyName"
                   value={formData.companyName}
                   onChange={handleChange}
-                  placeholder="Ihr Salon"
+                  placeholder="Ihr Unternehmen"
                   className={`input-field ${errors.companyName ? 'input-error' : ''}`}
                 />
                 {errors.companyName && <p className="text-red-400 text-xs mt-1">{errors.companyName}</p>}

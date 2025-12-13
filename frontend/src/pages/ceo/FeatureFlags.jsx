@@ -138,7 +138,7 @@ const FeatureFlags = () => {
     const labels = {
       all: 'Alle Benutzer',
       percentage: 'Prozentsatz',
-      salon_ids: 'Spezifische Salons',
+      salon_ids: 'Spezifische Unternehmen',
       beta_users: 'Beta-Benutzer'
     };
     return labels[type] || type;
@@ -324,7 +324,7 @@ if (await isFeatureEnabled('new_dashboard', salonId)) {
                 <select value={newFlag.targetType} onChange={(e) => setNewFlag({...newFlag, targetType: e.target.value})} className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
                   <option value="all">Alle Benutzer</option>
                   <option value="percentage">Prozentsatz</option>
-                  <option value="salon_ids">Spezifische Salons</option>
+                  <option value="salon_ids">Spezifische Unternehmen</option>
                   <option value="beta_users">Beta-Benutzer</option>
                 </select>
               </div>
@@ -336,7 +336,7 @@ if (await isFeatureEnabled('new_dashboard', salonId)) {
               )}
               {newFlag.targetType === 'salon_ids' && (
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">Salon IDs (kommagetrennt)</label>
+                  <label className="block text-gray-400 text-sm mb-2">Unternehmens-IDs (kommagetrennt)</label>
                   <input type="text" value={newFlag.targetValue} onChange={(e) => setNewFlag({...newFlag, targetValue: e.target.value})} className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" placeholder="id1, id2, id3" />
                 </div>
               )}
@@ -373,7 +373,7 @@ if (await isFeatureEnabled('new_dashboard', salonId)) {
                 <select value={selectedFlag.targetType} onChange={(e) => setSelectedFlag({...selectedFlag, targetType: e.target.value})} className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
                   <option value="all">Alle Benutzer</option>
                   <option value="percentage">Prozentsatz</option>
-                  <option value="salon_ids">Spezifische Salons</option>
+                  <option value="salon_ids">Spezifische Unternehmen</option>
                   <option value="beta_users">Beta-Benutzer</option>
                 </select>
               </div>
@@ -385,7 +385,7 @@ if (await isFeatureEnabled('new_dashboard', salonId)) {
               )}
               {selectedFlag.targetType === 'salon_ids' && (
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">Salon IDs (kommagetrennt)</label>
+                  <label className="block text-gray-400 text-sm mb-2">Unternehmens-IDs (kommagetrennt)</label>
                   <input type="text" value={selectedFlag.targetValue} onChange={(e) => setSelectedFlag({...selectedFlag, targetValue: e.target.value})} className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" />
                 </div>
               )}

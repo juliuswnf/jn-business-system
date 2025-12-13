@@ -19,11 +19,11 @@ const STEPS = [
 const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 
 const DEFAULT_SERVICES = [
-  { name: 'Herrenhaarschnitt', duration: 30, price: 25 },
-  { name: 'Damenhaarschnitt', duration: 45, price: 40 },
-  { name: 'Waschen & Föhnen', duration: 30, price: 25 },
-  { name: 'Färben', duration: 90, price: 80 },
-  { name: 'Bartpflege', duration: 20, price: 15 },
+  { name: 'Beratung Standard', duration: 30, price: 25 },
+  { name: 'Beratung Premium', duration: 45, price: 40 },
+  { name: 'Basis Service', duration: 30, price: 25 },
+  { name: 'Behandlung Komplett', duration: 90, price: 80 },
+  { name: 'Express Service', duration: 20, price: 15 },
 ];
 
 export default function OnboardingWizard() {
@@ -447,7 +447,7 @@ export default function OnboardingWizard() {
                 onClick={useTemplate}
                 className="w-full px-4 py-3 border border-dashed border-zinc-600 rounded-xl text-zinc-400 hover:text-white hover:border-zinc-500 transition text-sm"
               >
-                Vorlage für Friseur-Services verwenden
+                Beispiel-Services verwenden
               </button>
 
               {/* Services List */}

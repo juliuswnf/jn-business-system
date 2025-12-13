@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { MapPinIcon, ChevronRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 /**
- * Stadt-spezifische Salon Page - SEO optimiert
+ * Stadt-spezifische Dienstleister Page - SEO optimiert
  * Dynamic Route: /salons/[city]
  * Beispiele: /salons/muenchen, /salons/berlin, /salons/hamburg
  */
@@ -51,11 +51,11 @@ const SalonsByCity = () => {
       if (data.success) {
         setSalons(data.salons);
       } else {
-        setError('Keine Salons in dieser Stadt gefunden.');
+        setError('Keine Anbieter in dieser Stadt gefunden.');
       }
     } catch (err) {
       console.error('Error fetching salons:', err);
-      setError('Fehler beim Laden der Salons.');
+      setError('Fehler beim Laden der Anbieter.');
     } finally {
       setLoading(false);
     }
@@ -72,14 +72,14 @@ const SalonsByCity = () => {
             className="inline-flex items-center gap-2 text-indigo-100 hover:text-white mb-6 transition-colors"
           >
             <ArrowLeftIcon className="h-5 w-5" />
-            Alle Salons
+            Alle Anbieter
           </Link>
 
           <h1 className="text-4xl font-bold mb-4">
-            Friseure in {displayCityName}
+            Dienstleister in {displayCityName}
           </h1>
           <p className="text-xl text-indigo-100">
-            Die besten Salons in {displayCityName} - Online Termin buchen
+            Die besten Anbieter in {displayCityName} - Online Termin buchen
           </p>
         </div>
       </div>
@@ -109,7 +109,7 @@ const SalonsByCity = () => {
         ) : salons.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg mb-4">
-              Aktuell keine Salons in {displayCityName} verfügbar.
+              Aktuell keine Anbieter in {displayCityName} verfügbar.
             </p>
             <Link
               to="/salons"
@@ -122,7 +122,7 @@ const SalonsByCity = () => {
           <>
             <div className="mb-6">
               <p className="text-gray-600">
-                {salons.length} {salons.length === 1 ? 'Salon' : 'Salons'} in {displayCityName}
+                {salons.length} {salons.length === 1 ? 'Anbieter' : 'Anbieter'} in {displayCityName}
               </p>
             </div>
 
@@ -174,12 +174,12 @@ const SalonsByCity = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="prose max-w-none">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Friseur {displayCityName} - Online Termin buchen
+              Dienstleister {displayCityName} - Online Termin buchen
             </h2>
             <p className="text-gray-600 mb-4">
-              Entdecke die besten Friseure und Salons in {displayCityName}. Buche deinen Termin 
-              bequem online - 24/7 verfügbar mit sofortiger Bestätigung. Egal ob Herrenschnitt, 
-              Damenfrisur, Färben oder Styling - finde den perfekten Salon in deiner Nähe.
+              Entdecke die besten Dienstleister in {displayCityName}. Buche deinen Termin 
+              bequem online - 24/7 verfügbar mit sofortiger Bestätigung. Egal ob Beratung, 
+              Behandlung, Training oder Wellness - finde den perfekten Anbieter in deiner Nähe.
             </p>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Vorteile der Online-Buchung in {displayCityName}
@@ -188,7 +188,7 @@ const SalonsByCity = () => {
               <li>✓ Sofortige Terminbestätigung ohne Wartezeit</li>
               <li>✓ Übersicht aller verfügbaren Termine</li>
               <li>✓ Einfache Verwaltung und Umbuchung</li>
-              <li>✓ Top-bewertete Salons in {displayCityName}</li>
+              <li>✓ Top-bewertete Anbieter in {displayCityName}</li>
             </ul>
           </div>
         </div>

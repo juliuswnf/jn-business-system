@@ -34,7 +34,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/salons" className="text-gray-400 hover:text-white transition">
-                  Salons
+                  Anbieter
                 </Link>
               </li>
               <li>
@@ -63,7 +63,7 @@ const Footer = () => {
           {/* Produkt - nur für Business User */}
           {user && (user.role === 'salon_owner' || user.role === 'employee' || user.role === 'ceo') && (
             <div>
-              <h4 className="text-white font-medium mb-4">Für Salons</h4>
+              <h4 className="text-white font-medium mb-4">Für Unternehmen</h4>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link to="/dashboard" className="text-gray-400 hover:text-white transition">
@@ -106,7 +106,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link to="/salons" className="text-gray-400 hover:text-white transition">
-                    Salons finden
+                    Anbieter finden
                   </Link>
                 </li>
               </ul>
@@ -116,7 +116,7 @@ const Footer = () => {
           {/* Für nicht-angemeldete User */}
           {!user && (
             <div>
-              <h4 className="text-white font-medium mb-4">Für Salons</h4>
+              <h4 className="text-white font-medium mb-4">Für Unternehmen</h4>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link to="/demo" className="text-gray-400 hover:text-white transition">
@@ -162,7 +162,7 @@ const Footer = () => {
 
         {/* Stadt-Seiten für SEO */}
         <div className="mt-8 pt-8 border-t border-gray-800">
-          <h4 className="text-white font-medium mb-4 text-sm">Salons in deiner Stadt</h4>
+          <h4 className="text-white font-medium mb-4 text-sm">Anbieter in deiner Stadt</h4>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link to="/salons/muenchen" className="text-xs text-gray-500 hover:text-white transition">
               München

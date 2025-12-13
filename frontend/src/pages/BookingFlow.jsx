@@ -9,8 +9,8 @@ const BookingFlow = () => {
   const [customerInfo, setCustomerInfo] = useState({ name: '', email: '', phone: '' });
 
   const services = [
-    { id: 1, name: 'Haarschnitt', price: 25, duration: 30 },
-    { id: 2, name: 'Färben', price: 50, duration: 60 }
+    { id: 1, name: 'Beratung', price: 25, duration: 30 },
+    { id: 2, name: 'Behandlung', price: 50, duration: 60 }
   ];
 
   const handleServiceSelect = (service) => {

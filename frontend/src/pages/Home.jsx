@@ -11,7 +11,7 @@ function Home() {
             {/* Left: Text Content */}
             <div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                Online-Buchungssystem für Salons
+                Online-Buchungssystem für Ihr Unternehmen
               </h1>
               <p className="text-xl text-gray-400 mb-8 max-w-lg">
                 Kunden buchen Termine direkt über Ihre Website. 
@@ -49,7 +49,7 @@ function Home() {
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                         <span className="text-black font-bold text-sm">JN</span>
                       </div>
-                      <span className="font-medium">Mein Salon Dashboard</span>
+                      <span className="font-medium">Mein Dashboard</span>
                     </div>
                     <div className="flex gap-1.5">
                       <div className="w-3 h-3 rounded-full bg-zinc-600" />
@@ -85,7 +85,7 @@ function Home() {
                             <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">MH</div>
                             <div>
                               <div className="font-medium">Maria H.</div>
-                              <div className="text-sm text-gray-500">Haarschnitt · 10:30 Uhr</div>
+                              <div className="text-sm text-gray-500">Beratung · 10:30 Uhr</div>
                             </div>
                           </div>
                           <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Bestätigt</span>
@@ -95,7 +95,7 @@ function Home() {
                             <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">SK</div>
                             <div>
                               <div className="font-medium">Sophie K.</div>
-                              <div className="text-sm text-gray-500">Färben · 14:00 Uhr</div>
+                              <div className="text-sm text-gray-500">Behandlung · 14:00 Uhr</div>
                             </div>
                           </div>
                           <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">Neu</span>
@@ -105,7 +105,7 @@ function Home() {
                             <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">LM</div>
                             <div>
                               <div className="font-medium">Lisa M.</div>
-                              <div className="text-sm text-gray-500">Styling · 16:30 Uhr</div>
+                              <div className="text-sm text-gray-500">Termin · 16:30 Uhr</div>
                             </div>
                           </div>
                           <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Bestätigt</span>
@@ -229,7 +229,7 @@ function Home() {
               <div className="grid grid-cols-2 gap-8">
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">500+</div>
-                  <div className="text-gray-500 text-sm">Aktive Salons</div>
+                  <div className="text-gray-500 text-sm">Aktive Unternehmen</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">50k+</div>

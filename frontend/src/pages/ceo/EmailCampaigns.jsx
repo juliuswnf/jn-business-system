@@ -309,9 +309,9 @@ const EmailCampaigns = () => {
               <div>
                 <label className="block text-gray-400 text-sm mb-2">Empfänger</label>
                 <select value={newCampaign.recipients} onChange={(e) => setNewCampaign({...newCampaign, recipients: e.target.value})} className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
-                  <option value="all">Alle Salons</option>
-                  <option value="active">Nur aktive Salons</option>
-                  <option value="inactive">Inaktive Salons</option>
+                  <option value="all">Alle Unternehmen</option>
+                  <option value="active">Nur aktive Unternehmen</option>
+                  <option value="inactive">Inaktive Unternehmen</option>
                   <option value="trial">Trial-Nutzer</option>
                   <option value="premium">Premium-Kunden</option>
                 </select>

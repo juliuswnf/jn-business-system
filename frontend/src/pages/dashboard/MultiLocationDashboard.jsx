@@ -166,12 +166,18 @@ export default function MultiLocationDashboard() {
   };
 
   const businessTypes = [
-    { value: 'hair-salon', label: 'Friseursalon' },
-    { value: 'beauty-salon', label: 'Beautysalon' },
+    { value: 'hair-salon', label: 'Friseur' },
+    { value: 'beauty-salon', label: 'Beauty-Studio' },
     { value: 'spa-wellness', label: 'Spa & Wellness' },
     { value: 'tattoo-piercing', label: 'Tattoo & Piercing' },
     { value: 'nail-salon', label: 'Nagelstudio' },
-    { value: 'barbershop', label: 'Barbershop' }
+    { value: 'barbershop', label: 'Barbershop' },
+    { value: 'massage-therapy', label: 'Massage-Praxis' },
+    { value: 'physiotherapy', label: 'Physiotherapie' },
+    { value: 'personal-training', label: 'Personal Training' },
+    { value: 'yoga-studio', label: 'Yoga-Studio' },
+    { value: 'medical-aesthetics', label: 'Medizinische Ästhetik' },
+    { value: 'other', label: 'Sonstiges' }
   ];
 
   if (loading) {
@@ -376,7 +382,7 @@ export default function MultiLocationDashboard() {
                   value={newLocation.name}
                   onChange={(e) => setNewLocation({ ...newLocation, name: e.target.value })}
                   required
-                  placeholder="z.B. Salon Mitte"
+                  placeholder="z.B. Standort Mitte"
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
               </div>
@@ -388,7 +394,7 @@ export default function MultiLocationDashboard() {
                   value={newLocation.email}
                   onChange={(e) => setNewLocation({ ...newLocation, email: e.target.value })}
                   required
-                  placeholder="salon-mitte@example.com"
+                  placeholder="standort-mitte@example.com"
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
               </div>

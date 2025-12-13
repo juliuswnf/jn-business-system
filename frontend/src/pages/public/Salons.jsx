@@ -3,8 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { MapPinIcon, MagnifyingGlassIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 /**
- * /salons Landing Page - SEO-optimierte Salon-Übersicht
- * Marketplace Discovery für alle aktiven Salons
+ * /salons Landing Page - SEO-optimierte Dienstleister-Übersicht
+ * Marketplace Discovery für alle aktiven Unternehmen
  */
 const Salons = () => {
   const navigate = useNavigate();
@@ -62,10 +62,10 @@ const Salons = () => {
       <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">
-            Friseure & Salons in deiner Nähe
+            Dienstleister in deiner Nähe
           </h1>
           <p className="text-xl text-indigo-100 mb-8">
-            Entdecke Top-Salons und buche online deinen nächsten Termin
+            Entdecke Top-Anbieter und buche online deinen nächsten Termin
           </p>
 
           {/* Search Bar */}
@@ -74,7 +74,7 @@ const Salons = () => {
               <MagnifyingGlassIcon className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Salonname oder Stadt eingeben..."
+                placeholder="Name oder Stadt eingeben..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -121,14 +121,14 @@ const Salons = () => {
         ) : filteredSalons.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400 text-lg">
-              Keine Salons gefunden. Versuche einen anderen Suchbegriff.
+              Keine Anbieter gefunden. Versuche einen anderen Suchbegriff.
             </p>
           </div>
         ) : (
           <>
             <div className="mb-6">
               <p className="text-gray-600 dark:text-gray-400">
-                {filteredSalons.length} {filteredSalons.length === 1 ? 'Salon' : 'Salons'} gefunden
+                {filteredSalons.length} {filteredSalons.length === 1 ? 'Anbieter' : 'Anbieter'} gefunden
               </p>
             </div>
 
@@ -203,11 +203,11 @@ const Salons = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="prose max-w-none">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Online Termine bei Top-Friseuren buchen
+              Online Termine bei Top-Dienstleistern buchen
             </h2>
             <p className="text-gray-600 mb-4">
-              Finde den perfekten Friseur in deiner Stadt und buche deinen Termin bequem online - 
-              24/7 verfügbar, sofortige Bestätigung. Alle Salons auf unserer Plattform bieten 
+              Finde den perfekten Anbieter in deiner Stadt und buche deinen Termin bequem online - 
+              24/7 verfügbar, sofortige Bestätigung. Alle Unternehmen auf unserer Plattform bieten 
               professionelle Services und moderne Buchungsmöglichkeiten.
             </p>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">

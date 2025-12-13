@@ -90,7 +90,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
             </button>
           )}
         </div>
-        <p className="text-gray-400 text-sm mt-1">Salon Management</p>
+        <p className="text-gray-400 text-sm mt-1">Business Management</p>
       </div>
 
       {/* User Info */}

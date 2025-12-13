@@ -2,11 +2,11 @@
 import { Link } from 'react-router-dom';
 
 const SERVICES = [
-  { id: 1, name: 'Haarschnitt Damen', duration: 45, price: 45 },
-  { id: 2, name: 'Haarschnitt Herren', duration: 30, price: 28 },
-  { id: 3, name: 'Färben komplett', duration: 120, price: 85 },
-  { id: 4, name: 'Balayage / Highlights', duration: 150, price: 120 },
-  { id: 5, name: 'Waschen & Föhnen', duration: 30, price: 25 },
+  { id: 1, name: 'Beratung Standard', duration: 45, price: 45 },
+  { id: 2, name: 'Beratung Express', duration: 30, price: 28 },
+  { id: 3, name: 'Behandlung Komplett', duration: 120, price: 85 },
+  { id: 4, name: 'Premium Behandlung', duration: 150, price: 120 },
+  { id: 5, name: 'Basis Service', duration: 30, price: 25 },
 ];
 
 const EMPLOYEES = ['Julia M.', 'Marco S.', 'Lisa K.'];

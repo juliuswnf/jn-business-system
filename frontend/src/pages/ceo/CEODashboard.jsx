@@ -72,7 +72,7 @@ const CEODashboard = () => {
           <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Total Salons</p>
+                <p className="text-sm text-gray-400">Unternehmen</p>
                 <p className="text-3xl font-bold text-white">{stats.totalSalons}</p>
               </div>
               <BuildingStorefrontIcon className="h-12 w-12 text-blue-500" />
@@ -166,7 +166,7 @@ const CEODashboard = () => {
             <div className="grid grid-cols-2 gap-4">
               <Link to="/ceo/companies" className="flex items-center p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-blue-500 transition-colors">
                 <BuildingStorefrontIcon className="h-6 w-6 text-blue-500 mr-3" />
-                <span className="font-medium text-white">Salons</span>
+                <span className="font-medium text-white">Unternehmen</span>
               </Link>
 
               <Link to="/ceo/users" className="flex items-center p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-green-500 transition-colors">

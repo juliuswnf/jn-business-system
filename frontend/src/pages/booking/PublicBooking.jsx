@@ -337,7 +337,7 @@ export default function PublicBooking() {
               )}
             </div>
 
-            <h3 className="text-xl font-bold mb-4 mt-8">Friseur wählen</h3>
+            <h3 className="text-xl font-bold mb-4 mt-8">Mitarbeiter wählen</h3>
             {employees.length === 0 ? (
               <p className="text-gray-400 mb-6">Mitarbeiter wird automatisch zugewiesen</p>
             ) : (
@@ -461,7 +461,7 @@ export default function PublicBooking() {
                   <span className="font-semibold">{bookingData.service}</span>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-300">Friseur:</span>
+                  <span className="text-gray-300">Mitarbeiter:</span>
                   <span className="font-semibold">{bookingData.employee}</span>
                 </div>
                 <div className="flex justify-between">

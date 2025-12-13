@@ -67,7 +67,7 @@ export default function Users() {
           <p className="text-3xl font-bold text-accent">{counts.total}</p>
         </div>
         <div className="bg-secondary/50 border border-accent/20 p-4 rounded-lg">
-          <p className="text-slate-350 text-sm mb-2">Salon-Besitzer</p>
+          <p className="text-slate-350 text-sm mb-2">Unternehmer</p>
           <p className="text-3xl font-bold text-blue-500">{counts.salon_owners}</p>
         </div>
         <div className="bg-secondary/50 border border-accent/20 p-4 rounded-lg">
@@ -96,7 +96,7 @@ export default function Users() {
               className="px-4 py-2 rounded-lg bg-primary/50 border border-accent/20 text-white"
             >
               <option value="all">Alle Rollen</option>
-              <option value="salon_owner">Salon-Besitzer</option>
+              <option value="salon_owner">Unternehmer</option>
               <option value="employee">Mitarbeiter</option>
               <option value="customer">Kunde</option>
               <option value="admin">Admin</option>
@@ -133,7 +133,7 @@ export default function Users() {
                     <td className="px-6 py-4 text-slate-350">{user.email}</td>
                     <td className="px-6 py-4">
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-accent/20 text-accent capitalize">
-                        {user.role === 'salon_owner' ? 'Salon-Besitzer' : user.role}
+                        {user.role === 'salon_owner' ? 'Unternehmer' : user.role}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-slate-350">{user.companyName || '-'}</td>

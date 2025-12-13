@@ -67,7 +67,7 @@ const FAQ = () => {
         },
         {
           question: 'Kann ich mehrere Services gleichzeitig buchen?',
-          answer: 'Das hängt vom Salon ab. Viele Salons erlauben es, mehrere Services zu kombinieren (z.B. Schnitt + Färben). Die Zeiten werden automatisch zusammengerechnet.'
+          answer: 'Das hängt vom Anbieter ab. Viele Unternehmen erlauben es, mehrere Services zu kombinieren. Die Zeiten werden automatisch zusammengerechnet.'
         },
         {
           question: 'Wie sicher sind meine Daten?',

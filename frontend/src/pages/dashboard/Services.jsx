@@ -220,7 +220,7 @@ export default function Services() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:border-zinc-500 focus:outline-none"
-                  placeholder="z.B. Herrenhaarschnitt"
+                  placeholder="z.B. Beratung Standard"
                   required
                 />
               </div>

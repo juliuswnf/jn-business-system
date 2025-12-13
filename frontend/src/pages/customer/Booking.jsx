@@ -310,8 +310,8 @@ export default function Booking() {
         {/* Step 0: Salon Selection */}
         {bookingStep === 0 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-2">Wähle einen Friseursalon</h2>
-            <p className="text-gray-400 mb-6">Suche nach einem Salon in deiner Nähe</p>
+            <h2 className="text-2xl font-bold mb-2">Wähle einen Anbieter</h2>
+            <p className="text-gray-400 mb-6">Suche nach einem Anbieter in deiner Nähe</p>
             
             <SalonSelector
               onSelect={handleSalonSelect}
@@ -356,7 +356,7 @@ export default function Booking() {
 
             {employees.length > 0 && (
               <>
-                <h3 className="text-xl font-bold mb-4 mt-8">Bevorzugten Friseur wählen (optional)</h3>
+                <h3 className="text-xl font-bold mb-4 mt-8">Bevorzugten Mitarbeiter wählen (optional)</h3>
                 <div className="space-y-3 mb-6">
                   {employees.map((emp) => (
                     <div
@@ -520,7 +520,7 @@ export default function Booking() {
                 <span className="font-semibold">{bookingData.service}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-300">Friseur:</span>
+                <span className="text-gray-300">Mitarbeiter:</span>
                 <span className="font-semibold">{bookingData.employee || 'Wird zugewiesen'}</span>
               </div>
               <div className="border-t border-zinc-700 pt-4 mt-4">
