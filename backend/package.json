@@ -21,6 +21,7 @@
     "test:email": "node scripts/emailDeliverabilityTest.js"
   },
   "dependencies": {
+    "archiver": "^7.0.1",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.8.0",
