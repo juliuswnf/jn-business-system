@@ -32,7 +32,7 @@ export const getAllBackups = async (req, res) => {
 
     const backups = await Backup.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
+      .skip((page - 1).lean().maxTimeMS(5000) * limit)
       .limit(parseInt(limit))
       .populate('createdBy', 'name email');
 
@@ -84,7 +84,7 @@ export const getBackupDetails = async (req, res) => {
     const { backupId } = req.params;
 
     const backup = await Backup.findById(backupId)
-      .populate('createdBy', 'name email');
+      .populate('createdBy', 'name email').maxTimeMS(5000);
 
     if (!backup) {
       return res.status(404).json({
@@ -135,7 +135,7 @@ export const createBackup = async (req, res) => {
 
 // ==================== PERFORM BACKUP (Internal) ====================
 async function performBackup(backupId) {
-  const backup = await Backup.findById(backupId);
+  const backup = await Backup.findById(backupId).maxTimeMS(5000);
   if (!backup) return;
 
   try {
@@ -226,7 +226,7 @@ export const deleteBackup = async (req, res) => {
   try {
     const { backupId } = req.params;
 
-    const backup = await Backup.findById(backupId);
+    const backup = await Backup.findById(backupId).maxTimeMS(5000);
     if (!backup) {
       return res.status(404).json({
         success: false,
@@ -265,7 +265,7 @@ export const restoreBackup = async (req, res) => {
       });
     }
 
-    const backup = await Backup.findById(backupId);
+    const backup = await Backup.findById(backupId).maxTimeMS(5000);
     if (!backup) {
       return res.status(404).json({
         success: false,
@@ -307,7 +307,7 @@ export const getBackupSchedule = async (req, res) => {
         weekly: 4,
         monthly: 3
       },
-      lastRun: await Backup.findOne({ type: 'scheduled' }).sort({ createdAt: -1 }).select('createdAt status'),
+      lastRun: await Backup.findOne({ type: 'scheduled' }).sort({ createdAt: -1 }).maxTimeMS(5000).select('createdAt status'),
       nextRun: new Date(Date.now() + 24 * 60 * 60 * 1000) // Tomorrow
     };
 
@@ -349,7 +349,7 @@ export const downloadBackup = async (req, res) => {
   try {
     const { backupId } = req.params;
 
-    const backup = await Backup.findById(backupId);
+    const backup = await Backup.findById(backupId).maxTimeMS(5000);
     if (!backup) {
       return res.status(404).json({
         success: false,
@@ -381,3 +381,5 @@ export default {
   updateBackupSchedule,
   downloadBackup
 };
+
+

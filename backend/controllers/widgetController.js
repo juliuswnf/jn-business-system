@@ -16,7 +16,7 @@ export const createWidget = async (req, res) => {
     const userId = req.user.id;
 
     // Check if salon exists and belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId });
+    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -66,7 +66,7 @@ export const getWidget = async (req, res) => {
     const userId = req.user.id;
 
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId });
+    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -141,7 +141,7 @@ export const getWidgetByApiKey = async (req, res) => {
     const services = await Service.find({
       salonId: widget.salonId._id,
       isActive: true
-    }).select('name description duration price category');
+    }).lean().maxTimeMS(5000).select('name description duration price category');
 
     return res.status(200).json({
       success: true,
@@ -172,7 +172,7 @@ export const updateWidget = async (req, res) => {
     const { theme, settings, layout, allowedDomains } = req.body;
 
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId });
+    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -220,7 +220,7 @@ export const regenerateApiKey = async (req, res) => {
     const userId = req.user.id;
 
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId });
+    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -266,7 +266,7 @@ export const deleteWidget = async (req, res) => {
     const userId = req.user.id;
 
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId });
+    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -307,7 +307,7 @@ export const getWidgetStats = async (req, res) => {
     const userId = req.user.id;
 
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId });
+    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -347,3 +347,5 @@ export default {
   deleteWidget,
   getWidgetStats
 };
+
+

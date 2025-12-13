@@ -32,7 +32,7 @@ export const createProgressEntry = async (req, res) => {
     const userId = req.user.id;
 
     // Verify salon authorization
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -82,7 +82,7 @@ export const uploadProgressPhotos = async (req, res) => {
     const { type } = req.body; // front, back, side, other
     const userId = req.user.id;
 
-    const progressEntry = await ProgressEntry.findById(id);
+    const progressEntry = await ProgressEntry.findById(id).maxTimeMS(5000);
     if (!progressEntry) {
       return res.status(404).json({ success: false, message: 'Progress entry not found' });
     }
@@ -157,7 +157,7 @@ export const getClientProgressHistory = async (req, res) => {
 
     const progressEntries = await ProgressEntry.find(query)
       .sort({ recordedAt: -1 })
-      .limit(parseInt(limit))
+      .limit(parseInt(limit).lean().maxTimeMS(5000))
       .populate('trainerId', 'name email')
       .populate('bookingId', 'bookingDate')
       .lean();
@@ -217,7 +217,7 @@ export const updateProgressEntry = async (req, res) => {
     const updateData = req.body;
     const userId = req.user.id;
 
-    const progressEntry = await ProgressEntry.findById(id);
+    const progressEntry = await ProgressEntry.findById(id).maxTimeMS(5000);
     if (!progressEntry) {
       return res.status(404).json({ success: false, message: 'Progress entry not found' });
     }
@@ -257,7 +257,7 @@ export const deleteProgressEntry = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const progressEntry = await ProgressEntry.findById(id);
+    const progressEntry = await ProgressEntry.findById(id).maxTimeMS(5000);
     if (!progressEntry) {
       return res.status(404).json({ success: false, message: 'Progress entry not found' });
     }
@@ -301,7 +301,7 @@ export const getWeightTrend = async (req, res) => {
     if (salonId) query.salonId = salonId;
 
     const weightEntries = await ProgressEntry.find(query)
-      .sort({ recordedAt: 1 })
+      .sort({ recordedAt: 1 }).lean().maxTimeMS(5000)
       .select('recordedAt weight')
       .lean();
 
@@ -334,7 +334,7 @@ export const getPerformanceTrend = async (req, res) => {
     if (exercise) query[`performance.${exercise}`] = { $exists: true };
 
     const performanceEntries = await ProgressEntry.find(query)
-      .sort({ recordedAt: 1 })
+      .sort({ recordedAt: 1 }).lean().maxTimeMS(5000)
       .select('recordedAt performance')
       .lean();
 
@@ -381,3 +381,5 @@ export const getTrainerStatistics = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+

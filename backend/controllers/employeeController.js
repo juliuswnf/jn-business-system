@@ -17,7 +17,7 @@ export const getAllEmployees = async (req, res) => {
     const employees = await User.find({
       salonId,
       role: { $in: ['employee', 'manager'] }
-    }).select('name email phone role status createdAt');
+    }).lean().maxTimeMS(5000).select('name email phone role status createdAt');
 
     res.status(200).json({
       success: true,
@@ -44,7 +44,7 @@ export const getEmployeeById = async (req, res) => {
       _id: employeeId,
       salonId,
       role: { $in: ['employee', 'manager'] }
-    }).select('name email phone role status createdAt');
+    }).maxTimeMS(5000).select('name email phone role status createdAt');
 
     if (!employee) {
       return res.status(404).json({
@@ -142,3 +142,5 @@ export default {
   updateEmployee,
   deleteEmployee
 };
+
+

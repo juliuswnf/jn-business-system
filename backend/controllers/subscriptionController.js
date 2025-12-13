@@ -51,7 +51,7 @@ export const createCheckout = async (req, res) => {
     }
 
     // Get salon
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -90,7 +90,7 @@ export const createPortal = async (req, res) => {
   try {
     const salonId = req.user.salonId;
 
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -132,7 +132,7 @@ export const getSubscriptionStatus = async (req, res) => {
   try {
     const salonId = req.user.salonId;
 
-    const salon = await Salon.findById(salonId).select('subscription');
+    const salon = await Salon.findById(salonId).maxTimeMS(5000).select('subscription');
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -243,3 +243,4 @@ export default {
   getSubscriptionStatus,
   getPlans
 };
+

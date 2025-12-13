@@ -28,7 +28,7 @@ export const createPackage = async (req, res) => {
     const userId = req.user.id;
 
     // Verify salon ownership
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -86,7 +86,7 @@ export const getAvailablePackages = async (req, res) => {
     }
 
     const packages = await Package.find(query)
-      .populate('serviceIds', 'name price duration')
+      .populate('serviceIds', 'name price duration').lean().maxTimeMS(5000)
       .populate('trainerId', 'name email')
       .sort({ soldCount: -1, createdAt: -1 })
       .lean();
@@ -113,7 +113,7 @@ export const purchasePackage = async (req, res) => {
     const { id } = req.params;
     const { customerId, paymentId } = req.body;
 
-    const pkg = await Package.findById(id);
+    const pkg = await Package.findById(id).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
@@ -176,7 +176,7 @@ export const getCustomerPackages = async (req, res) => {
     if (status) query.status = status;
 
     const customerPackages = await CustomerPackage.find(query)
-      .populate('packageId', 'name description sessionDuration')
+      .populate('packageId', 'name description sessionDuration').lean().maxTimeMS(5000)
       .populate('salonId', 'name')
       .sort({ purchasedAt: -1 })
       .lean();
@@ -197,7 +197,7 @@ export const usePackageSession = async (req, res) => {
     const { id } = req.params;
     const { bookingId } = req.body;
 
-    const customerPackage = await CustomerPackage.findById(id);
+    const customerPackage = await CustomerPackage.findById(id).maxTimeMS(5000);
     if (!customerPackage) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
@@ -235,7 +235,7 @@ export const cancelPackage = async (req, res) => {
     const { reason } = req.body;
     const userId = req.user.id;
 
-    const customerPackage = await CustomerPackage.findById(id);
+    const customerPackage = await CustomerPackage.findById(id).maxTimeMS(5000);
     if (!customerPackage) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
@@ -269,13 +269,13 @@ export const updatePackage = async (req, res) => {
     const { name, description, price, isActive } = req.body;
     const userId = req.user.id;
 
-    const pkg = await Package.findById(id);
+    const pkg = await Package.findById(id).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
     // Verify authorization
-    const salon = await Salon.findById(pkg.salonId);
+    const salon = await Salon.findById(pkg.salonId).maxTimeMS(5000);
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -304,13 +304,13 @@ export const deletePackage = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const pkg = await Package.findById(id);
+    const pkg = await Package.findById(id).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
     // Verify authorization
-    const salon = await Salon.findById(pkg.salonId);
+    const salon = await Salon.findById(pkg.salonId).maxTimeMS(5000);
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -337,7 +337,7 @@ export const getPackageStatistics = async (req, res) => {
     const userId = req.user.id;
 
     // Verify authorization
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -385,3 +385,5 @@ export const getPackageStatistics = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+

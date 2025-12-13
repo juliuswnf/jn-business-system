@@ -32,7 +32,7 @@ export const createBooking = async (req, res) => {
 
     // ? SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
     if (idempotencyKey) {
-      const existingBooking = await Booking.findOne({ idempotencyKey });
+      const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
       
       if (existingBooking) {
         logger.info(`?? Duplicate booking attempt detected: ${idempotencyKey}`);
@@ -62,7 +62,7 @@ export const createBooking = async (req, res) => {
     // Support new { date, time } format OR legacy ISO string
     if (typeof bookingDate === 'object' && bookingDate.date && bookingDate.time) {
       // New format: { date: "2025-12-15", time: "14:00" }
-      const salon = await Salon.findById(salonId);
+      const salon = await Salon.findById(salonId).maxTimeMS(5000);
       if (!salon) {
         return res.status(404).json({
           success: false,
@@ -101,7 +101,7 @@ export const createBooking = async (req, res) => {
       }
     }
 
-    const service = await Service.findById(serviceId);
+    const service = await Service.findById(serviceId).maxTimeMS(5000);
     if (!service) {
       return res.status(404).json({
         success: false,
@@ -115,7 +115,7 @@ export const createBooking = async (req, res) => {
 
     try {
       // ? HIGH FIX #8: Check salon capacity (prevent overbooking)
-      const salon = await Salon.findById(salonId).session(session);
+      const salon = await Salon.findById(salonId).maxTimeMS(5000).session(session);
       if (!salon) {
         await session.abortTransaction();
         return res.status(404).json({
@@ -164,7 +164,7 @@ export const createBooking = async (req, res) => {
         employeeId: employeeId || null,
         bookingDate: parsedDate,
         status: { $nin: ['cancelled'] }
-      }).session(session);
+      }).maxTimeMS(5000).session(session);
 
       if (existingBooking) {
         await session.abortTransaction();
@@ -250,7 +250,7 @@ export const getBookings = async (req, res) => {
     }
 
     const total = await Booking.countDocuments(filter);
-    const bookings = await Booking.find(filter)
+    const bookings = await Booking.find(filter).lean().maxTimeMS(5000)
       .populate('serviceId', 'name price duration')
       .populate('employeeId', 'name')
       .sort({ bookingDate: -1 })
@@ -291,7 +291,7 @@ export const getBooking = async (req, res) => {
     }
 
     const booking = await Booking.findById(req.params.id)
-      .populate('serviceId')
+      .populate('serviceId').maxTimeMS(5000)
       .populate('employeeId', 'name');
 
     if (!booking) {
@@ -329,7 +329,7 @@ export const updateBooking = async (req, res) => {
     const { bookingDate, status, notes } = req.body;
 
     // Load booking first
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id).maxTimeMS(5000);
 
     if (!booking) {
       return res.status(404).json({
@@ -357,7 +357,7 @@ export const updateBooking = async (req, res) => {
       // Support new { date, time } format OR legacy ISO string
       if (typeof bookingDate === 'object' && bookingDate.date && bookingDate.time) {
         // New format: { date: "2025-12-15", time: "14:00" }
-        const salon = await Salon.findById(booking.salonId);
+        const salon = await Salon.findById(booking.salonId).maxTimeMS(5000);
         if (!salon) {
           return res.status(404).json({
             success: false,
@@ -429,7 +429,7 @@ export const confirmBooking = async (req, res) => {
       });
     }
 
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id).maxTimeMS(5000);
 
     if (!booking) {
       return res.status(404).json({
@@ -477,7 +477,7 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id).maxTimeMS(5000);
 
     if (!booking) {
       return res.status(404).json({
@@ -525,7 +525,7 @@ export const completeBooking = async (req, res) => {
       });
     }
 
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id).maxTimeMS(5000);
 
     if (!booking) {
       return res.status(404).json({
@@ -573,7 +573,7 @@ export const deleteBooking = async (req, res) => {
       });
     }
 
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id).maxTimeMS(5000);
 
     if (!booking) {
       return res.status(404).json({
@@ -676,7 +676,7 @@ export const getBookingsByDate = async (req, res) => {
     // ? PAGINATION - single day should be reasonable, but limit for safety
     const limit = Math.min(500, parseInt(req.query.limit) || 500); // Max 500 bookings per day
 
-    const bookings = await Booking.find(filter)
+    const bookings = await Booking.find(filter).lean().maxTimeMS(5000)
       .populate('serviceId', 'name duration')
       .populate('employeeId', 'name')
       .sort({ bookingDate: 1 })
@@ -712,3 +712,4 @@ export default {
   getBookingStats,
   getBookingsByDate
 };
+

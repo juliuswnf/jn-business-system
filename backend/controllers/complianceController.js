@@ -17,7 +17,7 @@ export const getBaas = async (req, res) => {
 
     const baas = await BAA.find({ salonId })
       .sort({ expirationDate: 1 })
-      .populate('createdBy', 'firstName lastName email')
+      .populate('createdBy', 'firstName lastName email').lean().maxTimeMS(5000)
       .populate('lastReviewedBy', 'firstName lastName')
       .lean();
 
@@ -139,7 +139,7 @@ export const renewBaa = async (req, res) => {
     const { id } = req.params;
     const { newExpirationDate } = req.body;
 
-    const baa = await BAA.findById(id);
+    const baa = await BAA.findById(id).maxTimeMS(5000);
     if (!baa) {
       return res.status(404).json({
         success: false,
@@ -273,3 +273,5 @@ export default {
   terminateBaa,
   getComplianceStatus
 };
+
+

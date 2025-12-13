@@ -18,7 +18,7 @@ export const getAllFlags = async (req, res) => {
 
     const flags = await FeatureFlag.find(query)
       .sort({ category: 1, name: 1 })
-      .populate('createdBy', 'name')
+      .populate('createdBy', 'name').lean().maxTimeMS(5000)
       .populate('lastModifiedBy', 'name');
 
     // Get customer counts for each flag
@@ -52,7 +52,7 @@ export const getFlagDetails = async (req, res) => {
     const { flagId } = req.params;
 
     const flag = await FeatureFlag.findById(flagId)
-      .populate('enabledFor', 'name ownerEmail')
+      .populate('enabledFor', 'name ownerEmail').maxTimeMS(5000)
       .populate('disabledFor', 'name ownerEmail')
       .populate('createdBy', 'name email')
       .populate('lastModifiedBy', 'name email');
@@ -95,7 +95,7 @@ export const createFlag = async (req, res) => {
     }
 
     // Check for duplicate key
-    const existing = await FeatureFlag.findOne({ key });
+    const existing = await FeatureFlag.findOne({ key }).maxTimeMS(5000);
     if (existing) {
       return res.status(400).json({
         success: false,
@@ -138,7 +138,7 @@ export const updateFlag = async (req, res) => {
       rolloutPercentage
     } = req.body;
 
-    const flag = await FeatureFlag.findById(flagId);
+    const flag = await FeatureFlag.findById(flagId).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -173,7 +173,7 @@ export const toggleFlag = async (req, res) => {
   try {
     const { flagId } = req.params;
 
-    const flag = await FeatureFlag.findById(flagId);
+    const flag = await FeatureFlag.findById(flagId).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -225,7 +225,7 @@ export const updateCustomerFlag = async (req, res) => {
     const { flagId } = req.params;
     const { salonId, action } = req.body; // action: 'enable' or 'disable' or 'remove'
 
-    const flag = await FeatureFlag.findById(flagId);
+    const flag = await FeatureFlag.findById(flagId).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -233,7 +233,7 @@ export const updateCustomerFlag = async (req, res) => {
       });
     }
 
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -278,7 +278,7 @@ export const checkFlagForCustomer = async (req, res) => {
   try {
     const { flagKey, salonId } = req.params;
 
-    const flag = await FeatureFlag.findOne({ key: flagKey });
+    const flag = await FeatureFlag.findOne({ key: flagKey }).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -286,7 +286,7 @@ export const checkFlagForCustomer = async (req, res) => {
       });
     }
 
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -318,3 +318,5 @@ export default {
   updateCustomerFlag,
   checkFlagForCustomer
 };
+
+

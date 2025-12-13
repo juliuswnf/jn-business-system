@@ -63,7 +63,7 @@ export const register = async (req, res) => {
     const userRole = allowedRoles.includes(role) ? role : 'customer';
 
     // Check if user exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email }).maxTimeMS(5000);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -101,7 +101,7 @@ export const register = async (req, res) => {
         .replace(/^-|-$/g, '');
 
       // Check for existing slug and add number if needed
-      const existingSlug = await Salon.findOne({ slug });
+      const existingSlug = await Salon.findOne({ slug }).maxTimeMS(5000);
       if (existingSlug) {
         slug = `${slug}-${Date.now().toString(36)}`;
       }
@@ -190,7 +190,7 @@ export const login = async (req, res) => {
     }
 
     // Find user with password field
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).maxTimeMS(5000).select('+password');
 
     if (!user) {
       logger.warn(`⚠️ Login attempt with non-existent email: ${email}`);
@@ -330,7 +330,7 @@ export const ceoLogin = async (req, res) => {
     }
 
     // Find user with password field AND 2FA fields (twoFactorSecret has select: false)
-    const user = await User.findOne({ email }).select('+password +twoFactorSecret');
+    const user = await User.findOne({ email }).maxTimeMS(5000).select('+password +twoFactorSecret');
 
     if (!user) {
       ipAttempts.count++;
@@ -539,7 +539,7 @@ export const employeeLogin = async (req, res) => {
     }
 
     // Find user with password field
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).maxTimeMS(5000).select('+password');
 
     if (!user) {
       logger.warn(`⚠️ Employee login attempt with non-existent email: ${email}`);
@@ -613,7 +613,7 @@ export const employeeLogin = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).maxTimeMS(5000);
 
     if (!user) {
       return res.status(404).json({
@@ -726,7 +726,7 @@ export const changePassword = async (req, res) => {
     }
 
     // Find user with password
-    const user = await User.findById(req.user.id).select('+password');
+    const user = await User.findById(req.user.id).maxTimeMS(5000).select('+password');
 
     if (!user) {
       return res.status(404).json({
@@ -798,7 +798,7 @@ export const forgotPassword = async (req, res) => {
     }
 
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).maxTimeMS(5000);
     if (!user) {
       // Don't reveal if email exists (security best practice)
       logger.warn(`⚠️ Password reset requested for non-existent email: ${email}`);
@@ -881,7 +881,7 @@ export const resetPassword = async (req, res) => {
     // Find user with valid token
     const user = await User.findOne({
       passwordResetToken: hashedToken,
-      passwordResetExpire: { $gt: Date.now() }
+      passwordResetExpire: { $gt: Date.now().maxTimeMS(5000) }
     });
 
     if (!user) {
@@ -934,7 +934,7 @@ export const verifyToken = (req, res) => {
 
 export const sendVerificationEmail = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).maxTimeMS(5000);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -990,7 +990,7 @@ export const verifyEmail = async (req, res) => {
     // Find user with valid token
     const user = await User.findOne({
       emailVerificationToken: hashedToken,
-      emailVerificationExpire: { $gt: Date.now() }
+      emailVerificationExpire: { $gt: Date.now().maxTimeMS(5000) }
     });
 
     if (!user) {
@@ -1070,7 +1070,7 @@ export const refreshToken = async (req, res) => {
     }
 
     // Find user
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).maxTimeMS(5000);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -1111,7 +1111,7 @@ export const refreshToken = async (req, res) => {
 
 export const enable2FA = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).maxTimeMS(5000);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -1175,7 +1175,7 @@ export const verify2FA = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).maxTimeMS(5000);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -1250,7 +1250,7 @@ export const disable2FA = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.user.id).select('+password');
+    const user = await User.findById(req.user.id).maxTimeMS(5000).select('+password');
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -1306,7 +1306,7 @@ export const disable2FA = async (req, res) => {
 
 export const get2FAStatus = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).maxTimeMS(5000);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -1342,7 +1342,7 @@ export const regenerateBackupCodes = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.user.id).select('+password');
+    const user = await User.findById(req.user.id).maxTimeMS(5000).select('+password');
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -1417,3 +1417,4 @@ export default {
   get2FAStatus,
   regenerateBackupCodes
 };
+

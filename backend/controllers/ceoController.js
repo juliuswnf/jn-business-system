@@ -45,7 +45,7 @@ export const getCEODashboard = async (req, res) => {
     const recentBookings = await Booking.find()
       .sort({ createdAt: -1 })
       .limit(10)
-      .populate('salonId', 'name slug')
+      .populate('salonId', 'name slug').maxTimeMS(5000)
       .populate('serviceId', 'name');
 
     res.status(200).json({
@@ -137,7 +137,7 @@ export const getAllBusinesses = async (req, res) => {
     const total = await Salon.countDocuments(filter);
 
     const salons = await Salon.find(filter)
-      .populate('owner', 'name email')
+      .populate('owner', 'name email').lean().maxTimeMS(5000)
       .select('name slug email phone address isActive subscription createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -277,7 +277,7 @@ export const deleteBusiness = async (req, res) => {
     const { businessId } = req.params;
 
     // Load salon to check existence
-    const salon = await Salon.findById(businessId);
+    const salon = await Salon.findById(businessId).maxTimeMS(5000);
 
     if (!salon) {
       return res.status(404).json({
@@ -631,7 +631,7 @@ export const getCEOStats = async (req, res) => {
     });
 
     // Berechne tatsächliche Starter/Pro basierend auf verfügbaren Daten
-    const activeSalons = await Salon.find({ 'subscription.status': 'active' });
+    const activeSalons = await Salon.find({ 'subscription.status': 'active' }).lean().maxTimeMS(5000);
     let calculatedStarter = 0;
     let calculatedPro = 0;
 
@@ -700,7 +700,7 @@ export const getErrorLogs = async (req, res) => {
 
     const errors = await ErrorLog.find(filter)
       .sort({ createdAt: -1 })
-      .skip(skip)
+      .skip(skip).lean().maxTimeMS(5000)
       .limit(parseInt(limit))
       .populate('salonId', 'name')
       .populate('userId', 'name email')
@@ -749,7 +749,7 @@ export const resolveError = async (req, res) => {
     const { errorId } = req.params;
     const { notes } = req.body;
 
-    const errorLog = await ErrorLog.findById(errorId);
+    const errorLog = await ErrorLog.findById(errorId).maxTimeMS(5000);
 
     if (!errorLog) {
       return res.status(404).json({
@@ -876,7 +876,7 @@ export const getAllCustomers = async (req, res) => {
     const total = await Salon.countDocuments(filter);
 
     const customers = await Salon.find(filter)
-      .populate('owner', 'name email')
+      .populate('owner', 'name email').lean().maxTimeMS(5000)
       .select('name email phone address isActive isPremium subscription createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -950,7 +950,7 @@ export const getCEOSubscriptions = async (req, res) => {
     const total = await Salon.countDocuments(filter);
 
     const salons = await Salon.find(filter)
-      .populate('owner', 'name email')
+      .populate('owner', 'name email').lean().maxTimeMS(5000)
       .select('name email isPremium subscription createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -1035,7 +1035,7 @@ export const getAllUsers = async (req, res) => {
     const skip = (page - 1) * limit;
     const total = await User.countDocuments(filter);
 
-    const users = await User.find(filter)
+    const users = await User.find(filter).lean().maxTimeMS(5000)
       .select('name email role companyName isActive isBanned createdAt lastLogin')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -1103,7 +1103,7 @@ export const banUser = async (req, res) => {
 
     const { userId } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).maxTimeMS(5000);
 
     if (!user) {
       return res.status(404).json({
@@ -1153,7 +1153,7 @@ export const unbanUser = async (req, res) => {
 
     const { userId } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).maxTimeMS(5000);
 
     if (!user) {
       return res.status(404).json({
@@ -1212,3 +1212,5 @@ export default {
   banUser,
   unbanUser
 };
+
+

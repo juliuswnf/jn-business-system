@@ -26,7 +26,7 @@ export const createClinicalNote = async (req, res) => {
     const userId = req.user.id;
 
     // Verify salon has HIPAA enabled
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -108,7 +108,7 @@ export const getClinicalNote = async (req, res) => {
     const { accessReason, justification } = req.query;
 
     const clinicalNote = await ClinicalNote.findById(id)
-      .populate('practitionerId', 'name email')
+      .populate('practitionerId', 'name email').maxTimeMS(5000)
       .populate('customerId', 'name email');
 
     if (!clinicalNote) {
@@ -116,7 +116,7 @@ export const getClinicalNote = async (req, res) => {
     }
 
     // Verify authorization
-    const salon = await Salon.findById(clinicalNote.salonId);
+    const salon = await Salon.findById(clinicalNote.salonId).maxTimeMS(5000);
     const isOwner = salon.owner.toString() === userId;
     const isPractitioner = clinicalNote.practitionerId._id.toString() === userId;
 
@@ -187,7 +187,7 @@ export const getPatientClinicalNotes = async (req, res) => {
     const { salonId, noteType } = req.query;
 
     // Verify authorization
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -208,7 +208,7 @@ export const getPatientClinicalNotes = async (req, res) => {
 
     const clinicalNotes = await ClinicalNote.find(query)
       .sort({ treatmentDate: -1 })
-      .populate('practitionerId', 'name email')
+      .populate('practitionerId', 'name email').lean().maxTimeMS(5000)
       .select('-encryptedContent -encryptedIV -encryptedAuthTag')
       .lean();
 
@@ -247,7 +247,7 @@ export const updateClinicalNote = async (req, res) => {
     const { subject, content, noteType, accessLevel } = req.body;
     const userId = req.user.id;
 
-    const clinicalNote = await ClinicalNote.findById(id);
+    const clinicalNote = await ClinicalNote.findById(id).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
@@ -323,13 +323,13 @@ export const deleteClinicalNote = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const clinicalNote = await ClinicalNote.findById(id);
+    const clinicalNote = await ClinicalNote.findById(id).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
 
     // Verify authorization (only practitioner or owner)
-    const salon = await Salon.findById(clinicalNote.salonId);
+    const salon = await Salon.findById(clinicalNote.salonId).maxTimeMS(5000);
     const isOwner = salon.owner.toString() === userId;
     const isPractitioner = clinicalNote.practitionerId.toString() === userId;
 
@@ -378,7 +378,7 @@ export const shareClinicalNote = async (req, res) => {
     const { shareWithUserId, expiresInDays } = req.body;
     const userId = req.user.id;
 
-    const clinicalNote = await ClinicalNote.findById(id);
+    const clinicalNote = await ClinicalNote.findById(id).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
@@ -410,3 +410,5 @@ export const shareClinicalNote = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+

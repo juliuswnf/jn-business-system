@@ -48,7 +48,7 @@ export const getAuditLogs = async (req, res) => {
 
     const logs = await AuditLog.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
+      .skip((page - 1).lean().maxTimeMS(5000) * limit)
       .limit(parseInt(limit))
       .populate('userId', 'name email');
 
@@ -76,7 +76,7 @@ export const getLogDetails = async (req, res) => {
     const { logId } = req.params;
 
     const log = await AuditLog.findById(logId)
-      .populate('userId', 'name email role');
+      .populate('userId', 'name email role').maxTimeMS(5000);
 
     if (!log) {
       return res.status(404).json({
@@ -176,7 +176,7 @@ export const getSecurityAlerts = async (req, res) => {
     // Get recent failed login attempts
     const failedLogins = await AuditLog.find({
       action: { $regex: /login.*failed/i },
-      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+      createdAt: { $gte: new Date(Date.now().lean().maxTimeMS(5000) - 24 * 60 * 60 * 1000) }
     })
     .sort({ createdAt: -1 })
     .limit(20);
@@ -187,7 +187,7 @@ export const getSecurityAlerts = async (req, res) => {
         { status: 'failed' },
         { action: { $regex: /suspicious|blocked|banned/i } }
       ],
-      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+      createdAt: { $gte: new Date(Date.now().lean().maxTimeMS(5000) - 24 * 60 * 60 * 1000) }
     })
     .sort({ createdAt: -1 })
     .limit(20);
@@ -241,7 +241,7 @@ export const exportAuditLogs = async (req, res) => {
 
     const logs = await AuditLog.find(query)
       .sort({ createdAt: -1 })
-      .limit(10000) // Max 10k records
+      .limit(10000).lean().maxTimeMS(5000) // Max 10k records
       .lean();
 
     if (format === 'csv') {
@@ -277,3 +277,5 @@ export default {
   getSecurityAlerts,
   exportAuditLogs
 };
+
+

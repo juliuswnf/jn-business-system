@@ -21,7 +21,7 @@ export const getAllCampaigns = async (req, res) => {
     // Get campaigns from email logs
     const campaigns = await EmailLog.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
+      .skip((page - 1).lean().maxTimeMS(5000) * limit)
       .limit(parseInt(limit));
 
     const total = await EmailLog.countDocuments(query);
@@ -81,31 +81,31 @@ export const createCampaign = async (req, res) => {
     let targetEmails = [];
 
     if (recipients === 'all') {
-      const salons = await Salon.find({ isActive: true }).select('ownerEmail');
+      const salons = await Salon.find({ isActive: true }).lean().maxTimeMS(5000).select('ownerEmail');
       targetEmails = salons.map(s => s.ownerEmail).filter(Boolean);
     } else if (recipients === 'trial') {
       const salons = await Salon.find({
         isActive: true,
         'subscription.status': 'trial'
-      }).select('ownerEmail');
+      }).lean().maxTimeMS(5000).select('ownerEmail');
       targetEmails = salons.map(s => s.ownerEmail).filter(Boolean);
     } else if (recipients === 'paid') {
       const salons = await Salon.find({
         isActive: true,
         'subscription.status': 'active'
-      }).select('ownerEmail');
+      }).lean().maxTimeMS(5000).select('ownerEmail');
       targetEmails = salons.map(s => s.ownerEmail).filter(Boolean);
     } else if (recipients === 'starter') {
       const salons = await Salon.find({
         isActive: true,
         'subscription.plan': 'starter'
-      }).select('ownerEmail');
+      }).lean().maxTimeMS(5000).select('ownerEmail');
       targetEmails = salons.map(s => s.ownerEmail).filter(Boolean);
     } else if (recipients === 'pro') {
       const salons = await Salon.find({
         isActive: true,
         'subscription.plan': 'pro'
-      }).select('ownerEmail');
+      }).lean().maxTimeMS(5000).select('ownerEmail');
       targetEmails = salons.map(s => s.ownerEmail).filter(Boolean);
     } else if (Array.isArray(recipients)) {
       targetEmails = recipients;
@@ -153,7 +153,7 @@ export const getCampaignDetails = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId);
+    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -201,7 +201,7 @@ export const cancelCampaign = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId);
+    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -241,7 +241,7 @@ export const sendCampaign = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId);
+    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -298,7 +298,7 @@ export const deleteCampaign = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId);
+    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -461,3 +461,5 @@ export default {
   getEmailTemplates,
   getEmailStats
 };
+
+

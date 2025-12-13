@@ -16,7 +16,7 @@ export const getSalonInfo = async (req, res) => {
     const salonId = req.params.salonId || req.user.salonId;
 
     const salon = await Salon.findById(salonId)
-      .populate('owner', 'name email')
+      .populate('owner', 'name email').maxTimeMS(5000)
       .populate('services');
 
     if (!salon) {
@@ -53,7 +53,7 @@ export const updateSalon = async (req, res) => {
     const salonId = req.params.salonId || req.user.salonId;
 
     // Load salon first
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
 
     if (!salon) {
       return res.status(404).json({
@@ -106,7 +106,7 @@ export const getSalonServices = async (req, res) => {
 
     const services = await Service.find({ salonId })
       .sort({ createdAt: -1 })
-      .skip(skip)
+      .skip(skip).lean().maxTimeMS(5000)
       .limit(limit);
 
     res.status(200).json({
@@ -160,7 +160,7 @@ export const getSalonBookings = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const bookings = await Booking.find(filter)
-      .populate('serviceId', 'name price duration')
+      .populate('serviceId', 'name price duration').lean().maxTimeMS(5000)
       .populate('employeeId', 'name')
       .sort({ bookingDate: -1 })
       .skip(skip)
@@ -234,7 +234,7 @@ export const getSalonDashboard = async (req, res) => {
 
     // Get salon info
     const salon = await Salon.findById(salonId)
-      .populate('owner', 'name email')
+      .populate('owner', 'name email').maxTimeMS(5000)
       .populate('services');
 
     if (!salon) {
@@ -318,7 +318,7 @@ export const getSalonDashboard = async (req, res) => {
 
     // Get recent bookings
     const recentBookings = await Booking.find({ salonId })
-      .populate('serviceId', 'name price')
+      .populate('serviceId', 'name price').lean().maxTimeMS(5000)
       .populate('employeeId', 'name')
       .sort({ bookingDate: -1 })
       .limit(5);
@@ -365,3 +365,5 @@ export default {
   getSalonStats,
   getSalonDashboard
 };
+
+

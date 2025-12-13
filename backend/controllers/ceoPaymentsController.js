@@ -55,7 +55,7 @@ export const getAllTransactions = async (req, res) => {
 
     const transactions = await Payment.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
+      .skip((page - 1).lean().maxTimeMS(5000) * limit)
       .limit(parseInt(limit))
       .populate('companyId', 'name email');
 
@@ -193,7 +193,7 @@ export const getTransactionDetails = async (req, res) => {
     const { transactionId } = req.params;
 
     const transaction = await Payment.findById(transactionId)
-      .populate('companyId', 'name email phone')
+      .populate('companyId', 'name email phone').maxTimeMS(5000)
       .populate('bookingId');
 
     if (!transaction) {
@@ -219,7 +219,7 @@ export const processRefund = async (req, res) => {
     const { transactionId } = req.params;
     const { reason, amount } = req.body;
 
-    const transaction = await Payment.findById(transactionId);
+    const transaction = await Payment.findById(transactionId).maxTimeMS(5000);
     if (!transaction) {
       return res.status(404).json({
         success: false,
@@ -355,3 +355,5 @@ export default {
   getPayoutSchedule,
   getRevenueByPlan
 };
+
+

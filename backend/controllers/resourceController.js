@@ -27,7 +27,7 @@ export const createResource = async (req, res) => {
     const userId = req.user.id;
 
     // Verify salon ownership
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -80,7 +80,7 @@ export const getSalonResources = async (req, res) => {
     if (status) query.status = status;
 
     const resources = await Resource.find(query)
-      .populate('compatibleServices', 'name duration')
+      .populate('compatibleServices', 'name duration').lean().maxTimeMS(5000)
       .sort({ type: 1, name: 1 })
       .lean();
 
@@ -101,7 +101,7 @@ export const getResourceById = async (req, res) => {
 
     const resource = await Resource.findById(id)
       .populate('compatibleServices', 'name duration price')
-      .lean();
+      .lean().maxTimeMS(5000);
 
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
@@ -130,7 +130,7 @@ export const checkResourceAvailability = async (req, res) => {
       });
     }
 
-    const resource = await Resource.findById(id);
+    const resource = await Resource.findById(id).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
@@ -181,13 +181,13 @@ export const updateResource = async (req, res) => {
     const updateData = req.body;
     const userId = req.user.id;
 
-    const resource = await Resource.findById(id);
+    const resource = await Resource.findById(id).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     // Verify authorization
-    const salon = await Salon.findById(resource.salonId);
+    const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -223,13 +223,13 @@ export const scheduleMaintenance = async (req, res) => {
     const { startDate, endDate, reason, isRecurring, recurringPattern } = req.body;
     const userId = req.user.id;
 
-    const resource = await Resource.findById(id);
+    const resource = await Resource.findById(id).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     // Verify authorization
-    const salon = await Salon.findById(resource.salonId);
+    const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -257,13 +257,13 @@ export const deleteResource = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const resource = await Resource.findById(id);
+    const resource = await Resource.findById(id).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     // Verify authorization
-    const salon = await Salon.findById(resource.salonId);
+    const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -311,7 +311,7 @@ export const getResourceUtilization = async (req, res) => {
       });
     }
 
-    const resource = await Resource.findById(id);
+    const resource = await Resource.findById(id).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
@@ -320,7 +320,7 @@ export const getResourceUtilization = async (req, res) => {
     const bookings = await Booking.find({
       resourceId: id,
       bookingDate: {
-        $gte: new Date(startDate),
+        $gte: new Date(startDate).lean().maxTimeMS(5000),
         $lte: new Date(endDate)
       },
       status: { $nin: ['cancelled'] },
@@ -367,7 +367,7 @@ export const getAvailableResourcesForService = async (req, res) => {
       isAvailable: true,
       status: 'active',
       deletedAt: null
-    }).lean();
+    }).lean().maxTimeMS(5000);
 
     if (!dateTime) {
       return res.json({
@@ -379,7 +379,7 @@ export const getAvailableResourcesForService = async (req, res) => {
     // Check availability for each resource
     const availableResources = [];
     for (const resource of resources) {
-      const resourceDoc = await Resource.findById(resource._id);
+      const resourceDoc = await Resource.findById(resource._id).maxTimeMS(5000);
       const isAvailable = resourceDoc.isAvailableAt(new Date(dateTime));
 
       if (isAvailable) {
@@ -416,3 +416,5 @@ export const getAvailableResourcesForService = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+

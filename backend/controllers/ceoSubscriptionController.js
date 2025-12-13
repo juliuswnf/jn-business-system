@@ -24,7 +24,7 @@ export const getAllSubscriptions = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const salons = await Salon.find(filter)
-      .populate('owner', 'name email')
+      .populate('owner', 'name email').lean().maxTimeMS(5000)
       .select('name slug email subscription isActive createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -114,7 +114,7 @@ export const getSalonSubscription = async (req, res) => {
     const { salonId } = req.params;
 
     const salon = await Salon.findById(salonId)
-      .populate('owner', 'name email phone');
+      .populate('owner', 'name email phone').maxTimeMS(5000);
 
     if (!salon) {
       return res.status(404).json({
@@ -167,7 +167,7 @@ export const toggleSalonStatus = async (req, res) => {
     const { salonId } = req.params;
     const { isActive } = req.body;
 
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
 
     if (!salon) {
       return res.status(404).json({
@@ -215,7 +215,7 @@ export const updateSubscriptionStatus = async (req, res) => {
       });
     }
 
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
 
     if (!salon) {
       return res.status(404).json({
@@ -263,7 +263,7 @@ export const getExpiringSoon = async (req, res) => {
         $gte: now,
         $lte: futureDate
       }
-    }).populate('owner', 'name email');
+    }).populate('owner', 'name email').lean().maxTimeMS(5000);
 
     // Find subscriptions ending soon
     const subscriptionsExpiring = await Salon.find({
@@ -273,7 +273,7 @@ export const getExpiringSoon = async (req, res) => {
         $gte: now,
         $lte: futureDate
       }
-    }).populate('owner', 'name email');
+    }).populate('owner', 'name email').lean().maxTimeMS(5000);
 
     res.status(200).json({
       success: true,
@@ -314,3 +314,5 @@ export default {
   updateSubscriptionStatus,
   getExpiringSoon
 };
+
+

@@ -44,7 +44,7 @@ export const createPaymentIntent = async (req, res) => {
       });
     }
 
-    const booking = await Booking.findById(bookingId);
+    const booking = await Booking.findById(bookingId).maxTimeMS(5000);
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -168,7 +168,7 @@ export const getPaymentHistory = async (req, res) => {
     const total = await Payment.countDocuments(filter);
     const skip = (page - 1) * limit;
     const payments = await Payment.find(filter)
-      .populate('bookingId', 'customerName customerEmail bookingDate')
+      .populate('bookingId', 'customerName customerEmail bookingDate').lean().maxTimeMS(5000)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -207,7 +207,7 @@ export const refundPayment = async (req, res) => {
       });
     }
 
-    const payment = await Payment.findById(paymentId);
+    const payment = await Payment.findById(paymentId).maxTimeMS(5000);
     if (!payment) {
       return res.status(404).json({
         success: false,
@@ -499,7 +499,7 @@ export const getPaymentDetails = async (req, res) => {
     const { paymentId } = req.params;
 
     const payment = await Payment.findById(paymentId)
-      .populate('bookingId');
+      .populate('bookingId').maxTimeMS(5000);
 
     if (!payment) {
       return res.status(404).json({
@@ -532,3 +532,5 @@ export default {
   handleStripeWebhook,
   getPaymentDetails
 };
+
+

@@ -16,7 +16,7 @@ export const uploadPortfolioItem = async (req, res) => {
     const userId = req.user.id;
 
     // Verify salon ownership or artist employment
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -103,7 +103,7 @@ export const getPublicPortfolio = async (req, res) => {
 
     const portfolioItems = await ArtistPortfolio.find(query)
       .sort({ featured: -1, order: 1, createdAt: -1 })
-      .limit(parseInt(limit))
+      .limit(parseInt(limit).lean().maxTimeMS(5000))
       .skip(skip)
       .populate('artistId', 'name email')
       .lean();
@@ -136,7 +136,7 @@ export const getArtistPortfolio = async (req, res) => {
       isPublic: true,
       deletedAt: null
     })
-      .sort({ featured: -1, order: 1, createdAt: -1 })
+      .sort({ featured: -1, order: 1, createdAt: -1 }).lean().maxTimeMS(5000)
       .populate('salonId', 'name slug')
       .lean();
 
@@ -157,7 +157,7 @@ export const updatePortfolioItem = async (req, res) => {
     const { title, description, category, style, tags, isPublic, featured } = req.body;
     const userId = req.user.id;
 
-    const portfolioItem = await ArtistPortfolio.findById(id);
+    const portfolioItem = await ArtistPortfolio.findById(id).maxTimeMS(5000);
     if (!portfolioItem) {
       return res.status(404).json({ success: false, message: 'Portfolio item not found' });
     }
@@ -195,7 +195,7 @@ export const deletePortfolioItem = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const portfolioItem = await ArtistPortfolio.findById(id);
+    const portfolioItem = await ArtistPortfolio.findById(id).maxTimeMS(5000);
     if (!portfolioItem) {
       return res.status(404).json({ success: false, message: 'Portfolio item not found' });
     }
@@ -236,7 +236,7 @@ export const toggleFeatured = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const portfolioItem = await ArtistPortfolio.findById(id);
+    const portfolioItem = await ArtistPortfolio.findById(id).maxTimeMS(5000);
     if (!portfolioItem) {
       return res.status(404).json({ success: false, message: 'Portfolio item not found' });
     }
@@ -296,3 +296,5 @@ export const incrementLikes = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+

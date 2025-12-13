@@ -214,7 +214,7 @@ export const getCohortAnalysis = async (req, res) => {
       // Customers who signed up in this month
       const cohortCustomers = await Salon.find({
         createdAt: { $gte: monthStart, $lte: monthEnd }
-      });
+      }).lean().maxTimeMS(5000);
 
       const cohortSize = cohortCustomers.length;
 
@@ -255,7 +255,7 @@ export const getChurnAnalysis = async (req, res) => {
     // Churned customers with reasons
     const churned = await Salon.find({
       'subscription.status': 'cancelled'
-    }).select('name subscription.cancelledAt subscription.cancelReason createdAt');
+    }).lean().maxTimeMS(5000).select('name subscription.cancelledAt subscription.cancelReason createdAt');
 
     // Group by reason
     const reasonCounts = {};
@@ -323,7 +323,7 @@ export const getAtRiskStudios = async (req, res) => {
     // Get all active/trial studios
     const studios = await Salon.find({
       'subscription.status': { $in: ['active', 'trial'] }
-    }).populate('owner', 'name email lastLogin');
+    }).populate('owner', 'name email lastLogin').lean().maxTimeMS(5000);
 
     const atRiskStudios = [];
     const now = new Date();
@@ -460,7 +460,7 @@ export const getLifecycleEmailStats = async (req, res) => {
 
     // Get recently sent emails
     const recentlySent = await LifecycleEmail.find({ status: 'sent' })
-      .populate('salonId', 'name')
+      .populate('salonId', 'name').lean().maxTimeMS(5000)
       .populate('userId', 'name email')
       .sort({ sentAt: -1 })
       .limit(20);
@@ -468,7 +468,7 @@ export const getLifecycleEmailStats = async (req, res) => {
     // Get upcoming emails
     const upcoming = await LifecycleEmail.find({
       status: 'pending',
-      scheduledFor: { $gte: new Date() }
+      scheduledFor: { $gte: new Date().lean().maxTimeMS(5000) }
     })
       .populate('salonId', 'name')
       .populate('userId', 'name email')
@@ -517,3 +517,5 @@ export default {
   getAtRiskStudios,
   getLifecycleEmailStats
 };
+
+

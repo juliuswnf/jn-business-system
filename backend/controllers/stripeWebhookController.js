@@ -172,7 +172,7 @@ const handleSubscriptionCreated = async (subscription) => {
       return;
     }
 
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
 
     if (!salon) {
       logger.warn(`Salon not found: ${salonId}`);
@@ -211,7 +211,7 @@ const handleSubscriptionUpdated = async (subscription) => {
   try {
     const salon = await Salon.findOne({
       'subscription.stripeSubscriptionId': subscription.id
-    });
+    }).maxTimeMS(5000);
 
     if (!salon) {
       logger.warn(`No salon found for subscription: ${subscription.id}`);
@@ -261,7 +261,7 @@ const handleSubscriptionDeleted = async (subscription) => {
   try {
     const salon = await Salon.findOne({
       'subscription.stripeSubscriptionId': subscription.id
-    });
+    }).maxTimeMS(5000);
 
     if (!salon) {
       logger.warn(`No salon found for subscription: ${subscription.id}`);
@@ -297,7 +297,7 @@ const handleTrialWillEnd = async (subscription) => {
   try {
     const salon = await Salon.findOne({
       'subscription.stripeSubscriptionId': subscription.id
-    });
+    }).maxTimeMS(5000);
 
     if (!salon) {
       logger.warn(`No salon found for subscription: ${subscription.id}`);
@@ -337,7 +337,7 @@ const handlePaymentActionRequired = async (invoice) => {
 
     const salon = await Salon.findOne({
       'subscription.stripeSubscriptionId': subscriptionId
-    });
+    }).maxTimeMS(5000);
 
     if (!salon) {
       logger.warn(`No salon found for subscription: ${subscriptionId}`);
@@ -366,3 +366,4 @@ const handlePaymentActionRequired = async (invoice) => {
 export default {
   handleStripeWebhook
 };
+

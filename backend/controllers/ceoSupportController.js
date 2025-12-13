@@ -40,7 +40,7 @@ export const getAllTickets = async (req, res) => {
         priority: -1, // urgent first
         createdAt: -1
       })
-      .skip((page - 1) * limit)
+      .skip((page - 1).lean().maxTimeMS(5000) * limit)
       .limit(parseInt(limit))
       .populate('salonId', 'name')
       .populate('assignedTo', 'name email');
@@ -110,7 +110,7 @@ export const getTicketDetails = async (req, res) => {
     const { ticketId } = req.params;
 
     const ticket = await SupportTicket.findById(ticketId)
-      .populate('salonId', 'name ownerEmail subscription')
+      .populate('salonId', 'name ownerEmail subscription').maxTimeMS(5000)
       .populate('userId', 'name email')
       .populate('assignedTo', 'name email')
       .populate('messages.senderId', 'name email');
@@ -184,7 +184,7 @@ export const updateTicket = async (req, res) => {
     const { ticketId } = req.params;
     const { status, priority, assignedTo, internalNotes, tags } = req.body;
 
-    const ticket = await SupportTicket.findById(ticketId);
+    const ticket = await SupportTicket.findById(ticketId).maxTimeMS(5000);
     if (!ticket) {
       return res.status(404).json({
         success: false,
@@ -229,7 +229,7 @@ export const addReply = async (req, res) => {
       });
     }
 
-    const ticket = await SupportTicket.findById(ticketId);
+    const ticket = await SupportTicket.findById(ticketId).maxTimeMS(5000);
     if (!ticket) {
       return res.status(404).json({
         success: false,
@@ -350,3 +350,5 @@ export default {
   addReply,
   getTicketStats
 };
+
+

@@ -28,7 +28,7 @@ export const createConsentForm = async (req, res) => {
     } = req.body;
 
     // Verify salon
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -86,7 +86,7 @@ export const getCustomerConsents = async (req, res) => {
     if (consentType) query.consentType = consentType;
     if (typeof isActive !== 'undefined') query.isActive = isActive === 'true';
 
-    const consents = await ConsentForm.find(query)
+    const consents = await ConsentForm.find(query).lean().maxTimeMS(5000)
       .sort({ signedAt: -1 })
       .lean();
 
@@ -107,7 +107,7 @@ export const getConsentById = async (req, res) => {
 
     const consent = await ConsentForm.findById(id)
       .populate('customerId', 'name email')
-      .lean();
+      .lean().maxTimeMS(5000);
 
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
@@ -130,7 +130,7 @@ export const revokeConsent = async (req, res) => {
     const { reason } = req.body;
     const userId = req.user.id;
 
-    const consent = await ConsentForm.findById(id);
+    const consent = await ConsentForm.findById(id).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
@@ -167,7 +167,7 @@ export const checkConsentValidity = async (req, res) => {
       consentType,
       isActive: true,
       deletedAt: null
-    }).sort({ signedAt: -1 });
+    }).sort({ signedAt: -1 }).maxTimeMS(5000);
 
     if (!consent) {
       return res.json({
@@ -205,7 +205,7 @@ export const getExpiringConsents = async (req, res) => {
       isActive: true,
       expiresAt: {
         $lte: expirationDate,
-        $gte: new Date()
+        $gte: new Date().lean().maxTimeMS(5000)
       },
       deletedAt: null
     })
@@ -230,7 +230,7 @@ export const downloadConsentPDF = async (req, res) => {
     const { id } = req.params;
 
     const consent = await ConsentForm.findById(id)
-      .populate('customerId', 'name email');
+      .populate('customerId', 'name email').maxTimeMS(5000);
 
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
@@ -267,7 +267,7 @@ export const addWitnessSignature = async (req, res) => {
     const { id } = req.params;
     const { witnessName, witnessSignature } = req.body;
 
-    const consent = await ConsentForm.findById(id);
+    const consent = await ConsentForm.findById(id).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
@@ -297,7 +297,7 @@ export const getSalonConsents = async (req, res) => {
     const { consentType, isActive, page = 1, limit = 50 } = req.query;
 
     // Verify authorization
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -314,7 +314,7 @@ export const getSalonConsents = async (req, res) => {
 
     const consents = await ConsentForm.find(query)
       .sort({ signedAt: -1 })
-      .limit(parseInt(limit))
+      .limit(parseInt(limit).lean().maxTimeMS(5000))
       .skip(skip)
       .populate('customerId', 'name email')
       .lean();
@@ -336,3 +336,5 @@ export const getSalonConsents = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+

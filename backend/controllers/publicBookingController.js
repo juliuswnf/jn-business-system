@@ -40,7 +40,7 @@ export const getAllSalons = async (req, res) => {
 
     // Get all salons (show all for now, can filter by subscription later)
     // For production: filter by subscription.status: 'active' or 'trialing'
-    const salons = await Salon.find({})
+    const salons = await Salon.find({}).lean().maxTimeMS(5000)
       .select('name slug address city phone businessHours createdAt subscription')
       .sort({ name: 1 })
       .skip(skip)
@@ -108,7 +108,7 @@ export const searchSalons = async (req, res) => {
         { 'address.street': searchRegex },
         { 'address.city': searchRegex }
       ]
-    })
+    }).lean().maxTimeMS(5000)
       .select('name slug address city phone subscription')
       .limit(10);
 
@@ -149,7 +149,7 @@ export const getSalonsByCity = async (req, res) => {
         { city: cityRegex },
         { 'address.city': cityRegex }
       ]
-    })
+    }).lean().maxTimeMS(5000)
       .select('name slug address city phone businessHours')
       .sort({ name: 1 });
 
@@ -210,14 +210,14 @@ export const getSalonBySlug = async (req, res) => {
     const services = await Service.find({
       salonId: salon._id,
       isActive: true
-    }).select('name description price duration category');
+    }).lean().maxTimeMS(5000).select('name description price duration category');
 
     // Get employees (users with role=employee for this salon)
     const employees = await User.find({
       salonId: salon._id,
       role: 'employee',
       isActive: true
-    }).select('name avatar');
+    }).lean().maxTimeMS(5000).select('name avatar');
 
     res.status(200).json({
       success: true,
@@ -267,7 +267,7 @@ export const getAvailableSlots = async (req, res) => {
       });
     }
 
-    const service = await Service.findById(serviceId);
+    const service = await Service.findById(serviceId).maxTimeMS(5000);
 
     if (!service) {
       return res.status(404).json({
@@ -308,7 +308,7 @@ export const getAvailableSlots = async (req, res) => {
       bookingFilter.employeeId = employeeId;
     }
 
-    const existingBookings = await Booking.find(bookingFilter);
+    const existingBookings = await Booking.find(bookingFilter).lean().maxTimeMS(5000);
 
     // Generate time slots based on business hours
     const slots = [];
@@ -391,7 +391,7 @@ export const createPublicBooking = async (req, res) => {
 
     // ? SRE FIX #30: Idempotency check
     if (idempotencyKey) {
-      const existingBooking = await Booking.findOne({ idempotencyKey });
+      const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
       
       if (existingBooking) {
         logger.info(`?? Duplicate public booking: ${idempotencyKey}`);
@@ -539,7 +539,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Get service
-    const service = await Service.findById(serviceId);
+    const service = await Service.findById(serviceId).maxTimeMS(5000);
 
     if (!service) {
       return res.status(404).json({
@@ -555,7 +555,7 @@ export const createPublicBooking = async (req, res) => {
       employeeId: employeeId || null,
       bookingDate: parsedBookingDate,
       status: { $nin: ['cancelled'] }
-    });
+    }).maxTimeMS(5000);
 
     if (existingBooking) {
       return res.status(409).json({
@@ -673,3 +673,5 @@ export default {
   getAvailableSlots,
   createPublicBooking
 };
+
+
