@@ -10,19 +10,19 @@ const plans = [
     yearlyPrice: 690,
     yearlyMonthlyCost: 57.50,
     features: [
-      { name: 'Mitarbeiter', value: '3' },
-      { name: 'Standorte', value: '1' },
-      { name: 'Buchungen/Monat', value: '200' },
-      { name: 'Kunden', value: '500' },
-      { name: 'Online-Buchung', included: true },
-      { name: 'Kalender & Terminverwaltung', included: true },
-      { name: 'E-Mail-Benachrichtigungen', included: true },
-      { name: 'Automatische Erinnerungen', included: true },
-      { name: 'Kundendatenbank (CRM)', included: true },
-      { name: 'Zahlungsabwicklung', included: true },
-      { name: 'Basis-Reporting', included: true },
-      { name: 'Google-Bewertungen', included: true },
-      { name: 'E-Mail-Support', included: true },
+      { name: 'Mitarbeiter', value: '3', description: 'Bis zu 3 Mitarbeiter können das System nutzen' },
+      { name: 'Standorte', value: '1', description: 'Für einen Salon-Standort' },
+      { name: 'Buchungen/Monat', value: '200', description: 'Bis zu 200 Termine pro Monat verwaltbar' },
+      { name: 'Kunden', value: '500', description: 'Bis zu 500 Kundenkontakte speicherbar' },
+      { name: 'Online-Buchung', included: true, description: 'Kunden buchen selbständig Termine über Ihre Webseite' },
+      { name: 'Kalender & Terminverwaltung', included: true, description: 'Alle Termine übersichtlich im Kalender' },
+      { name: 'E-Mail-Benachrichtigungen', included: true, description: 'Automatische E-Mails an Kunden bei Buchung' },
+      { name: 'Automatische Erinnerungen', included: true, description: 'Kunden bekommen vor Terminen eine Erinnerungs-E-Mail' },
+      { name: 'Kundendatenbank (CRM)', included: true, description: 'Alle Kundendaten sicher an einem Ort gespeichert' },
+      { name: 'Zahlungsabwicklung', included: true, description: 'Kunden können direkt online bezahlen' },
+      { name: 'Basis-Reporting', included: true, description: 'Einfache Übersicht über Umsätze und Termine' },
+      { name: 'Google-Bewertungen', included: true, description: 'Automatisch Kunden nach Bewertungen fragen' },
+      { name: 'E-Mail-Support', included: true, description: 'Hilfe per E-Mail bei Fragen' },
     ],
     notIncluded: [
       'SMS-Benachrichtigungen',
@@ -40,20 +40,20 @@ const plans = [
     yearlyMonthlyCost: 140.83,
     popular: true,
     features: [
-      { name: 'Mitarbeiter', value: '10' },
-      { name: 'Standorte', value: '1' },
-      { name: 'Buchungen/Monat', value: '1.000' },
-      { name: 'Kunden', value: '2.500' },
-      { name: 'Alles aus Starter', included: true, bold: true },
-      { name: 'Marketing-Automation', included: true },
-      { name: 'Erweiterte Analytics', included: true },
-      { name: 'Multi-Service Buchungen', included: true },
-      { name: 'Portfolio & Galerien', included: true },
-      { name: 'Custom Branding', included: true },
-      { name: 'Service-Pakete', included: true },
-      { name: 'Fortschrittsverfolgung', included: true },
-      { name: 'Ressourcenmanagement', included: true },
-      { name: 'Prioritäts-Support', included: true },
+      { name: 'Mitarbeiter', value: '10', description: 'Bis zu 10 Mitarbeiter können gleichzeitig arbeiten' },
+      { name: 'Standorte', value: '1', description: 'Für einen Salon-Standort' },
+      { name: 'Buchungen/Monat', value: '1.000', description: 'Bis zu 1.000 Termine pro Monat - ideal für größere Salons' },
+      { name: 'Kunden', value: '2.500', description: 'Bis zu 2.500 Kundenkontakte - mehr Stammkunden verwalten' },
+      { name: 'Alles aus Starter', included: true, bold: true, description: 'Alle Funktionen vom Starter-Plan inklusive' },
+      { name: 'Marketing-Automation', included: true, description: 'Automatische E-Mails für Geburtstage und Rückkehr-Erinnerungen' },
+      { name: 'Erweiterte Analytics', included: true, description: 'Detaillierte Auswertungen zu Umsätzen und beliebten Services' },
+      { name: 'Multi-Service Buchungen', included: true, description: 'Kunden können mehrere Behandlungen auf einmal buchen' },
+      { name: 'Portfolio & Galerien', included: true, description: 'Vorher-Nachher Bilder Ihrer Arbeit zeigen' },
+      { name: 'Custom Branding', included: true, description: 'Buchungsseite in Ihren Farben und mit Ihrem Logo' },
+      { name: 'Service-Pakete', included: true, description: 'Kombinationen aus mehreren Leistungen anbieten' },
+      { name: 'Fortschrittsverfolgung', included: true, description: 'Behandlungsverläufe dokumentieren (z.B. bei Tattoos)' },
+      { name: 'Ressourcenmanagement', included: true, description: 'Räume und Geräte planen (z.B. Massageräume)' },
+      { name: 'Prioritäts-Support', included: true, description: 'Schnellere Hilfe bei Fragen und Problemen' },
     ],
     notIncluded: [
       'SMS-Benachrichtigungen (nur Enterprise)',
@@ -71,21 +71,21 @@ const plans = [
     yearlyMonthlyCost: 332.50,
     badge: 'SMS INCLUDED',
     features: [
-      { name: 'Mitarbeiter', value: 'Unbegrenzt' },
-      { name: 'Standorte', value: '5' },
-      { name: 'Buchungen/Monat', value: 'Unbegrenzt' },
-      { name: 'Kunden', value: 'Unbegrenzt' },
-      { name: 'Alles aus Professional', included: true, bold: true },
-      { name: 'SMS-Benachrichtigungen', value: '500/Monat', included: true, highlight: true },
-      { name: 'Multi-Standort Support', included: true },
-      { name: 'White-Label Optionen', included: true },
-      { name: 'REST API-Zugang', included: true },
-      { name: 'Webhook Integrationen', included: true },
-      { name: 'HIPAA Compliance', included: true },
-      { name: 'Audit-Logs', included: true },
-      { name: 'Dedizierter Account Manager', included: true },
-      { name: 'SEPA & Rechnung als Zahlungsart', included: true },
-      { name: 'Prioritäts-Support (24/7)', included: true },
+      { name: 'Mitarbeiter', value: 'Unbegrenzt', description: 'Beliebig viele Mitarbeiter ohne Aufpreis' },
+      { name: 'Standorte', value: '5', description: 'Bis zu 5 Filialen gleichzeitig verwalten' },
+      { name: 'Buchungen/Monat', value: 'Unbegrenzt', description: 'Keine Begrenzung bei der Anzahl der Termine' },
+      { name: 'Kunden', value: 'Unbegrenzt', description: 'Unbegrenzt viele Kundenkontakte speichern' },
+      { name: 'Alles aus Professional', included: true, bold: true, description: 'Alle Funktionen vom Professional-Plan inklusive' },
+      { name: 'SMS-Benachrichtigungen', value: '500/Monat', included: true, highlight: true, description: 'SMS-Erinnerungen direkt aufs Handy - verhindert vergessene Termine' },
+      { name: 'Multi-Standort Support', included: true, description: 'Mehrere Salons zentral verwalten mit einer Übersicht' },
+      { name: 'White-Label Optionen', included: true, description: 'Komplett in Ihrem Design - kein JN Automation Logo sichtbar' },
+      { name: 'REST API-Zugang', included: true, description: 'Anbindung an Ihre eigene Software möglich' },
+      { name: 'Webhook Integrationen', included: true, description: 'Automatische Benachrichtigungen an andere Programme' },
+      { name: 'HIPAA Compliance', included: true, description: 'Medizinische Daten nach höchstem Standard geschützt' },
+      { name: 'Audit-Logs', included: true, description: 'Nachvollziehen wer was wann geändert hat' },
+      { name: 'Dedizierter Account Manager', included: true, description: 'Persönlicher Ansprechpartner nur für Sie' },
+      { name: 'SEPA & Rechnung als Zahlungsart', included: true, description: 'Kunden können per Lastschrift oder auf Rechnung zahlen' },
+      { name: 'Prioritäts-Support (24/7)', included: true, description: 'Hilfe rund um die Uhr - auch nachts und am Wochenende' },
     ],
   },
 ];
@@ -273,19 +273,23 @@ export default function Pricing() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div className="flex-1">
-                      <span className={feature.bold ? 'font-semibold text-white' : 'text-gray-300'}>
-                        {feature.icon && <span className="mr-2">{feature.icon}</span>}
+                      <div className={feature.bold ? 'font-semibold text-white' : 'text-gray-300'}>
                         {feature.name}
-                      </span>
-                      {feature.value && (
-                        <span className="ml-1 text-white font-medium">
-                          ({feature.value})
-                        </span>
-                      )}
-                      {feature.highlight && (
-                        <span className="ml-2 text-xs text-purple-400 font-medium">
-                          NUR ENTERPRISE
-                        </span>
+                        {feature.value && (
+                          <span className="ml-1 text-white font-medium">
+                            ({feature.value})
+                          </span>
+                        )}
+                        {feature.highlight && (
+                          <span className="ml-2 text-xs text-purple-400 font-medium">
+                            NUR ENTERPRISE
+                          </span>
+                        )}
+                      </div>
+                      {feature.description && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {feature.description}
+                        </div>
                       )}
                     </div>
                   </li>
@@ -320,7 +324,7 @@ export default function Pricing() {
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-bold mb-2">📱 SMS-Benachrichtigungen nur in Enterprise</h3>
+              <h3 className="text-xl font-bold mb-2">SMS-Benachrichtigungen nur in Enterprise</h3>
               <p className="text-gray-300 mb-4">
                 Reduziere No-Shows um bis zu 60% mit automatischen SMS-Erinnerungen 2h & 24h vor Terminen.
                 Inklusive 500 SMS pro Monat (skalierbar mit Team-Größe: +50 SMS pro Mitarbeiter).
