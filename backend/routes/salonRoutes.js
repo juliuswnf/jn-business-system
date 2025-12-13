@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import salonController from '../controllers/salonController.js';
 import salonAnalyticsController from '../controllers/salonAnalyticsController.js';
 import { checkSalonOwnership, enforceTenantFilter } from '../middleware/tenantMiddleware.js';

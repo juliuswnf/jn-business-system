@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import mongoose from 'mongoose';
 /**
  * Salon Controller - MVP
@@ -41,7 +41,7 @@ export const getSalonInfo = async (req, res) => {
 
 // ==================== UPDATE SALON ====================
 
-// ✅ HIGH FIX #11: Allowed fields whitelist (prevent subscription manipulation)
+// ? HIGH FIX #11: Allowed fields whitelist (prevent subscription manipulation)
 const ALLOWED_SALON_FIELDS = [
   'name', 'email', 'phone', 'address', 'description', 'openingHours',
   'businessHours', 'googleReviewUrl', 'defaultLanguage', 'timezone',
@@ -62,7 +62,7 @@ export const updateSalon = async (req, res) => {
       });
     }
 
-    // ✅ HIGH FIX #11: Only update whitelisted fields
+    // ? HIGH FIX #11: Only update whitelisted fields
     const updateData = {};
     for (const field of ALLOWED_SALON_FIELDS) {
       if (req.body[field] !== undefined) {
@@ -74,7 +74,7 @@ export const updateSalon = async (req, res) => {
     Object.assign(salon, updateData);
     await salon.save();
 
-    logger.log(`✅ Salon updated: ${salon.name} (ID: ${salonId})`);
+    logger.log(`? Salon updated: ${salon.name} (ID: ${salonId})`);
 
     res.status(200).json({
       success: true,
@@ -96,7 +96,7 @@ export const getSalonServices = async (req, res) => {
   try {
     const salonId = req.params.salonId || req.user.salonId;
 
-    // ✅ PAGINATION - prevent unbounded queries (DoS protection)
+    // ? PAGINATION - prevent unbounded queries (DoS protection)
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50)); // Default 50, max 100
     const skip = (page - 1) * limit;
@@ -113,7 +113,7 @@ export const getSalonServices = async (req, res) => {
       success: true,
       count: services.length,
       services,
-      // ✅ Pagination metadata
+      // ? Pagination metadata
       pagination: {
         page,
         limit,

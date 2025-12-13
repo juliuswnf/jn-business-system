@@ -1,4 +1,4 @@
-﻿import Widget from '../models/Widget.js';
+import Widget from '../models/Widget.js';
 import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import logger from '../utils/logger.js';
@@ -27,7 +27,7 @@ export const createWidget = async (req, res) => {
     // Create widget
     const widget = await Widget.createForSalon(salonId, req.body);
 
-    logger.log(`✅ Widget created for salon: ${salonId}`);
+    logger.log(`? Widget created for salon: ${salonId}`);
 
     return res.status(201).json({
       success: true,
@@ -50,7 +50,7 @@ export const createWidget = async (req, res) => {
       });
     }
 
-    logger.error('� CreateWidget Error:', error);
+    logger.error('? CreateWidget Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to create widget'
@@ -98,7 +98,7 @@ export const getWidget = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('❌ GetWidget Error:', error);
+    logger.error('? GetWidget Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch widget'
@@ -155,7 +155,7 @@ export const getWidgetByApiKey = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('� GetWidgetByApiKey Error:', error);
+    logger.error('? GetWidgetByApiKey Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch widget'
@@ -196,7 +196,7 @@ export const updateWidget = async (req, res) => {
 
     await widget.save();
 
-    logger.log(`✅ Widget updated: ${widget._id}`);
+    logger.log(`? Widget updated: ${widget._id}`);
 
     return res.status(200).json({
       success: true,
@@ -204,7 +204,7 @@ export const updateWidget = async (req, res) => {
       widget
     });
   } catch (error) {
-    logger.error('� UpdateWidget Error:', error);
+    logger.error('? UpdateWidget Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to update widget'
@@ -238,7 +238,7 @@ export const regenerateApiKey = async (req, res) => {
 
     await widget.regenerateApiKey();
 
-    logger.log(`⚠️ API Key regenerated for salon: ${salonId}`);
+    logger.log(`?? API Key regenerated for salon: ${salonId}`);
 
     return res.status(200).json({
       success: true,
@@ -250,7 +250,7 @@ export const regenerateApiKey = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('❌ RegenerateApiKey Error:', error);
+    logger.error('? RegenerateApiKey Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to regenerate API key'
@@ -284,14 +284,14 @@ export const deleteWidget = async (req, res) => {
 
     await widget.deleteOne();
 
-    logger.log(`✅ Widget deleted: ${widget._id}`);
+    logger.log(`? Widget deleted: ${widget._id}`);
 
     return res.status(200).json({
       success: true,
       message: 'Widget deleted successfully'
     });
   } catch (error) {
-    logger.error('❌ DeleteWidget Error:', error);
+    logger.error('? DeleteWidget Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to delete widget'
@@ -328,7 +328,7 @@ export const getWidgetStats = async (req, res) => {
       stats
     });
   } catch (error) {
-    logger.error('❌ GetWidgetStats Error:', error);
+    logger.error('? GetWidgetStats Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch widget stats'

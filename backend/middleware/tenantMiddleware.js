@@ -1,4 +1,4 @@
-﻿import Booking from '../models/Booking.js';
+import Booking from '../models/Booking.js';
 import Service from '../models/Service.js';
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
@@ -70,7 +70,7 @@ export const checkTenantAccess = (resourceType, idParam = 'id') => {
 
       // Check if user's salon matches the resource's salon
       if (!userSalonId || resourceSalonId !== userSalonId) {
-        logger.warn(`ðŸš« Tenant access denied: User ${req.user.id} (salon: ${userSalonId}) tried to access ${resourceType} ${resourceId} (salon: ${resourceSalonId})`);
+        logger.warn(`🚫 Tenant access denied: User ${req.user.id} (salon: ${userSalonId}) tried to access ${resourceType} ${resourceId} (salon: ${resourceSalonId})`);
 
         return res.status(403).json({
           success: false,
@@ -104,7 +104,7 @@ export const enforceTenantFilter = (req, res, next) => {
 
   // All other users MUST have a salonId
   if (!req.user.salonId) {
-    logger.warn(`ðŸš« User ${req.user.id} has no salonId assigned`);
+    logger.warn(`🚫 User ${req.user.id} has no salonId assigned`);
     return res.status(403).json({
       success: false,
       message: 'No salon assigned to your account'
@@ -140,7 +140,7 @@ export const checkSalonOwnership = async (req, res, next) => {
 
     // Check if user's salon matches the requested salon
     if (!userSalonId || salonId !== userSalonId) {
-      logger.warn(`ðŸš« Salon ownership denied: User ${req.user.id} (salon: ${userSalonId}) tried to access salon ${salonId}`);
+      logger.warn(`🚫 Salon ownership denied: User ${req.user.id} (salon: ${userSalonId}) tried to access salon ${salonId}`);
 
       return res.status(403).json({
         success: false,

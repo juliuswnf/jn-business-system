@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import Booking from '../models/Booking.js';
@@ -14,23 +14,23 @@ const router = express.Router();
 
 /**
  * Widget Routes - Embeddable Booking Widget API
- * Public endpoints für externe Salon-Websites
+ * Public endpoints f�r externe Salon-Websites
  * Kein Auth erforderlich - Slug-basiert
- * Rate-Limited für Spam-Schutz
+ * Rate-Limited f�r Spam-Schutz
  */
 
-// ✅ HIGH FIX #12: Apply CORS middleware (allowedDomains whitelist)
+// ? HIGH FIX #12: Apply CORS middleware (allowedDomains whitelist)
 router.use(widgetCorsMiddleware);
 
 // Apply widget rate limiter to all routes
 router.use(widgetLimiter);
 
-// ✅ HIGH FIX #12: Validate slug format (prevent injection)
+// ? HIGH FIX #12: Validate slug format (prevent injection)
 const isValidSlug = (slug) => {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) && slug.length >= 3 && slug.length <= 50;
 };
 
-// ✅ HIGH FIX #12: Sanitize input strings (prevent XSS)
+// ? HIGH FIX #12: Sanitize input strings (prevent XSS)
 const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
   return input
@@ -45,7 +45,7 @@ router.get('/config/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // ✅ HIGH FIX #12: Validate slug format
+    // ? HIGH FIX #12: Validate slug format
     if (!isValidSlug(slug)) {
       return res.status(400).json({
         success: false,
@@ -90,7 +90,7 @@ router.get('/services/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // ✅ HIGH FIX #12: Validate slug format
+    // ? HIGH FIX #12: Validate slug format
     if (!isValidSlug(slug)) {
       return res.status(400).json({
         success: false,
@@ -130,7 +130,7 @@ router.get('/timeslots/:slug', async (req, res) => {
     const { slug } = req.params;
     const { date, serviceId } = req.query;
 
-    // ✅ HIGH FIX #12: Validate slug format
+    // ? HIGH FIX #12: Validate slug format
     if (!isValidSlug(slug)) {
       return res.status(400).json({
         success: false,
@@ -138,7 +138,7 @@ router.get('/timeslots/:slug', async (req, res) => {
       });
     }
 
-    // ✅ HIGH FIX #12: Validate serviceId format
+    // ? HIGH FIX #12: Validate serviceId format
     if (!serviceId || !isValidObjectId(serviceId)) {
       return res.status(400).json({
         success: false,
@@ -249,7 +249,7 @@ router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, re
     const { slug } = req.params;
     const { customerName, customerEmail, customerPhone, serviceId, date, time, notes } = req.body;
 
-    // ✅ HIGH FIX #12: Validate slug format
+    // ? HIGH FIX #12: Validate slug format
     if (!isValidSlug(slug)) {
       return res.status(400).json({
         success: false,
@@ -257,7 +257,7 @@ router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, re
       });
     }
 
-    // ✅ HIGH FIX #12: Validate and sanitize inputs
+    // ? HIGH FIX #12: Validate and sanitize inputs
     if (!serviceId || !isValidObjectId(serviceId)) {
       return res.status(400).json({
         success: false,
@@ -265,7 +265,7 @@ router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, re
       });
     }
 
-    // ✅ HIGH FIX #12: Sanitize user inputs (XSS prevention)
+    // ? HIGH FIX #12: Sanitize user inputs (XSS prevention)
     const sanitizedData = {
       customerName: sanitizeInput(customerName),
       customerEmail: sanitizeInput(customerEmail),

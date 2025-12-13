@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Email Template Service
  * Handles rendering of email templates with placeholders
  * for confirmation, reminder, and review emails

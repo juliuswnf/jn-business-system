@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Security Middleware Suite
  * Version: 1.0.0
  * Provides: Rate limiting, input validation, XSS/CSRF protection
@@ -25,7 +25,7 @@ export const generalLimiter = (req, res, next) => {
   if (requests.length >= maxRequests) {
     return res.status(429).json({
       success: false,
-      message: 'Zu viele Anfragen - bitte spÃ¤ter versuchen'
+      message: 'Zu viele Anfragen - bitte später versuchen'
     });
   }
 
@@ -97,7 +97,7 @@ export const apiLimiter = (req, res, next) => {
   if (requests.length >= maxRequests) {
     return res.status(429).json({
       success: false,
-      message: 'API Limit Ã¼berschritten'
+      message: 'API Limit überschritten'
     });
   }
 
@@ -135,7 +135,7 @@ export const bruteForcePrevention = (req, res, next) => {
   if (attempt.lockedUntil > Date.now()) {
     return res.status(429).json({
       success: false,
-      message: 'Zu viele fehlgeschlagene Versuche - Konto vorÃ¼bergehend gesperrt'
+      message: 'Zu viele fehlgeschlagene Versuche - Konto vorübergehend gesperrt'
     });
   }
 
@@ -192,7 +192,7 @@ export const validateInput = (req, res, next) => {
     if (typeof value === 'string' && /<script|javascript:|onerror=/i.test(value)) {
       return res.status(400).json({
         success: false,
-        message: 'UngÃ¼ltige Eingabe - verdÃ¤chtige Zeichen erkannt'
+        message: 'Ungültige Eingabe - verdächtige Zeichen erkannt'
       });
     }
   }
@@ -217,7 +217,7 @@ export const requestSizeLimit = (req, res, next) => {
   if (contentLength > maxSize) {
     return res.status(413).json({
       success: false,
-      message: 'AnfragegrÃ¶ÃŸe zu groÃŸ (max 10MB)'
+      message: 'Anfragegröße zu groß (max 10MB)'
     });
   }
   next();

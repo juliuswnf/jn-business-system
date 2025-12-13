@@ -1,4 +1,4 @@
-﻿import ConsentForm from '../models/ConsentForm.js';
+import ConsentForm from '../models/ConsentForm.js';
 import Salon from '../models/Salon.js';
 import { generateConsentPDF } from '../utils/pdfGenerator.js';
 
@@ -61,7 +61,7 @@ export const createConsentForm = async (req, res) => {
         consentForm.pdfUrl = pdfUrl;
         await consentForm.save();
       } catch (error) {
-        console.warn('PDF generation failed:', error);
+        logger.warn('PDF generation failed:', error);
       }
     }
 

@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import alertingService from '../services/alertingService.js';
 /**
  * Error Handler Middleware Suite
@@ -44,7 +44,7 @@ const logError = (err, req) => {
 // ==================== ERROR HANDLERS ====================
 
 const handleCastError = (err) => {
-  const message = `UngÃ¼ltiges Format fÃ¼r ${err.path}: ${err.value}`;
+  const message = `Ungültiges Format für ${err.path}: ${err.value}`;
   return new AppError(message, 400);
 };
 
@@ -64,7 +64,7 @@ const handleValidationError = (err) => {
 };
 
 const handleJWTError = () => {
-  return new AppError('Token ungÃ¼ltig oder beschÃ¤digt', 401);
+  return new AppError('Token ungültig oder beschädigt', 401);
 };
 
 const handleTokenExpiredError = () => {
@@ -82,10 +82,10 @@ const getErrorMessage = (errorCode) => {
     'EMPLOYEE_NOT_FOUND': 'Mitarbeiter nicht gefunden',
     'INVALID_PASSWORD': 'Passwort ist falsch',
     'EMAIL_ALREADY_EXISTS': 'Email wird bereits verwendet',
-    'INVALID_TOKEN': 'Token ungÃ¼ltig',
+    'INVALID_TOKEN': 'Token ungültig',
     'TOKEN_EXPIRED': 'Token abgelaufen',
     'PERMISSION_DENIED': 'Keine Berechtigung',
-    'INVALID_INPUT': 'UngÃ¼ltige Eingabe',
+    'INVALID_INPUT': 'Ungültige Eingabe',
     'SERVER_ERROR': 'Ein Fehler ist aufgetreten'
   };
 
@@ -125,7 +125,7 @@ const handleDatabaseError = (error, req, res, next) => {
   if (error.name === 'MongoError' || error.name === 'MongoNetworkError') {
     return res.status(503).json({
       success: false,
-      message: 'Datenbankverbindung fehlgeschlagen. Bitte spÃ¤ter versuchen.'
+      message: 'Datenbankverbindung fehlgeschlagen. Bitte später versuchen.'
     });
   }
 
@@ -145,7 +145,7 @@ const handleFileUploadError = (error, req, res, next) => {
   if (error.code === 'LIMIT_FILE_SIZE') {
     return res.status(413).json({
       success: false,
-      message: 'Datei zu groÃŸ (max. 5MB)'
+      message: 'Datei zu groß (max. 5MB)'
     });
   }
 
@@ -172,7 +172,7 @@ const handleRateLimitError = (error, req, res, next) => {
   if (error.status === 429) {
     return res.status(429).json({
       success: false,
-      message: 'Zu viele Anfragen, bitte spÃ¤ter versuchen',
+      message: 'Zu viele Anfragen, bitte später versuchen',
       retryAfter: error.retryAfter || 60
     });
   }
@@ -186,7 +186,7 @@ const handleAuthError = (error, req, res, next) => {
   if (error.name === 'JsonWebTokenError') {
     return res.status(401).json({
       success: false,
-      message: 'Token ungÃ¼ltig'
+      message: 'Token ungültig'
     });
   }
 
@@ -213,7 +213,7 @@ const handleAuthorizationError = (error, req, res, next) => {
   if (error.statusCode === 403) {
     return res.status(403).json({
       success: false,
-      message: 'Sie haben keine Berechtigung fÃ¼r diese Aktion'
+      message: 'Sie haben keine Berechtigung für diese Aktion'
     });
   }
 
@@ -249,7 +249,7 @@ const validationErrorHandler = (req, res, next) => {
 
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((err) => {
-    logger.error('âŒ Async Error:', err);
+    logger.error('❌ Async Error:', err);
     next(err);
   });
 };

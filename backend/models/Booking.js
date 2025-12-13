@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 
 const bookingSchema = new mongoose.Schema(
@@ -194,7 +194,7 @@ const bookingSchema = new mongoose.Schema(
       index: true
     },
 
-    // ==================== Idempotency Key (✅ SRE FIX #30) ====================
+    // ==================== Idempotency Key (? SRE FIX #30) ====================
     idempotencyKey: {
       type: String,
       unique: true,
@@ -214,7 +214,7 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       enum: ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'],
       default: 'pending',
-      index: true // ✅ Performance optimization
+      index: true // ? Performance optimization
     },
 
     notes: {
@@ -303,9 +303,9 @@ bookingSchema.index({ status: 1, bookingDate: 1 });
 bookingSchema.index({ bookingDate: 1, status: 1 });
 bookingSchema.index({ employeeId: 1, bookingDate: 1 });
 bookingSchema.index({ deletedAt: 1 }); // For soft delete queries
-bookingSchema.index({ customerId: 1, bookingDate: -1 }); // ✅ Customer booking history (descending)
-bookingSchema.index({ salonId: 1, createdAt: -1 }); // ✅ Recent bookings per salon
-bookingSchema.index({ paymentStatus: 1, bookingDate: 1 }); // ✅ Payment tracking
+bookingSchema.index({ customerId: 1, bookingDate: -1 }); // ? Customer booking history (descending)
+bookingSchema.index({ salonId: 1, createdAt: -1 }); // ? Recent bookings per salon
+bookingSchema.index({ paymentStatus: 1, bookingDate: 1 }); // ? Payment tracking
 
 // ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
 
@@ -516,7 +516,7 @@ bookingSchema.index({ salonId: 1, employeeId: 1, bookingDate: 1 }); // Employee 
 bookingSchema.index({ customerEmail: 1, salonId: 1 }); // Customer lookup
 bookingSchema.index({ salonId: 1, createdAt: -1 }); // Recent bookings
 
-// ✅ AUDIT FIX: Multi-tenant plugin for automatic salonId filtering
+// ? AUDIT FIX: Multi-tenant plugin for automatic salonId filtering
 bookingSchema.plugin(multiTenantPlugin);
 
 // ==================== EXPORT ====================

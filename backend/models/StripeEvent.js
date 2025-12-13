@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 /**
  * StripeEvent Schema
@@ -14,7 +14,7 @@ const stripeEventSchema = new mongoose.Schema(
     stripeEventId: {
       type: String,
       required: true,
-      unique: true, // ✅ PREVENTS DUPLICATE PROCESSING
+      unique: true, // ? PREVENTS DUPLICATE PROCESSING
       index: true
     },
 

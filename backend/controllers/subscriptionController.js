@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import Salon from '../models/Salon.js';
 import { createCheckoutSession, createBillingPortalSession } from '../services/stripeService.js';
 
@@ -174,7 +174,7 @@ export const getPlans = async (req, res) => {
         name: 'Starter',
         price: 49,
         yearlyPrice: 39,
-        description: 'Perfekt fÃ¼r Solo-Studios & Einzelunternehmer',
+        description: 'Perfekt für Solo-Studios & Einzelunternehmer',
         priceIdMonthly: process.env.STRIPE_PRICE_STARTER_MONTHLY,
         priceIdYearly: process.env.STRIPE_PRICE_STARTER_YEARLY,
         features: [
@@ -191,7 +191,7 @@ export const getPlans = async (req, res) => {
         name: 'Professional',
         price: 99,
         yearlyPrice: 79,
-        description: 'FÃ¼r wachsende Teams',
+        description: 'Für wachsende Teams',
         priceIdMonthly: process.env.STRIPE_PRICE_PRO_MONTHLY,
         priceIdYearly: process.env.STRIPE_PRICE_PRO_YEARLY,
         highlighted: true,
@@ -209,7 +209,7 @@ export const getPlans = async (req, res) => {
         name: 'Enterprise',
         price: 199,
         yearlyPrice: 159,
-        description: 'FÃ¼r Salon-Ketten',
+        description: 'Für Salon-Ketten',
         priceIdMonthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY,
         priceIdYearly: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY,
         features: [

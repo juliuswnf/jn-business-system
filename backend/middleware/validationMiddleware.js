@@ -1,4 +1,4 @@
-﻿import Joi from 'joi';
+import Joi from 'joi';
 import validator from 'validator';
 import logger from '../utils/logger.js';
 
@@ -11,7 +11,7 @@ import logger from '../utils/logger.js';
 // ==================== CUSTOM JOI MESSAGES ====================
 
 const joiMessages = {
-  'string.email': 'ungÃ¼ltige E-Mail-Adresse',
+  'string.email': 'ungültige E-Mail-Adresse',
   'string.min': 'muss mindestens {#limit} Zeichen lang sein',
   'string.max': 'darf maximal {#limit} Zeichen lang sein',
   'number.positive': 'muss positiv sein',
@@ -42,7 +42,7 @@ export const validateBody = (schema) => {
           type: detail.type
         }));
 
-        logger.warn(`âŒ Body Validation Error: ${JSON.stringify(errors)}`);
+        logger.warn(`❌ Body Validation Error: ${JSON.stringify(errors)}`);
 
         return res.status(400).json({
           success: false,
@@ -56,7 +56,7 @@ export const validateBody = (schema) => {
       req.body = value;
       next();
     } catch (err) {
-      logger.error('âŒ Body Validation Exception:', err.message);
+      logger.error('❌ Body Validation Exception:', err.message);
       next(err);
     }
   };
@@ -82,7 +82,7 @@ export const validateParams = (schema) => {
           message: detail.message
         }));
 
-        logger.warn(`âŒ Params Validation Error:  ${JSON.stringify(errors)}`);
+        logger.warn(`❌ Params Validation Error:  ${JSON.stringify(errors)}`);
 
         return res.status(400).json({
           success: false,
@@ -96,7 +96,7 @@ export const validateParams = (schema) => {
       req.params = value;
       next();
     } catch (err) {
-      logger.error('âŒ Params Validation Exception:', err.message);
+      logger.error('❌ Params Validation Exception:', err.message);
       next(err);
     }
   };
@@ -134,7 +134,7 @@ export const validateQuery = (schema) => {
       req.query = value;
       next();
     } catch (err) {
-      logger.error('âŒ Query Validation Exception:', err.message);
+      logger.error('❌ Query Validation Exception:', err.message);
       next(err);
     }
   };
@@ -191,7 +191,7 @@ export const sanitizeInput = (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error('âŒ Sanitize Input Error:', error.message);
+    logger.error('❌ Sanitize Input Error:', error.message);
     next(error);
   }
 };
@@ -217,7 +217,7 @@ export const sanitizeField = (field, type = 'string') => {
 
       next();
     } catch (error) {
-      logger.error(`âŒ Sanitize Field "${field}" Error:`, error.message);
+      logger.error(`❌ Sanitize Field "${field}" Error:`, error.message);
       next(error);
     }
   };
@@ -230,10 +230,10 @@ export const validateEmail = (req, res, next) => {
     const { email } = req.body || req.query || req.params;
 
     if (email && !validator.isEmail(email)) {
-      logger.warn(`âš ï¸ Invalid email format: ${email}`);
+      logger.warn(`⚠️ Invalid email format: ${email}`);
       return res.status(400).json({
         success: false,
-        message: 'UngÃ¼ltige Email-Adresse',
+        message: 'Ungültige Email-Adresse',
         field: 'email',
         timestamp: new Date().toISOString()
       });
@@ -241,7 +241,7 @@ export const validateEmail = (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error('âŒ Email Validation Error:', error.message);
+    logger.error('❌ Email Validation Error:', error.message);
     next(error);
   }
 };
@@ -266,7 +266,7 @@ export const validatePassword = (req, res, next) => {
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         success: false,
-        message: 'Passwort muss mindestens 8 Zeichen, 1 GroÃŸbuchstabe, 1 Kleinbuchstabe und 1 Zahl enthalten',
+        message: 'Passwort muss mindestens 8 Zeichen, 1 Großbuchstabe, 1 Kleinbuchstabe und 1 Zahl enthalten',
         field: 'password',
         requirements: {
           minLength: 8,
@@ -279,7 +279,7 @@ export const validatePassword = (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error('âŒ Password Validation Error:', error.message);
+    logger.error('❌ Password Validation Error:', error.message);
     next(error);
   }
 };
@@ -291,10 +291,10 @@ export const validatePhone = (req, res, next) => {
     const { phone } = req.body || req.query;
 
     if (phone && !validator.isMobilePhone(phone, 'any', { strictMode: false })) {
-      logger.warn(`âš ï¸ Invalid phone format: ${phone}`);
+      logger.warn(`⚠️ Invalid phone format: ${phone}`);
       return res.status(400).json({
         success: false,
-        message: 'UngÃ¼ltige Telefonnummer',
+        message: 'Ungültige Telefonnummer',
         field: 'phone',
         format: '+1-234-567-8900'
       });
@@ -302,7 +302,7 @@ export const validatePhone = (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error('âŒ Phone Validation Error:', error.message);
+    logger.error('❌ Phone Validation Error:', error.message);
     next(error);
   }
 };
@@ -317,14 +317,14 @@ export const validateURL = (req, res, next) => {
     if (urlField && !validator.isURL(urlField, { require_protocol: false })) {
       return res.status(400).json({
         success: false,
-        message: 'UngÃ¼ltige URL',
+        message: 'Ungültige URL',
         format: 'https://example.com'
       });
     }
 
     next();
   } catch (error) {
-    logger.error('âŒ URL Validation Error:', error.message);
+    logger.error('❌ URL Validation Error:', error.message);
     next(error);
   }
 };
@@ -340,7 +340,7 @@ export const validateDate = (req, res, next) => {
       if (d.value && !validator.isISO8601(String(d.value))) {
         return res.status(400).json({
           success: false,
-          message: 'UngÃ¼ltiges Datum',
+          message: 'Ungültiges Datum',
           field: d.name,
           format: 'YYYY-MM-DD'
         });
@@ -349,7 +349,7 @@ export const validateDate = (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error('âŒ Date Validation Error:', error.message);
+    logger.error('❌ Date Validation Error:', error.message);
     next(error);
   }
 };
@@ -376,7 +376,7 @@ export const validateNumeric = (fields = []) => {
 
       next();
     } catch (error) {
-      logger.error('âŒ Numeric Validation Error:', error.message);
+      logger.error('❌ Numeric Validation Error:', error.message);
       next(error);
     }
   };
@@ -404,7 +404,7 @@ export const validateArray = (fields = []) => {
 
       next();
     } catch (error) {
-      logger.error('âŒ Array Validation Error:', error.message);
+      logger.error('❌ Array Validation Error:', error.message);
       next(error);
     }
   };
@@ -430,7 +430,7 @@ export const validateRequiredFields = (fields = []) => {
 
       next();
     } catch (error) {
-      logger.error('âŒ Required Fields Validation Error:', error.message);
+      logger.error('❌ Required Fields Validation Error:', error.message);
       next(error);
     }
   };
@@ -458,7 +458,7 @@ export const validateStringLength = (field, minLength, maxLength) => {
 
       next();
     } catch (error) {
-      logger.error('âŒ String Length Validation Error:', error.message);
+      logger.error('❌ String Length Validation Error:', error.message);
       next(error);
     }
   };
@@ -483,7 +483,7 @@ export const validateEnum = (field, allowedValues) => {
 
       next();
     } catch (error) {
-      logger.error('âŒ Enum Validation Error:', error.message);
+      logger.error('❌ Enum Validation Error:', error.message);
       next(error);
     }
   };
@@ -506,7 +506,7 @@ export const validateCustom = (validationFn, message = 'Validierung fehlgeschlag
 
       next();
     } catch (err) {
-      logger.error('âŒ Custom Validation Error:', err);
+      logger.error('❌ Custom Validation Error:', err);
       res.status(500).json({
         success: false,
         message: 'Validierungsfehler im Server'
@@ -561,22 +561,22 @@ const bookingSchema = Joi.object({
     'any.required': 'Name ist erforderlich'
   }),
   customerEmail: Joi.string().email().required().messages({
-    'string.email': 'UngÃ¼ltige E-Mail-Adresse',
+    'string.email': 'Ungültige E-Mail-Adresse',
     'any.required': 'E-Mail ist erforderlich'
   }),
   customerPhone: Joi.string().pattern(/^[0-9+\-() ]{10,}$/).required().messages({
-    'string.pattern.base': 'UngÃ¼ltige Telefonnummer',
+    'string.pattern.base': 'Ungültige Telefonnummer',
     'any.required': 'Telefonnummer ist erforderlich'
   }),
   serviceId: Joi.string().length(24).required().messages({
-    'string.length': 'UngÃ¼ltige Service-ID',
+    'string.length': 'Ungültige Service-ID',
     'any.required': 'Service ist erforderlich'
   }),
   date: Joi.string().required().messages({
     'any.required': 'Datum ist erforderlich'
   }),
   time: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required().messages({
-    'string.pattern.base': 'UngÃ¼ltiges Zeitformat (HH:MM)',
+    'string.pattern.base': 'Ungültiges Zeitformat (HH:MM)',
     'any.required': 'Zeit ist erforderlich'
   }),
   notes: Joi.string().max(500).allow('', null).optional()

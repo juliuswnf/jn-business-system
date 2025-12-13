@@ -1,9 +1,9 @@
-﻿import cors from 'cors';
+import cors from 'cors';
 import Widget from '../models/Widget.js';
 import logger from '../utils/logger.js';
 
 /**
- * ✅ HIGH FIX #12: Dynamic CORS Middleware for Widget Routes
+ * ? HIGH FIX #12: Dynamic CORS Middleware for Widget Routes
  *
  * Validates origin against salon-specific allowedDomains whitelist
  * Prevents unauthorized embedding of booking widget
@@ -41,7 +41,7 @@ const widgetCorsMiddleware = async (req, res, next) => {
 
     if (!widget || !widget.allowedDomains || widget.allowedDomains.length === 0) {
       // No whitelist configured - allow all origins (permissive mode for setup)
-      logger.warn(`⚠️ No CORS whitelist configured for salon ${slug} - allowing all origins`);
+      logger.warn(`?? No CORS whitelist configured for salon ${slug} - allowing all origins`);
       return cors({
         origin: true,
         credentials: true,
@@ -50,7 +50,7 @@ const widgetCorsMiddleware = async (req, res, next) => {
       })(req, res, next);
     }
 
-    // ✅ Validate origin against whitelist
+    // ? Validate origin against whitelist
     const isAllowed = widget.allowedDomains.some(domain => {
       if (!origin) return false;
 
@@ -66,7 +66,7 @@ const widgetCorsMiddleware = async (req, res, next) => {
     });
 
     if (!isAllowed) {
-      logger.warn(`🚫 CORS blocked: ${origin} not in whitelist for salon ${slug}`);
+      logger.warn(`?? CORS blocked: ${origin} not in whitelist for salon ${slug}`);
       logger.warn(`Allowed domains: ${widget.allowedDomains.join(', ')}`);
     }
 
@@ -79,7 +79,7 @@ const widgetCorsMiddleware = async (req, res, next) => {
     })(req, res, next);
 
   } catch (error) {
-    logger.error('❌ CORS middleware error:', error);
+    logger.error('? CORS middleware error:', error);
     // Fail-safe: deny on error
     return cors({
       origin: false,
@@ -88,7 +88,7 @@ const widgetCorsMiddleware = async (req, res, next) => {
   }
 };
 
-// ✅ Development mode bypass (local testing)
+// ? Development mode bypass (local testing)
 const widgetCorsDevelopment = cors({
   origin: (origin, callback) => {
     // Allow localhost in development

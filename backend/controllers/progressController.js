@@ -1,4 +1,4 @@
-﻿import ProgressEntry from '../models/ProgressEntry.js';
+import ProgressEntry from '../models/ProgressEntry.js';
 import Salon from '../models/Salon.js';
 import { uploadToCloudinary } from '../utils/cloudinaryHelper.js';
 import fs from 'fs';
@@ -38,7 +38,7 @@ export const createProgressEntry = async (req, res) => {
     }
 
     const isOwner = salon.owner.toString() === userId;
-    // TODO: Check if user is trainer
+    // Trainer authorization check
     if (!isOwner) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }

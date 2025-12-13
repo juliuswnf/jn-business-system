@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import cacheService from '../services/cacheService.js';
 import mongoose from 'mongoose';
 import timezoneHelpers from '../utils/timezoneHelpers.js';
@@ -30,12 +30,12 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // ✅ SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
+    // ? SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
     if (idempotencyKey) {
       const existingBooking = await Booking.findOne({ idempotencyKey });
       
       if (existingBooking) {
-        logger.info(`⚠️ Duplicate booking attempt detected: ${idempotencyKey}`);
+        logger.info(`?? Duplicate booking attempt detected: ${idempotencyKey}`);
         return res.status(200).json({
           success: true,
           message: 'Booking already exists',
@@ -56,7 +56,7 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid employee ID format' });
     }
 
-    // ✅ AUDIT FIX: Parse and validate date with timezone support
+    // ? AUDIT FIX: Parse and validate date with timezone support
     let parsedDate;
     
     // Support new { date, time } format OR legacy ISO string
@@ -114,7 +114,7 @@ export const createBooking = async (req, res) => {
     session.startTransaction();
 
     try {
-      // ✅ HIGH FIX #8: Check salon capacity (prevent overbooking)
+      // ? HIGH FIX #8: Check salon capacity (prevent overbooking)
       const salon = await Salon.findById(salonId).session(session);
       if (!salon) {
         await session.abortTransaction();
@@ -129,8 +129,8 @@ export const createBooking = async (req, res) => {
       const serviceDuration = service.duration || 60;
       const endTime = new Date(startTime.getTime() + serviceDuration * 60 * 1000);
 
-      // ✅ HIGH FIX #8: Check concurrent bookings against salon capacity
-      // ✅ AUDIT FIX: Use service duration as buffer (not fixed 30 min)
+      // ? HIGH FIX #8: Check concurrent bookings against salon capacity
+      // ? AUDIT FIX: Use service duration as buffer (not fixed 30 min)
       const bufferMs = serviceDuration * 60 * 1000;
       const concurrentBookings = await Booking.countDocuments({
         salonId,
@@ -146,10 +146,10 @@ export const createBooking = async (req, res) => {
 
       if (concurrentBookings >= maxConcurrentBookings) {
         await session.abortTransaction();
-        logger.warn(`⚠️ Capacity exceeded: ${concurrentBookings}/${maxConcurrentBookings} for salon ${salonId}`);
+        logger.warn(`?? Capacity exceeded: ${concurrentBookings}/${maxConcurrentBookings} for salon ${salonId}`);
         return res.status(409).json({
           success: false,
-          message: `Kapazität erreicht. Maximal ${maxConcurrentBookings} gleichzeitige Buchungen möglich.`,
+          message: `Kapazit�t erreicht. Maximal ${maxConcurrentBookings} gleichzeitige Buchungen m�glich.`,
           capacity: {
             current: concurrentBookings,
             max: maxConcurrentBookings
@@ -185,7 +185,7 @@ export const createBooking = async (req, res) => {
         customerPhone,
         notes,
         status: 'pending',
-        idempotencyKey: idempotencyKey || null // ✅ SRE FIX #30: Store idempotency key
+        idempotencyKey: idempotencyKey || null // ? SRE FIX #30: Store idempotency key
       };
 
       const [booking] = await Booking.create([bookingData], { session });
@@ -338,7 +338,7 @@ export const updateBooking = async (req, res) => {
       });
     }
 
-    // ✅ TENANT ISOLATION CHECK
+    // ? TENANT ISOLATION CHECK
     if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
       return res.status(403).json({
         success: false,
@@ -351,7 +351,7 @@ export const updateBooking = async (req, res) => {
     if (notes !== undefined) booking.notes = notes;
     
     if (bookingDate) {
-      // ✅ AUDIT FIX: Parse and validate date with timezone support
+      // ? AUDIT FIX: Parse and validate date with timezone support
       let parsedDate;
 
       // Support new { date, time } format OR legacy ISO string
@@ -438,7 +438,7 @@ export const confirmBooking = async (req, res) => {
       });
     }
 
-    // ✅ TENANT ISOLATION CHECK
+    // ? TENANT ISOLATION CHECK
     if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
       return res.status(403).json({
         success: false,
@@ -486,7 +486,7 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    // ✅ TENANT ISOLATION CHECK
+    // ? TENANT ISOLATION CHECK
     if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
       return res.status(403).json({
         success: false,
@@ -534,7 +534,7 @@ export const completeBooking = async (req, res) => {
       });
     }
 
-    // ✅ TENANT ISOLATION CHECK
+    // ? TENANT ISOLATION CHECK
     if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
       return res.status(403).json({
         success: false,
@@ -582,7 +582,7 @@ export const deleteBooking = async (req, res) => {
       });
     }
 
-    // ✅ TENANT ISOLATION CHECK
+    // ? TENANT ISOLATION CHECK
     if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
       return res.status(403).json({
         success: false,
@@ -590,7 +590,7 @@ export const deleteBooking = async (req, res) => {
       });
     }
 
-    // ✅ SOFT DELETE instead of hard delete
+    // ? SOFT DELETE instead of hard delete
     await booking.softDelete(req.user.id);
 
     return res.status(200).json({
@@ -673,7 +673,7 @@ export const getBookingsByDate = async (req, res) => {
       filter.salonId = salonId;
     }
 
-    // ✅ PAGINATION - single day should be reasonable, but limit for safety
+    // ? PAGINATION - single day should be reasonable, but limit for safety
     const limit = Math.min(500, parseInt(req.query.limit) || 500); // Max 500 bookings per day
 
     const bookings = await Booking.find(filter)

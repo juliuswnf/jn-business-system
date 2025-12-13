@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Industry Terminology Helper
  * Returns industry-specific terminology for UI/UX
  */

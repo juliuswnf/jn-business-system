@@ -1,11 +1,11 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 import crypto from 'crypto';
 
 /**
  * Clinical Notes Model
  * For Medical Aesthetics / Physiotherapy
- * ⚠️ HIPAA/GDPR-Enhanced: Encrypted PHI Storage
+ * ?? HIPAA/GDPR-Enhanced: Encrypted PHI Storage
  */
 
 const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
@@ -238,3 +238,4 @@ clinicalNoteSchema.plugin(multiTenantPlugin);
 const ClinicalNote = mongoose.model('ClinicalNote', clinicalNoteSchema);
 
 export default ClinicalNote;
+

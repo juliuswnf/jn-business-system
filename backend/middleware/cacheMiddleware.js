@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Response Caching Middleware
  * 
  * Caches GET request responses in memory to reduce database load.

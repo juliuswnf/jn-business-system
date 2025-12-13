@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import healthCheckService from '../services/healthCheckService.js';
 import backupService from '../services/backupService.js';
 import authMiddleware from '../middleware/authMiddleware.js';
@@ -7,8 +7,8 @@ import logger from '../utils/logger.js';
 const router = express.Router();
 
 /**
- * ✅ MEDIUM FIX #14: Comprehensive Health Check Routes
- * ✅ MEDIUM FIX #13: Backup Management Routes
+ * ? MEDIUM FIX #14: Comprehensive Health Check Routes
+ * ? MEDIUM FIX #13: Backup Management Routes
  */
 
 // ==================== PUBLIC HEALTH CHECK ====================
@@ -48,7 +48,7 @@ router.get('/health/detailed', async (req, res) => {
       ...health
     });
   } catch (error) {
-    logger.error('❌ Detailed health check failed:', error);
+    logger.error('? Detailed health check failed:', error);
     return res.status(500).json({
       success: false,
       message: 'Health check failed',
@@ -69,7 +69,7 @@ router.post('/backups/create', async (req, res) => {
       backup: result
     });
   } catch (error) {
-    logger.error('❌ Backup creation failed:', error);
+    logger.error('? Backup creation failed:', error);
     return res.status(500).json({
       success: false,
       message: 'Backup creation failed',
@@ -88,7 +88,7 @@ router.get('/backups', async (req, res) => {
       backups
     });
   } catch (error) {
-    logger.error('❌ Failed to list backups:', error);
+    logger.error('? Failed to list backups:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to list backups',
@@ -107,7 +107,7 @@ router.post('/backups/cleanup', async (req, res) => {
       ...result
     });
   } catch (error) {
-    logger.error('❌ Backup cleanup failed:', error);
+    logger.error('? Backup cleanup failed:', error);
     return res.status(500).json({
       success: false,
       message: 'Backup cleanup failed',
@@ -142,7 +142,7 @@ router.post('/backups/restore', async (req, res) => {
       ...result
     });
   } catch (error) {
-    logger.error('❌ Restore failed:', error);
+    logger.error('? Restore failed:', error);
     return res.status(500).json({
       success: false,
       message: 'Restore failed',

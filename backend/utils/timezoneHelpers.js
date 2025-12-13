@@ -1,8 +1,8 @@
-﻿import { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 import logger from './logger.js';
 
 /**
- * ✅ AUDIT FIX: Timezone-aware date utilities using Luxon
+ * ? AUDIT FIX: Timezone-aware date utilities using Luxon
  * Handles DST transitions correctly for salon booking system
  */
 
@@ -34,7 +34,7 @@ export const toUTC = (dateString, timeString, timezone) => {
     // Convert to UTC and return as JS Date
     return dt.toJSDate();
   } catch (error) {
-    logger.error('❌ Timezone conversion error:', error.message);
+    logger.error('? Timezone conversion error:', error.message);
     throw new Error(`Failed to convert to UTC: ${error.message}`);
   }
 };
@@ -62,7 +62,7 @@ export const fromUTC = (utcDate, timezone) => {
       jsDate: dt.toJSDate()
     };
   } catch (error) {
-    logger.error('❌ Timezone conversion error:', error.message);
+    logger.error('? Timezone conversion error:', error.message);
     throw new Error(`Failed to convert from UTC: ${error.message}`);
   }
 };
@@ -97,7 +97,7 @@ export const validateBookingTime = (dateString, timeString, timezone) => {
     const offset2 = oneHourLater.offset;
 
     if (offset1 !== offset2) {
-      logger.warn(`⚠️ Booking time ${dateString} ${timeString} is near DST transition in ${timezone}`);
+      logger.warn(`?? Booking time ${dateString} ${timeString} is near DST transition in ${timezone}`);
     }
 
     return { valid: true };

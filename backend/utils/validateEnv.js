@@ -1,4 +1,4 @@
-﻿import logger from './logger.js';
+import logger from './logger.js';
 // ==================== VALIDATE ENVIRONMENT VARIABLES ====================
 
 import dotenv from 'dotenv';
@@ -241,14 +241,14 @@ const validationChains = {
 export const validateEnv = () => {
   try {
     logger.log('\n================================');
-    logger.log('  ðŸ” Validating Environment Variables');
+    logger.log('  🔍 Validating Environment Variables');
     logger.log('================================\n');
 
     // Check required variables
     const requiredErrors = validationChains.validateRequired();
 
     if (Object.keys(requiredErrors).length > 0) {
-      logger.log('âŒ Missing required environment variables:\n');
+      logger.log('❌ Missing required environment variables:\n');
       Object.entries(requiredErrors).forEach(([key, value]) => {
         logger.log(`   - ${key}: ${value}`);
       });
@@ -260,7 +260,7 @@ export const validateEnv = () => {
     const valueErrors = validationChains.validateValues();
 
     if (Object.keys(valueErrors).length > 0) {
-      logger.log('âš ï¸  Invalid environment variable values:\n');
+      logger.log('⚠️  Invalid environment variable values:\n');
       Object.entries(valueErrors).forEach(([key, value]) => {
         logger.log(`   - ${key}: ${value}`);
       });
@@ -268,10 +268,10 @@ export const validateEnv = () => {
       return false;
     }
 
-    logger.log('âœ… All environment variables valid!\n');
+    logger.log('✅ All environment variables valid!\n');
     return true;
   } catch (error) {
-    logger.error('âŒ Error validating environment:', error.message, '\n');
+    logger.error('❌ Error validating environment:', error.message, '\n');
     return false;
   }
 };
@@ -279,13 +279,13 @@ export const validateEnv = () => {
 // ==================== SHOW ENV STATUS ====================
 
 export const showEnvStatus = () => {
-  logger.log('\nðŸ“‹ Environment Status:\n');
+  logger.log('\n📋 Environment Status:\n');
   logger.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
   logger.log(`   PORT: ${process.env.PORT}`);
   logger.log(`   FRONTEND_URL: ${process.env.FRONTEND_URL}`);
-  logger.log(`   MONGODB_URI: ${process.env.MONGODB_URI ? 'âœ… Configured' : 'âŒ Missing'}`);
-  logger.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? 'âœ… Configured' : 'âŒ Missing'}`);
-  logger.log(`   REDIS: ${process.env.REDIS_HOST ? 'âœ… Configured' : 'âŒ Not configured'}`);
+  logger.log(`   MONGODB_URI: ${process.env.MONGODB_URI ? '✅ Configured' : '❌ Missing'}`);
+  logger.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✅ Configured' : '❌ Missing'}`);
+  logger.log(`   REDIS: ${process.env.REDIS_HOST ? '✅ Configured' : '❌ Not configured'}`);
   logger.log('');
 };
 
@@ -297,20 +297,20 @@ export const createEnvFromTemplate = () => {
     const envPath = path.join(__dirname, '../.env');
 
     if (!fs.existsSync(templatePath)) {
-      logger.warn('âš ï¸  .env.example not found');
+      logger.warn('⚠️  .env.example not found');
       return false;
     }
 
     if (fs.existsSync(envPath)) {
-      logger.log('âš ï¸  .env already exists\n');
+      logger.log('⚠️  .env already exists\n');
       return false;
     }
 
     fs.copyFileSync(templatePath, envPath);
-    logger.log('âœ… .env file created from template\n');
+    logger.log('✅ .env file created from template\n');
     return true;
   } catch (error) {
-    logger.error('âŒ Error creating .env file:', error.message);
+    logger.error('❌ Error creating .env file:', error.message);
     return false;
   }
 };

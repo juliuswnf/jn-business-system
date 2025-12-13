@@ -1,4 +1,4 @@
-﻿import { body, param, validationResult } from 'express-validator';
+import { body, param, validationResult } from 'express-validator';
 import { ValidationError } from '../services/errorHandlerService.js';
 
 // ==================== REGEX PATTERNS ====================
@@ -22,21 +22,21 @@ export const patterns = {
 export const validators = {
   isEmail: (value) => {
     if (!patterns.email.test(value)) {
-      throw new Error('UngÃ¼ltiges Email-Format');
+      throw new Error('Ungültiges Email-Format');
     }
     return true;
   },
 
   isPhone: (value) => {
     if (!patterns.phone.test(value)) {
-      throw new Error('UngÃ¼ltige Telefonnummer');
+      throw new Error('Ungültige Telefonnummer');
     }
     return true;
   },
 
   isURL: (value) => {
     if (!patterns.url.test(value)) {
-      throw new Error('UngÃ¼ltige URL');
+      throw new Error('Ungültige URL');
     }
     return true;
   },
@@ -45,7 +45,7 @@ export const validators = {
     if (!patterns.strongPassword.test(value)) {
       throw new Error(
         'Passwort muss mindestens 12 Zeichen, ' +
-        '1 GroÃŸbuchstabe, 1 Kleinbuchstabe, 1 Zahl und 1 Sonderzeichen enthalten'
+        '1 Großbuchstabe, 1 Kleinbuchstabe, 1 Zahl und 1 Sonderzeichen enthalten'
       );
     }
     return true;
@@ -55,7 +55,7 @@ export const validators = {
     if (!patterns.password.test(value)) {
       throw new Error(
         'Passwort muss mindestens 8 Zeichen, ' +
-        '1 GroÃŸbuchstabe, 1 Kleinbuchstabe, 1 Zahl und 1 Sonderzeichen enthalten'
+        '1 Großbuchstabe, 1 Kleinbuchstabe, 1 Zahl und 1 Sonderzeichen enthalten'
       );
     }
     return true;
@@ -63,21 +63,21 @@ export const validators = {
 
   isMongoId: (value) => {
     if (!patterns.mongoId.test(value)) {
-      throw new Error('UngÃ¼ltige ID-Format');
+      throw new Error('Ungültige ID-Format');
     }
     return true;
   },
 
   isZipCode: (value) => {
     if (!patterns.zipCode.test(value)) {
-      throw new Error('UngÃ¼ltiger Postleitzahl-Format (5 Ziffern)');
+      throw new Error('Ungültiger Postleitzahl-Format (5 Ziffern)');
     }
     return true;
   },
 
   isCreditCard: (value) => {
     if (!patterns.creditCard.test(value)) {
-      throw new Error('UngÃ¼ltige Kreditkartennummer');
+      throw new Error('Ungültige Kreditkartennummer');
     }
 
     let sum = 0;
@@ -98,7 +98,7 @@ export const validators = {
     }
 
     if (sum % 10 !== 0) {
-      throw new Error('UngÃ¼ltige Kreditkartennummer');
+      throw new Error('Ungültige Kreditkartennummer');
     }
 
     return true;
@@ -106,7 +106,7 @@ export const validators = {
 
   isCVV: (value) => {
     if (!patterns.cvv.test(value)) {
-      throw new Error('UngÃ¼ltiger CVV-Format (3-4 Ziffern)');
+      throw new Error('Ungültiger CVV-Format (3-4 Ziffern)');
     }
     return true;
   },
@@ -120,7 +120,7 @@ export const validators = {
 
   isHexColor: (value) => {
     if (!patterns.hex.test(value)) {
-      throw new Error('UngÃ¼ltiges Hex-Farbformat');
+      throw new Error('Ungültiges Hex-Farbformat');
     }
     return true;
   },
@@ -156,7 +156,7 @@ export const validators = {
   isDate: (value) => {
     const date = new Date(value);
     if (isNaN(date.getTime())) {
-      throw new Error('UngÃ¼ltiges Datum');
+      throw new Error('Ungültiges Datum');
     }
     return true;
   },
@@ -164,7 +164,7 @@ export const validators = {
   isFutureDate: (value) => {
     const date = new Date(value);
     if (isNaN(date.getTime())) {
-      throw new Error('UngÃ¼ltiges Datum');
+      throw new Error('Ungültiges Datum');
     }
     if (date <= new Date()) {
       throw new Error('Datum muss in der Zukunft liegen');
@@ -175,7 +175,7 @@ export const validators = {
   isPastDate: (value) => {
     const date = new Date(value);
     if (isNaN(date.getTime())) {
-      throw new Error('UngÃ¼ltiges Datum');
+      throw new Error('Ungültiges Datum');
     }
     if (date >= new Date()) {
       throw new Error('Datum muss in der Vergangenheit liegen');
@@ -185,7 +185,7 @@ export const validators = {
 
   isTimeFormat: (value) => {
     if (!/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
-      throw new Error('UngÃ¼ltiges Zeitformat (HH:MM)');
+      throw new Error('Ungültiges Zeitformat (HH:MM)');
     }
     return true;
   },
@@ -208,7 +208,7 @@ export const validators = {
 
   isURLSlug: (value) => {
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)) {
-      throw new Error('URL-Format ungÃ¼ltig');
+      throw new Error('URL-Format ungültig');
     }
     return true;
   },
@@ -218,7 +218,7 @@ export const validators = {
       JSON.parse(value);
       return true;
     } catch (e) {
-      throw new Error('UngÃ¼ltiges JSON-Format');
+      throw new Error('Ungültiges JSON-Format');
     }
   }
 };
@@ -228,31 +228,31 @@ export const validators = {
 export const validationChains = {
   createUser: [
     body('name').trim().notEmpty().withMessage('Name ist erforderlich'),
-    body('email').isEmail().withMessage('UngÃ¼ltiges Email-Format'),
+    body('email').isEmail().withMessage('Ungültiges Email-Format'),
     body('password').custom(validators.isPassword),
-    body('role').isIn(['employee', 'admin', 'ceo']).withMessage('UngÃ¼ltige Rolle')
+    body('role').isIn(['employee', 'admin', 'ceo']).withMessage('Ungültige Rolle')
   ],
 
   loginUser: [
-    body('email').isEmail().withMessage('UngÃ¼ltiges Email-Format'),
+    body('email').isEmail().withMessage('Ungültiges Email-Format'),
     body('password').notEmpty().withMessage('Passwort ist erforderlich')
   ],
 
   updateProfile: [
     body('name').trim().notEmpty().withMessage('Name ist erforderlich'),
-    body('email').isEmail().withMessage('UngÃ¼ltiges Email-Format'),
+    body('email').isEmail().withMessage('Ungültiges Email-Format'),
     body('phone').optional().custom(validators.isPhone)
   ],
 
   changePassword: [
     body('oldPassword').notEmpty().withMessage('Altes Passwort ist erforderlich'),
     body('newPassword').custom(validators.isPassword),
-    body('confirmPassword').notEmpty().withMessage('PasswortbestÃ¤tigung ist erforderlich')
+    body('confirmPassword').notEmpty().withMessage('Passwortbestätigung ist erforderlich')
   ],
 
   createCustomer: [
     body('name').trim().notEmpty().withMessage('Name ist erforderlich'),
-    body('email').isEmail().withMessage('UngÃ¼ltiges Email-Format'),
+    body('email').isEmail().withMessage('Ungültiges Email-Format'),
     body('phone').custom(validators.isPhone),
     body('address.city').trim().notEmpty().withMessage('Stadt ist erforderlich'),
     body('address.zipCode').custom(validators.isZipCode)
@@ -285,7 +285,7 @@ export const validationChains = {
   ],
 
   createPayment: [
-    body('amount').isFloat({ min: 0.01 }).withMessage('Betrag muss grÃ¶ÃŸer als 0 sein'),
+    body('amount').isFloat({ min: 0.01 }).withMessage('Betrag muss größer als 0 sein'),
     body('currency').custom(validators.isEnum(['EUR', 'USD', 'GBP'])),
     body('paymentMethod').custom(validators.isEnum(['card', 'cash', 'transfer']))
   ],
@@ -301,7 +301,7 @@ export const validationChains = {
   ],
 
   mongoIdParam: [
-    param('id').custom(validators.isMongoId).withMessage('UngÃ¼ltige ID')
+    param('id').custom(validators.isMongoId).withMessage('Ungültige ID')
   ]
 };
 

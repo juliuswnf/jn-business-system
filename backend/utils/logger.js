@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-console */
+/* eslint-disable no-console */
 import winston from 'winston';
 import path from 'path';
 import { fileURLToPath } from 'url';

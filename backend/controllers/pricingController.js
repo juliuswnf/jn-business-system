@@ -1,4 +1,4 @@
-﻿import { PRICING_TIERS, FEATURE_NAMES, compareTiers } from '../config/pricing.js';
+import { PRICING_TIERS, FEATURE_NAMES, compareTiers } from '../config/pricing.js';
 import smsService from '../services/smsService.js';
 
 /**

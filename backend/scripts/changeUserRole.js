@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import User from '../models/User.js';
 
@@ -13,37 +13,37 @@ const changeUserRole = async () => {
   const newRole = process.argv[3];
 
   if (!email || !newRole) {
-    console.log('âŒ Usage: node changeUserRole.js <email> <newRole>');
+    console.log('❌ Usage: node changeUserRole.js <email> <newRole>');
     console.log('   Roles: customer, salon_owner, employee, admin, ceo');
     process.exit(1);
   }
 
   const validRoles = ['customer', 'salon_owner', 'employee', 'admin', 'ceo'];
   if (!validRoles.includes(newRole)) {
-    console.log(`âŒ Invalid role: ${newRole}`);
+    console.log(`❌ Invalid role: ${newRole}`);
     console.log(`   Valid roles: ${validRoles.join(', ')}`);
     process.exit(1);
   }
 
   try {
-    console.log('ðŸ”— Connecting to database...');
+    console.log('🔗 Connecting to database...');
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('âœ… Connected to database');
+    console.log('✅ Connected to database');
 
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      console.log(`âŒ User with email "${email}" not found`);
+      console.log(`❌ User with email "${email}" not found`);
       process.exit(1);
     }
 
-    console.log('\nðŸ“‹ Current user info:');
+    console.log('\n📋 Current user info:');
     console.log(`   Name: ${user.name}`);
     console.log(`   Email: ${user.email}`);
     console.log(`   Current Role: ${user.role}`);
 
     if (user.role === newRole) {
-      console.log(`\nâš ï¸  User already has role: ${newRole}`);
+      console.log(`\n⚠️  User already has role: ${newRole}`);
       process.exit(0);
     }
 
@@ -54,13 +54,13 @@ const changeUserRole = async () => {
     );
 
     const updatedUser = await User.findById(user._id);
-    console.log('\\nâœ… Role changed successfully!');
+    console.log('\\n✅ Role changed successfully!');
     console.log(`   Old Role: ${user.role}`);
     console.log(`   New Role: ${updatedUser.role}`);
 
     process.exit(0);
   } catch (error) {
-    console.error('âŒ Error:', error.message);
+    console.error('� Error:', error.message);
     process.exit(1);
   }
 };

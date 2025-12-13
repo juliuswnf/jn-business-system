@@ -1,4 +1,4 @@
-﻿import Stripe from 'stripe';
+import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import Salon from '../models/Salon.js';
 import { PRICING_TIERS } from '../config/pricing.js';
@@ -23,7 +23,7 @@ class StripePaymentService {
   constructor() {
     // Initialize Stripe with API key
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('❌ STRIPE_SECRET_KEY is not defined in environment variables');
+      logger.error('? STRIPE_SECRET_KEY is not defined in environment variables');
       throw new Error('STRIPE_SECRET_KEY is required');
     }
     
@@ -45,7 +45,7 @@ class StripePaymentService {
       },
     };
 
-    console.log('✅ Stripe Payment Service initialized with Price IDs:', {
+    logger.info('? Stripe Payment Service initialized with Price IDs:', {
       starter_monthly: this.priceIds.starter.monthly,
       starter_yearly: this.priceIds.starter.yearly,
       professional_monthly: this.priceIds.professional.monthly,
@@ -82,7 +82,7 @@ class StripePaymentService {
     salon.subscription.stripeCustomerId = customer.id;
     await salon.save();
 
-    console.log(`[Stripe] Created customer ${customer.id} for salon ${salon._id}`);
+    logger.info(`[Stripe] Created customer ${customer.id} for salon ${salon._id}`);
 
     return customer.id;
   }
@@ -175,7 +175,7 @@ class StripePaymentService {
 
       await salon.save();
 
-      console.log(`[Stripe] Created subscription ${subscription.id} for salon ${salon._id}`);
+      logger.info(`[Stripe] Created subscription ${subscription.id} for salon ${salon._id}`);
 
       return {
         subscriptionId: subscription.id,
@@ -183,7 +183,7 @@ class StripePaymentService {
         status: subscription.status,
       };
     } catch (error) {
-      console.error('[Stripe] Error creating subscription:', error);
+      logger.error('[Stripe] Error creating subscription:', error);
       throw error;
     }
   }
@@ -244,7 +244,7 @@ class StripePaymentService {
       );
       await salon.save();
 
-      console.log(
+      logger.info(
         `[Stripe] Upgraded salon ${salon._id} from ${currentTier} to ${newTier}`
       );
 
@@ -254,7 +254,7 @@ class StripePaymentService {
         proratedAmount: updatedSubscription.latest_invoice?.amount_due || 0,
       };
     } catch (error) {
-      console.error('[Stripe] Error upgrading subscription:', error);
+      logger.error('[Stripe] Error upgrading subscription:', error);
       throw error;
     }
   }
@@ -346,7 +346,7 @@ class StripePaymentService {
 
       await salon.save();
 
-      console.log(
+      logger.info(
         `[Stripe] Downgraded salon ${salon._id} from ${currentTier} to ${newTier} (${
           immediate ? 'immediate' : 'at period end'
         })`
@@ -361,7 +361,7 @@ class StripePaymentService {
           : new Date(subscription.current_period_end * 1000),
       };
     } catch (error) {
-      console.error('[Stripe] Error downgrading subscription:', error);
+      logger.error('[Stripe] Error downgrading subscription:', error);
       throw error;
     }
   }
@@ -410,14 +410,14 @@ class StripePaymentService {
       salon.subscription.paymentMethod = 'sepa';
       await salon.save();
 
-      console.log(`[Stripe] Created SEPA setup intent for salon ${salon._id}`);
+      logger.info(`[Stripe] Created SEPA setup intent for salon ${salon._id}`);
 
       return {
         clientSecret: setupIntent.client_secret,
         status: setupIntent.status,
       };
     } catch (error) {
-      console.error('[Stripe] Error setting up SEPA:', error);
+      logger.error('[Stripe] Error setting up SEPA:', error);
       throw error;
     }
   }
@@ -473,7 +473,7 @@ class StripePaymentService {
       salon.subscription.paymentMethod = 'invoice';
       await salon.save();
 
-      console.log(`[Stripe] Created invoice ${invoice.id} for salon ${salon._id}`);
+      logger.info(`[Stripe] Created invoice ${invoice.id} for salon ${salon._id}`);
 
       return {
         invoiceId: finalizedInvoice.id,
@@ -483,7 +483,7 @@ class StripePaymentService {
         amount: finalizedInvoice.amount_due / 100,
       };
     } catch (error) {
-      console.error('[Stripe] Error creating invoice:', error);
+      logger.error('[Stripe] Error creating invoice:', error);
       throw error;
     }
   }
@@ -527,7 +527,7 @@ class StripePaymentService {
       salon.subscription.trialEndsAt = null;
       await salon.save();
 
-      console.log(`[Stripe] Converted trial to paid for salon ${salon._id}`);
+      logger.info(`[Stripe] Converted trial to paid for salon ${salon._id}`);
 
       return {
         subscriptionId: updatedSubscription.id,
@@ -535,7 +535,7 @@ class StripePaymentService {
         tier,
       };
     } catch (error) {
-      console.error('[Stripe] Error converting trial to paid:', error);
+      logger.error('[Stripe] Error converting trial to paid:', error);
       throw error;
     }
   }
@@ -569,7 +569,7 @@ class StripePaymentService {
 
       await salon.save();
 
-      console.log(
+      logger.info(
         `[Stripe] Canceled subscription for salon ${salon._id} (${
           immediately ? 'immediate' : 'at period end'
         })`
@@ -581,7 +581,7 @@ class StripePaymentService {
         canceledAt: immediately ? new Date() : new Date(subscription.current_period_end * 1000),
       };
     } catch (error) {
-      console.error('[Stripe] Error canceling subscription:', error);
+      logger.error('[Stripe] Error canceling subscription:', error);
       throw error;
     }
   }

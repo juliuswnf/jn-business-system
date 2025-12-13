@@ -1,11 +1,11 @@
-﻿const paginationMiddleware = (req, res, next) => {
+const paginationMiddleware = (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
 
   if (page < 1 || limit < 1) {
     return res.status(400).json({
       success: false,
-      message: 'Page und Limit mÃ¼ssen grÃ¶ÃŸer als 0 sein'
+      message: 'Page und Limit müssen größer als 0 sein'
     });
   }
 

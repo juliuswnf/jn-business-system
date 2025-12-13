@@ -1,4 +1,4 @@
-﻿import ArtistPortfolio from '../models/ArtistPortfolio.js';
+import ArtistPortfolio from '../models/ArtistPortfolio.js';
 import Salon from '../models/Salon.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinaryHelper.js';
 import path from 'path';
@@ -23,8 +23,8 @@ export const uploadPortfolioItem = async (req, res) => {
 
     // Check if user is owner or employee
     const isOwner = salon.owner.toString() === userId;
-    // TODO: Check if user is employee of this salon
-    if (!isOwner) {
+    const isEmployee = req.user.role === 'employee' && req.user.salonId?.toString() === salonId;
+    if (!isOwner && !isEmployee && req.user.role !== 'admin' && req.user.role !== 'ceo') {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -216,7 +216,7 @@ export const deletePortfolioItem = async (req, res) => {
         await deleteFromCloudinary(portfolioItem.imageUrl);
         await deleteFromCloudinary(portfolioItem.thumbnailUrl);
       } catch (err) {
-        console.warn('Failed to delete from Cloudinary:', err);
+        logger.warn('Failed to delete from Cloudinary:', err);
       }
     }
 

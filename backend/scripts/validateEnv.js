@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-console */
+/* eslint-disable no-console */
 /**
  * Environment Validation Script
  * Run before deployment to ensure all required variables are set
@@ -19,11 +19,11 @@ const colors = {
 };
 
 const log = {
-  info: (msg) => console.log(`${colors.blue}â„¹${colors.reset} ${msg}`),
-  success: (msg) => console.log(`${colors.green}âœ“${colors.reset} ${msg}`),
-  warn: (msg) => console.log(`${colors.yellow}âš ${colors.reset} ${msg}`),
-  error: (msg) => console.log(`${colors.red}âœ—${colors.reset} ${msg}`),
-  header: (msg) => console.log(`\n${colors.cyan}â•â•â• ${msg} â•â•â•${colors.reset}`)
+  info: (msg) => console.log(`${colors.blue}ℹ${colors.reset} ${msg}`),
+  success: (msg) => console.log(`${colors.green}✓${colors.reset} ${msg}`),
+  warn: (msg) => console.log(`${colors.yellow}⚠${colors.reset} ${msg}`),
+  error: (msg) => console.log(`${colors.red}✗${colors.reset} ${msg}`),
+  header: (msg) => console.log(`\n${colors.cyan}═══ ${msg} ═══${colors.reset}`)
 };
 
 // Environment variable definitions
@@ -106,9 +106,9 @@ function validateVar(config, isRequired = true) {
 }
 
 function runValidation() {
-  console.log('\n' + 'â•'.repeat(50));
+  console.log('\n' + '═'.repeat(50));
   console.log('  JN AUTOMATION - Environment Validation');
-  console.log('â•'.repeat(50));
+  console.log('═'.repeat(50));
 
   // Check required variables
   log.header('Required Variables');

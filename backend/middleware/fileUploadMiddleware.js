@@ -1,9 +1,9 @@
-﻿import multer from 'multer';
+import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
 /**
- * ✅ SRE FIX #33: File Upload Validation
+ * ? SRE FIX #33: File Upload Validation
  * Prevents file upload bombs, validates type and size
  */
 
@@ -101,7 +101,7 @@ export const validateImageDimensions = async (filePath) => {
   } catch (error) {
     // If sharp not installed, skip dimension check (backwards compatible)
     if (error.code === 'MODULE_NOT_FOUND') {
-      console.warn('⚠️ sharp not installed - skipping image dimension validation');
+      logger.warn('?? sharp not installed - skipping image dimension validation');
       return { valid: true, skipped: true };
     }
     

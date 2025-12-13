@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import securityMiddleware from '../middleware/securityMiddleware.js';
 import ceoMiddleware from '../middleware/ceoMiddleware.js';
@@ -21,13 +21,13 @@ router.use(authMiddleware.authorize('ceo'));
 
 // ==================== NEW CEO DASHBOARD ENDPOINTS ====================
 
-// Get CEO Stats (fÃ¼r neues Dashboard)
+// Get CEO Stats (für neues Dashboard)
 router.get('/stats', ceoMiddleware.verifyCEOAuth, ceoController.getCEOStats);
 
 // Get All Customers (Unternehmen)
 router.get('/customers', ceoMiddleware.verifyCEOAuth, ceoController.getAllCustomers);
 
-// Get CEO Subscriptions (fÃ¼r Abonnements Tab)
+// Get CEO Subscriptions (für Abonnements Tab)
 router.get('/ceo-subscriptions', ceoMiddleware.verifyCEOAuth, ceoController.getCEOSubscriptions);
 
 // Error Log Management
@@ -87,7 +87,7 @@ router.get('/settings', ceoMiddleware.verifyCEOAuth, ceoController.getSystemSett
 router.put('/settings', securityMiddleware.validateContentType, ceoController.updateSystemSettings);
 
 // ==================== CEO HIDDEN LOGIN ROUTE ====================
-// Nur über spezielle URL erreichbar
+// Nur �ber spezielle URL erreichbar
 router.get('/hidden-login', (req, res) => {
   return res.json({
     success: true,
@@ -97,7 +97,7 @@ router.get('/hidden-login', (req, res) => {
 });
 
 // ==================== CEO STATUS ROUTE ====================
-// Für System-Überwachung
+// F�r System-�berwachung
 router.get('/status', ceoMiddleware.verifyCEOAuth, (req, res) => {
   return res.json({
     success: true,
@@ -108,7 +108,7 @@ router.get('/status', ceoMiddleware.verifyCEOAuth, (req, res) => {
 });
 
 // ==================== SYSTEM CONTROL ROUTES ====================
-// FÃ¼r das System Control Tab im CEO Dashboard
+// Für das System Control Tab im CEO Dashboard
 
 // Get status of all services
 router.get('/system/status', ceoMiddleware.verifyCEOAuth, systemController.getAllServicesStatus);

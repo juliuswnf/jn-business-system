@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { checkTenantAccess, enforceTenantFilter } from '../middleware/tenantMiddleware.js';
 import { bookingCreationLimiter, mutationLimiter } from '../middleware/rateLimiterMiddleware.js';
@@ -24,13 +24,13 @@ router.get('/by-date', bookingController.getBookingsByDate);
 // Get booking by ID (tenant access check)
 router.get('/:id', checkTenantAccess('booking'), bookingController.getBooking);
 
-// ✅ HIGH FIX #10: Create booking with rate limiter (DoS protection)
+// ? HIGH FIX #10: Create booking with rate limiter (DoS protection)
 router.post('/', bookingCreationLimiter, bookingController.createBooking);
 
-// ✅ HIGH FIX #10: Update booking with rate limiter
+// ? HIGH FIX #10: Update booking with rate limiter
 router.put('/:id', mutationLimiter, checkTenantAccess('booking'), bookingController.updateBooking);
 
-// ✅ HIGH FIX #10: Confirm/Cancel/Complete/Delete with rate limiter
+// ? HIGH FIX #10: Confirm/Cancel/Complete/Delete with rate limiter
 router.patch('/:id/confirm', mutationLimiter, checkTenantAccess('booking'), bookingController.confirmBooking);
 router.patch('/:id/cancel', mutationLimiter, checkTenantAccess('booking'), bookingController.cancelBooking);
 router.patch('/:id/complete', mutationLimiter, checkTenantAccess('booking'), bookingController.completeBooking);

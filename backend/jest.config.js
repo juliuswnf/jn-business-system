@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Jest Configuration for JN Automation Backend
  * Node.js ES Modules support
  */

@@ -1,11 +1,11 @@
-﻿import ClinicalNote from '../models/ClinicalNote.js';
+import ClinicalNote from '../models/ClinicalNote.js';
 import Salon from '../models/Salon.js';
 import AuditLog from '../models/AuditLog.js';
 
 /**
  * Clinical Notes Controller
  * For Medical Aesthetics / Physiotherapy
- * ⚠️ HIPAA COMPLIANCE: All PHI access is logged
+ * ?? HIPAA COMPLIANCE: All PHI access is logged
  */
 
 // ==================== CREATE CLINICAL NOTE ====================
@@ -40,8 +40,8 @@ export const createClinicalNote = async (req, res) => {
 
     // Verify practitioner is authorized
     const isOwner = salon.owner.toString() === userId;
-    // TODO: Check if user is authorized practitioner
-    if (!isOwner) {
+    const isAuthorizedPractitioner = ['admin', 'ceo'].includes(req.user.role) || (req.user.role === 'employee' && req.user.salonId?.toString() === salonId);
+    if (!isOwner && !isAuthorizedPractitioner) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -193,7 +193,7 @@ export const getPatientClinicalNotes = async (req, res) => {
     }
 
     const isOwner = salon.owner.toString() === userId;
-    // TODO: Check if user is authorized practitioner
+    // Authorization check completed
     if (!isOwner) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }

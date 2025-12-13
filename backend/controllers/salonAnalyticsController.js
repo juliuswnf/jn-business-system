@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Salon Analytics Controller
  * Provides success metrics and KPIs for salon owners
  * Shows them the value they get from JN Automation

@@ -1,4 +1,4 @@
-﻿import User from '../models/User.js';
+import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import logger from '../utils/logger.js';
@@ -130,7 +130,7 @@ export const register = async (req, res) => {
       user.salonId = salon._id;
       await user.save();
 
-      logger.log(`âœ… Salon created for new owner: ${salon.name} (${salon.slug})`);
+      logger.log(`✅ Salon created for new owner: ${salon.name} (${salon.slug})`);
 
       // Queue welcome email
       try {
@@ -143,7 +143,7 @@ export const register = async (req, res) => {
       // Schedule lifecycle emails for trial nurturing
       try {
         await LifecycleEmail.scheduleForNewSalon(salon, user);
-        logger.log(`âœ… Lifecycle emails scheduled for: ${salon.name}`);
+        logger.log(`✅ Lifecycle emails scheduled for: ${salon.name}`);
       } catch (lifecycleError) {
         logger.warn('Lifecycle email scheduling failed:', lifecycleError.message);
       }
@@ -152,7 +152,7 @@ export const register = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    logger.log(`âœ… User registered: ${user.email} (${user.role})`);
+    logger.log(`✅ User registered: ${user.email} (${user.role})`);
 
     res.status(201).json({
       success: true,
@@ -166,7 +166,7 @@ export const register = async (req, res) => {
       } : null
     });
   } catch (error) {
-    logger.error('âŒ Register Error:', error);
+    logger.error('❌ Register Error:', error);
     res.status(500).json({
       success: false,
       message: 'Registration failed',
@@ -193,7 +193,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      logger.warn(`âš ï¸ Login attempt with non-existent email: ${email}`);
+      logger.warn(`⚠️ Login attempt with non-existent email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
@@ -212,7 +212,7 @@ export const login = async (req, res) => {
     const isPasswordCorrect = await user.comparePassword(password);
 
     if (!isPasswordCorrect) {
-      logger.warn(`âš ï¸ Invalid password for: ${email}`);
+      logger.warn(`⚠️ Invalid password for: ${email}`);
       await user.incLoginAttempts();
       return res.status(401).json({
         success: false,
@@ -226,7 +226,7 @@ export const login = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    logger.log(`âœ… User logged in: ${user.email} (${user.role})`);
+    logger.log(`✅ User logged in: ${user.email} (${user.role})`);
 
     res.status(200).json({
       success: true,
@@ -234,7 +234,7 @@ export const login = async (req, res) => {
       user: user.toJSON()
     });
   } catch (error) {
-    logger.error('âŒ Login Error:', error);
+    logger.error('❌ Login Error:', error);
     res.status(500).json({
       success: false,
       message: 'Login failed'
@@ -291,7 +291,7 @@ export const ceoLogin = async (req, res) => {
 
     // SECURITY: Check IP Whitelist FIRST
     if (!isIPWhitelisted(clientIP)) {
-      logger.error(`[CEO-SECURITY] â›” BLOCKED - IP not whitelisted: ${clientIP}`);
+      logger.error(`[CEO-SECURITY] ⛔ BLOCKED - IP not whitelisted: ${clientIP}`);
       // Don't reveal that it's an IP block - generic message
       return res.status(403).json({
         success: false,
@@ -343,7 +343,7 @@ export const ceoLogin = async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        message: 'UngÃ¼ltige Anmeldedaten'
+        message: 'Ungültige Anmeldedaten'
       });
     }
 
@@ -387,7 +387,7 @@ export const ceoLogin = async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        message: 'UngÃ¼ltige Anmeldedaten'
+        message: 'Ungültige Anmeldedaten'
       });
     }
 
@@ -417,7 +417,7 @@ export const ceoLogin = async (req, res) => {
           await user.resetLoginAttempts();
           const token = generateToken(user._id, '30d');
 
-          logger.log(`[CEO-SECURITY] âœ… 2FA setup completed and CEO logged in: ${user.email}, IP: ${clientIP}`);
+          logger.log(`[CEO-SECURITY] ✅ 2FA setup completed and CEO logged in: ${user.email}, IP: ${clientIP}`);
 
           return res.status(200).json({
             success: true,
@@ -430,7 +430,7 @@ export const ceoLogin = async (req, res) => {
           logger.warn(`[CEO-SECURITY] Invalid 2FA code during setup: ${email}, IP: ${clientIP}`);
           return res.status(401).json({
             success: false,
-            message: 'UngÃ¼ltiger 2FA-Code. Bitte versuchen Sie es erneut.'
+            message: 'Ungültiger 2FA-Code. Bitte versuchen Sie es erneut.'
           });
         }
       }
@@ -452,7 +452,7 @@ export const ceoLogin = async (req, res) => {
       return res.status(200).json({
         success: false,
         requiresTwoFactorSetup: true,
-        message: '2FA ist fÃ¼r CEO-Zugang Pflicht. Bitte richten Sie die Zwei-Faktor-Authentifizierung ein.',
+        message: '2FA ist für CEO-Zugang Pflicht. Bitte richten Sie die Zwei-Faktor-Authentifizierung ein.',
         qrCode,
         secret, // Allow manual entry
         setupInstructions: 'Scannen Sie den QR-Code mit einer Authenticator-App (Google Authenticator, Authy, etc.)'
@@ -486,7 +486,7 @@ export const ceoLogin = async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        message: 'UngÃ¼ltiger 2FA-Code'
+        message: 'Ungültiger 2FA-Code'
       });
     }
 
@@ -507,7 +507,7 @@ export const ceoLogin = async (req, res) => {
     // Generate token (CEO gets longer session)
     const token = generateToken(user._id, '30d');
 
-    logger.log(`[CEO-SECURITY] âœ… SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
+    logger.log(`[CEO-SECURITY] ✅ SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
 
     res.status(200).json({
       success: true,
@@ -542,7 +542,7 @@ export const employeeLogin = async (req, res) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      logger.warn(`âš ï¸ Employee login attempt with non-existent email: ${email}`);
+      logger.warn(`⚠️ Employee login attempt with non-existent email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -551,7 +551,7 @@ export const employeeLogin = async (req, res) => {
 
     // Verify user is employee or admin
     if (!['employee', 'admin'].includes(user.role)) {
-      logger.warn(`âš ï¸ Non-employee user attempted employee login: ${email} (role: ${user.role})`);
+      logger.warn(`⚠️ Non-employee user attempted employee login: ${email} (role: ${user.role})`);
       return res.status(403).json({
         success: false,
         message: 'Access denied. Employee credentials required.'
@@ -560,7 +560,7 @@ export const employeeLogin = async (req, res) => {
 
     // Check company association if companyId provided
     if (companyId && user.companyId && user.companyId.toString() !== companyId) {
-      logger.warn(`âš ï¸ Employee ${email} attempted login to wrong company`);
+      logger.warn(`⚠️ Employee ${email} attempted login to wrong company`);
       return res.status(403).json({
         success: false,
         message: 'Access denied. Invalid company.'
@@ -579,7 +579,7 @@ export const employeeLogin = async (req, res) => {
     const isPasswordCorrect = await user.comparePassword(password);
 
     if (!isPasswordCorrect) {
-      logger.warn(`âš ï¸ Invalid password for employee: ${email}`);
+      logger.warn(`⚠️ Invalid password for employee: ${email}`);
       await user.incLoginAttempts();
       return res.status(401).json({
         success: false,
@@ -593,7 +593,7 @@ export const employeeLogin = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    logger.log(`âœ… Employee logged in: ${user.email} (${user.role})`);
+    logger.log(`✅ Employee logged in: ${user.email} (${user.role})`);
 
     res.status(200).json({
       success: true,
@@ -601,7 +601,7 @@ export const employeeLogin = async (req, res) => {
       user: user.toJSON()
     });
   } catch (error) {
-    logger.error('âŒ Employee Login Error:', error);
+    logger.error('❌ Employee Login Error:', error);
     res.status(500).json({
       success: false,
       message: 'Login failed'
@@ -627,7 +627,7 @@ export const getProfile = async (req, res) => {
       user: user.toJSON()
     });
   } catch (error) {
-    logger.error('âŒ GetProfile Error:', error);
+    logger.error('❌ GetProfile Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching profile'
@@ -679,7 +679,7 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    logger.log(`âœ… Profile updated for user: ${user.email}`);
+    logger.log(`✅ Profile updated for user: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -687,7 +687,7 @@ export const updateProfile = async (req, res) => {
       user: user.toJSON()
     });
   } catch (error) {
-    logger.error('âŒ UpdateProfile Error:', error);
+    logger.error('❌ UpdateProfile Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating profile'
@@ -738,7 +738,7 @@ export const changePassword = async (req, res) => {
     // Verify old password
     const isPasswordCorrect = await user.comparePassword(oldPassword);
     if (!isPasswordCorrect) {
-      logger.warn(`âš ï¸ Invalid old password for: ${user.email}`);
+      logger.warn(`⚠️ Invalid old password for: ${user.email}`);
       return res.status(401).json({
         success: false,
         message: 'Current password is incorrect'
@@ -749,14 +749,14 @@ export const changePassword = async (req, res) => {
     user.password = newPassword;
     await user.save();
 
-    logger.log(`âœ… Password changed for user: ${user.email}`);
+    logger.log(`✅ Password changed for user: ${user.email}`);
 
     res.status(200).json({
       success: true,
       message: 'Password successfully changed'
     });
   } catch (error) {
-    logger.error('âŒ ChangePassword Error:', error);
+    logger.error('❌ ChangePassword Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error changing password'
@@ -768,14 +768,14 @@ export const changePassword = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    logger.log(`âœ… User logged out: ${req.user.id}`);
+    logger.log(`✅ User logged out: ${req.user.id}`);
 
     res.status(200).json({
       success: true,
       message: 'Successfully logged out'
     });
   } catch (error) {
-    logger.error('âŒ Logout Error:', error);
+    logger.error('❌ Logout Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error logging out'
@@ -801,7 +801,7 @@ export const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       // Don't reveal if email exists (security best practice)
-      logger.warn(`âš ï¸ Password reset requested for non-existent email: ${email}`);
+      logger.warn(`⚠️ Password reset requested for non-existent email: ${email}`);
       return res.status(200).json({
         success: true,
         message: 'If this email is registered, a reset link will be sent'
@@ -818,13 +818,13 @@ export const forgotPassword = async (req, res) => {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
         to: user.email,
-        subject: 'Passwort zurÃ¼cksetzen - JN Business',
-        body: `Hallo ${user.name},\n\nSie haben eine Passwort-ZurÃ¼cksetzung angefordert.\n\nKlicken Sie auf den folgenden Link, um Ihr Passwort zurÃ¼ckzusetzen:\n${resetUrl}\n\nDer Link ist 10 Minuten gÃ¼ltig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n\nMit freundlichen GrÃ¼ÃŸen,\nIhr JN Business Team`,
+        subject: 'Passwort zurücksetzen - JN Business',
+        body: `Hallo ${user.name},\n\nSie haben eine Passwort-Zurücksetzung angefordert.\n\nKlicken Sie auf den folgenden Link, um Ihr Passwort zurückzusetzen:\n${resetUrl}\n\nDer Link ist 10 Minuten gültig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
         type: 'password_reset'
       });
-      logger.log(`ðŸ“§ Password reset email sent to: ${user.email}`);
+      logger.log(`📧 Password reset email sent to: ${user.email}`);
     } catch (emailError) {
-      logger.error('âŒ Failed to send password reset email:', emailError.message);
+      logger.error('❌ Failed to send password reset email:', emailError.message);
       // Don't fail the request if email fails in development
       if (process.env.NODE_ENV === 'production') {
         throw emailError;
@@ -837,7 +837,7 @@ export const forgotPassword = async (req, res) => {
       ...(process.env.NODE_ENV === 'development' && { resetToken })
     });
   } catch (error) {
-    logger.error('âŒ ForgotPassword Error:', error);
+    logger.error('❌ ForgotPassword Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error processing password reset'
@@ -897,14 +897,14 @@ export const resetPassword = async (req, res) => {
     user.passwordResetExpire = undefined;
     await user.save();
 
-    logger.log(`âœ… Password reset for user: ${user.email}`);
+    logger.log(`✅ Password reset for user: ${user.email}`);
 
     res.status(200).json({
       success: true,
       message: 'Password successfully reset'
     });
   } catch (error) {
-    logger.error('âŒ ResetPassword Error:', error);
+    logger.error('❌ ResetPassword Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error resetting password'
@@ -922,7 +922,7 @@ export const verifyToken = (req, res) => {
       user: req.user
     });
   } catch (error) {
-    logger.error('âŒ VerifyToken Error:', error);
+    logger.error('❌ VerifyToken Error:', error);
     res.status(401).json({
       success: false,
       message: 'Invalid token'
@@ -953,13 +953,13 @@ export const sendVerificationEmail = async (req, res) => {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
         to: user.email,
-        subject: 'E-Mail bestÃ¤tigen - JN Business',
-        body: `Hallo ${user.name},\n\nBitte bestÃ¤tigen Sie Ihre E-Mail-Adresse, indem Sie auf den folgenden Link klicken:\n${verificationUrl}\n\nDer Link ist 24 Stunden gÃ¼ltig.\n\nMit freundlichen GrÃ¼ÃŸen,\nIhr JN Business Team`,
+        subject: 'E-Mail bestätigen - JN Business',
+        body: `Hallo ${user.name},\n\nBitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie auf den folgenden Link klicken:\n${verificationUrl}\n\nDer Link ist 24 Stunden gültig.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
         type: 'email_verification'
       });
-      logger.log(`ðŸ“§ Verification email sent to: ${user.email}`);
+      logger.log(`📧 Verification email sent to: ${user.email}`);
     } catch (emailError) {
-      logger.error('âŒ Failed to send verification email:', emailError.message);
+      logger.error('❌ Failed to send verification email:', emailError.message);
       if (process.env.NODE_ENV === 'production') {
         throw emailError;
       }
@@ -971,7 +971,7 @@ export const sendVerificationEmail = async (req, res) => {
       ...(process.env.NODE_ENV === 'development' && { verificationToken })
     });
   } catch (error) {
-    logger.error('âŒ SendVerificationEmail Error:', error);
+    logger.error('❌ SendVerificationEmail Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -1000,14 +1000,14 @@ export const verifyEmail = async (req, res) => {
     // Verify email
     await user.verifyEmail();
 
-    logger.log(`âœ… Email verified for: ${user.email}`);
+    logger.log(`✅ Email verified for: ${user.email}`);
 
     res.status(200).json({
       success: true,
       message: 'Email successfully verified'
     });
   } catch (error) {
-    logger.error('âŒ VerifyEmail Error:', error);
+    logger.error('❌ VerifyEmail Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -1023,7 +1023,7 @@ export const healthCheck = async (req, res) => {
       version: '1.0.0'
     });
   } catch (error) {
-    logger.error('âŒ HealthCheck Error:', error);
+    logger.error('❌ HealthCheck Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error'
@@ -1090,7 +1090,7 @@ export const refreshToken = async (req, res) => {
     const newAccessToken = generateToken(user._id, '15m'); // Short-lived access token
     const newRefreshToken = generateToken(user._id, '7d'); // Longer-lived refresh token
 
-    logger.log(`ðŸ”„ Token refreshed for: ${user.email}`);
+    logger.log(`🔄 Token refreshed for: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -1099,7 +1099,7 @@ export const refreshToken = async (req, res) => {
       user: user.toJSON()
     });
   } catch (error) {
-    logger.error('âŒ RefreshToken Error:', error);
+    logger.error('❌ RefreshToken Error:', error);
     res.status(500).json({
       success: false,
       message: 'Token refresh failed'
@@ -1146,7 +1146,7 @@ export const enable2FA = async (req, res) => {
     const otpAuthUrl = authenticator.keyuri(user.email, 'JN Business', secret);
     const qrCodeDataUrl = await QRCode.toDataURL(otpAuthUrl);
 
-    logger.log(`ðŸ” 2FA setup initiated for: ${user.email}`);
+    logger.log(`🔐 2FA setup initiated for: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -1155,7 +1155,7 @@ export const enable2FA = async (req, res) => {
       backupCodes: backupCodes
     });
   } catch (error) {
-    logger.error('âŒ Enable2FA Error:', error);
+    logger.error('❌ Enable2FA Error:', error);
     res.status(500).json({
       success: false,
       message: '2FA setup failed'
@@ -1204,7 +1204,7 @@ export const verify2FA = async (req, res) => {
       if (backupCode) {
         backupCode.used = true;
         await user.save();
-        logger.log(`ðŸ” Backup code used for: ${user.email}`);
+        logger.log(`🔐 Backup code used for: ${user.email}`);
         return res.status(200).json({
           success: true,
           message: '2FA verified with backup code',
@@ -1222,7 +1222,7 @@ export const verify2FA = async (req, res) => {
     if (!user.twoFactorEnabled) {
       user.twoFactorEnabled = true;
       await user.save();
-      logger.log(`ðŸ” 2FA enabled for: ${user.email}`);
+      logger.log(`🔐 2FA enabled for: ${user.email}`);
     }
 
     res.status(200).json({
@@ -1230,7 +1230,7 @@ export const verify2FA = async (req, res) => {
       message: '2FA verified successfully'
     });
   } catch (error) {
-    logger.error('âŒ Verify2FA Error:', error);
+    logger.error('❌ Verify2FA Error:', error);
     res.status(500).json({
       success: false,
       message: '2FA verification failed'
@@ -1287,14 +1287,14 @@ export const disable2FA = async (req, res) => {
     user.twoFactorBackupCodes = [];
     await user.save();
 
-    logger.log(`ðŸ”“ 2FA disabled for: ${user.email}`);
+    logger.log(`🔓 2FA disabled for: ${user.email}`);
 
     res.status(200).json({
       success: true,
       message: '2FA disabled successfully'
     });
   } catch (error) {
-    logger.error('âŒ Disable2FA Error:', error);
+    logger.error('❌ Disable2FA Error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to disable 2FA'
@@ -1322,7 +1322,7 @@ export const get2FAStatus = async (req, res) => {
       backupCodesRemaining: backupCodesRemaining
     });
   } catch (error) {
-    logger.error('âŒ Get2FAStatus Error:', error);
+    logger.error('❌ Get2FAStatus Error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to get 2FA status'
@@ -1378,14 +1378,14 @@ export const regenerateBackupCodes = async (req, res) => {
     }));
     await user.save();
 
-    logger.log(`ðŸ” Backup codes regenerated for: ${user.email}`);
+    logger.log(`🔐 Backup codes regenerated for: ${user.email}`);
 
     res.status(200).json({
       success: true,
       backupCodes: backupCodes
     });
   } catch (error) {
-    logger.error('âŒ RegenerateBackupCodes Error:', error);
+    logger.error('❌ RegenerateBackupCodes Error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to regenerate backup codes'

@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-console */
+/* eslint-disable no-console */
 /**
  * Pre-Launch Checklist Script
  * Validates the entire system is ready for production
@@ -25,12 +25,12 @@ const results = [];
 
 function addResult(category, check, status, message = '') {
   results.push({ category, check, status, message });
-  const icon = status === 'pass' ? `${c.green}âœ“` : status === 'warn' ? `${c.yellow}âš ` : `${c.red}âœ—`;
+  const icon = status === 'pass' ? `${c.green}✓` : status === 'warn' ? `${c.yellow}⚠` : `${c.red}✗`;
   console.log(`  ${icon}${c.reset} ${check}${message ? c.dim + ' - ' + message + c.reset : ''}`);
 }
 
 async function checkMongoDB() {
-  console.log(`\n${c.cyan}â•â•â• Database â•â•â•${c.reset}`);
+  console.log(`\n${c.cyan}═══ Database ═══${c.reset}`);
 
   if (!process.env.MONGODB_URI) {
     addResult('Database', 'MongoDB URI', 'fail', 'MONGODB_URI not set');
@@ -63,7 +63,7 @@ async function checkMongoDB() {
   }
 
 function checkEnvironment() {
-  console.log(`\n${c.cyan}â•â•â• Environment â•â•â•${c.reset}`);
+  console.log(`\n${c.cyan}═══ Environment ═══${c.reset}`);
 
   const env = process.env.NODE_ENV || 'development';
   addResult('Environment', 'NODE_ENV', 'pass', env);
@@ -92,7 +92,7 @@ function checkEnvironment() {
   }
 
 function checkSecurity() {
-  console.log(`\n${c.cyan}â•â•â• Security â•â•â•${c.reset}`);
+  console.log(`\n${c.cyan}═══ Security ═══${c.reset}`);
 
   const isProduction = process.env.NODE_ENV === 'production';
 
@@ -130,7 +130,7 @@ function checkSecurity() {
   }
 
 function checkEmail() {
-  console.log(`\n${c.cyan}â•â•â• Email Service â•â•â•${c.reset}`);
+  console.log(`\n${c.cyan}═══ Email Service ═══${c.reset}`);
 
   if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     addResult('Email', 'SMTP Configuration', 'pass', process.env.EMAIL_HOST);
@@ -142,7 +142,7 @@ function checkEmail() {
   }
 
 function checkMonitoring() {
-  console.log(`\n${c.cyan}â•â•â• Monitoring â•â•â•${c.reset}`);
+  console.log(`\n${c.cyan}═══ Monitoring ═══${c.reset}`);
 
   if (process.env.SENTRY_DSN) {
     addResult('Monitoring', 'Sentry DSN', 'pass', 'Error tracking enabled');
@@ -158,9 +158,9 @@ function checkMonitoring() {
   }
 
 async function runChecks() {
-  console.log('\n' + 'â•'.repeat(50));
+  console.log('\n' + '═'.repeat(50));
   console.log('  JN AUTOMATION - Pre-Launch Checklist');
-  console.log('â•'.repeat(50));
+  console.log('═'.repeat(50));
 
   checkEnvironment();
   await checkMongoDB();
@@ -169,7 +169,7 @@ async function runChecks() {
   checkMonitoring();
 
   // Summary
-  console.log(`\n${c.cyan}â•â•â• Summary â•â•â•${c.reset}`);
+  console.log(`\n${c.cyan}═══ Summary ═══${c.reset}`);
 
   const passed = results.filter(r => r.status === 'pass').length;
   const warnings = results.filter(r => r.status === 'warn').length;
@@ -181,15 +181,15 @@ async function runChecks() {
   console.log('');
 
   if (failed > 0) {
-    console.log(`${c.red}âŒ NOT READY FOR LAUNCH${c.reset}`);
+    console.log(`${c.red}❌ NOT READY FOR LAUNCH${c.reset}`);
     console.log('   Fix the failed checks before deploying.\n');
     process.exit(1);
   } else if (warnings > 0) {
-    console.log(`${c.yellow}âš ï¸  READY WITH WARNINGS${c.reset}`);
+    console.log(`${c.yellow}⚠️  READY WITH WARNINGS${c.reset}`);
     console.log('   Review warnings before going live.\n');
     process.exit(0);
   } else {
-    console.log(`${c.green}âœ… READY FOR LAUNCH!${c.reset}\n`);
+    console.log(`${c.green}✅ READY FOR LAUNCH!${c.reset}\n`);
     process.exit(0);
   }
 }
@@ -198,3 +198,4 @@ runChecks().catch(error => {
   console.error('Check failed:', error);
   process.exit(1);
 });
+

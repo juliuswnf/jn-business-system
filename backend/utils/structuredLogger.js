@@ -1,7 +1,7 @@
-﻿import winston from 'winston';
+import winston from 'winston';
 
 /**
- * ✅ AUDIT FIX: Structured JSON logger with Winston
+ * ? AUDIT FIX: Structured JSON logger with Winston
  * Replaces console.log with proper logging for production monitoring
  */
 

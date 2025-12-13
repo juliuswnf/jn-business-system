@@ -1,4 +1,4 @@
-﻿import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
@@ -42,9 +42,9 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    logger.log('\nâœ… Database connected\n');
+    logger.log('\n✅ Database connected\n');
   } catch (error) {
-    logger.error('\nâŒ Database connection error:', error.message, '\n');
+    logger.error('\n❌ Database connection error:', error.message, '\n');
     process.exit(1);
   }
 };
@@ -59,7 +59,7 @@ const getBackupDir = () => {
 
 const backupCollection = async (model, collectionName) => {
   try {
-    logger.log(`  ðŸ“¦ Backing up ${collectionName}...`);
+    logger.log(`  📦 Backing up ${collectionName}...`);
     const data = await model.find({});
     return {
       collectionName,
@@ -67,7 +67,7 @@ const backupCollection = async (model, collectionName) => {
       data
     };
   } catch (error) {
-    logger.error(`  âŒ Error backing up ${collectionName}:`, error.message);
+    logger.error(`  ❌ Error backing up ${collectionName}:`, error.message);
     throw error;
   }
 };
@@ -75,9 +75,9 @@ const backupCollection = async (model, collectionName) => {
 export const backupFullDatabase = async (compress = false) => {
   try {
     logger.log('\n================================');
-    logger.log('  ðŸ’¾ FULL DATABASE BACKUP');
+    logger.log('  💾 FULL DATABASE BACKUP');
     logger.log('================================\n');
-    logger.log('ðŸ”„ Backing up all collections...\n');
+    logger.log('🔄 Backing up all collections...\n');
 
     const backupData = {
       timestamp: new Date().toISOString(),
@@ -114,7 +114,7 @@ export const backupFullDatabase = async (compress = false) => {
     fs.writeFileSync(filePath, JSON.stringify(backupData, null, 2));
 
     if (compress) {
-      logger.log('\nðŸ“¦ Compressing backup...\n');
+      logger.log('\n📦 Compressing backup...\n');
       const compressedFileName = `${fileName}.gz`;
       const compressedFilePath = path.join(backupDir, compressedFileName);
 
@@ -131,8 +131,8 @@ export const backupFullDatabase = async (compress = false) => {
 
     const fileSize = (fs.statSync(filePath).size / 1024 / 1024).toFixed(2);
 
-    logger.log('âœ… Backup completed!\n');
-    logger.log('ðŸ“Š Backup Summary:');
+    logger.log('✅ Backup completed!\n');
+    logger.log('📊 Backup Summary:');
     logger.log(`   File: ${fileName}`);
     logger.log(`   Path: ${filePath}`);
     logger.log(`   Size: ${fileSize} MB`);
@@ -141,7 +141,7 @@ export const backupFullDatabase = async (compress = false) => {
 
     return { filePath, fileName, fileSize, totalDocuments, timestamp: backupData.timestamp };
   } catch (error) {
-    logger.error('âŒ Error backing up database:', error.message, '\n');
+    logger.error('❌ Error backing up database:', error.message, '\n');
     throw error;
   }
 };
@@ -149,7 +149,7 @@ export const backupFullDatabase = async (compress = false) => {
 export const backupSelectedCollections = async (collectionNames) => {
   try {
     logger.log('\n================================');
-    logger.log('  ðŸ’¾ SELECTIVE BACKUP');
+    logger.log('  💾 SELECTIVE BACKUP');
     logger.log('================================\n');
 
     const backupData = {
@@ -175,7 +175,7 @@ export const backupSelectedCollections = async (collectionNames) => {
       const model = availableCollections[collectionName];
 
       if (!model) {
-        logger.warn(`âš ï¸  Unknown collection: ${collectionName}`);
+        logger.warn(`⚠️  Unknown collection: ${collectionName}`);
         continue;
       }
 
@@ -192,8 +192,8 @@ export const backupSelectedCollections = async (collectionNames) => {
     fs.writeFileSync(filePath, JSON.stringify(backupData, null, 2));
     const fileSize = (fs.statSync(filePath).size / 1024).toFixed(2);
 
-    logger.log('\nâœ… Selective backup completed!\n');
-    logger.log('ðŸ“Š Backup Summary:');
+    logger.log('\n✅ Selective backup completed!\n');
+    logger.log('📊 Backup Summary:');
     logger.log(`   File: ${fileName}`);
     logger.log(`   Collections: ${collectionNames.join(', ')}`);
     logger.log(`   Size: ${fileSize} KB`);
@@ -201,14 +201,14 @@ export const backupSelectedCollections = async (collectionNames) => {
 
     return { filePath, fileName, fileSize };
   } catch (error) {
-    logger.error('âŒ Error backing up collections:', error.message, '\n');
+    logger.error('❌ Error backing up collections:', error.message, '\n');
     throw error;
   }
 };
 export const restoreFromBackup = async (backupFile) => {
   try {
     logger.log('\n================================');
-    logger.log('  ðŸ”„ RESTORE FROM BACKUP');
+    logger.log('  🔄 RESTORE FROM BACKUP');
     logger.log('================================\n');
 
     const backupDir = getBackupDir();
@@ -218,7 +218,7 @@ export const restoreFromBackup = async (backupFile) => {
       throw new Error(`Backup file not found: ${backupFile}`);
     }
 
-    logger.log('ðŸ“– Reading backup file...\n');
+    logger.log('📖 Reading backup file...\n');
 
     let backupData;
 
@@ -237,7 +237,7 @@ export const restoreFromBackup = async (backupFile) => {
       backupData = JSON.parse(fileContent);
     }
 
-    logger.log('ðŸ”„ Restoring collections...\n');
+    logger.log('🔄 Restoring collections...\n');
 
     const collectionModels = {
       users: User,
@@ -257,7 +257,7 @@ export const restoreFromBackup = async (backupFile) => {
       const model = collectionModels[collectionName];
 
       if (!model) {
-        logger.warn(`âš ï¸  Unknown collection: ${collectionName}`);
+        logger.warn(`⚠️  Unknown collection: ${collectionName}`);
         continue;
       }
 
@@ -265,20 +265,20 @@ export const restoreFromBackup = async (backupFile) => {
 
       if (backup.data && backup.data.length > 0) {
         await model.insertMany(backup.data);
-        logger.log(`  âœ… Restored ${backup.data.length} documents to ${collectionName}`);
+        logger.log(`  ✅ Restored ${backup.data.length} documents to ${collectionName}`);
         totalRestored += backup.data.length;
       }
     }
 
-    logger.log('\nâœ… Restore completed!\n');
-    logger.log('ðŸ“Š Restore Summary:');
+    logger.log('\n✅ Restore completed!\n');
+    logger.log('📊 Restore Summary:');
     logger.log(`   Backup: ${backupFile}`);
     logger.log(`   Total Documents Restored: ${totalRestored}`);
     logger.log(`   Backup Timestamp: ${backupData.timestamp}\n`);
 
     return totalRestored;
   } catch (error) {
-    logger.error('âŒ Error restoring backup:', error.message, '\n');
+    logger.error('❌ Error restoring backup:', error.message, '\n');
     throw error;
   }
 };
@@ -289,11 +289,11 @@ export const listBackups = () => {
     const files = fs.readdirSync(backupDir);
 
     if (files.length === 0) {
-      logger.log('\nðŸ“ No backups found\n');
+      logger.log('\n📁 No backups found\n');
       return [];
     }
 
-    logger.log('\nðŸ“ Available Backups:\n');
+    logger.log('\n📁 Available Backups:\n');
 
     files.forEach((file, index) => {
       const filePath = path.join(backupDir, file);
@@ -307,7 +307,7 @@ export const listBackups = () => {
 
     return files;
   } catch (error) {
-    logger.error('âŒ Error listing backups:', error.message, '\n');
+    logger.error('❌ Error listing backups:', error.message, '\n');
     return [];
   }
 };
@@ -322,9 +322,9 @@ export const deleteBackup = (backupFile) => {
     }
 
     fs.unlinkSync(backupPath);
-    logger.log(`âœ… Backup deleted: ${backupFile}\n`);
+    logger.log(`✅ Backup deleted: ${backupFile}\n`);
   } catch (error) {
-    logger.error('âŒ Error deleting backup:', error.message, '\n');
+    logger.error('❌ Error deleting backup:', error.message, '\n');
     throw error;
   }
 };
@@ -332,7 +332,7 @@ export const deleteBackup = (backupFile) => {
 const interactiveMode = async () => {
   try {
     logger.log('================================');
-    logger.log('  ðŸ’¾ DATABASE BACKUP TOOL');
+    logger.log('  💾 DATABASE BACKUP TOOL');
     logger.log('================================\n');
 
     logger.log('Options:');
@@ -360,7 +360,7 @@ const interactiveMode = async () => {
         const backupNum = await question('Enter backup number to restore: ');
         const backupFile = backups[parseInt(backupNum) - 1];
         if (backupFile) {
-          const confirm = await question('âš ï¸  This will overwrite existing data. Continue? (yes/no): ');
+          const confirm = await question('⚠️  This will overwrite existing data. Continue? (yes/no): ');
           if (confirm.toLowerCase() === 'yes') {
             await restoreFromBackup(backupFile);
           }
@@ -381,13 +381,13 @@ const interactiveMode = async () => {
         }
       }
     } else {
-      logger.log('\nâŒ Invalid option\n');
+      logger.log('\n❌ Invalid option\n');
     }
 
     rl.close();
     process.exit(0);
   } catch (error) {
-    logger.error('\nâŒ Fatal error:', error.message, '\n');
+    logger.error('\n❌ Fatal error:', error.message, '\n');
     rl.close();
     process.exit(1);
   }
@@ -398,7 +398,7 @@ const main = async () => {
     await connectDB();
     await interactiveMode();
   } catch (error) {
-    logger.error('\nâŒ Fatal error:', error.message, '\n');
+    logger.error('\n❌ Fatal error:', error.message, '\n');
     process.exit(1);
   }
 };

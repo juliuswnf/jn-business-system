@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import {
   createClinicalNote,
   getClinicalNote,
@@ -13,7 +13,7 @@ const { protect } = authMiddleware;
 
 const router = express.Router();
 
-// ⚠️ ALL ROUTES ARE PROTECTED - HIPAA COMPLIANCE
+// ?? ALL ROUTES ARE PROTECTED - HIPAA COMPLIANCE
 // Every access is logged in AuditLog
 
 // ==================== ROUTES ====================

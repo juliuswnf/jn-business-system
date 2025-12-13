@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Public Booking Routes
  * No authentication required - for customer-facing booking
  * Rate-limited for spam protection

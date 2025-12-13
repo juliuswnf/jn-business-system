@@ -1,11 +1,11 @@
-ï»¿/**
+/**
  * Pricing Configuration for JN Automation
  * Updated: December 13, 2025
  * 
  * Pricing Structure:
- * - Starter: â‚¬69/month (â‚¬690/year with 17% discount)
- * - Professional: â‚¬169/month (â‚¬1,690/year with 17% discount)
- * - Enterprise: â‚¬399/month (â‚¬3,990/year with 17% discount)
+ * - Starter: €69/month (€690/year with 17% discount)
+ * - Professional: €169/month (€1,690/year with 17% discount)
+ * - Enterprise: €399/month (€3,990/year with 17% discount)
  */
 
 export const PRICING_TIERS = {
@@ -38,7 +38,7 @@ export const PRICING_TIERS = {
       
       // Notifications
       emailNotifications: true,
-      smsNotifications: false, // âŒ No SMS
+      smsNotifications: false, // ? No SMS
       
       // Payments
       stripeIntegration: true,
@@ -92,7 +92,7 @@ export const PRICING_TIERS = {
       locations: 1,
       bookingsPerMonth: 1000,
       customers: -1, // Unlimited
-      smsPerMonth: 0, // âŒ No SMS (key change from original spec)
+      smsPerMonth: 0, // ? No SMS (key change from original spec)
       storageGB: 25
     },
     
@@ -104,7 +104,7 @@ export const PRICING_TIERS = {
       customerCRM: true,
       publicSalonPage: true,
       emailNotifications: true,
-      smsNotifications: false, // âŒ Still no SMS in Professional
+      smsNotifications: false, // ? Still no SMS in Professional
       stripeIntegration: true,
       basicReports: true,
       
@@ -161,12 +161,12 @@ export const PRICING_TIERS = {
       overageTier1: {
         from: 501,
         to: 1000,
-        pricePerSMS: 0.05 // â‚¬0.05 per SMS
+        pricePerSMS: 0.05 // €0.05 per SMS
       },
       overageTier2: {
         from: 1001,
         to: -1, // Unlimited
-        pricePerSMS: 0.045 // â‚¬0.045 per SMS (volume discount)
+        pricePerSMS: 0.045 // €0.045 per SMS (volume discount)
       }
     },
     
@@ -178,7 +178,7 @@ export const PRICING_TIERS = {
       customerCRM: true,
       publicSalonPage: true,
       emailNotifications: true,
-      smsNotifications: true, // âœ… SMS only in Enterprise
+      smsNotifications: true, // ? SMS only in Enterprise
       stripeIntegration: true,
       basicReports: true,
       advancedAnalytics: true,
@@ -375,13 +375,13 @@ export function calculateSMSOverageCost(tierSlug, smsUsed, smsLimit) {
   const pricing = tier.smsPricing;
   let cost = 0;
   
-  // Tier 1: 501-1000 (â‚¬0.05/SMS)
+  // Tier 1: 501-1000 (€0.05/SMS)
   const tier1SMS = Math.min(overage, pricing.overageTier1.to - smsLimit);
   if (tier1SMS > 0) {
     cost += tier1SMS * pricing.overageTier1.pricePerSMS;
   }
   
-  // Tier 2: 1001+ (â‚¬0.045/SMS)
+  // Tier 2: 1001+ (€0.045/SMS)
   const tier2SMS = Math.max(0, overage - tier1SMS);
   if (tier2SMS > 0) {
     cost += tier2SMS * pricing.overageTier2.pricePerSMS;

@@ -1,4 +1,4 @@
-﻿import { exec } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
@@ -9,7 +9,7 @@ import alertingService from './alertingService.js';
 const execAsync = promisify(exec);
 
 /**
- * ✅ MEDIUM FIX #13: Automated Database Backup Service
+ * ? MEDIUM FIX #13: Automated Database Backup Service
  *
  * Features:
  * - Automated daily MongoDB backups
@@ -39,7 +39,7 @@ const createMongoBackup = async () => {
       throw new Error('MONGO_URI not configured');
     }
 
-    logger.log(`📦 Starting MongoDB backup to ${backupPath}...`);
+    logger.log(`?? Starting MongoDB backup to ${backupPath}...`);
 
     // Use mongodump if available, otherwise use mongoose export
     if (await isMongoToolsInstalled()) {
@@ -53,7 +53,7 @@ const createMongoBackup = async () => {
     const zipPath = `${backupPath}.tar.gz`;
     if (process.platform === 'win32') {
       // Windows: Use 7zip or skip compression
-      logger.warn('⚠️ Compression skipped on Windows. Install 7zip for compression.');
+      logger.warn('?? Compression skipped on Windows. Install 7zip for compression.');
     } else {
       await execAsync(`tar -czf "${zipPath}" -C "${BACKUP_DIR}" "${path.basename(backupPath)}"`);
       // Remove uncompressed directory
@@ -62,7 +62,7 @@ const createMongoBackup = async () => {
 
     const backupSize = await getFileSize(process.platform === 'win32' ? backupPath : zipPath);
 
-    logger.log(`✅ Backup completed: ${backupSize}MB`);
+    logger.log(`? Backup completed: ${backupSize}MB`);
 
     return {
       success: true,
@@ -71,7 +71,7 @@ const createMongoBackup = async () => {
       timestamp: new Date().toISOString()
     };
   } catch (error) {
-    logger.error('❌ Backup creation failed:', error);
+    logger.error('? Backup creation failed:', error);
     
     // Send alert
     await alertingService.sendAlert({
@@ -101,7 +101,7 @@ const exportCollectionsManually = async (backupPath) => {
     const filePath = path.join(backupPath, `${collName}.json`);
     await fs.writeFile(filePath, JSON.stringify(documents, null, 2), 'utf8');
     
-    logger.log(`  ✓ Exported ${collName}: ${documents.length} documents`);
+    logger.log(`  ? Exported ${collName}: ${documents.length} documents`);
   }
 };
 
@@ -150,17 +150,17 @@ const cleanupOldBackups = async () => {
       if (age > retentionMs) {
         await fs.rm(filePath, { recursive: true, force: true });
         deletedCount++;
-        logger.log(`🗑️  Deleted old backup: ${file}`);
+        logger.log(`???  Deleted old backup: ${file}`);
       }
     }
 
     if (deletedCount > 0) {
-      logger.log(`✅ Cleaned up ${deletedCount} old backups`);
+      logger.log(`? Cleaned up ${deletedCount} old backups`);
     }
 
     return { deletedCount };
   } catch (error) {
-    logger.error('❌ Backup cleanup failed:', error);
+    logger.error('? Backup cleanup failed:', error);
     throw error;
   }
 };
@@ -190,7 +190,7 @@ const listBackups = async () => {
 
     return backups.sort((a, b) => new Date(b.created) - new Date(a.created));
   } catch (error) {
-    logger.error('❌ Failed to list backups:', error);
+    logger.error('? Failed to list backups:', error);
     return [];
   }
 };
@@ -200,7 +200,7 @@ const listBackups = async () => {
  */
 const restoreFromBackup = async (backupPath) => {
   try {
-    logger.warn('⚠️  RESTORE OPERATION STARTED - This will overwrite current data!');
+    logger.warn('??  RESTORE OPERATION STARTED - This will overwrite current data!');
 
     const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
     if (!mongoUri) {
@@ -221,7 +221,7 @@ const restoreFromBackup = async (backupPath) => {
       throw new Error('mongorestore not available. Manual restore required.');
     }
 
-    logger.log('✅ Restore completed successfully');
+    logger.log('? Restore completed successfully');
 
     return {
       success: true,
@@ -229,7 +229,7 @@ const restoreFromBackup = async (backupPath) => {
       timestamp: new Date().toISOString()
     };
   } catch (error) {
-    logger.error('❌ Restore failed:', error);
+    logger.error('? Restore failed:', error);
     throw error;
   }
 };
@@ -239,7 +239,7 @@ const restoreFromBackup = async (backupPath) => {
  */
 const runBackupJob = async () => {
   try {
-    logger.log('🔄 Starting scheduled backup job...');
+    logger.log('?? Starting scheduled backup job...');
 
     // Create backup
     const result = await createMongoBackup();
@@ -247,11 +247,11 @@ const runBackupJob = async () => {
     // Clean up old backups
     await cleanupOldBackups();
 
-    logger.log('✅ Backup job completed successfully');
+    logger.log('? Backup job completed successfully');
 
     return result;
   } catch (error) {
-    logger.error('❌ Backup job failed:', error);
+    logger.error('? Backup job failed:', error);
     throw error;
   }
 };

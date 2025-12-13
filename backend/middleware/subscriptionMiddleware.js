@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * Subscription Middleware
  * Ensures salon has active subscription before allowing access
@@ -87,7 +87,7 @@ export const checkBookingLimits = async (req, res, next) => {
         success: false,
         message: planType === 'starter'
           ? 'Monatliches Buchungslimit erreicht. Bitte auf Pro upgraden.'
-          : 'Buchungslimit fÃ¼r Testphase erreicht.',
+          : 'Buchungslimit für Testphase erreicht.',
         code: 'BOOKING_LIMIT_EXCEEDED',
         bookingLimits: req.bookingLimits,
         upgradeUrl: '/pricing'

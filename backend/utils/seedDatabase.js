@@ -1,4 +1,4 @@
-﻿import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import readline from 'readline';
@@ -29,9 +29,9 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    logger.log('\nâœ… Database connected\n');
+    logger.log('\n✅ Database connected\n');
   } catch (error) {
-    logger.error('\nâŒ Database connection error:', error.message, '\n');
+    logger.error('\n❌ Database connection error:', error.message, '\n');
     process.exit(1);
   }
 };
@@ -43,7 +43,7 @@ const hashPassword = async (password) => {
 
 export const seedUsers = async (companyId) => {
   try {
-    logger.log('ðŸ“ Seeding users...\n');
+    logger.log('📝 Seeding users...\n');
 
     const hashedPassword = await hashPassword('TestPassword123!');
 
@@ -81,26 +81,26 @@ export const seedUsers = async (companyId) => {
     ];
 
     const createdUsers = await User.insertMany(users);
-    logger.log(`âœ… ${createdUsers.length} users seeded\n`);
+    logger.log(`✅ ${createdUsers.length} users seeded\n`);
     return createdUsers;
   } catch (error) {
-    logger.error('âŒ Error seeding users:', error.message, '\n');
+    logger.error('❌ Error seeding users:', error.message, '\n');
     throw error;
   }
 };
 
 export const seedCustomers = async (companyId) => {
   try {
-    logger.log('ðŸ‘¥ Seeding customers...\n');
+    logger.log('👥 Seeding customers...\n');
 
     const customers = [
       {
-        name: 'Max MÃ¼ller',
+        name: 'Max Müller',
         email: 'max@example.com',
         phone: '+49123456789',
         companyId,
         address: {
-          street: 'HauptstraÃŸe 1',
+          street: 'Hauptstraße 1',
           city: 'Berlin',
           zipCode: '10115',
           country: 'DE'
@@ -126,7 +126,7 @@ export const seedCustomers = async (companyId) => {
         phone: '+49555666777',
         companyId,
         address: {
-          street: 'KurfÃ¼rstendamm 3',
+          street: 'Kurfürstendamm 3',
           city: 'Berlin',
           zipCode: '10719',
           country: 'DE'
@@ -136,17 +136,17 @@ export const seedCustomers = async (companyId) => {
     ];
 
     const createdCustomers = await Customer.insertMany(customers);
-    logger.log(`âœ… ${createdCustomers.length} customers seeded\n`);
+    logger.log(`✅ ${createdCustomers.length} customers seeded\n`);
     return createdCustomers;
   } catch (error) {
-    logger.error('âŒ Error seeding customers:', error.message, '\n');
+    logger.error('❌ Error seeding customers:', error.message, '\n');
     throw error;
   }
 };
 
 export const seedServices = async (companyId) => {
   try {
-    logger.log('ðŸ”§ Seeding services...\n');
+    logger.log('🔧 Seeding services...\n');
 
     const services = [
       {
@@ -160,8 +160,8 @@ export const seedServices = async (companyId) => {
         createdAt: new Date()
       },
       {
-        name: 'FÃ¤rben',
-        description: 'HaarfÃ¤rbung mit hochwertigen Produkten',
+        name: 'Färben',
+        description: 'Haarfärbung mit hochwertigen Produkten',
         category: 'Coloring',
         price: 59.99,
         duration: 90,
@@ -192,17 +192,17 @@ export const seedServices = async (companyId) => {
     ];
 
     const createdServices = await Service.insertMany(services);
-    logger.log(`âœ… ${createdServices.length} services seeded\n`);
+    logger.log(`✅ ${createdServices.length} services seeded\n`);
     return createdServices;
   } catch (error) {
-    logger.error('âŒ Error seeding services:', error.message, '\n');
+    logger.error('❌ Error seeding services:', error.message, '\n');
     throw error;
   }
 };
 
 export const seedAppointments = async (companyId, customers, services, employees) => {
   try {
-    logger.log('ðŸ“… Seeding appointments...\n');
+    logger.log('📅 Seeding appointments...\n');
 
     const appointments = [
       {
@@ -238,17 +238,17 @@ export const seedAppointments = async (companyId, customers, services, employees
     ];
 
     const createdAppointments = await Appointment.insertMany(appointments);
-    logger.log(`âœ… ${createdAppointments.length} appointments seeded\n`);
+    logger.log(`✅ ${createdAppointments.length} appointments seeded\n`);
     return createdAppointments;
   } catch (error) {
-    logger.error('âŒ Error seeding appointments:', error.message, '\n');
+    logger.error('❌ Error seeding appointments:', error.message, '\n');
     throw error;
   }
 };
 
 export const seedBookings = async (companyId, customers, services) => {
   try {
-    logger.log('ðŸ“‹ Seeding bookings...\n');
+    logger.log('📋 Seeding bookings...\n');
 
     const bookings = [
       {
@@ -274,17 +274,17 @@ export const seedBookings = async (companyId, customers, services) => {
     ];
 
     const createdBookings = await Booking.insertMany(bookings);
-    logger.log(`âœ… ${createdBookings.length} bookings seeded\n`);
+    logger.log(`✅ ${createdBookings.length} bookings seeded\n`);
     return createdBookings;
   } catch (error) {
-    logger.error('âŒ Error seeding bookings:', error.message, '\n');
+    logger.error('❌ Error seeding bookings:', error.message, '\n');
     throw error;
   }
 };
 
 export const seedPayments = async (companyId, bookings) => {
   try {
-    logger.log('ðŸ’³ Seeding payments...\n');
+    logger.log('💳 Seeding payments...\n');
 
     const payments = bookings.map(booking => ({
       bookingId: booking._id,
@@ -298,17 +298,17 @@ export const seedPayments = async (companyId, bookings) => {
     }));
 
     const createdPayments = await Payment.insertMany(payments);
-    logger.log(`âœ… ${createdPayments.length} payments seeded\n`);
+    logger.log(`✅ ${createdPayments.length} payments seeded\n`);
     return createdPayments;
   } catch (error) {
-    logger.error('âŒ Error seeding payments:', error.message, '\n');
+    logger.error('❌ Error seeding payments:', error.message, '\n');
     throw error;
   }
 };
 
 export const seedReviews = async (companyId, customers, services) => {
   try {
-    logger.log('â­ Seeding reviews...\n');
+    logger.log('⭐ Seeding reviews...\n');
 
     const reviews = [
       {
@@ -332,23 +332,23 @@ export const seedReviews = async (companyId, customers, services) => {
         serviceId: services[2]._id,
         companyId,
         rating: 5,
-        comment: 'Ausgezeichnet! WÃ¼rde ich empfehlen.',
+        comment: 'Ausgezeichnet! Würde ich empfehlen.',
         createdAt: new Date()
       }
     ];
 
     const createdReviews = await Review.insertMany(reviews);
-    logger.log(`âœ… ${createdReviews.length} reviews seeded\n`);
+    logger.log(`✅ ${createdReviews.length} reviews seeded\n`);
     return createdReviews;
   } catch (error) {
-    logger.error('âŒ Error seeding reviews:', error.message, '\n');
+    logger.error('❌ Error seeding reviews:', error.message, '\n');
     throw error;
   }
 };
 
 export const seedEmployees = async (companyId) => {
   try {
-    logger.log('ðŸ‘¨â€ðŸ’¼ Seeding employees...\n');
+    logger.log('👨‍💼 Seeding employees...\n');
 
     const employees = [
       {
@@ -369,17 +369,17 @@ export const seedEmployees = async (companyId) => {
         lastName: 'Schmidt',
         email: 'employee2@test.com',
         phone: '+49444555666',
-        specialties: ['FÃ¤rben', 'Massage'],
+        specialties: ['Färben', 'Massage'],
         isActive: true,
         createdAt: new Date()
       }
     ];
 
     const createdEmployees = await Employee.insertMany(employees);
-    logger.log(`âœ… ${createdEmployees.length} employees seeded\n`);
+    logger.log(`✅ ${createdEmployees.length} employees seeded\n`);
     return createdEmployees;
   } catch (error) {
-    logger.error('âŒ Error seeding employees:', error.message, '\n');
+    logger.error('❌ Error seeding employees:', error.message, '\n');
     throw error;
   }
 };
@@ -389,7 +389,7 @@ const main = async () => {
     await connectDB();
 
     logger.log('================================');
-    logger.log('  ðŸŒ± DATABASE SEEDING');
+    logger.log('  🌱 DATABASE SEEDING');
     logger.log('================================\n');
 
     const companyId = new mongoose.Types.ObjectId();
@@ -404,10 +404,10 @@ const main = async () => {
     const reviews = await seedReviews(companyId, customers, services);
 
     logger.log('================================');
-    logger.log('  âœ… Database seeding completed!');
+    logger.log('  ✅ Database seeding completed!');
     logger.log('================================\n');
 
-    logger.log('ðŸ“Š Seeded Data Summary:');
+    logger.log('📊 Seeded Data Summary:');
     logger.log(`   Users: ${users.length}`);
     logger.log(`   Customers: ${customers.length}`);
     logger.log(`   Services: ${services.length}`);
@@ -417,14 +417,14 @@ const main = async () => {
     logger.log(`   Reviews: ${reviews.length}`);
     logger.log(`   Employees: ${employees.length}\n`);
 
-    logger.log('ðŸ” Test Login Credentials:');
+    logger.log('🔐 Test Login Credentials:');
     logger.log('   Email: admin@test.com');
     logger.log('   Password: TestPassword123!\n');
 
     rl.close();
     process.exit(0);
   } catch (error) {
-    logger.error('\nâŒ Fatal error:', error.message, '\n');
+    logger.error('\n❌ Fatal error:', error.message, '\n');
     rl.close();
     process.exit(1);
   }

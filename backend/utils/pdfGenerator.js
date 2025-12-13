@@ -1,4 +1,4 @@
-﻿import PDFDocument from 'pdfkit';
+import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
 import logger from './logger.js';
@@ -197,11 +197,11 @@ export async function generateConsentPDF(consentData) {
       writeStream.on('error', reject);
     });
 
-    logger.info(`✅ Generated consent PDF: ${filename}`);
+    logger.info(`? Generated consent PDF: ${filename}`);
 
     return filePath;
   } catch (error) {
-    logger.error(`❌ Failed to generate consent PDF: ${error.message}`);
+    logger.error(`? Failed to generate consent PDF: ${error.message}`);
     throw new Error(`Failed to generate consent PDF: ${error.message}`);
   }
 }
@@ -327,7 +327,7 @@ export async function generateClinicalNotePDF(noteData) {
       .fontSize(8)
       .fillColor('red')
       .text(
-        '⚠️ CONFIDENTIAL - Protected Health Information (PHI). Unauthorized disclosure is prohibited.',
+        '?? CONFIDENTIAL - Protected Health Information (PHI). Unauthorized disclosure is prohibited.',
         50,
         doc.page.height - 50,
         { align: 'center', width: doc.page.width - 100 }
@@ -340,11 +340,11 @@ export async function generateClinicalNotePDF(noteData) {
       writeStream.on('error', reject);
     });
 
-    logger.info(`✅ Generated clinical note PDF: ${filename}`);
+    logger.info(`? Generated clinical note PDF: ${filename}`);
 
     return filePath;
   } catch (error) {
-    logger.error(`❌ Failed to generate clinical note PDF: ${error.message}`);
+    logger.error(`? Failed to generate clinical note PDF: ${error.message}`);
     throw new Error(`Failed to generate clinical note PDF: ${error.message}`);
   }
 }

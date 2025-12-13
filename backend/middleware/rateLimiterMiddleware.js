@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * Rate Limiter Middleware Suite
  * Version: 1.0.0
@@ -29,7 +29,7 @@ class MemoryStoreAdapter {
 
       cb(null, current);
     } catch (err) {
-      logger.error('âŒ MemoryStore incr error:', err);
+      logger.error('❌ MemoryStore incr error:', err);
       cb(err);
     }
   }
@@ -40,7 +40,7 @@ class MemoryStoreAdapter {
       this.hits.set(key, { count: current, timestamp: Date.now() });
       cb(null, current);
     } catch (err) {
-      logger.error('âŒ MemoryStore decrement error:', err);
+      logger.error('❌ MemoryStore decrement error:', err);
       cb(err);
     }
   }
@@ -69,7 +69,7 @@ class MemoryStoreAdapter {
     }
 
     if (deleted > 0) {
-      logger.log(`✅ Cleaned up ${deleted} expired rate limit entries`);
+      logger.log(`? Cleaned up ${deleted} expired rate limit entries`);
     }
   }
 
@@ -95,7 +95,7 @@ const generalLimiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_GENERAL || '100'),
   message: {
     success: false,
-    message: 'Zu viele Anfragen von dieser IP, bitte spÃ¤ter versuchen'
+    message: 'Zu viele Anfragen von dieser IP, bitte später versuchen'
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -103,10 +103,10 @@ const generalLimiter = rateLimit({
   keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   skip: (req) => req.user && (req.user.role === 'admin' || req.user.role === 'ceo'),
   handler: (req, res) => {
-    logger.warn(`âš ï¸ Rate limit exceeded for ${req.ip}`);
+    logger.warn(`⚠️ Rate limit exceeded for ${req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele Anfragen, bitte spÃ¤ter versuchen',
+      message: 'Zu viele Anfragen, bitte später versuchen',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
     });
   }
@@ -119,15 +119,15 @@ const authLimiter = rateLimit({
   skipFailedRequests: false,
   message: {
     success: false,
-    message: 'Zu viele Login-Versuche, bitte spÃ¤ter versuchen'
+    message: 'Zu viele Login-Versuche, bitte später versuchen'
   },
   store: memoryStoreAdapter,
   keyGenerator: (req) => req.body?.email || req.ip || 'unknown',
   handler: (req, res) => {
-    logger.warn(`âš ï¸ Auth rate limit exceeded for ${req.body?.email || req.ip}`);
+    logger.warn(`⚠️ Auth rate limit exceeded for ${req.body?.email || req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele Login-Versuche. Bitte versuchen Sie es spÃ¤ter erneut.',
+      message: 'Zu viele Login-Versuche. Bitte versuchen Sie es später erneut.',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
       email: req.body?.email
     });
@@ -151,7 +151,7 @@ const strictLimiter = rateLimit({
 const apiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_API || '1000'),
-  message: { success: false, message: 'API Rate Limit Ã¼berschritten' },
+  message: { success: false, message: 'API Rate Limit überschritten' },
   store: memoryStoreAdapter,
   keyGenerator: (req) => req.user?.id || req.ip,
   skip: (req) => req.user?.role === 'ceo'
@@ -160,14 +160,14 @@ const apiLimiter = rateLimit({
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_PAYMENT || '50'),
-  message: { success: false, message: 'Zu viele Zahlungsversuche, bitte spÃ¤ter versuchen' },
+  message: { success: false, message: 'Zu viele Zahlungsversuche, bitte später versuchen' },
   store: memoryStoreAdapter,
   keyGenerator: (req) => req.user?.id || req.ip,
   handler: (req, res) => {
-    logger.warn(`âš ï¸ Payment rate limit exceeded for user ${req.user?.id}`);
+    logger.warn(`⚠️ Payment rate limit exceeded for user ${req.user?.id}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele Zahlungsversuche. Bitte versuchen Sie es spÃ¤ter erneut.',
+      message: 'Zu viele Zahlungsversuche. Bitte versuchen Sie es später erneut.',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
     });
   }
@@ -182,7 +182,7 @@ const uploadLimiter = rateLimit({
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      message: 'Sie haben Ihr tÃ¤gliches Upload-Limit erreicht',
+      message: 'Sie haben Ihr tägliches Upload-Limit erreicht',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
       resetTime: new Date(req.rateLimit.resetTime * 1000)
     });
@@ -196,10 +196,10 @@ const emailLimiter = rateLimit({
   store: memoryStoreAdapter,
   keyGenerator: (req) => req.user?.email || req.email || req.ip,
   handler: (req, res) => {
-    logger.warn(`âš ï¸ Email rate limit exceeded for ${req.user?.email || req.ip}`);
+    logger.warn(`⚠️ Email rate limit exceeded for ${req.user?.email || req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele Email-Anfragen. Bitte versuchen Sie es spÃ¤ter erneut.',
+      message: 'Zu viele Email-Anfragen. Bitte versuchen Sie es später erneut.',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
     });
   }
@@ -222,7 +222,7 @@ const exportLimiter = rateLimit({
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      message: 'Sie haben Ihr tÃ¤gliches Export-Limit erreicht',
+      message: 'Sie haben Ihr tägliches Export-Limit erreicht',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
     });
   }
@@ -236,7 +236,7 @@ const bookingLimiter = rateLimit({
   keyGenerator: (req) => req.user?.id || req.ip
 });
 
-// ✅ HIGH FIX #10: Booking Creation Limiter - DoS Protection
+// ? HIGH FIX #10: Booking Creation Limiter - DoS Protection
 const bookingCreationLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: parseInt(process.env.RATE_LIMIT_BOOKING_CREATION || '10'), // 10 bookings per minute
@@ -247,7 +247,7 @@ const bookingCreationLimiter = rateLimit({
   keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   skip: (req) => req.user && req.user.role === 'ceo', // CEO bypass
   handler: (req, res) => {
-    logger.warn(`⚠️ Booking creation rate limit exceeded: ${req.user?.id || req.ip}`);
+    logger.warn(`?? Booking creation rate limit exceeded: ${req.user?.id || req.ip}`);
     res.status(429).json({
       success: false,
       message: 'Zu viele Buchungsanfragen. Bitte warten Sie einen Moment.',
@@ -256,21 +256,21 @@ const bookingCreationLimiter = rateLimit({
   }
 });
 
-// ✅ HIGH FIX #10: Mutation Limiter - General DoS Protection for Updates/Deletes
+// ? HIGH FIX #10: Mutation Limiter - General DoS Protection for Updates/Deletes
 const mutationLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: parseInt(process.env.RATE_LIMIT_MUTATIONS || '30'), // 30 mutations per minute
-  message: { success: false, message: 'Zu viele Änderungen in kurzer Zeit' },
+  message: { success: false, message: 'Zu viele �nderungen in kurzer Zeit' },
   standardHeaders: true,
   legacyHeaders: false,
   store: memoryStoreAdapter,
   keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   skip: (req) => req.user && req.user.role === 'ceo', // CEO bypass
   handler: (req, res) => {
-    logger.warn(`⚠️ Mutation rate limit exceeded: ${req.user?.id || req.ip}`);
+    logger.warn(`?? Mutation rate limit exceeded: ${req.user?.id || req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele Änderungen. Bitte verlangsamen Sie Ihre Anfragen.',
+      message: 'Zu viele �nderungen. Bitte verlangsamen Sie Ihre Anfragen.',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
     });
   }
@@ -297,10 +297,10 @@ const ceoLoginLimiter = rateLimit({
   store: memoryStoreAdapter,
   keyGenerator: (req) => `ceo:${req.body?.email || req.ip}`,
   handler: (req, res) => {
-    logger.warn(`ðŸš¨ CEO login rate limit exceeded for ${req.body?.email || req.ip}`);
+    logger.warn(`🚨 CEO login rate limit exceeded for ${req.body?.email || req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele CEO-Login-Versuche. Aus SicherheitsgrÃ¼nden bitte 15 Minuten warten.',
+      message: 'Zu viele CEO-Login-Versuche. Aus Sicherheitsgründen bitte 15 Minuten warten.',
       retryAfter: 900
     });
   }
@@ -318,10 +318,10 @@ const passwordResetLimiter = rateLimit({
   store: memoryStoreAdapter,
   keyGenerator: (req) => `pwreset:${req.body?.email || req.ip}`,
   handler: (req, res) => {
-    logger.warn(`âš ï¸ Password reset rate limit exceeded for ${req.body?.email || req.ip}`);
+    logger.warn(`⚠️ Password reset rate limit exceeded for ${req.body?.email || req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele Passwort-Reset-Anfragen. Bitte Ã¼berprÃ¼fen Sie Ihre E-Mails oder warten Sie eine Stunde.',
+      message: 'Zu viele Passwort-Reset-Anfragen. Bitte überprüfen Sie Ihre E-Mails oder warten Sie eine Stunde.',
       retryAfter: 3600
     });
   }
@@ -334,15 +334,15 @@ const registrationLimiter = rateLimit({
   max: 5, // 5 registrations per hour per IP
   message: {
     success: false,
-    message: 'Zu viele Registrierungen von dieser IP. Bitte spÃ¤ter versuchen.'
+    message: 'Zu viele Registrierungen von dieser IP. Bitte später versuchen.'
   },
   store: memoryStoreAdapter,
   keyGenerator: (req) => `register:${req.ip}`,
   handler: (req, res) => {
-    logger.warn(`âš ï¸ Registration rate limit exceeded for IP ${req.ip}`);
+    logger.warn(`⚠️ Registration rate limit exceeded for IP ${req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele Registrierungsversuche. Bitte versuchen Sie es spÃ¤ter erneut.',
+      message: 'Zu viele Registrierungsversuche. Bitte versuchen Sie es später erneut.',
       retryAfter: 3600
     });
   }
@@ -373,12 +373,12 @@ const publicBookingLimiter = rateLimit({
   max: 10, // 10 bookings per hour per IP
   message: {
     success: false,
-    message: 'Zu viele Buchungen. Bitte versuchen Sie es spÃ¤ter erneut.'
+    message: 'Zu viele Buchungen. Bitte versuchen Sie es später erneut.'
   },
   store: memoryStoreAdapter,
   keyGenerator: (req) => `publicbook:${req.ip}:${req.body?.customerEmail || 'unknown'}`,
   handler: (req, res) => {
-    logger.warn(`âš ï¸ Public booking rate limit exceeded for IP ${req.ip}`);
+    logger.warn(`⚠️ Public booking rate limit exceeded for IP ${req.ip}`);
     res.status(429).json({
       success: false,
       message: 'Zu viele Buchungsversuche. Bitte versuchen Sie es in einer Stunde erneut.',
@@ -449,12 +449,12 @@ const resetRateLimiter = (req, res) => {
     memoryStoreAdapter.resetAll();
     res.status(200).json({
       success: true,
-      message: 'Rate Limiter zurÃ¼ckgesetzt'
+      message: 'Rate Limiter zurückgesetzt'
     });
   } else {
     res.status(403).json({
       success: false,
-      message: 'Nur CEO kann Rate Limiter zurÃ¼cksetzen'
+      message: 'Nur CEO kann Rate Limiter zurücksetzen'
     });
   }
 };
@@ -471,7 +471,7 @@ const resetRateLimitKey = (req, res) => {
     memoryStoreAdapter.resetKey(key);
     res.status(200).json({
       success: true,
-      message: `Rate Limit Key ${key} zurÃ¼ckgesetzt`
+      message: `Rate Limit Key ${key} zurückgesetzt`
     });
   } else {
     res.status(403).json({
@@ -544,6 +544,6 @@ export {
   resetRateLimitKey,
   getRateLimitInfo,
   rateLimiterMiddlewareChain,
-  bookingCreationLimiter, // ✅ HIGH FIX #10
-  mutationLimiter // ✅ HIGH FIX #10
+  bookingCreationLimiter, // ? HIGH FIX #10
+  mutationLimiter // ? HIGH FIX #10
 };

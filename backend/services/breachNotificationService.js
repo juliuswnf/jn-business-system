@@ -1,10 +1,10 @@
-ï»¿import AuditLog from '../models/AuditLog.js';
+import AuditLog from '../models/AuditLog.js';
 import logger from '../utils/logger.js';
 import nodemailer from 'nodemailer';
 
 /**
  * Breach Notification Service
- * HIPAA Breach Notification Rule (45 CFR Â§Â§ 164.400-414)
+ * HIPAA Breach Notification Rule (45 CFR §§ 164.400-414)
  */
 
 /**

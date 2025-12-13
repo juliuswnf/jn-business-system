@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * Stripe Subscription Service
  * Handles Stripe integration for salon subscriptions
@@ -37,7 +37,7 @@ export const createStripeCustomer = async (salon, ownerData) => {
       }
     });
 
-    logger.log(`âœ… Created Stripe customer: ${customer.id}`);
+    logger.log(`✅ Created Stripe customer: ${customer.id}`);
     return customer.id;
   } catch (error) {
     logger.error('Error creating Stripe customer:', error);
@@ -99,7 +99,7 @@ export const createSubscription = async (salon, priceId, trialDays = 14) => {
 
     await salon.save();
 
-    logger.log(`âœ… Created subscription for salon ${salon.slug}`);
+    logger.log(`✅ Created subscription for salon ${salon.slug}`);
 
     return subscription;
   } catch (error) {
@@ -138,7 +138,7 @@ export const cancelSubscription = async (salon, immediately = false) => {
 
     await salon.save();
 
-    logger.log(`âœ… Cancelled subscription for salon ${salon.slug}`);
+    logger.log(`✅ Cancelled subscription for salon ${salon.slug}`);
 
     return subscription;
   } catch (error) {
@@ -168,7 +168,7 @@ export const reactivateSubscription = async (salon) => {
     salon.subscription.status = 'active';
     await salon.save();
 
-    logger.log(`âœ… Reactivated subscription for salon ${salon.slug}`);
+    logger.log(`✅ Reactivated subscription for salon ${salon.slug}`);
 
     return subscription;
   } catch (error) {
@@ -204,7 +204,7 @@ export const updateSubscriptionPlan = async (salon, newPriceId) => {
     salon.subscription.planId = newPriceId;
     await salon.save();
 
-    logger.log(`âœ… Updated subscription plan for salon ${salon.slug}`);
+    logger.log(`✅ Updated subscription plan for salon ${salon.slug}`);
 
     return updatedSubscription;
   } catch (error) {
@@ -275,7 +275,7 @@ export const handleSuccessfulPayment = async (invoice) => {
 
     await salon.save();
 
-    logger.log(`âœ… Updated subscription after successful payment for salon ${salon.slug}`);
+    logger.log(`✅ Updated subscription after successful payment for salon ${salon.slug}`);
   } catch (error) {
     logger.error('Error handling successful payment:', error);
     throw error;
@@ -309,7 +309,7 @@ export const handleFailedPayment = async (invoice) => {
 
     await salon.save();
 
-    logger.log(`âš ï¸ Updated subscription after failed payment for salon ${salon.slug}`);
+    logger.log(`⚠️ Updated subscription after failed payment for salon ${salon.slug}`);
 
     // TODO: Send email notification to salon owner
   } catch (error) {
@@ -373,7 +373,7 @@ export const createCheckoutSession = async (salon, priceId, successUrl, cancelUr
       locale: 'de'
     });
 
-    logger.log(`âœ… Created checkout session for salon ${salon.slug}`);
+    logger.log(`✅ Created checkout session for salon ${salon.slug}`);
 
     return session;
   } catch (error) {

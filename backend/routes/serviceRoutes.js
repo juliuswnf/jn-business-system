@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { checkTenantAccess, enforceTenantFilter } from '../middleware/tenantMiddleware.js';
 import { mutationLimiter } from '../middleware/rateLimiterMiddleware.js';
@@ -46,7 +46,7 @@ router.get('/:id', checkTenantAccess('service'), async (req, res) => {
   }
 });
 
-// ✅ HIGH FIX #10: Create service with rate limiter
+// ? HIGH FIX #10: Create service with rate limiter
 router.post('/', mutationLimiter, async (req, res) => {
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
@@ -60,14 +60,14 @@ router.post('/', mutationLimiter, async (req, res) => {
     });
 
     await service.save();
-    logger.log(`✅ Service created: ${service.name} for salon ${salonId}`);
+    logger.log(`? Service created: ${service.name} for salon ${salonId}`);
     return res.status(201).json({ success: true, data: service });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
   }
 });
 
-// ✅ HIGH FIX #10: Update service with rate limiter
+// ? HIGH FIX #10: Update service with rate limiter
 router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, res) => {
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
@@ -76,7 +76,7 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
     // eslint-disable-next-line no-unused-vars
     const { salonId, ...updateData } = req.body;
 
-    // ✅ OPTIMISTIC LOCKING - load, check version, update, save
+    // ? OPTIMISTIC LOCKING - load, check version, update, save
     const service = await Service.findById(req.params.id);
 
     if (!service) {
@@ -98,7 +98,7 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
     // Save with version increment
     await service.save();
 
-    logger.log(`✅ Service updated: ${service.name} (version ${service.__v})`);
+    logger.log(`? Service updated: ${service.name} (version ${service.__v})`);
     return res.json({ success: true, data: service });
   } catch (error) {
     if (error.name === 'VersionError') {
@@ -111,12 +111,12 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
   }
 });
 
-// ✅ HIGH FIX #10: Delete service with rate limiter
+// ? HIGH FIX #10: Delete service with rate limiter
 router.delete('/:id', mutationLimiter, checkTenantAccess('service'), async (req, res) => {
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
 
-    // ✅ SOFT DELETE - load first, then soft delete with audit trail
+    // ? SOFT DELETE - load first, then soft delete with audit trail
     const service = await Service.findById(req.params.id);
 
     if (!service) {
@@ -126,7 +126,7 @@ router.delete('/:id', mutationLimiter, checkTenantAccess('service'), async (req,
     // Soft delete with user ID for audit trail
     await service.softDelete(req.user._id);
 
-    logger.log(`🗑️ Service soft-deleted: ${service.name} by user ${req.user._id}`);
+    logger.log(`??? Service soft-deleted: ${service.name} by user ${req.user._id}`);
     return res.json({ success: true, message: 'Service deleted successfully' });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

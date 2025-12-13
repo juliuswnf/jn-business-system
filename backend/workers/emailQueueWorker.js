@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * Email Queue Worker
  * Processes scheduled emails (reminders and review requests)
@@ -27,13 +27,13 @@ const processEmailQueue = async () => {
     if (pendingEmails.length === 0) {
       return;
     }
-    logger.log(`ðŸ“§ Processing ${pendingEmails.length} pending emails...`);
+    logger.log(`📧 Processing ${pendingEmails.length} pending emails...`);
     for (const queueItem of pendingEmails) {
       await processEmailQueueItem(queueItem);
     }
-    logger.log('âœ… Finished processing email queue');
+    logger.log('✅ Finished processing email queue');
   } catch (error) {
-    logger.error('âŒ Error processing email queue:', error);
+    logger.error('❌ Error processing email queue:', error);
   }
 };
 
@@ -48,7 +48,7 @@ const processEmailQueueItem = async (queueItem) => {
       .populate('salonId')
       .populate('serviceId');
     if (!booking) {
-      logger.warn(`âš ï¸  Booking not found: ${queueItem.bookingId}`);
+      logger.warn(`⚠️  Booking not found: ${queueItem.bookingId}`);
       queueItem.status = 'failed';
       queueItem.error = 'Booking not found';
       await queueItem.save();
@@ -57,7 +57,7 @@ const processEmailQueueItem = async (queueItem) => {
     // Get salon
     const salon = await Salon.findById(booking.salonId || queueItem.salonId);
     if (!salon) {
-      logger.warn('âš ï¸  Salon not found');
+      logger.warn('⚠️  Salon not found');
       queueItem.status = 'failed';
       queueItem.error = 'Salon not found';
       await queueItem.save();
@@ -101,16 +101,16 @@ const processEmailQueueItem = async (queueItem) => {
       status: 'sent',
       sentAt: new Date()
     });
-    logger.log(`✉️ Sent ${queueItem.type} email (booking: ${booking._id})`);
+    logger.log(`?? Sent ${queueItem.type} email (booking: ${booking._id})`);
   } catch (error) {
-    logger.error(`âŒ Failed to send email ${queueItem._id}:`, error.message);
+    logger.error(`❌ Failed to send email ${queueItem._id}:`, error.message);
     // Increment retry counter
     queueItem.retries = (queueItem.retries || 0) + 1;
     queueItem.error = error.message;
     // If max retries reached, mark as failed
     if (queueItem.retries >= 3) {
       queueItem.status = 'failed';
-      logger.error(`ðŸ’€ Email ${queueItem._id} failed after ${queueItem.retries} retries`);
+      logger.error(`💀 Email ${queueItem._id} failed after ${queueItem.retries} retries`);
       // Log failed send
       await EmailLog.create({
         salonId: queueItem.salonId,
@@ -126,7 +126,7 @@ const processEmailQueueItem = async (queueItem) => {
       // Schedule retry with exponential backoff
       const backoffMinutes = Math.pow(2, queueItem.retries) * 5; // 5, 10, 20 minutes
       queueItem.scheduledFor = new Date(Date.now() + backoffMinutes * 60 * 1000);
-      logger.log(`ðŸ”„ Scheduled retry #${queueItem.retries} in ${backoffMinutes} minutes`);
+      logger.log(`🔄 Scheduled retry #${queueItem.retries} in ${backoffMinutes} minutes`);
     }
     await queueItem.save();
   }
@@ -143,7 +143,7 @@ const scheduleReminderEmail = async (booking, salon) => {
     const scheduledFor = new Date(booking.bookingDate.getTime() - reminderHours * 60 * 60 * 1000);
     // Don't schedule if booking date is in the past or too soon
     if (scheduledFor < new Date()) {
-      logger.log('â­ï¸  Skipping reminder - booking is too soon or in the past');
+      logger.log('⏭️  Skipping reminder - booking is too soon or in the past');
       return null;
     }
     const queueItem = await EmailQueue.create({
@@ -154,7 +154,7 @@ const scheduleReminderEmail = async (booking, salon) => {
       scheduledFor,
       status: 'pending'
     });
-    logger.log(`â° Scheduled reminder email for ${booking.customerEmail} at ${scheduledFor}`);
+    logger.log(`⏰ Scheduled reminder email for ${booking.customerEmail} at ${scheduledFor}`);
     return queueItem;
   } catch (error) {
     logger.error('Error scheduling reminder email:', error);
@@ -179,7 +179,7 @@ const scheduleReviewEmail = async (booking, salon) => {
       scheduledFor,
       status: 'pending'
     });
-    logger.log(`â­ Scheduled review email for ${booking.customerEmail} at ${scheduledFor}`);
+    logger.log(`⭐ Scheduled review email for ${booking.customerEmail} at ${scheduledFor}`);
     return queueItem;
   } catch (error) {
     logger.error('Error scheduling review email:', error);
@@ -203,7 +203,7 @@ const cancelScheduledEmails = async (bookingId) => {
         error: 'Booking was cancelled'
       }
     );
-    logger.log(`ðŸš« Cancelled ${result.modifiedCount} pending emails for booking ${bookingId}`);
+    logger.log(`🚫 Cancelled ${result.modifiedCount} pending emails for booking ${bookingId}`);
     return result;
   } catch (error) {
     logger.error('Error cancelling scheduled emails:', error);
@@ -223,7 +223,7 @@ const cleanupOldEmails = async () => {
       updatedAt: { $lt: thirtyDaysAgo }
     });
     if (result.deletedCount > 0) {
-      logger.log(`ðŸ§¹ Cleaned up ${result.deletedCount} old email queue items`);
+      logger.log(`🧹 Cleaned up ${result.deletedCount} old email queue items`);
     }
     return result;
   } catch (error) {
@@ -237,12 +237,12 @@ const cleanupOldEmails = async () => {
  * Runs every minute to process pending emails
  */
 const startWorker = () => {
-  logger.log('🚀 Starting email queue worker...');
+  logger.log('?? Starting email queue worker...');
   
-  // ✅ HIGH FIX #9: Run immediately on startup (don't wait 1 minute)
+  // ? HIGH FIX #9: Run immediately on startup (don't wait 1 minute)
   processEmailQueueSafe();
 
-  // ✅ HIGH FIX #9: Use safe wrapper - worker never dies
+  // ? HIGH FIX #9: Use safe wrapper - worker never dies
   const intervalId = setInterval(processEmailQueueSafe, 60 * 1000);
 
   // Cleanup old emails once per day
@@ -263,7 +263,7 @@ const stopWorker = (intervals) => {
   if (intervals.cleanupIntervalId) {
     clearInterval(intervals.cleanupIntervalId);
   }
-  logger.log('🛑 Email queue worker stopped');
+  logger.log('?? Email queue worker stopped');
 };
 
 // ES6 Export

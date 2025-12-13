@@ -1,4 +1,4 @@
-Ôªøimport axios from 'axios';
+import axios from 'axios';
 import {
   SMS_PRIORITY,
   shouldUseSMS,
@@ -10,7 +10,7 @@ import {
  *
  * Handles SMS notifications with:
  * - Priority-based sending (high: 2h+24h, medium: same-day, low: email-only)
- * - Plivo integration (‚Ç¨0.038/SMS)
+ * - Plivo integration (Ä0.038/SMS)
  * - SMS limit enforcement with overage tracking
  * - Email fallback on failure/limit exceeded
  * - Usage tracking per salon
@@ -29,7 +29,7 @@ class SMSService {
     this.baseUrl = `https://api.plivo.com/v1/Account/${this.authId}`;
     
     // SMS cost (Plivo Germany rate)
-    this.SMS_COST = 0.038; // ‚Ç¨0.038 per SMS
+    this.SMS_COST = 0.038; // Ä0.038 per SMS
   }
 
   /**
@@ -49,7 +49,7 @@ class SMSService {
       
       // Check if salon has SMS feature (Enterprise only)
       if (!salon.hasFeature('smsNotifications')) {
-        console.warn(`[SMS Service] Salon ${salon._id} (${salon.subscription.tier}) tried to send SMS - NOT ENTERPRISE`);
+        logger.warn(`[SMS Service] Salon ${salon._id} (${salon.subscription.tier}) tried to send SMS - NOT ENTERPRISE`);
         
         return {
           success: false,
@@ -71,8 +71,8 @@ class SMSService {
       const useSMS = shouldUseSMS(notificationType, smsRemaining, salon.subscription.tier);
       
       if (!useSMS) {
-        console.info(`[SMS Service] Skipping SMS for ${notificationType} - priority too low or budget exhausted`);
-        console.info(`[SMS Service] SMS remaining: ${smsRemaining}/${smsLimit}`);
+        logger.info(`[SMS Service] Skipping SMS for ${notificationType} - priority too low or budget exhausted`);
+        logger.info(`[SMS Service] SMS remaining: ${smsRemaining}/${smsLimit}`);
         
         return {
           success: false,
@@ -89,7 +89,7 @@ class SMSService {
       
       // Check if salon can send SMS (under limit)
       if (!salon.canSendSMS()) {
-        console.warn(`[SMS Service] Salon ${salon._id} SMS limit exceeded: ${salon.subscription.smsUsedThisMonth}/${smsLimit}`);
+        logger.warn(`[SMS Service] Salon ${salon._id} SMS limit exceeded: ${salon.subscription.smsUsedThisMonth}/${smsLimit}`);
         
         // Calculate overage cost
         const overageCost = calculateSMSOverageCost(
@@ -101,7 +101,7 @@ class SMSService {
         return {
           success: false,
           error: 'SMS_LIMIT_EXCEEDED',
-          message: `SMS limit exceeded (${salon.subscription.smsUsedThisMonth}/${smsLimit}). Overage cost: ‚Ç¨${overageCost.toFixed(4)}/SMS`,
+          message: `SMS limit exceeded (${salon.subscription.smsUsedThisMonth}/${smsLimit}). Overage cost: Ä${overageCost.toFixed(4)}/SMS`,
           fallbackToEmail: true,
           smsUsed: salon.subscription.smsUsedThisMonth,
           smsLimit,
@@ -173,9 +173,9 @@ class SMSService {
         
         const newRemaining = salon.getRemainingSMS();
         
-        console.info(`[SMS Service] SMS sent successfully to ${to}`);
-        console.info(`[SMS Service] Message ID: ${response.data.message_uuid[0]}`);
-        console.info(`[SMS Service] SMS remaining: ${newRemaining}/${smsLimit}`);
+        logger.info(`[SMS Service] SMS sent successfully to ${to}`);
+        logger.info(`[SMS Service] Message ID: ${response.data.message_uuid[0]}`);
+        logger.info(`[SMS Service] SMS remaining: ${newRemaining}/${smsLimit}`);
         
         return {
           success: true,
@@ -239,7 +239,7 @@ class SMSService {
       const customerPhone = booking.customerPhone || booking.customer?.phone;
       
       if (!customerPhone) {
-        console.warn(`[SMS Service] No phone number for booking ${booking._id}`);
+        logger.warn(`[SMS Service] No phone number for booking ${booking._id}`);
         return {
           success: false,
           error: 'NO_PHONE_NUMBER',
@@ -318,7 +318,7 @@ class SMSService {
         minute: '2-digit'
       });
 
-      const message = `Buchung best√§tigt! ${salon.name} am ${appointmentTime}. Details per E-Mail.`;
+      const message = `Buchung best‰tigt! ${salon.name} am ${appointmentTime}. Details per E-Mail.`;
 
       return await this.sendSMS({
         to: customerPhone,

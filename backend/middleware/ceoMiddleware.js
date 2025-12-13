@@ -1,4 +1,4 @@
-﻿import User from '../models/User.js';
+import User from '../models/User.js';
 import logger from '../utils/logger.js';
 
 // ==================== CHECK CEO ROLE ====================
@@ -19,7 +19,7 @@ const ceoAccessOnly = (req, res, next) => {
   if (req.user.role !== 'ceo') {
     return res.status(403).json({
       success: false,
-      message: 'CEO Dashboard nur fÃ¼r CEO verfÃ¼gbar'
+      message: 'CEO Dashboard nur für CEO verfügbar'
     });
   }
   next();
@@ -67,7 +67,7 @@ const validateCEOBusinessAccess = async (req, res, next) => {
     if (req.user.role !== 'ceo') {
       return res.status(403).json({
         success: false,
-        message: 'Nur CEO kann auf GeschÃ¤ftsdaten zugreifen'
+        message: 'Nur CEO kann auf Geschäftsdaten zugreifen'
       });
     }
 
@@ -80,7 +80,7 @@ const validateCEOBusinessAccess = async (req, res, next) => {
       if (!business || business.role !== 'admin') {
         return res.status(404).json({
           success: false,
-          message: 'GeschÃ¤ft nicht gefunden'
+          message: 'Geschäft nicht gefunden'
         });
       }
 
@@ -186,7 +186,7 @@ const verifyCEOEmail = async (req, res, next) => {
     if (!user.email || !user.email.includes('@')) {
       return res.status(400).json({
         success: false,
-        message: 'GÃ¼ltige CEO Email erforderlich'
+        message: 'Gültige CEO Email erforderlich'
       });
     }
 
@@ -224,7 +224,7 @@ const preventPermissionEscalation = (req, res, next) => {
   if (req.user.role !== 'ceo' && req.params.id && req.params.id !== req.user.id) {
     return res.status(403).json({
       success: false,
-      message: 'Sie kÃ¶nnen nur Ihr eigenes Profil aktualisieren'
+      message: 'Sie können nur Ihr eigenes Profil aktualisieren'
     });
   }
 
@@ -320,7 +320,7 @@ const verifySensitiveAction = async (req, res, next) => {
       if (!confirmPassword) {
         return res.status(403).json({
           success: false,
-          message: 'PasswortbestÃ¤tigung erforderlich fÃ¼r sensible Aktion'
+          message: 'Passwortbestätigung erforderlich für sensible Aktion'
         });
       }
 

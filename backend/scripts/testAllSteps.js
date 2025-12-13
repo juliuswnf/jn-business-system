@@ -1,16 +1,16 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 /**
- * Test Script fÃ¼r alle 3 Schritte
- * FÃ¼hrt automatisierte ÃœberprÃ¼fungen durch
+ * Test Script für alle 3 Schritte
+ * Führt automatisierte Überprüfungen durch
  *
- * AusfÃ¼hren: node scripts/testAllSteps.js
+ * Ausführen: node scripts/testAllSteps.js
  */
 
 const http = require('http');
 
 const API_URL = process.env.API_URL || 'http://localhost:5000';
 
-// Colors fÃ¼r Console
+// Colors für Console
 const colors = {
   reset: '\x1b[0m',
   green: '\x1b[32m',
@@ -21,10 +21,10 @@ const colors = {
 };
 
 const log = {
-  success: (msg) => console.log(`${colors.green}âœ… ${msg}${colors.reset}`),
-  error: (msg) => console.log(`${colors.red}âŒ ${msg}${colors.reset}`),
-  info: (msg) => console.log(`${colors.blue}â„¹ï¸  ${msg}${colors.reset}`),
-  warn: (msg) => console.log(`${colors.yellow}âš ï¸  ${msg}${colors.reset}`),
+  success: (msg) => console.log(`${colors.green}✅ ${msg}${colors.reset}`),
+  error: (msg) => console.log(`${colors.red}❌ ${msg}${colors.reset}`),
+  info: (msg) => console.log(`${colors.blue}ℹ️  ${msg}${colors.reset}`),
+  warn: (msg) => console.log(`${colors.yellow}⚠️  ${msg}${colors.reset}`),
   header: (msg) => console.log(`\n${colors.bold}${colors.blue}${'='.repeat(50)}\n${msg}\n${'='.repeat(50)}${colors.reset}\n`)
 };
 
@@ -210,7 +210,7 @@ async function testWidgetEndpoint() {
 
 async function runAllTests() {
   console.log('\n');
-  log.header('ðŸ§ª JN AUTOMATION - COMPLETE SYSTEM TEST');
+  log.header('🧪 JN AUTOMATION - COMPLETE SYSTEM TEST');
 
   const results = {
     passed: 0,
@@ -241,7 +241,7 @@ async function runAllTests() {
   }
 
   // Summary
-  log.header('ðŸ“Š TEST SUMMARY');
+  log.header('📊 TEST SUMMARY');
 
   console.log(`Total Tests: ${results.tests.length}`);
   console.log(`${colors.green}Passed: ${results.passed}${colors.reset}`);
@@ -249,15 +249,15 @@ async function runAllTests() {
 
   console.log('\nDetailed Results:');
   results.tests.forEach(t => {
-    console.log(`  ${t.passed ? 'âœ…' : 'âŒ'} ${t.name}`);
+    console.log(`  ${t.passed ? '✅' : '❌'} ${t.name}`);
   });
 
   if (results.failed === 0) {
-    log.header('ðŸŽ‰ ALL TESTS PASSED!');
+    log.header('🎉 ALL TESTS PASSED!');
     console.log('System is ready for deployment.\n');
     process.exit(0);
   } else {
-    log.header('âš ï¸ SOME TESTS FAILED');
+    log.header('⚠️ SOME TESTS FAILED');
     console.log('Please review the failures above.\n');
     process.exit(1);
   }

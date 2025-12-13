@@ -1,4 +1,4 @@
-﻿import BAA from '../models/BAA.js';
+import BAA from '../models/BAA.js';
 import { upload } from '../middleware/uploadMiddleware.js';
 import cloudinary from '../utils/cloudinaryHelper.js';
 import logger from '../utils/logger.js';

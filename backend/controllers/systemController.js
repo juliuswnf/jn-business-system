@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
@@ -58,9 +58,9 @@ const checkPortInUse = async (port) => {
     const isWindows = process.platform === 'win32';
     if (isWindows) {
       // Use PowerShell for language-independent check (works on German/English Windows)
-      // Check for both LISTENING (English) and ABHÃ–REN (German)
+      // Check for both LISTENING (English) and ABHÖREN (German)
       const { stdout } = await execAsync(
-        `powershell -Command "netstat -ano | Select-String ':${port}' | Select-String 'LISTENING|ABHÃ–REN'"`,
+        `powershell -Command "netstat -ano | Select-String ':${port}' | Select-String 'LISTENING|ABHÖREN'"`,
         { timeout: 5000 }
       );
       return stdout.trim().length > 0;
@@ -181,7 +181,7 @@ const stopNodeService = async (port) => {
       // Windows: Find all PIDs on this port and kill them (works on German/English Windows)
       try {
         const { stdout } = await execAsync(
-          `powershell -Command "netstat -ano | Select-String ':${port}' | Select-String 'LISTENING|ABHÃ–REN'"`,
+          `powershell -Command "netstat -ano | Select-String ':${port}' | Select-String 'LISTENING|ABHÖREN'"`,
           { timeout: 5000 }
         );
         const lines = stdout.trim().split('\n');
@@ -302,7 +302,7 @@ export const startService = async (req, res) => {
 
       const result = await startDockerContainer(service);
       if (result.success) {
-        logger.log(`âœ… Started Docker container: ${service.containerName}`);
+        logger.log(`✅ Started Docker container: ${service.containerName}`);
         return res.status(200).json({
           success: true,
           message: `${service.name} started successfully`,
@@ -336,7 +336,7 @@ export const startService = async (req, res) => {
 
       const result = await startNodeService(service, serviceId);
       if (result.success) {
-        logger.log(`âœ… Started ${service.name}`);
+        logger.log(`✅ Started ${service.name}`);
 
         // Wait a bit for the service to start
         await new Promise(resolve => setTimeout(resolve, 4000));
@@ -404,7 +404,7 @@ export const stopService = async (req, res) => {
     if (service.type === 'docker') {
       const result = await stopDockerContainer(service.containerName);
       if (result.success) {
-        logger.log(`â¹ Stopped Docker container: ${service.containerName}`);
+        logger.log(`⏹ Stopped Docker container: ${service.containerName}`);
         return res.status(200).json({
           success: true,
           message: `${service.name} stopped successfully`,
@@ -419,7 +419,7 @@ export const stopService = async (req, res) => {
     } else {
       await stopNodeService(service.port);
       delete runningProcesses[serviceId];
-      logger.log(`â¹ Stopped ${service.name}`);
+      logger.log(`⏹ Stopped ${service.name}`);
 
       return res.status(200).json({
         success: true,
@@ -532,7 +532,7 @@ export const startAllServices = async (req, res) => {
       }
     }
 
-    logger.log('ðŸš€ Start all services completed');
+    logger.log('🚀 Start all services completed');
 
     res.status(200).json({
       success: true,
@@ -616,7 +616,7 @@ export const stopAllServices = async (req, res) => {
       status: 'running'
     });
 
-    logger.log('â¹ Stop all services completed');
+    logger.log('⏹ Stop all services completed');
 
     res.status(200).json({
       success: true,

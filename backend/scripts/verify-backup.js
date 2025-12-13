@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Verify Database Backup Integrity
  * 
  * Run after restoring from backup to verify:
@@ -23,24 +23,24 @@ config();
 let hasErrors = false;
 
 function logSuccess(message) {
-  console.log(`✓ ${message}`);
+  console.log(`? ${message}`);
 }
 
 function logError(message) {
-  console.error(`✗ ${message}`);
+  console.error(`? ${message}`);
   hasErrors = true;
 }
 
 function logWarning(message) {
-  console.warn(`⚠ ${message}`);
+  logger.warn(`? ${message}`);
 }
 
 async function verifyBackup() {
   try {
     console.log('');
-    console.log('╔══════════════════════════════════════════════════════════╗');
-    console.log('║       Database Backup Integrity Verification            ║');
-    console.log('╚══════════════════════════════════════════════════════════╝');
+    console.log('+----------------------------------------------------------+');
+    console.log('�       Database Backup Integrity Verification            �');
+    console.log('+----------------------------------------------------------+');
     console.log('');
 
     // Connect to database
@@ -50,7 +50,7 @@ async function verifyBackup() {
     console.log('');
 
     // 1. Verify Record Counts
-    console.log('📊 Verifying record counts...');
+    console.log('?? Verifying record counts...');
     const salonCount = await Salon.countDocuments();
     const bookingCount = await Booking.countDocuments();
     const userCount = await User.countDocuments();
@@ -68,7 +68,7 @@ async function verifyBackup() {
     }
 
     // 2. Verify Salon References in Bookings
-    console.log('🔗 Verifying salon references...');
+    console.log('?? Verifying salon references...');
     const salonIds = await Salon.find().distinct('_id');
     const bookingsWithInvalidSalon = await Booking.countDocuments({
       salon: { $nin: salonIds, $ne: null }
@@ -81,7 +81,7 @@ async function verifyBackup() {
     }
 
     // 3. Verify User References in Bookings
-    console.log('🔗 Verifying user references...');
+    console.log('?? Verifying user references...');
     const userIds = await User.find().distinct('_id');
     const bookingsWithInvalidCustomer = await Booking.countDocuments({
       customer: { $nin: userIds, $ne: null }
@@ -95,7 +95,7 @@ async function verifyBackup() {
 
     // 4. Check for Duplicate Idempotency Keys
     console.log('');
-    console.log('🔍 Checking for duplicate idempotency keys...');
+    console.log('?? Checking for duplicate idempotency keys...');
     const duplicateKeys = await Booking.aggregate([
       { 
         $match: { 
@@ -125,7 +125,7 @@ async function verifyBackup() {
 
     // 5. Verify Required Fields
     console.log('');
-    console.log('📋 Verifying required fields...');
+    console.log('?? Verifying required fields...');
     
     const salonsWithoutName = await Salon.countDocuments({ name: { $in: [null, ''] } });
     const salonsWithoutSlug = await Salon.countDocuments({ slug: { $in: [null, ''] } });
@@ -146,7 +146,7 @@ async function verifyBackup() {
 
     // 6. Verify Date Formats
     console.log('');
-    console.log('📅 Verifying date formats...');
+    console.log('?? Verifying date formats...');
     
     const bookingsWithInvalidDate = await Booking.countDocuments({
       date: { $not: /^\d{4}-\d{2}-\d{2}$/ }
@@ -160,7 +160,7 @@ async function verifyBackup() {
 
     // 7. Check for Orphaned Data
     console.log('');
-    console.log('🗑️ Checking for orphaned data...');
+    console.log('??? Checking for orphaned data...');
     
     const salonsWithoutOwner = await Salon.countDocuments({
       owner: { $nin: userIds }
@@ -174,7 +174,7 @@ async function verifyBackup() {
 
     // 8. Summary Statistics
     console.log('');
-    console.log('📈 Summary Statistics:');
+    console.log('?? Summary Statistics:');
     
     const bookingsByStatus = await Booking.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } },
@@ -194,17 +194,17 @@ async function verifyBackup() {
 
     // 9. Final Verdict
     console.log('');
-    console.log('═══════════════════════════════════════════════════════════');
+    console.log('-----------------------------------------------------------');
     
     if (hasErrors) {
       console.log('');
-      console.error('❌ BACKUP VERIFICATION FAILED');
+      console.error('? BACKUP VERIFICATION FAILED');
       console.error('   Issues were found. Review the errors above.');
       console.log('');
       process.exit(1);
     } else {
       console.log('');
-      console.log('✅ BACKUP VERIFICATION SUCCESSFUL');
+      console.log('? BACKUP VERIFICATION SUCCESSFUL');
       console.log('   All checks passed. Database integrity is confirmed.');
       console.log('');
       process.exit(0);
@@ -212,7 +212,7 @@ async function verifyBackup() {
 
   } catch (error) {
     console.error('');
-    console.error('❌ Verification failed with error:');
+    console.error('? Verification failed with error:');
     console.error(error);
     console.error('');
     process.exit(1);

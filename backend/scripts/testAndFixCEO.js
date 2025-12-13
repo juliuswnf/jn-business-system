@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-console */
+/* eslint-disable no-console */
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
@@ -9,17 +9,17 @@ dotenv.config();
 const testAndFixCEO = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('âœ… Connected to DB');
+    console.log('✅ Connected to DB');
 
     // Get CEO with password field
     const ceo = await User.findOne({ email: 'julius@jn-automation.de' }).select('+password');
 
     if (!ceo) {
-      console.log('âŒ CEO not found');
+      console.log('❌ CEO not found');
       process.exit(1);
     }
 
-    console.log('\n📋 CEO Account Info:');
+    console.log('\n?? CEO Account Info:');
     console.log('   Email:', ceo.email);
     console.log('   Role:', ceo.role);
     console.log('   Has password:', !!ceo.password);
@@ -28,12 +28,12 @@ const testAndFixCEO = async () => {
     // Test current password
     const testPassword = 'CEO@12345';
     const isMatch = await bcrypt.compare(testPassword, ceo.password);
-    console.log('\n🔐 Password Test:');
+    console.log('\n?? Password Test:');
     console.log('   Testing: (default password)');
     console.log('   Match:', isMatch);
 
     if (!isMatch) {
-      console.log('\nðŸ”§ Fixing password...');
+      console.log('\n🔧 Fixing password...');
 
       // Generate new hash
       const salt = await bcrypt.genSalt(10);
@@ -52,9 +52,9 @@ const testAndFixCEO = async () => {
     }
 
     await mongoose.disconnect();
-    console.log('\nâœ… Done!');
+    console.log('\n✅ Done!');
   } catch (error) {
-    console.error('âŒ Error:', error);
+    console.error('❌ Error:', error);
     process.exit(1);
   }
 };

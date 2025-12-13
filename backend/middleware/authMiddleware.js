@@ -1,4 +1,4 @@
-﻿import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import logger from '../utils/logger.js';
 
@@ -32,7 +32,7 @@ const protect = async (req, res, next) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
-      logger.error('âŒ JWT Verification Error:', error.name);
+      logger.error('❌ JWT Verification Error:', error.name);
 
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({
@@ -44,7 +44,7 @@ const protect = async (req, res, next) => {
       if (error.name === 'JsonWebTokenError') {
         return res.status(401).json({
           success: false,
-          message: 'Token ungÃ¼ltig'
+          message: 'Token ungültig'
         });
       }
 
@@ -70,7 +70,7 @@ const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error('âŒ Protect Middleware Error:', error.message);
+    logger.error('❌ Protect Middleware Error:', error.message);
     next(error);
   }
 };
@@ -89,7 +89,7 @@ const authorize = (...allowedRoles) => {
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: 'Sie haben keine Berechtigung fÃ¼r diese Aktion'
+        message: 'Sie haben keine Berechtigung für diese Aktion'
       });
     }
     next();
@@ -109,7 +109,7 @@ const isAdmin = (req, res, next) => {
   if (req.user.role !== 'admin' && req.user.role !== 'ceo') {
     return res.status(403).json({
       success: false,
-      message: 'Nur Admins kÃ¶nnen diese Aktion ausfÃ¼hren'
+      message: 'Nur Admins können diese Aktion ausführen'
     });
   }
   next();
@@ -128,7 +128,7 @@ const isCEO = (req, res, next) => {
   if (req.user.role !== 'ceo') {
     return res.status(403).json({
       success: false,
-      message: 'Nur CEO kann diese Aktion ausfÃ¼hren'
+      message: 'Nur CEO kann diese Aktion ausführen'
     });
   }
   next();
@@ -181,13 +181,13 @@ const optionalAuth = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await User.findById(decoded.id);
       } catch (error) {
-        logger.log('âš ï¸ Optional auth token invalid, continuing without user');
+        logger.log('⚠️ Optional auth token invalid, continuing without user');
       }
     }
 
     next();
   } catch (error) {
-    logger.error('âŒ Optional Auth Middleware Error:', error.message);
+    logger.error('❌ Optional Auth Middleware Error:', error.message);
     next();
   }
 };
@@ -197,7 +197,7 @@ const optionalAuth = async (req, res, next) => {
 const validateRequest = (schema) => {
   return (req, res, next) => {
     if (!schema) {
-      logger.error('âŒ Validation schema is undefined');
+      logger.error('❌ Validation schema is undefined');
       return next();
     }
 
@@ -285,7 +285,7 @@ const requestTimeout = (timeout = 30000) => {
 
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((err) => {
-    logger.error('âŒ Async Handler Error:', err.message);
+    logger.error('❌ Async Handler Error:', err.message);
     next(err);
   });
 };
@@ -309,7 +309,7 @@ const rateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
     if (recentRequests.length >= maxRequests) {
       return res.status(429).json({
         success: false,
-        message: 'Zu viele Anfragen, bitte spÃ¤ter versuchen'
+        message: 'Zu viele Anfragen, bitte später versuchen'
       });
     }
 

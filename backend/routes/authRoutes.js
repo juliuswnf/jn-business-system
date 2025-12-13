@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import ceoMiddleware from '../middleware/ceoMiddleware.js';
 import authController from '../controllers/authController.js';

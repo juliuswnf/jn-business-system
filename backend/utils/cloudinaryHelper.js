@@ -1,4 +1,4 @@
-﻿import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 import path from 'path';
 import logger from './logger.js';
@@ -18,9 +18,9 @@ if (isCloudinaryConfigured()) {
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
   });
-  logger.info('✅ Cloudinary configured successfully');
+  logger.info('? Cloudinary configured successfully');
 } else {
-  logger.warn('⚠️ Cloudinary not configured - files will be stored locally');
+  logger.warn('?? Cloudinary not configured - files will be stored locally');
 }
 
 /**
@@ -34,7 +34,7 @@ if (isCloudinaryConfigured()) {
  */
 export async function uploadToCloudinary(filePath, options = {}) {
   if (!isCloudinaryConfigured()) {
-    logger.warn('⚠️ Cloudinary not configured - skipping upload');
+    logger.warn('?? Cloudinary not configured - skipping upload');
     return {
       url: `/uploads/${path.basename(filePath)}`,
       public_id: null,
@@ -59,16 +59,16 @@ export async function uploadToCloudinary(filePath, options = {}) {
 
     const result = await cloudinary.uploader.upload(filePath, uploadOptions);
 
-    logger.info(`✅ Uploaded to Cloudinary: ${result.public_id}`);
+    logger.info(`? Uploaded to Cloudinary: ${result.public_id}`);
 
     // Delete local file after successful upload
     try {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        logger.info(`🗑️ Deleted local file: ${filePath}`);
+        logger.info(`??? Deleted local file: ${filePath}`);
       }
     } catch (deleteError) {
-      logger.warn(`⚠️ Failed to delete local file: ${deleteError.message}`);
+      logger.warn(`?? Failed to delete local file: ${deleteError.message}`);
     }
 
     return {
@@ -81,7 +81,7 @@ export async function uploadToCloudinary(filePath, options = {}) {
       isLocal: false
     };
   } catch (error) {
-    logger.error(`❌ Cloudinary upload failed: ${error.message}`);
+    logger.error(`? Cloudinary upload failed: ${error.message}`);
     throw new Error(`Failed to upload to Cloudinary: ${error.message}`);
   }
 }
@@ -93,12 +93,12 @@ export async function uploadToCloudinary(filePath, options = {}) {
  */
 export async function deleteFromCloudinary(publicId) {
   if (!isCloudinaryConfigured()) {
-    logger.warn('⚠️ Cloudinary not configured - skipping delete');
+    logger.warn('?? Cloudinary not configured - skipping delete');
     return { result: 'not_found', isLocal: true };
   }
 
   if (!publicId) {
-    logger.warn('⚠️ No public_id provided for deletion');
+    logger.warn('?? No public_id provided for deletion');
     return { result: 'not_found' };
   }
 
@@ -106,14 +106,14 @@ export async function deleteFromCloudinary(publicId) {
     const result = await cloudinary.uploader.destroy(publicId);
     
     if (result.result === 'ok') {
-      logger.info(`✅ Deleted from Cloudinary: ${publicId}`);
+      logger.info(`? Deleted from Cloudinary: ${publicId}`);
     } else {
-      logger.warn(`⚠️ Cloudinary delete result: ${result.result} for ${publicId}`);
+      logger.warn(`?? Cloudinary delete result: ${result.result} for ${publicId}`);
     }
 
     return result;
   } catch (error) {
-    logger.error(`❌ Cloudinary delete failed: ${error.message}`);
+    logger.error(`? Cloudinary delete failed: ${error.message}`);
     throw new Error(`Failed to delete from Cloudinary: ${error.message}`);
   }
 }
@@ -141,7 +141,7 @@ export function generateSignedUrl(publicId, expiresIn = 3600) {
 
     return signedUrl;
   } catch (error) {
-    logger.error(`❌ Failed to generate signed URL: ${error.message}`);
+    logger.error(`? Failed to generate signed URL: ${error.message}`);
     throw new Error(`Failed to generate signed URL: ${error.message}`);
   }
 }
@@ -174,7 +174,7 @@ export function generateThumbnailUrl(publicId, options = {}) {
 
     return thumbnailUrl;
   } catch (error) {
-    logger.error(`❌ Failed to generate thumbnail URL: ${error.message}`);
+    logger.error(`? Failed to generate thumbnail URL: ${error.message}`);
     throw new Error(`Failed to generate thumbnail URL: ${error.message}`);
   }
 }

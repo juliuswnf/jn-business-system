@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import timezoneHelpers from '../utils/timezoneHelpers.js';
 import { 
   escapeRegex, 
@@ -378,7 +378,7 @@ export const createPublicBooking = async (req, res) => {
       customerPhone,
       notes,
       language,
-      idempotencyKey  // ✅ SRE FIX #30
+      idempotencyKey  // ? SRE FIX #30
     } = req.body;
 
     // Validation
@@ -389,14 +389,14 @@ export const createPublicBooking = async (req, res) => {
       });
     }
 
-    // ✅ SRE FIX #30: Idempotency check
+    // ? SRE FIX #30: Idempotency check
     if (idempotencyKey) {
       const existingBooking = await Booking.findOne({ idempotencyKey });
       
       if (existingBooking) {
-        logger.info(`⚠️ Duplicate public booking: ${idempotencyKey}`);
+        logger.info(`?? Duplicate public booking: ${idempotencyKey}`);
         
-        // ✅ SRE FIX #38: Email status feedback
+        // ? SRE FIX #38: Email status feedback
         const warnings = [];
         if (!existingBooking.emailsSent?.confirmation) {
           warnings.push('Confirmation email is delayed. You will receive it within 15 minutes.');
@@ -427,14 +427,14 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Validate and parse date
-    // ✅ AUDIT FIX: Support both legacy ISO string and new { date, time } format
+    // ? AUDIT FIX: Support both legacy ISO string and new { date, time } format
     let parsedBookingDate;
     
     if (typeof bookingDate === 'string') {
       // Legacy format: ISO string
       parsedBookingDate = parseValidDate(bookingDate);
     } else if (bookingDate.date && bookingDate.time) {
-      // ✅ NEW FORMAT: { date: "2025-12-11", time: "14:00" }
+      // ? NEW FORMAT: { date: "2025-12-11", time: "14:00" }
       // Salon loaded below, validate after getting salon
       parsedBookingDate = null; // Will be set after salon loaded
     } else {
@@ -480,7 +480,7 @@ export const createPublicBooking = async (req, res) => {
       });
     }
 
-    // ✅ AUDIT FIX: Convert bookingDate to UTC using salon timezone
+    // ? AUDIT FIX: Convert bookingDate to UTC using salon timezone
     if (!parsedBookingDate && bookingDate.date && bookingDate.time) {
       // Validate booking time (DST check)
       const validation = timezoneHelpers.validateBookingTime(
@@ -578,7 +578,7 @@ export const createPublicBooking = async (req, res) => {
       language: language || salon.defaultLanguage || 'de',
       status: 'confirmed', // Auto-confirm public bookings
       confirmedAt: new Date(),
-      idempotencyKey: idempotencyKey || null // ✅ SRE FIX #30
+      idempotencyKey: idempotencyKey || null // ? SRE FIX #30
     });
 
     // Populate for email
@@ -612,7 +612,7 @@ export const createPublicBooking = async (req, res) => {
       // Mark email as sent
       await booking.markEmailSent('confirmation');
 
-      logger.log(`âœ‰ï¸  Sent confirmation email to ${customerEmail}`);
+      logger.log(`✉️  Sent confirmation email to ${customerEmail}`);
     } catch (emailError) {
       logger.error('Error sending confirmation email:', emailError);
       // Don't fail the booking if email fails

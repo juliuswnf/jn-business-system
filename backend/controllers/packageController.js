@@ -1,4 +1,4 @@
-﻿import Package from '../models/Package.js';
+import Package from '../models/Package.js';
 import CustomerPackage from '../models/CustomerPackage.js';
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';

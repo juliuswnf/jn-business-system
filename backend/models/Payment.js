@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
 import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 
@@ -15,27 +15,27 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Customer',
       default: null,
-      index: true,  // âœ… Added
-      sparse: true  // âœ… Added
+      index: true,  // ✅ Added
+      sparse: true  // ✅ Added
     },
 
     customerName: {
       type: String,
       trim: true,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     customerEmail: {
       type: String,
       lowercase: true,
       trim: true,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     customerPhone: {
       type: String,
       trim: true,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     bookingId: {
@@ -49,8 +49,8 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Appointment',
       default: null,
-      index: true,  // âœ… Added
-      sparse: true  // âœ… Added
+      index: true,  // ✅ Added
+      sparse: true  // ✅ Added
     },
 
     amount: {
@@ -61,29 +61,29 @@ const paymentSchema = new mongoose.Schema(
 
     currency: {
       type: String,
-      enum: ['EUR', 'USD', 'GBP', 'CHF'],  // âœ… Added currencies
+      enum: ['EUR', 'USD', 'GBP', 'CHF'],  // ✅ Added currencies
       default: 'EUR',
-      index: true  // âœ… Added
+      index: true  // ✅ Added
     },
 
     discount: {
       type: Number,
       default: 0,
-      min: 0,  // âœ… Added
-      max: 100  // âœ… Added: percentage
+      min: 0,  // ✅ Added
+      max: 100  // ✅ Added: percentage
     },
 
     tax: {
       type: Number,
       default: 0,
-      min: 0,  // âœ… Added
-      max: 100  // âœ… Added: percentage
+      min: 0,  // ✅ Added
+      max: 100  // ✅ Added: percentage
     },
 
     finalAmount: {
       type: Number,
       required: true,
-      min: 0  // âœ… Added
+      min: 0  // ✅ Added
     },
 
     paymentMethod: {
@@ -95,46 +95,46 @@ const paymentSchema = new mongoose.Schema(
 
     stripePaymentIntentId: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     stripeChargeId: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     stripeCustomerId: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     stripeReceiptUrl: {
       type: String,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     cardLast4: {
       type: String,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     cardBrand: {
       type: String,
       enum: ['visa', 'mastercard', 'amex', 'discover'],
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     cardExpiry: {
       type: String,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     status: {
       type: String,
-      enum: ['pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded', 'partially_refunded'],  // âœ… FIXED
+      enum: ['pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded', 'partially_refunded'],  // ✅ FIXED
       default: 'pending',
       index: true
     },
@@ -148,37 +148,37 @@ const paymentSchema = new mongoose.Schema(
 
     reference: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     isRefunded: {
       type: Boolean,
       default: false,
-      index: true  // âœ… Added
+      index: true  // ✅ Added
     },
 
     refundAmount: {
       type: Number,
       default: 0,
-      min: 0  // âœ… Added
+      min: 0  // ✅ Added
     },
 
     refundReason: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       maxlength: 500
     },
 
     refundedAt: {
       type: Date,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     refundStripeId: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
@@ -204,7 +204,7 @@ const paymentSchema = new mongoose.Schema(
 
     invoiceUrl: {
       type: String,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     invoiceGenerated: {
@@ -214,31 +214,31 @@ const paymentSchema = new mongoose.Schema(
 
     invoiceGeneratedAt: {
       type: Date,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     receiptUrl: {
       type: String,
-      sparse: true  // âœ… Added
+      sparse: true  // ✅ Added
     },
 
     receiptSent: {
       type: Boolean,
       default: false,
-      index: true  // âœ… Added
+      index: true  // ✅ Added
     },
 
     receiptSentAt: {
       type: Date,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     isInstallment: {
       type: Boolean,
       default: false,
-      index: true  // âœ… Added
+      index: true  // ✅ Added
     },
 
     installmentPlan: {
@@ -250,62 +250,62 @@ const paymentSchema = new mongoose.Schema(
     installmentNumber: {
       type: Number,
       default: 1,
-      min: 1  // âœ… Added
+      min: 1  // ✅ Added
     },
 
     totalInstallments: {
       type: Number,
       default: 1,
-      min: 1  // âœ… Added
+      min: 1  // ✅ Added
     },
 
     nextInstallmentDate: {
       type: Date,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     errorMessage: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       maxlength: 500
     },
 
     errorCode: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     failureReason: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       maxlength: 500
     },
 
     retryCount: {
       type: Number,
       default: 0,
-      min: 0,  // âœ… Added
-      max: 5  // âœ… Added: max retries
+      min: 0,  // ✅ Added
+      max: 5  // ✅ Added: max retries
     },
 
     lastRetryAt: {
       type: Date,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     notes: {
       type: String,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       maxlength: 1000
     },
 
     processedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
@@ -322,13 +322,13 @@ const paymentSchema = new mongoose.Schema(
 
     processedAt: {
       type: Date,
-      sparse: true,  // âœ… Added
+      sparse: true,  // ✅ Added
       index: true
     },
 
     completedAt: {
       type: Date,
-      sparse: true,  // ✅ Added
+      sparse: true,  // ? Added
       index: true
     },
 
@@ -351,17 +351,17 @@ const paymentSchema = new mongoose.Schema(
 
 // ==================== INDEXES (OPTIMIZED) ====================
 
-// ✅ Primary queries
+// ? Primary queries
 paymentSchema.index({ companyId: 1, status: 1, createdAt: -1 });
 paymentSchema.index({ companyId: 1, createdAt: -1 });
 
-// ✅ Customer queries
+// ? Customer queries
 paymentSchema.index({ companyId: 1, customerId: 1, createdAt: -1 }, { sparse: true });
 
-// ✅ Booking queries
+// ? Booking queries
 paymentSchema.index({ bookingId: 1, status: 1 });
 
-// ✅ Soft delete queries
+// ? Soft delete queries
 paymentSchema.index({ deletedAt: 1 });
 
 // ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
@@ -381,19 +381,19 @@ paymentSchema.pre('countDocuments', function(next) {
   next();
 });
 
-// ✅ Status queries
+// ? Status queries
 paymentSchema.index({ status: 1, createdAt: -1 });
 
-// âœ… Transaction tracking
+// ✅ Transaction tracking
 paymentSchema.index({ transactionId: 1 });
 
-// âœ… Revenue queries
+// ✅ Revenue queries
 paymentSchema.index({ companyId: 1, status: 1, completedAt: -1 });
 
-// âœ… Refund queries
+// ✅ Refund queries
 paymentSchema.index({ isRefunded: 1, refundedAt: -1 });
 
-// âœ… Installment queries
+// ✅ Installment queries
 paymentSchema.index({ companyId: 1, isInstallment: 1, nextInstallmentDate: 1 });
 
 
@@ -415,7 +415,7 @@ paymentSchema.virtual('remainingAmount').get(function() {
   try {
     return Math.max(0, this.finalAmount - (this.refundAmount || 0));
   } catch (err) {
-    logger.error('âŒ Calculate remaining amount error:', err.message);
+    logger.error('❌ Calculate remaining amount error:', err.message);
     return this.finalAmount;
   }
 });
@@ -436,10 +436,10 @@ paymentSchema.methods.calculateFinalAmount = function() {
     const discountAmount = (this.amount * this.discount) / 100;
     const afterDiscount = this.amount - discountAmount;
     const taxAmount = (afterDiscount * this.tax) / 100;
-    this.finalAmount = Math.round((afterDiscount + taxAmount) * 100) / 100;  // âœ… Fixed rounding
+    this.finalAmount = Math.round((afterDiscount + taxAmount) * 100) / 100;  // ✅ Fixed rounding
     return this.finalAmount;
   } catch (err) {
-    logger.error('âŒ Calculate final amount error:', err.message);
+    logger.error('❌ Calculate final amount error:', err.message);
     return this.finalAmount;
   }
 };
@@ -447,10 +447,10 @@ paymentSchema.methods.calculateFinalAmount = function() {
 paymentSchema.methods.processPayment = async function() {
   try {
     this.status = 'processing';
-    logger.log(`â³ Processing payment: ${this._id}`);
+    logger.log(`⏳ Processing payment: ${this._id}`);
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Process payment error:', err.message);
+    logger.error('❌ Process payment error:', err.message);
     throw err;
   }
 };
@@ -460,10 +460,10 @@ paymentSchema.methods.markAsCompleted = async function() {
     this.status = 'completed';
     this.processedAt = new Date();
     this.completedAt = new Date();
-    logger.log(`âœ… Payment completed: ${this.transactionId}`);
+    logger.log(`✅ Payment completed: ${this.transactionId}`);
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Mark as completed error:', err.message);
+    logger.error('❌ Mark as completed error:', err.message);
     throw err;
   }
 };
@@ -477,14 +477,14 @@ paymentSchema.methods.markAsFailed = async function(errorCode, errorMessage) {
     this.lastRetryAt = new Date();
 
     if (this.retryCount >= 5) {
-      logger.error(`âŒ Payment failed (Max retries): ${this._id}`);
+      logger.error(`❌ Payment failed (Max retries): ${this._id}`);
     } else {
-      logger.warn(`âš ï¸ Payment failed (Retry ${this.retryCount}): ${errorCode}`);
+      logger.warn(`⚠️ Payment failed (Retry ${this.retryCount}): ${errorCode}`);
     }
 
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Mark as failed error:', err.message);
+    logger.error('❌ Mark as failed error:', err.message);
     throw err;
   }
 };
@@ -498,21 +498,21 @@ paymentSchema.methods.refundPayment = async function(amount = null, reason = 'Cu
     }
 
     this.isRefunded = true;
-    this.refundAmount = Math.round(refundAmount * 100) / 100;  // âœ… Fixed rounding
+    this.refundAmount = Math.round(refundAmount * 100) / 100;  // ✅ Fixed rounding
     this.refundReason = reason;
     this.refundedAt = new Date();
 
     if (refundAmount >= this.finalAmount) {
       this.status = 'refunded';
-      logger.log(`ðŸ’° Full refund processed: ${this.transactionId}`);
+      logger.log(`💰 Full refund processed: ${this.transactionId}`);
     } else {
       this.status = 'partially_refunded';
-      logger.log(`ðŸ’¸ Partial refund processed: ${this.transactionId} (${refundAmount})`);
+      logger.log(`💸 Partial refund processed: ${this.transactionId} (${refundAmount})`);
     }
 
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Refund payment error:', err.message);
+    logger.error('❌ Refund payment error:', err.message);
     throw err;
   }
 };
@@ -524,7 +524,7 @@ paymentSchema.methods.generateInvoiceNumber = function() {
     this.invoiceNumber = `INV-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}-${String(random).padStart(5, '0')}`;
     return this.invoiceNumber;
   } catch (err) {
-    logger.error('âŒ Generate invoice number error:', err.message);
+    logger.error('❌ Generate invoice number error:', err.message);
     throw err;
   }
 };
@@ -534,10 +534,10 @@ paymentSchema.methods.markInvoiceGenerated = async function(invoiceUrl = null) {
     this.invoiceGenerated = true;
     this.invoiceGeneratedAt = new Date();
     if (invoiceUrl) {this.invoiceUrl = invoiceUrl;}
-    logger.log(`ðŸ“„ Invoice generated: ${this.invoiceNumber}`);
+    logger.log(`📄 Invoice generated: ${this.invoiceNumber}`);
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Mark invoice generated error:', err.message);
+    logger.error('❌ Mark invoice generated error:', err.message);
     throw err;
   }
 };
@@ -547,10 +547,10 @@ paymentSchema.methods.markReceiptSent = async function(receiptUrl = null) {
     this.receiptSent = true;
     this.receiptSentAt = new Date();
     if (receiptUrl) {this.receiptUrl = receiptUrl;}
-    logger.log(`ðŸ“§ Receipt sent: ${this.transactionId}`);
+    logger.log(`📧 Receipt sent: ${this.transactionId}`);
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Mark receipt sent error:', err.message);
+    logger.error('❌ Mark receipt sent error:', err.message);
     throw err;
   }
 };
@@ -562,10 +562,10 @@ paymentSchema.methods.retryPayment = async function() {
     }
 
     this.status = 'pending';
-    logger.log(`ðŸ”„ Payment retry scheduled (Attempt ${this.retryCount + 1})`);
+    logger.log(`🔄 Payment retry scheduled (Attempt ${this.retryCount + 1})`);
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Retry payment error:', err.message);
+    logger.error('❌ Retry payment error:', err.message);
     throw err;
   }
 };
@@ -584,10 +584,10 @@ paymentSchema.methods.createInstallmentPlan = async function(planType = '2-pay')
     nextDate.setDate(nextDate.getDate() + 30);
     this.nextInstallmentDate = nextDate;
 
-    logger.log(`ðŸ“Š Installment plan created: ${planType} (${numberOfPayments} payments)`);
+    logger.log(`📊 Installment plan created: ${planType} (${numberOfPayments} payments)`);
     return await this.save();
   } catch (err) {
-    logger.error('âŒ Create installment plan error:', err.message);
+    logger.error('❌ Create installment plan error:', err.message);
     throw err;
   }
 };
@@ -608,7 +608,7 @@ paymentSchema.methods.getSummary = function() {
       currency: this.currency
     };
   } catch (err) {
-    logger.error('âŒ Get summary error:', err.message);
+    logger.error('❌ Get summary error:', err.message);
     return {};
   }
 };
@@ -616,7 +616,7 @@ paymentSchema.methods.getSummary = function() {
 paymentSchema.methods.toJSON = function() {
   const obj = this.toObject();
   delete obj.__v;
-  // âœ… Remove sensitive Stripe data
+  // ✅ Remove sensitive Stripe data
   delete obj.stripePaymentIntentId;
   delete obj.stripeChargeId;
   delete obj.stripeCustomerId;
@@ -634,7 +634,7 @@ paymentSchema.statics.getByDateRange = async function(companyId, startDate, endD
       createdAt: { $gte: startDate, $lte: endDate }
     }).sort({ createdAt: -1 });
   } catch (err) {
-    logger.error('âŒ Get by date range error:', err.message);
+    logger.error('❌ Get by date range error:', err.message);
     throw err;
   }
 };
@@ -648,7 +648,7 @@ paymentSchema.statics.getCompleted = function(companyId, limit = 50) {
       .sort({ completedAt: -1 })
       .limit(limit);
   } catch (err) {
-    logger.error('âŒ Get completed error:', err.message);
+    logger.error('❌ Get completed error:', err.message);
     throw err;
   }
 };
@@ -660,7 +660,7 @@ paymentSchema.statics.getPending = function(companyId) {
       status: { $in: ['pending', 'processing'] }
     }).sort({ createdAt: 1 });
   } catch (err) {
-    logger.error('âŒ Get pending error:', err.message);
+    logger.error('❌ Get pending error:', err.message);
     throw err;
   }
 };
@@ -672,7 +672,7 @@ paymentSchema.statics.getFailed = function(companyId) {
       status: 'failed'
     }).sort({ lastRetryAt: -1 });
   } catch (err) {
-    logger.error('âŒ Get failed error:', err.message);
+    logger.error('❌ Get failed error:', err.message);
     throw err;
   }
 };
@@ -684,7 +684,7 @@ paymentSchema.statics.getRefunded = function(companyId) {
       isRefunded: true
     }).sort({ refundedAt: -1 });
   } catch (err) {
-    logger.error('âŒ Get refunded error:', err.message);
+    logger.error('❌ Get refunded error:', err.message);
     throw err;
   }
 };
@@ -696,12 +696,12 @@ paymentSchema.statics.getByCustomer = function(customerId, limit = 10) {
       .sort({ createdAt: -1 })
       .limit(limit);
   } catch (err) {
-    logger.error('âŒ Get by customer error:', err.message);
+    logger.error('❌ Get by customer error:', err.message);
     throw err;
   }
 };
 
-// âœ… FIXED: Revenue reporting
+// ✅ FIXED: Revenue reporting
 paymentSchema.statics.getRevenueReport = async function(companyId, startDate, endDate) {
   try {
     const result = await this.aggregate([
@@ -730,7 +730,7 @@ paymentSchema.statics.getRevenueReport = async function(companyId, startDate, en
       averageTransaction: 0
     };
   } catch (err) {
-    logger.error('âŒ Get revenue report error:', err.message);
+    logger.error('❌ Get revenue report error:', err.message);
     throw err;
   }
 };
@@ -754,7 +754,7 @@ paymentSchema.statics.getPaymentMethodStats = async function(companyId) {
       { $sort: { totalAmount: -1 } }
     ]);
   } catch (err) {
-    logger.error('âŒ Get payment method stats error:', err.message);
+    logger.error('❌ Get payment method stats error:', err.message);
     throw err;
   }
 };
@@ -782,7 +782,7 @@ paymentSchema.statics.getDailyRevenue = async function(companyId, days = 30) {
       { $sort: { _id: 1 } }
     ]);
   } catch (err) {
-    logger.error('âŒ Get daily revenue error:', err.message);
+    logger.error('❌ Get daily revenue error:', err.message);
     throw err;
   }
 };
@@ -795,12 +795,12 @@ paymentSchema.statics.getInstallmentPayments = function(companyId) {
       status: { $ne: 'completed' }
     }).sort({ nextInstallmentDate: 1 });
   } catch (err) {
-    logger.error('âŒ Get installment payments error:', err.message);
+    logger.error('❌ Get installment payments error:', err.message);
     throw err;
   }
 };
 
-// âœ… NEW: Get failed payments for retry
+// ✅ NEW: Get failed payments for retry
 paymentSchema.statics.getFailedForRetry = function(companyId, maxRetries = 5) {
   try {
     return this.find({
@@ -809,12 +809,12 @@ paymentSchema.statics.getFailedForRetry = function(companyId, maxRetries = 5) {
       retryCount: { $lt: maxRetries }
     }).sort({ lastRetryAt: 1 });
   } catch (err) {
-    logger.error('âŒ Get failed for retry error:', err.message);
+    logger.error('❌ Get failed for retry error:', err.message);
     throw err;
   }
 };
 
-// âœ… NEW: Get statistics dashboard
+// ✅ NEW: Get statistics dashboard
 paymentSchema.statics.getPaymentStats = async function(companyId) {
   try {
     return this.aggregate([
@@ -846,7 +846,7 @@ paymentSchema.statics.getPaymentStats = async function(companyId) {
       }
     ]);
   } catch (err) {
-    logger.error('âŒ Get payment stats error:', err.message);
+    logger.error('❌ Get payment stats error:', err.message);
     throw err;
   }
 };
@@ -863,12 +863,12 @@ paymentSchema.pre('save', async function(next) {
     this.updatedAt = new Date();
     next();
   } catch (err) {
-    logger.error('❌ Pre-save hook error:', err.message);
+    logger.error('? Pre-save hook error:', err.message);
     next(err);
   }
 });
 
-// ✅ AUDIT FIX: Multi-tenant plugin (companyId = salonId)
+// ? AUDIT FIX: Multi-tenant plugin (companyId = salonId)
 paymentSchema.plugin(multiTenantPlugin);
 
 // ==================== EXPORT ====================

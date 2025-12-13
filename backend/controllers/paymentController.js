@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * Payment Controller - MVP Simplified
  * Essential payment operations only
@@ -403,7 +403,7 @@ export const handleStripeWebhook = async (req, res) => {
     const sig = req.headers['stripe-signature'];
 
     if (!sig) {
-      logger.error('âŒ Missing Stripe signature header');
+      logger.error('❌ Missing Stripe signature header');
       return res.status(401).json({
         success: false,
         message: 'Missing signature'
@@ -411,7 +411,7 @@ export const handleStripeWebhook = async (req, res) => {
     }
 
     if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      logger.error('âŒ STRIPE_WEBHOOK_SECRET not configured');
+      logger.error('❌ STRIPE_WEBHOOK_SECRET not configured');
       return res.status(500).json({
         success: false,
         message: 'Webhook secret not configured'
@@ -426,19 +426,19 @@ export const handleStripeWebhook = async (req, res) => {
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-      logger.error('âŒ Stripe signature verification failed:', err.message);
+      logger.error('❌ Stripe signature verification failed:', err.message);
       return res.status(400).json({
         success: false,
         message: 'Webhook signature verification failed'
       });
     }
 
-    logger.log(`âœ… Stripe webhook received: ${event.type}`);
+    logger.log(`✅ Stripe webhook received: ${event.type}`);
 
     switch (event.type) {
     case 'payment_intent.succeeded': {
       const paymentIntentSucceeded = event.data.object;
-      logger.log('âœ… Payment succeeded:', paymentIntentSucceeded.id);
+      logger.log('✅ Payment succeeded:', paymentIntentSucceeded.id);
 
       if (paymentIntentSucceeded.metadata?.bookingId) {
         await Booking.findOneAndUpdate(
@@ -454,7 +454,7 @@ export const handleStripeWebhook = async (req, res) => {
 
     case 'payment_intent.payment_failed': {
       const paymentIntentFailed = event.data.object;
-      logger.log('âŒ Payment failed:', paymentIntentFailed.id);
+      logger.log('❌ Payment failed:', paymentIntentFailed.id);
 
       if (paymentIntentFailed.metadata?.bookingId) {
         await Booking.findOneAndUpdate(
@@ -467,7 +467,7 @@ export const handleStripeWebhook = async (req, res) => {
 
     case 'charge.refunded': {
       const chargeRefunded = event.data.object;
-      logger.log('ðŸ’° Charge refunded:', chargeRefunded.id);
+      logger.log('💰 Charge refunded:', chargeRefunded.id);
 
       if (chargeRefunded.payment_intent) {
         await Payment.findOneAndUpdate(
@@ -479,12 +479,12 @@ export const handleStripeWebhook = async (req, res) => {
     }
 
     default:
-      logger.log(`âš ï¸ Unhandled webhook event type: ${event.type}`);
+      logger.log(`⚠️ Unhandled webhook event type: ${event.type}`);
     }
 
     res.status(200).json({ received: true });
   } catch (error) {
-    logger.error('âŒ Stripe Webhook Error:', error);
+    logger.error('❌ Stripe Webhook Error:', error);
     res.status(400).json({
       success: false,
       message: 'Webhook processing error'

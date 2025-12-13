@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * CEO Analytics Controller
  * Deep-dive analytics for revenue, growth, cohorts, and churn

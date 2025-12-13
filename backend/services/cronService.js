@@ -1,4 +1,4 @@
-﻿import cron from 'node-cron';
+import cron from 'node-cron';
 import logger from '../utils/logger.js';
 import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';
@@ -24,7 +24,7 @@ const sendBookingReminders = async () => {
       'emailsSent.reminder': { $ne: true }
     }).populate('salonId serviceId');
 
-    logger.info(`ðŸ“§ Reminder check: Found ${bookings.length} bookings to remind`);
+    logger.info(`📧 Reminder check: Found ${bookings.length} bookings to remind`);
 
     for (const booking of bookings) {
       try {
@@ -37,13 +37,13 @@ const sendBookingReminders = async () => {
         booking.emailsSent.reminder = true;
         await booking.save();
 
-        logger.info(`✅ Reminder sent for booking ${booking._id}`);
+        logger.info(`? Reminder sent for booking ${booking._id}`);
       } catch (emailError) {
-        logger.error(`âŒ Failed to send reminder for booking ${booking._id}:`, emailError.message);
+        logger.error(`❌ Failed to send reminder for booking ${booking._id}:`, emailError.message);
       }
     }
   } catch (err) {
-    logger.error('âŒ sendBookingReminders failed:', err.message);
+    logger.error('❌ sendBookingReminders failed:', err.message);
   }
 };
 
@@ -64,7 +64,7 @@ const sendReviewRequests = async () => {
       'emailsSent.review': { $ne: true }
     }).populate('salonId serviceId');
 
-    logger.info(`â­ Review check: Found ${bookings.length} bookings for review request`);
+    logger.info(`⭐ Review check: Found ${bookings.length} bookings for review request`);
 
     for (const booking of bookings) {
       try {
@@ -78,13 +78,13 @@ const sendReviewRequests = async () => {
         booking.emailsSent.review = true;
         await booking.save();
 
-        logger.info(`✅ Review request sent for booking ${booking._id}`);
+        logger.info(`? Review request sent for booking ${booking._id}`);
       } catch (emailError) {
-        logger.error(`âŒ Failed to send review request for booking ${booking._id}:`, emailError.message);
+        logger.error(`❌ Failed to send review request for booking ${booking._id}:`, emailError.message);
       }
     }
   } catch (err) {
-    logger.error('âŒ sendReviewRequests failed:', err.message);
+    logger.error('❌ sendReviewRequests failed:', err.message);
   }
 };
 
@@ -93,25 +93,25 @@ const sendReviewRequests = async () => {
 const cleanupExpiredErrorLogs = async () => {
   try {
     // MVP: Error logs are console-only, no DB cleanup needed
-    logger.log('âœ… Cleanup: Error logs cleanup triggered (console-only for MVP)');
+    logger.log('✅ Cleanup: Error logs cleanup triggered (console-only for MVP)');
   } catch (err) {
-    logger.error('âŒ Cleanup error logs failed:', err.message);
+    logger.error('❌ Cleanup error logs failed:', err.message);
   }
 };
 
 const cleanupExpiredSessions = async () => {
   try {
-    logger.log('âœ… Session cleanup triggered');
+    logger.log('✅ Session cleanup triggered');
   } catch (err) {
-    logger.error('âŒ Session cleanup failed:', err.message);
+    logger.error('❌ Session cleanup failed:', err.message);
   }
 };
 
 const cleanupOrphanedData = async () => {
   try {
-    logger.log('âœ… Orphaned data cleanup triggered');
+    logger.log('✅ Orphaned data cleanup triggered');
   } catch (err) {
-    logger.error('âŒ Orphaned data cleanup failed:', err.message);
+    logger.error('❌ Orphaned data cleanup failed:', err.message);
   }
 };
 
@@ -119,19 +119,19 @@ const cleanupOrphanedData = async () => {
 
 const performDatabaseMaintenance = async () => {
   try {
-    logger.log('âœ… Database maintenance started');
+    logger.log('✅ Database maintenance started');
     // Add DB index building, stats update, etc.
   } catch (err) {
-    logger.error('âŒ Database maintenance failed:', err.message);
+    logger.error('❌ Database maintenance failed:', err.message);
   }
 };
 
 const generateSystemReport = async () => {
   try {
     // MVP: Simple console report
-    logger.log('âœ… System Report: System running normally');
+    logger.log('✅ System Report: System running normally');
   } catch (err) {
-    logger.error('âŒ System report generation failed:', err.message);
+    logger.error('❌ System report generation failed:', err.message);
   }
 };
 
@@ -139,17 +139,17 @@ const generateSystemReport = async () => {
 
 const checkSystemHealth = async () => {
   try {
-    logger.log('âœ… System health check passed');
+    logger.log('✅ System health check passed');
   } catch (err) {
-    logger.error('âŒ System health check failed:', err.message);
+    logger.error('❌ System health check failed:', err.message);
   }
 };
 
 const checkWebhookHealth = async () => {
   try {
-    logger.log('âœ… Webhook health check triggered');
+    logger.log('✅ Webhook health check triggered');
   } catch (err) {
-    logger.error('âŒ Webhook health check failed:', err.message);
+    logger.error('❌ Webhook health check failed:', err.message);
   }
 };
 
@@ -157,17 +157,17 @@ const checkWebhookHealth = async () => {
 
 const sendDailyReports = async () => {
   try {
-    logger.log('âœ… Daily reports sent');
+    logger.log('✅ Daily reports sent');
   } catch (err) {
-    logger.error('âŒ Daily report sending failed:', err.message);
+    logger.error('❌ Daily report sending failed:', err.message);
   }
 };
 
 const sendWeeklyDigest = async () => {
   try {
-    logger.log('âœ… Weekly digest sent');
+    logger.log('✅ Weekly digest sent');
   } catch (err) {
-    logger.error('âŒ Weekly digest sending failed:', err.message);
+    logger.error('❌ Weekly digest sending failed:', err.message);
   }
 };
 
@@ -175,20 +175,20 @@ const sendWeeklyDigest = async () => {
 
 export const initializeCronJobs = () => {
   try {
-    logger.log('🕐 Initializing Cron Jobs...');
+    logger.log('?? Initializing Cron Jobs...');
 
-    // ✅ MEDIUM FIX #13: Automated Database Backups
+    // ? MEDIUM FIX #13: Automated Database Backups
     // Every day at 2 AM - Create database backup
     cron.schedule(backupService.BACKUP_SCHEDULE, async () => {
       try {
-        logger.log('🔄 Starting scheduled database backup...');
+        logger.log('?? Starting scheduled database backup...');
         await backupService.runBackupJob();
       } catch (error) {
-        logger.error('❌ Scheduled backup failed:', error);
+        logger.error('? Scheduled backup failed:', error);
       }
     });
 
-    // ✅ Cleanup Jobs
+    // ? Cleanup Jobs
     // Every day at 2:30 AM - Clean up old error logs
     cron.schedule('30 2 * * *', cleanupExpiredErrorLogs);
 
@@ -198,37 +198,37 @@ export const initializeCronJobs = () => {
     // Every day at 4 AM - Clean up orphaned data
     cron.schedule('0 4 * * *', cleanupOrphanedData);
 
-    // âœ… Maintenance Jobs
+    // ✅ Maintenance Jobs
     // Every Sunday at 3 AM - Database maintenance
     cron.schedule('0 3 * * 0', performDatabaseMaintenance);
 
     // Every day at 6 AM - Generate system report
     cron.schedule('0 6 * * *', generateSystemReport);
 
-    // âœ… Monitoring Jobs
+    // ✅ Monitoring Jobs
     // Every 5 minutes - Check system health
     cron.schedule('*/5 * * * *', checkSystemHealth);
 
     // Every 10 minutes - Check webhook health
     cron.schedule('*/10 * * * *', checkWebhookHealth);
 
-    // âœ… Notification Jobs
+    // ✅ Notification Jobs
     // Every day at 8 AM - Send daily reports
     cron.schedule('0 8 * * *', sendDailyReports);
 
     // Every Monday at 9 AM - Send weekly digest
     cron.schedule('0 9 * * 1', sendWeeklyDigest);
 
-    // âœ… Booking Notification Jobs
+    // ✅ Booking Notification Jobs
     // Every hour - Send 24h booking reminders
     cron.schedule('0 * * * *', sendBookingReminders);
 
     // Every hour - Send review requests (2h after appointment)
     cron.schedule('30 * * * *', sendReviewRequests);
 
-    logger.log('âœ… All Cron Jobs initialized successfully');
+    logger.log('✅ All Cron Jobs initialized successfully');
   } catch (err) {
-    logger.error('âŒ Failed to initialize cron jobs:', err.message);
+    logger.error('❌ Failed to initialize cron jobs:', err.message);
     throw err;
   }
 };
@@ -240,9 +240,9 @@ export const stopAllCronJobs = () => {
     cron.getTasks().forEach(task => {
       task.stop();
     });
-    logger.log('âœ… All cron jobs stopped');
+    logger.log('✅ All cron jobs stopped');
   } catch (err) {
-    logger.error('âŒ Failed to stop cron jobs:', err.message);
+    logger.error('❌ Failed to stop cron jobs:', err.message);
     throw err;
   }
 };

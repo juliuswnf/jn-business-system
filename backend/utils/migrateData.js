@@ -1,4 +1,4 @@
-﻿import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import readline from 'readline';
 
@@ -30,16 +30,16 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    logger.log('\nâœ… Database connected\n');
+    logger.log('\n✅ Database connected\n');
   } catch (error) {
-    logger.error('\nâŒ Database connection error:', error.message, '\n');
+    logger.error('\n❌ Database connection error:', error.message, '\n');
     process.exit(1);
   }
 };
 
 export const addMissingFields = async () => {
   try {
-    logger.log('ðŸ”§ Adding missing fields to users...\n');
+    logger.log('🔧 Adding missing fields to users...\n');
 
     const result = await User.updateMany(
       { phoneVerified: { $exists: false } },
@@ -53,17 +53,17 @@ export const addMissingFields = async () => {
       }
     );
 
-    logger.log(`âœ… Updated ${result.modifiedCount} users\n`);
+    logger.log(`✅ Updated ${result.modifiedCount} users\n`);
     return result.modifiedCount;
   } catch (error) {
-    logger.error('âŒ Error adding missing fields:', error.message, '\n');
+    logger.error('❌ Error adding missing fields:', error.message, '\n');
     throw error;
   }
 };
 
 export const updateBookingStatus = async () => {
   try {
-    logger.log('ðŸ“… Updating booking statuses...\n');
+    logger.log('📅 Updating booking statuses...\n');
 
     const cancelResult = await Booking.updateMany(
       {
@@ -73,17 +73,17 @@ export const updateBookingStatus = async () => {
       { $set: { status: 'completed' } }
     );
 
-    logger.log(`âœ… Updated ${cancelResult.modifiedCount} bookings to completed\n`);
+    logger.log(`✅ Updated ${cancelResult.modifiedCount} bookings to completed\n`);
     return cancelResult.modifiedCount;
   } catch (error) {
-    logger.error('âŒ Error updating booking status:', error.message, '\n');
+    logger.error('❌ Error updating booking status:', error.message, '\n');
     throw error;
   }
 };
 
 export const consolidateCustomerData = async () => {
   try {
-    logger.log('ðŸ‘¥ Consolidating customer data...\n');
+    logger.log('👥 Consolidating customer data...\n');
 
     const customers = await Customer.find({});
     let mergedCount = 0;
@@ -109,24 +109,24 @@ export const consolidateCustomerData = async () => {
       }
     }
 
-    logger.log(`âœ… Merged ${mergedCount} duplicate customers\n`);
+    logger.log(`✅ Merged ${mergedCount} duplicate customers\n`);
     return mergedCount;
   } catch (error) {
-    logger.error('âŒ Error consolidating customer data:', error.message, '\n');
+    logger.error('❌ Error consolidating customer data:', error.message, '\n');
     throw error;
   }
 };
 
 export const fixPaymentData = async () => {
   try {
-    logger.log('ðŸ’³ Fixing payment data...\n');
+    logger.log('💳 Fixing payment data...\n');
 
     const currencyResult = await Payment.updateMany(
       { currency: { $exists: false } },
       { $set: { currency: 'EUR' } }
     );
 
-    logger.log(`âœ… Added currency to ${currencyResult.modifiedCount} payments`);
+    logger.log(`✅ Added currency to ${currencyResult.modifiedCount} payments`);
 
     const txnResult = await Payment.updateMany(
       { transactionId: { $exists: false } },
@@ -141,17 +141,17 @@ export const fixPaymentData = async () => {
       ]
     );
 
-    logger.log(`âœ… Added transaction IDs to ${txnResult.modifiedCount} payments\n`);
+    logger.log(`✅ Added transaction IDs to ${txnResult.modifiedCount} payments\n`);
     return currencyResult.modifiedCount + txnResult.modifiedCount;
   } catch (error) {
-    logger.error('âŒ Error fixing payment data:', error.message, '\n');
+    logger.error('❌ Error fixing payment data:', error.message, '\n');
     throw error;
   }
 };
 
 export const updateReviewRatings = async () => {
   try {
-    logger.log('â­ Updating review ratings...\n');
+    logger.log('⭐ Updating review ratings...\n');
 
     const result = await Review.updateMany(
       { $or: [{ rating: { $lt: 1 } }, { rating: { $gt: 5 } }] },
@@ -166,17 +166,17 @@ export const updateReviewRatings = async () => {
       ]
     );
 
-    logger.log(`âœ… Fixed ratings for ${result.modifiedCount} reviews\n`);
+    logger.log(`✅ Fixed ratings for ${result.modifiedCount} reviews\n`);
     return result.modifiedCount;
   } catch (error) {
-    logger.error('âŒ Error updating review ratings:', error.message, '\n');
+    logger.error('❌ Error updating review ratings:', error.message, '\n');
     throw error;
   }
 };
 
 export const addMissingTimestamps = async () => {
   try {
-    logger.log('â° Adding missing timestamps...\n');
+    logger.log('⏰ Adding missing timestamps...\n');
 
     const collections = [
       { model: Customer, name: 'Customers' },
@@ -193,21 +193,21 @@ export const addMissingTimestamps = async () => {
         { $set: { createdAt: new Date(), updatedAt: new Date() } }
       );
 
-      logger.log(`âœ… ${collection.name}: ${result.modifiedCount} documents updated`);
+      logger.log(`✅ ${collection.name}: ${result.modifiedCount} documents updated`);
       totalUpdated += result.modifiedCount;
     }
 
-    logger.log(`\nâœ… Total ${totalUpdated} documents updated\n`);
+    logger.log(`\n✅ Total ${totalUpdated} documents updated\n`);
     return totalUpdated;
   } catch (error) {
-    logger.error('âŒ Error adding timestamps:', error.message, '\n');
+    logger.error('❌ Error adding timestamps:', error.message, '\n');
     throw error;
   }
 };
 
 export const removeObsoleteFields = async () => {
   try {
-    logger.log('ðŸ—‘ï¸  Removing obsolete fields...\n');
+    logger.log('🗑️  Removing obsolete fields...\n');
 
     const result = await User.updateMany(
       {},
@@ -220,17 +220,17 @@ export const removeObsoleteFields = async () => {
       }
     );
 
-    logger.log(`âœ… Removed obsolete fields from ${result.modifiedCount} users\n`);
+    logger.log(`✅ Removed obsolete fields from ${result.modifiedCount} users\n`);
     return result.modifiedCount;
   } catch (error) {
-    logger.error('âŒ Error removing obsolete fields:', error.message, '\n');
+    logger.error('❌ Error removing obsolete fields:', error.message, '\n');
     throw error;
   }
 };
 
 export const getMigrationStatus = async () => {
   try {
-    logger.log('\nðŸ“Š Migration Status Check:\n');
+    logger.log('\n📊 Migration Status Check:\n');
 
     const checks = {
       usersWithPhoneVerified: await User.countDocuments({ phoneVerified: { $exists: true } }),
@@ -250,7 +250,7 @@ export const getMigrationStatus = async () => {
 
     return checks;
   } catch (error) {
-    logger.error('âŒ Error checking migration status:', error.message, '\n');
+    logger.error('❌ Error checking migration status:', error.message, '\n');
     throw error;
   }
 };
@@ -258,7 +258,7 @@ export const getMigrationStatus = async () => {
 const interactiveMode = async () => {
   try {
     logger.log('================================');
-    logger.log('  ðŸ”„ DATABASE MIGRATION TOOL');
+    logger.log('  🔄 DATABASE MIGRATION TOOL');
     logger.log('================================\n');
 
     logger.log('Available migrations:');
@@ -289,7 +289,7 @@ const interactiveMode = async () => {
     } else if (option === '7') {
       await removeObsoleteFields();
     } else if (option === '8') {
-      const confirm = await question('\nâš ï¸  Run all migrations? (yes/no): ');
+      const confirm = await question('\n⚠️  Run all migrations? (yes/no): ');
       if (confirm.toLowerCase() === 'yes') {
         await addMissingFields();
         await updateBookingStatus();
@@ -300,21 +300,21 @@ const interactiveMode = async () => {
         await removeObsoleteFields();
 
         logger.log('================================');
-        logger.log('  âœ… All migrations completed!');
+        logger.log('  ✅ All migrations completed!');
         logger.log('================================\n');
       } else {
-        logger.log('\nâŒ Operation cancelled\n');
+        logger.log('\n❌ Operation cancelled\n');
       }
     } else if (option === '9') {
       await getMigrationStatus();
     } else {
-      logger.log('\nâŒ Invalid option\n');
+      logger.log('\n❌ Invalid option\n');
     }
 
     rl.close();
     process.exit(0);
   } catch (error) {
-    logger.error('\nâŒ Fatal error:', error.message, '\n');
+    logger.error('\n❌ Fatal error:', error.message, '\n');
     rl.close();
     process.exit(1);
   }
@@ -325,7 +325,7 @@ const main = async () => {
     await connectDB();
     await interactiveMode();
   } catch (error) {
-    logger.error('\nâŒ Fatal error:', error.message, '\n');
+    logger.error('\n❌ Fatal error:', error.message, '\n');
     process.exit(1);
   }
 };

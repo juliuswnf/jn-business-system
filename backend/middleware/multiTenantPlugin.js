@@ -1,10 +1,10 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 
-// ✅ SRE FIX #25: Cache NODE_ENV for performance
+// ? SRE FIX #25: Cache NODE_ENV for performance
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
 
 /**
- * ✅ AUDIT FIX: Mongoose Multi-Tenant Plugin
+ * ? AUDIT FIX: Mongoose Multi-Tenant Plugin
  * Automatically injects salonId filter into ALL queries
  * Prevents accidental cross-tenant data leakage (GDPR breach prevention)
  */
@@ -96,7 +96,7 @@ export const multiTenantPlugin = (schema, options = {}) => {
       
       // Check if first stage is $match with salonId
       if (!firstStage.$match || !firstStage.$match[tenantField]) {
-        logger.warn(`[MultiTenant] ⚠️ Aggregation without ${tenantField} filter detected. Possible data leakage!`);
+        logger.warn(`[MultiTenant] ?? Aggregation without ${tenantField} filter detected. Possible data leakage!`);
         logger.warn(`[MultiTenant] Pipeline: ${JSON.stringify(pipeline[0])}`);
         
         // In strict mode, throw error

@@ -1,4 +1,4 @@
-﻿import cors from 'cors';
+import cors from 'cors';
 import logger from '../utils/logger.js';
 
 /**
@@ -20,7 +20,7 @@ const allowedOrigins = [
   process.env.PRODUCTION_FRONTEND_URL
 ].filter(Boolean);
 
-logger.log('âœ… Allowed CORS Origins:', allowedOrigins);
+logger.log('✅ Allowed CORS Origins:', allowedOrigins);
 
 // ==================== CORS OPTIONS ====================
 
@@ -29,7 +29,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      logger.warn(`âŒ CORS blocked request from origin: ${origin}`);
+      logger.warn(`❌ CORS blocked request from origin: ${origin}`);
       callback(new Error('Not allowed by CORS policy'));
     }
   },
@@ -130,7 +130,7 @@ const dynamicCors = (req, res, next) => {
 
 const corsErrorHandler = (err, req, res, next) => {
   if (err.message && err.message.includes('CORS')) {
-    logger.warn(`âŒ CORS Error: Origin ${req.headers.origin} not allowed`);
+    logger.warn(`❌ CORS Error: Origin ${req.headers.origin} not allowed`);
 
     return res.status(403).json({
       success: false,
@@ -162,7 +162,7 @@ const corsWithLogging = (req, res, next) => {
   const allowed = !origin || allowedOrigins.includes(origin);
 
   logger.log(
-    `[CORS] ${req.method} ${req.path} from ${origin || 'no-origin'} - ${allowed ? 'âœ… ALLOWED' : 'âŒ BLOCKED'}`
+    `[CORS] ${req.method} ${req.path} from ${origin || 'no-origin'} - ${allowed ? '✅ ALLOWED' : '❌ BLOCKED'}`
   );
 
   if (allowed) {
@@ -208,18 +208,18 @@ const addCorsOrigin = (req, res) => {
 
     if (!allowedOrigins.includes(origin)) {
       allowedOrigins.push(origin);
-      logger.log('âœ… New CORS origin added:', origin);
+      logger.log('✅ New CORS origin added:', origin);
     }
 
     res.status(200).json({
       success: true,
-      message: 'Origin hinzugefÃ¼gt',
+      message: 'Origin hinzugefügt',
       allowedOrigins
     });
   } else {
     res.status(403).json({
       success: false,
-      message: 'Nur CEO kann Origins hinzufÃ¼gen'
+      message: 'Nur CEO kann Origins hinzufügen'
     });
   }
 };
@@ -233,7 +233,7 @@ const removeCorsOrigin = (req, res) => {
 
     if (index > -1) {
       allowedOrigins.splice(index, 1);
-      logger.log('âœ… CORS origin removed:', origin);
+      logger.log('✅ CORS origin removed:', origin);
     }
 
     res.status(200).json({

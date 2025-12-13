@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Lifecycle Email Templates
  * Automated trial nurturing emails for conversion optimization
  *
@@ -37,13 +37,13 @@ const generateHtmlEmail = (subject, body) => {
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/âœ…/g, '<span style="color: #10B981;">âœ…</span>')
-    .replace(/ðŸŽ¯/g, '<span>ðŸŽ¯</span>')
-    .replace(/ðŸ’¡/g, '<span>ðŸ’¡</span>')
-    .replace(/â°/g, '<span>â°</span>')
-    .replace(/ðŸš€/g, '<span>ðŸš€</span>')
-    .replace(/ðŸŽ/g, '<span>ðŸŽ</span>')
-    .replace(/ðŸ‘‹/g, '<span>ðŸ‘‹</span>');
+    .replace(/✅/g, '<span style="color: #10B981;">✅</span>')
+    .replace(/🎯/g, '<span>🎯</span>')
+    .replace(/💡/g, '<span>💡</span>')
+    .replace(/⏰/g, '<span>⏰</span>')
+    .replace(/🚀/g, '<span>🚀</span>')
+    .replace(/🎁/g, '<span>🎁</span>')
+    .replace(/👋/g, '<span>👋</span>');
 
   return `
 <!DOCTYPE html>
@@ -101,7 +101,7 @@ const ctaButton = (text, url) => `
  */
 export const getLifecycleEmailTemplate = (emailType, data) => {
   const {
-    userName = 'GeschÃ¤tzter Kunde',
+    userName = 'Geschätzter Kunde',
     salonName = 'Ihr Studio',
     dashboardUrl = 'https://app.jn-automation.de/admin',
     pricingUrl = 'https://jn-automation.de/pricing',
@@ -111,28 +111,28 @@ export const getLifecycleEmailTemplate = (emailType, data) => {
   const templates = {
     // ==================== DAY 1: WELCOME ====================
     welcome_day1: createEmailTemplate(
-      `ðŸš€ Willkommen bei JN Automation, ${userName}!`,
+      `🚀 Willkommen bei JN Automation, ${userName}!`,
       `Hallo ${userName},
 
-herzlich willkommen bei JN Automation! ðŸ‘‹
+herzlich willkommen bei JN Automation! 👋
 
-Dein 30-Tage-Test fÃ¼r **${salonName}** ist jetzt aktiv. Hier sind deine nÃ¤chsten Schritte:
+Dein 30-Tage-Test für **${salonName}** ist jetzt aktiv. Hier sind deine nächsten Schritte:
 
 **In 5 Minuten startklar:**
 
-âœ… **Schritt 1:** Services anlegen
+✅ **Schritt 1:** Services anlegen
 Erstelle deine Behandlungen mit Preisen und Dauer.
 
-âœ… **Schritt 2:** Ã–ffnungszeiten festlegen
+✅ **Schritt 2:** Öffnungszeiten festlegen
 Definiere wann dein Studio Termine annimmt.
 
-âœ… **Schritt 3:** Widget einbinden
-Kopiere den Code und fÃ¼ge ihn auf deiner Website ein.
+✅ **Schritt 3:** Widget einbinden
+Kopiere den Code und füge ihn auf deiner Website ein.
 
-âœ… **Schritt 4:** Erster Test-Termin
+✅ **Schritt 4:** Erster Test-Termin
 Buche selbst einen Termin um alles zu testen.
 
-${ctaButton('Jetzt zum Dashboard â†’', dashboardUrl)}
+${ctaButton('Jetzt zum Dashboard →', dashboardUrl)}
 
 **Brauchst du Hilfe?**
 Antworte einfach auf diese E-Mail oder schreibe an ${supportEmail}
@@ -140,57 +140,57 @@ Antworte einfach auf diese E-Mail oder schreibe an ${supportEmail}
 Viel Erfolg mit deinem Studio!
 
 Julius
-GrÃ¼nder, JN Automation`
+Gründer, JN Automation`
     ),
 
     // ==================== DAY 3: ENGAGEMENT CHECK ====================
     engagement_day3: createEmailTemplate(
-      `ðŸ’¡ ${userName}, hast du schon deinen ersten Termin erstellt?`,
+      `💡 ${userName}, hast du schon deinen ersten Termin erstellt?`,
       `Hallo ${userName},
 
-du bist jetzt seit 3 Tagen bei JN Automation dabei. Wie lÃ¤uft's? ðŸŽ¯
+du bist jetzt seit 3 Tagen bei JN Automation dabei. Wie läuft's? 🎯
 
 **Schnelle Frage:** Hast du schon...
 
-â˜ Deine Services angelegt?
-â˜ Die Ã–ffnungszeiten eingestellt?
-â˜ Das Buchungs-Widget getestet?
+☐ Deine Services angelegt?
+☐ Die Öffnungszeiten eingestellt?
+☐ Das Buchungs-Widget getestet?
 
 Falls nicht - kein Problem! Die Einrichtung dauert nur **5-10 Minuten**.
 
-${ctaButton('Studio einrichten â†’', dashboardUrl)}
+${ctaButton('Studio einrichten →', dashboardUrl)}
 
 **Wusstest du?**
 Studios, die in der ersten Woche aktiv sind, sparen durchschnittlich **8 Stunden pro Monat** bei der Terminverwaltung.
 
 **Noch Fragen?**
-Ich helfe dir gerne persÃ¶nlich. Schreib mir an ${supportEmail}
+Ich helfe dir gerne persönlich. Schreib mir an ${supportEmail}
 
-Beste GrÃ¼ÃŸe,
+Beste Grüße,
 Julius`
     ),
 
     // ==================== DAY 7: MID-TRIAL ====================
     midtrial_day7: createEmailTemplate(
-      `â° ${userName}, noch 23 Tage Trial â€“ brauchst du UnterstÃ¼tzung?`,
+      `⏰ ${userName}, noch 23 Tage Trial – brauchst du Unterstützung?`,
       `Hallo ${userName},
 
-eine Woche ist rum! Dein Test lÃ¤uft noch **23 Tage**.
+eine Woche ist rum! Dein Test läuft noch **23 Tage**.
 
 **Wie kann ich dir helfen?**
 
-Ich mÃ¶chte sicherstellen, dass du das Beste aus JN Automation herausholst. Hier sind die hÃ¤ufigsten Fragen:
+Ich möchte sicherstellen, dass du das Beste aus JN Automation herausholst. Hier sind die häufigsten Fragen:
 
-ðŸŽ¯ **"Wie integriere ich das Widget auf meiner Website?"**
-â†’ Kopiere einfach den Code aus Dashboard > Widget
+🎯 **"Wie integriere ich das Widget auf meiner Website?"**
+→ Kopiere einfach den Code aus Dashboard > Widget
 
-ðŸŽ¯ **"Kann ich die BestÃ¤tigungsmail anpassen?"**
-â†’ Ja! Unter Einstellungen > E-Mail-Templates
+🎯 **"Kann ich die Bestätigungsmail anpassen?"**
+→ Ja! Unter Einstellungen > E-Mail-Templates
 
-ðŸŽ¯ **"Was passiert wenn ein Kunde absagt?"**
-â†’ Du bekommst sofort eine Benachrichtigung und der Termin wird freigegeben
+🎯 **"Was passiert wenn ein Kunde absagt?"**
+→ Du bekommst sofort eine Benachrichtigung und der Termin wird freigegeben
 
-${ctaButton('Alle Features entdecken â†’', dashboardUrl)}
+${ctaButton('Alle Features entdecken →', dashboardUrl)}
 
 **Pro-Tipp:**
 Aktiviere automatische Erinnerungen! Studios mit aktivierten Erinnerungen haben **30% weniger No-Shows**.
@@ -202,31 +202,31 @@ Julius`
 
     // ==================== DAY 23: URGENCY ====================
     urgency_day23: createEmailTemplate(
-      `âš ï¸ ${userName}, nur noch 7 Tage bis dein Test endet`,
+      `⚠️ ${userName}, nur noch 7 Tage bis dein Test endet`,
       `Hallo ${userName},
 
-dein 30-Tage-Test fÃ¼r **${salonName}** endet in **7 Tagen**.
+dein 30-Tage-Test für **${salonName}** endet in **7 Tagen**.
 
 **Hast du schon alle Features getestet?**
 
-âœ… Online-Buchungswidget
-âœ… Automatische TerminbestÃ¤tigungen
-âœ… Erinnerungs-E-Mails an Kunden
-âœ… Google-Bewertungsanfragen
-âœ… Umsatz-Statistiken
+✅ Online-Buchungswidget
+✅ Automatische Terminbestätigungen
+✅ Erinnerungs-E-Mails an Kunden
+✅ Google-Bewertungsanfragen
+✅ Umsatz-Statistiken
 
 **Jetzt upgraden und profitieren:**
 
-ðŸŽ **Starter** â€“ â‚¬49/Monat
-FÃ¼r Solo-Studios mit bis zu 500 Buchungen
+🎁 **Starter** – €49/Monat
+Für Solo-Studios mit bis zu 500 Buchungen
 
-ðŸŽ **Professional** â€“ â‚¬99/Monat
-FÃ¼r wachsende Studios mit Team
+🎁 **Professional** – €99/Monat
+Für wachsende Studios mit Team
 
-ðŸŽ **Enterprise** â€“ â‚¬199/Monat
-FÃ¼r groÃŸe Ketten mit mehreren Standorten
+🎁 **Enterprise** – €199/Monat
+Für große Ketten mit mehreren Standorten
 
-${ctaButton('Plan auswÃ¤hlen â†’', pricingUrl)}
+${ctaButton('Plan auswählen →', pricingUrl)}
 
 **20% Rabatt bei Jahreszahlung!**
 
@@ -237,22 +237,22 @@ Julius`
 
     // ==================== DAY 30: FINAL CALL ====================
     expiry_day30: createEmailTemplate(
-      `ðŸš¨ ${userName}, dein Test endet HEUTE`,
+      `🚨 ${userName}, dein Test endet HEUTE`,
       `Hallo ${userName},
 
-dein 30-Tage-Test fÃ¼r **${salonName}** endet **heute um Mitternacht**.
+dein 30-Tage-Test für **${salonName}** endet **heute um Mitternacht**.
 
 **Ab morgen:**
-âŒ Kein Zugriff mehr auf dein Dashboard
-âŒ Buchungs-Widget funktioniert nicht mehr
-âŒ Bestehende Termine bleiben, aber keine neuen
+❌ Kein Zugriff mehr auf dein Dashboard
+❌ Buchungs-Widget funktioniert nicht mehr
+❌ Bestehende Termine bleiben, aber keine neuen
 
 **Jetzt upgraden und nahtlos weitermachen:**
 
-${ctaButton('Jetzt upgraden â†’', pricingUrl)}
+${ctaButton('Jetzt upgraden →', pricingUrl)}
 
 **Nicht bereit?**
-Kein Problem! Deine Daten bleiben 30 Tage gespeichert. Du kannst jederzeit zurÃ¼ckkommen.
+Kein Problem! Deine Daten bleiben 30 Tage gespeichert. Du kannst jederzeit zurückkommen.
 
 Danke, dass du JN Automation ausprobiert hast!
 
@@ -261,24 +261,24 @@ Julius`
 
     // ==================== DAY 31: POST-EXPIRY DISCOUNT ====================
     expired_day31: createEmailTemplate(
-      `ðŸŽ ${userName}, exklusiv fÃ¼r dich: 20% Rabatt`,
+      `🎁 ${userName}, exklusiv für dich: 20% Rabatt`,
       `Hallo ${userName},
 
 dein Test ist gestern abgelaufen. Schade, dass es nicht geklappt hat!
 
-**Aber ich mÃ¶chte dir eine letzte Chance geben:**
+**Aber ich möchte dir eine letzte Chance geben:**
 
-ðŸŽ **20% Rabatt auf alle PlÃ¤ne** â€“ nur heute!
+🎁 **20% Rabatt auf alle Pläne** – nur heute!
 
 Nutze den Code **COMEBACK20** beim Checkout.
 
-${ctaButton('Mit 20% Rabatt starten â†’', pricingUrl)}
+${ctaButton('Mit 20% Rabatt starten →', pricingUrl)}
 
 **Deine Daten sind noch da!**
 Alle deine Services, Einstellungen und Statistiken warten auf dich.
 
 **War etwas nicht gut?**
-Ich wÃ¼rde mich Ã¼ber ehrliches Feedback freuen. Was hat gefehlt? Was kÃ¶nnen wir besser machen?
+Ich würde mich über ehrliches Feedback freuen. Was hat gefehlt? Was können wir besser machen?
 
 Einfach auf diese E-Mail antworten.
 
@@ -287,24 +287,24 @@ Julius`
 
     // ==================== DAY 45: WIN-BACK ====================
     winback_day45: createEmailTemplate(
-      `ðŸ‘‹ ${userName}, wir vermissen dich!`,
+      `👋 ${userName}, wir vermissen dich!`,
       `Hallo ${userName},
 
 es ist eine Weile her seit deinem Test bei JN Automation.
 
 **Was ist passiert?**
-- Nicht das Richtige fÃ¼r dich?
+- Nicht das Richtige für dich?
 - Keine Zeit gehabt?
 - Technische Probleme?
 
-Ich wÃ¼rde mich freuen zu hÃ¶ren, was wir besser machen kÃ¶nnen.
+Ich würde mich freuen zu hören, was wir besser machen können.
 
-**Neuer Start gefÃ¤llig?**
-Falls du es nochmal probieren mÃ¶chtest, schenke ich dir **einen weiteren Monat kostenlos**.
+**Neuer Start gefällig?**
+Falls du es nochmal probieren möchtest, schenke ich dir **einen weiteren Monat kostenlos**.
 
-${ctaButton('Kostenlosen Monat aktivieren â†’', `${pricingUrl}?promo=FREETRIAL`)}
+${ctaButton('Kostenlosen Monat aktivieren →', `${pricingUrl}?promo=FREETRIAL`)}
 
-Ansonsten: Alles Gute fÃ¼r dein Business!
+Ansonsten: Alles Gute für dein Business!
 
 Julius
 JN Automation`

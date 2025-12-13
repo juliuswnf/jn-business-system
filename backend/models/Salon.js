@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 const emailTemplateSchema = new mongoose.Schema({
   subject: {
@@ -35,7 +35,7 @@ const salonSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    index: true // ✅ Performance optimization for owner queries
+    index: true // ? Performance optimization for owner queries
   },
 
   // ==================== MULTI-INDUSTRY SUPPORT ====================
@@ -186,7 +186,7 @@ const salonSchema = new mongoose.Schema({
     min: 0
   },
 
-  // ✅ HIGH FIX #8: Capacity Management
+  // ? HIGH FIX #8: Capacity Management
   capacity: {
     type: Number,
     default: 5, // Default: 5 concurrent bookings
@@ -277,7 +277,7 @@ const salonSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true,
-    index: true // ✅ Performance optimization for active salon queries
+    index: true // ? Performance optimization for active salon queries
   },
   isPremium: {
     type: Boolean,
@@ -320,8 +320,8 @@ salonSchema.index({ owner: 1 });
 salonSchema.index({ 'subscription.status': 1 });
 salonSchema.index({ isActive: 1 });
 salonSchema.index({ deletedAt: 1 }); // For soft delete queries
-salonSchema.index({ owner: 1, isActive: 1 }); // ✅ Compound index for owner's active salons
-salonSchema.index({ owner: 1, deletedAt: 1 }); // ✅ Compound index for owner's non-deleted salons
+salonSchema.index({ owner: 1, isActive: 1 }); // ? Compound index for owner's active salons
+salonSchema.index({ owner: 1, deletedAt: 1 }); // ? Compound index for owner's non-deleted salons
 
 // ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
 
@@ -528,10 +528,10 @@ salonSchema.methods.initializeDefaultTemplates = function() {
   this.emailTemplates = {
     confirmation: {
       de: {
-        subject: 'BuchungsbestÃ¤tigung - {{salon_name}}',
+        subject: 'Buchungsbestätigung - {{salon_name}}',
         body: `Hallo {{customer_name}},
 
-Ihre Buchung wurde erfolgreich bestÃ¤tigt!
+Ihre Buchung wurde erfolgreich bestätigt!
 
 Details:
 - Service: {{service_name}}
@@ -548,7 +548,7 @@ Telefon: {{salon_phone}}
 
 Wir freuen uns auf Ihren Besuch!
 
-Mit freundlichen GrÃ¼ÃŸen,
+Mit freundlichen Grüßen,
 {{salon_name}}`,
         language: 'de'
       },
@@ -621,9 +621,9 @@ We look forward to seeing you!
         subject: 'Wie war Ihr Besuch bei {{salon_name}}?',
         body: `Hallo {{customer_name}},
 
-vielen Dank fÃ¼r Ihren Besuch bei uns!
+vielen Dank für Ihren Besuch bei uns!
 
-Wir wÃ¼rden uns sehr Ã¼ber Ihr Feedback freuen. Ihre Meinung hilft uns, unseren Service kontinuierlich zu verbessern.
+Wir würden uns sehr über Ihr Feedback freuen. Ihre Meinung hilft uns, unseren Service kontinuierlich zu verbessern.
 
 Bitte teilen Sie Ihre Erfahrung auf Google:
 {{google_review_url}}

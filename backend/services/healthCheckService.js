@@ -1,11 +1,11 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
 import Stripe from 'stripe';
-import emailQueueWorker from '../workers/emailQueueWorker.js';
+
 import EmailQueue from '../models/EmailQueue.js';
 
 /**
- * ✅ MEDIUM FIX #14: Comprehensive Health Check Service
+ * ? MEDIUM FIX #14: Comprehensive Health Check Service
  *
  * Monitors all critical system components:
  * - Database connectivity
@@ -61,7 +61,7 @@ const checkDatabase = async () => {
       }
     };
   } catch (error) {
-    logger.error('❌ Database health check failed:', error);
+    logger.error('? Database health check failed:', error);
     return {
       status: 'unhealthy',
       message: 'Database connection failed',
@@ -101,7 +101,7 @@ const checkStripe = async () => {
       }
     };
   } catch (error) {
-    logger.error('❌ Stripe health check failed:', error);
+    logger.error('? Stripe health check failed:', error);
     return {
       status: 'unhealthy',
       message: 'Stripe API connection failed',
@@ -140,7 +140,7 @@ const checkEmailQueue = async () => {
       }
     };
   } catch (error) {
-    logger.error('❌ Email queue health check failed:', error);
+    logger.error('? Email queue health check failed:', error);
     return {
       status: 'unhealthy',
       message: 'Email queue check failed',
@@ -173,7 +173,7 @@ const checkMemory = () => {
       }
     };
   } catch (error) {
-    logger.error('❌ Memory health check failed:', error);
+    logger.error('? Memory health check failed:', error);
     return {
       status: 'unknown',
       message: 'Memory check failed',
@@ -251,7 +251,7 @@ export const healthCheckEndpoint = async (req, res) => {
       ...health
     });
   } catch (error) {
-    logger.error('❌ Health check endpoint error:', error);
+    logger.error('? Health check endpoint error:', error);
     res.status(503).json({
       success: false,
       status: 'unhealthy',
