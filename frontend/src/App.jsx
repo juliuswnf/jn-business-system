@@ -23,6 +23,7 @@ const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Demo = lazy(() => import('./pages/Demo'));
 const Checkout = lazy(() => import('./pages/Checkout'));
+const SubscriptionManagement = lazy(() => import('./pages/SubscriptionManagement'));
 const Impressum = lazy(() => import('./pages/legal/Impressum'));
 const Datenschutz = lazy(() => import('./pages/legal/Datenschutz'));
 const AGB = lazy(() => import('./pages/legal/AGB'));
@@ -342,6 +343,14 @@ function App() {
               <DashboardLayout>
                 <LazyPage><Settings /></LazyPage>
               </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/subscription"
+          element={
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
+              <LazyPage><SubscriptionManagement /></LazyPage>
             </ProtectedRoute>
           }
         />

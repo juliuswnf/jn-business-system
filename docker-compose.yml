@@ -4,7 +4,7 @@ services:
   # ==================== MONGODB DATABASE ====================
 
   mongodb:
-    image: mongo:6.0-alpine
+    image: mongo:6.0
     container_name: jn-automation-mongodb
     hostname: mongodb
     ports:

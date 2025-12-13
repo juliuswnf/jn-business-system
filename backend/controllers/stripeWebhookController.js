@@ -184,13 +184,21 @@ const handleSubscriptionCreated = async (subscription) => {
     salon.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
 
+    // Set tier and billing cycle from metadata
+    if (subscription.metadata.tier) {
+      salon.subscription.tier = subscription.metadata.tier;
+    }
+    if (subscription.metadata.billingCycle) {
+      salon.subscription.billingCycle = subscription.metadata.billingCycle;
+    }
+
     if (subscription.trial_end) {
       salon.subscription.trialEndsAt = new Date(subscription.trial_end * 1000);
     }
 
     await salon.save();
 
-    logger.log(`âœ… Subscription created for salon: ${salon.slug}`);
+    logger.log(`✅ Subscription created for salon: ${salon.slug} (${salon.subscription.tier} - ${salon.subscription.billingCycle})`);
   } catch (error) {
     logger.error('Error handling subscription created:', error);
   }
@@ -210,11 +218,29 @@ const handleSubscriptionUpdated = async (subscription) => {
       return;
     }
 
+    const oldStatus = salon.subscription.status;
+    const oldTier = salon.subscription.tier;
+
     // Update subscription status
     salon.subscription.status = subscription.status === 'trialing' ? 'trial' : subscription.status;
     salon.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
     salon.subscription.cancelAtPeriodEnd = subscription.cancel_at_period_end;
+
+    // Update tier and billing cycle from metadata
+    if (subscription.metadata.tier && subscription.metadata.tier !== salon.subscription.tier) {
+      salon.subscription.tier = subscription.metadata.tier;
+      logger.log(`📈 Tier changed from ${oldTier} to ${subscription.metadata.tier} for salon: ${salon.slug}`);
+    }
+    if (subscription.metadata.billingCycle) {
+      salon.subscription.billingCycle = subscription.metadata.billingCycle;
+    }
+
+    // Handle trial conversion
+    if (oldStatus === 'trial' && salon.subscription.status === 'active') {
+      salon.subscription.trialEndsAt = null;
+      logger.log(`🎉 Trial converted to active for salon: ${salon.slug}`);
+    }
 
     if (subscription.trial_end) {
       salon.subscription.trialEndsAt = new Date(subscription.trial_end * 1000);
@@ -222,7 +248,7 @@ const handleSubscriptionUpdated = async (subscription) => {
 
     await salon.save();
 
-    logger.log(`âœ… Subscription updated for salon: ${salon.slug}`);
+    logger.log(`✅ Subscription updated for salon: ${salon.slug} (${salon.subscription.tier} - ${salon.subscription.status})`);
   } catch (error) {
     logger.error('Error handling subscription updated:', error);
   }

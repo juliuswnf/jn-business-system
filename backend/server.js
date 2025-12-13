@@ -30,6 +30,7 @@ import publicBookingRoutes from './routes/publicBookingRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import subscriptionManagementRoutes from './routes/subscriptionManagement.js';
 import ceoRoutes from './routes/ceoRoutes.js';
 import widgetRoutes from './routes/widgetRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
@@ -199,6 +200,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bookings/public', publicBookingRoutes);
 app.use('/api/widget', widgetRoutes); // Embeddable Widget API
 app.use('/api/subscriptions', subscriptionRoutes); // Stripe Subscription Management
+app.use('/api/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected)
 app.use('/api/system', systemRoutes); // ✅ MEDIUM FIX #13 & #14: Health & Backups
 app.use('/api/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: public + protected)
 

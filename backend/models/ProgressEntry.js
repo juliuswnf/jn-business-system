@@ -126,8 +126,7 @@ const progressEntrySchema = new mongoose.Schema(
         reps: Number
       },
       plank: {
-        duration: Number,
-        comment: 'Seconds'
+        duration: Number // Seconds
       }
     },
 

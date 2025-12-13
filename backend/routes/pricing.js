@@ -7,9 +7,12 @@ import {
   checkFeatureAccess,
   compareTiersEndpoint
 } from '../controllers/pricingController.js';
-import { authenticateSalon } from '../middleware/auth.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Use protect middleware for authentication
+const authenticateSalon = authMiddleware.protect;
 
 /**
  * Pricing Routes

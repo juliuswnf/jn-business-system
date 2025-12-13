@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import SMSUsageWidget from '../components/SMSUsageWidget';
 
 // API Base URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -160,6 +161,11 @@ const BusinessOwnerDashboard = () => {
           </div>
         ) : (
           <>
+            {/* SMS Usage Widget (Enterprise Only) */}
+            <div className="mb-8">
+              <SMSUsageWidget />
+            </div>
+
             {/* Today's Bookings */}
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
               <h2 className="text-xl font-semibold text-white mb-4">Heutige Termine</h2>

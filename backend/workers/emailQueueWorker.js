@@ -263,13 +263,12 @@ const stopWorker = (intervals) => {
   if (intervals.cleanupIntervalId) {
     clearInterval(intervals.cleanupIntervalId);
   }
-  logger.log('ðŸ›‘ Email queue worker stopped');
+  logger.log('🛑 Email queue worker stopped');
 };
 
 // ES6 Export
 export default {
   processEmailQueue,
-  processEmailQueueSafe, // ✅ HIGH FIX #9
   processEmailQueueItem,
   scheduleReminderEmail,
   scheduleReviewEmail,
