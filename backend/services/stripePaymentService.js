@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
-import Salon from '../models/Salon.js';
+import logger from '../utils/logger.js';
 import { PRICING_TIERS } from '../config/pricing.js';
 
 // Load environment variables
@@ -33,16 +33,16 @@ class StripePaymentService {
     this.priceIds = {
       starter: {
         monthly: process.env.STRIPE_STARTER_MONTHLY || 'price_1Sa2FXCfgv8Lqc0aJEHE6Y5r',
-        yearly: process.env.STRIPE_STARTER_YEARLY || 'price_1SbpU9Cfgv8Lqc0a2UKslNdB',
+        yearly: process.env.STRIPE_STARTER_YEARLY || 'price_1SbpU9Cfgv8Lqc0a2UKslNdB'
       },
       professional: {
         monthly: process.env.STRIPE_PROFESSIONAL_MONTHLY || 'price_1Sa2FzCfgv8Lqc0aU7erudfl',
-        yearly: process.env.STRIPE_PROFESSIONAL_YEARLY || 'price_1SbpUTCfgv8Lqc0aMoJ2EBh4',
+        yearly: process.env.STRIPE_PROFESSIONAL_YEARLY || 'price_1SbpUTCfgv8Lqc0aMoJ2EBh4'
       },
       enterprise: {
         monthly: process.env.STRIPE_ENTERPRISE_MONTHLY || 'price_1SbpSeCfgv8Lqc0aOsHZx11S',
-        yearly: process.env.STRIPE_ENTERPRISE_YEARLY || 'price_1SbpUmCfgv8Lqc0avzsttWvO',
-      },
+        yearly: process.env.STRIPE_ENTERPRISE_YEARLY || 'price_1SbpUmCfgv8Lqc0avzsttWvO'
+      }
     };
 
     logger.info('? Stripe Payment Service initialized with Price IDs:', {
@@ -51,7 +51,7 @@ class StripePaymentService {
       professional_monthly: this.priceIds.professional.monthly,
       professional_yearly: this.priceIds.professional.yearly,
       enterprise_monthly: this.priceIds.enterprise.monthly,
-      enterprise_yearly: this.priceIds.enterprise.yearly,
+      enterprise_yearly: this.priceIds.enterprise.yearly
     });
   }
 
@@ -74,8 +74,8 @@ class StripePaymentService {
       name: salon.name,
       metadata: {
         salonId: salon._id.toString(),
-        salonSlug: salon.slug,
-      },
+        salonSlug: salon.slug
+      }
     });
 
     // Save customer ID to salon
@@ -105,7 +105,7 @@ class StripePaymentService {
     billingCycle = 'monthly',
     paymentMethodId,
     email,
-    trial = false,
+    trial = false
   }) {
     try {
       // Validate tier
@@ -119,14 +119,14 @@ class StripePaymentService {
       // Attach payment method to customer
       if (paymentMethodId) {
         await this.stripe.paymentMethods.attach(paymentMethodId, {
-          customer: customerId,
+          customer: customerId
         });
 
         // Set as default payment method
         await this.stripe.customers.update(customerId, {
           invoice_settings: {
-            default_payment_method: paymentMethodId,
-          },
+            default_payment_method: paymentMethodId
+          }
         });
       }
 
@@ -143,14 +143,14 @@ class StripePaymentService {
         payment_behavior: 'default_incomplete',
         payment_settings: {
           payment_method_types: ['card'],
-          save_default_payment_method: 'on_subscription',
+          save_default_payment_method: 'on_subscription'
         },
         expand: ['latest_invoice.payment_intent'],
         metadata: {
           salonId: salon._id.toString(),
           tier,
-          billingCycle,
-        },
+          billingCycle
+        }
       };
 
       // Add trial period if requested (14 days for Enterprise trial)
@@ -180,7 +180,7 @@ class StripePaymentService {
       return {
         subscriptionId: subscription.id,
         clientSecret: subscription.latest_invoice.payment_intent.client_secret,
-        status: subscription.status,
+        status: subscription.status
       };
     } catch (error) {
       logger.error('[Stripe] Error creating subscription:', error);
@@ -223,8 +223,8 @@ class StripePaymentService {
         items: [
           {
             id: subscription.items.data[0].id,
-            price: newPriceId,
-          },
+            price: newPriceId
+          }
         ],
         proration_behavior: 'always_invoice', // Create invoice for prorated amount
         metadata: {
@@ -232,8 +232,8 @@ class StripePaymentService {
           tier: newTier,
           billingCycle,
           previousTier: currentTier,
-          upgradeDate: new Date().toISOString(),
-        },
+          upgradeDate: new Date().toISOString()
+        }
       });
 
       // Update salon
@@ -251,7 +251,7 @@ class StripePaymentService {
       return {
         subscriptionId: updatedSubscription.id,
         status: updatedSubscription.status,
-        proratedAmount: updatedSubscription.latest_invoice?.amount_due || 0,
+        proratedAmount: updatedSubscription.latest_invoice?.amount_due || 0
       };
     } catch (error) {
       logger.error('[Stripe] Error upgrading subscription:', error);
@@ -298,8 +298,8 @@ class StripePaymentService {
           items: [
             {
               id: subscription.items.data[0].id,
-              price: newPriceId,
-            },
+              price: newPriceId
+            }
           ],
           proration_behavior: 'none', // No proration for downgrades
           metadata: {
@@ -307,8 +307,8 @@ class StripePaymentService {
             tier: newTier,
             billingCycle,
             previousTier: currentTier,
-            downgradeDate: new Date().toISOString(),
-          },
+            downgradeDate: new Date().toISOString()
+          }
         });
 
         // Update salon immediately
@@ -320,8 +320,8 @@ class StripePaymentService {
           items: [
             {
               id: subscription.items.data[0].id,
-              price: newPriceId,
-            },
+              price: newPriceId
+            }
           ],
           proration_behavior: 'none',
           billing_cycle_anchor: 'unchanged',
@@ -330,8 +330,8 @@ class StripePaymentService {
             scheduledTier: newTier,
             scheduledBillingCycle: billingCycle,
             previousTier: currentTier,
-            downgradeScheduledDate: new Date().toISOString(),
-          },
+            downgradeScheduledDate: new Date().toISOString()
+          }
         });
 
         // Mark for downgrade at period end (keep current tier until then)
@@ -340,7 +340,7 @@ class StripePaymentService {
         salon.subscription.scheduledTierChange = {
           newTier,
           billingCycle,
-          effectiveDate: new Date(subscription.current_period_end * 1000),
+          effectiveDate: new Date(subscription.current_period_end * 1000)
         };
       }
 
@@ -358,7 +358,7 @@ class StripePaymentService {
         immediate,
         effectiveDate: immediate
           ? new Date()
-          : new Date(subscription.current_period_end * 1000),
+          : new Date(subscription.current_period_end * 1000)
       };
     } catch (error) {
       logger.error('[Stripe] Error downgrading subscription:', error);
@@ -394,16 +394,16 @@ class StripePaymentService {
           type: 'sepa_debit',
           billing_details: {
             name,
-            email,
+            email
           },
           sepa_debit: {
-            iban,
-          },
+            iban
+          }
         },
         metadata: {
           salonId: salon._id.toString(),
-          paymentType: 'sepa',
-        },
+          paymentType: 'sepa'
+        }
       });
 
       // Update salon payment method
@@ -414,7 +414,7 @@ class StripePaymentService {
 
       return {
         clientSecret: setupIntent.client_secret,
-        status: setupIntent.status,
+        status: setupIntent.status
       };
     } catch (error) {
       logger.error('[Stripe] Error setting up SEPA:', error);
@@ -450,7 +450,7 @@ class StripePaymentService {
         customer: customerId,
         amount,
         currency: 'eur',
-        description,
+        description
       });
 
       // Create invoice
@@ -461,8 +461,8 @@ class StripePaymentService {
         auto_advance: true,
         metadata: {
           salonId: salon._id.toString(),
-          paymentType: 'invoice',
-        },
+          paymentType: 'invoice'
+        }
       });
 
       // Finalize and send invoice
@@ -480,7 +480,7 @@ class StripePaymentService {
         invoiceUrl: finalizedInvoice.hosted_invoice_url,
         invoicePdf: finalizedInvoice.invoice_pdf,
         dueDate: new Date(finalizedInvoice.due_date * 1000),
-        amount: finalizedInvoice.amount_due / 100,
+        amount: finalizedInvoice.amount_due / 100
       };
     } catch (error) {
       logger.error('[Stripe] Error creating invoice:', error);
@@ -517,8 +517,8 @@ class StripePaymentService {
           ...subscription.metadata,
           trialConverted: 'true',
           trialConversionDate: new Date().toISOString(),
-          tier,
-        },
+          tier
+        }
       });
 
       // Update salon
@@ -532,7 +532,7 @@ class StripePaymentService {
       return {
         subscriptionId: updatedSubscription.id,
         status: updatedSubscription.status,
-        tier,
+        tier
       };
     } catch (error) {
       logger.error('[Stripe] Error converting trial to paid:', error);
@@ -562,7 +562,7 @@ class StripePaymentService {
       } else {
         // Cancel at period end
         canceledSubscription = await this.stripe.subscriptions.update(subscription.id, {
-          cancel_at_period_end: true,
+          cancel_at_period_end: true
         });
         salon.subscription.cancelAtPeriodEnd = true;
       }
@@ -578,7 +578,7 @@ class StripePaymentService {
       return {
         subscriptionId: canceledSubscription.id,
         status: canceledSubscription.status,
-        canceledAt: immediately ? new Date() : new Date(subscription.current_period_end * 1000),
+        canceledAt: immediately ? new Date() : new Date(subscription.current_period_end * 1000)
       };
     } catch (error) {
       logger.error('[Stripe] Error canceling subscription:', error);
@@ -600,3 +600,4 @@ class StripePaymentService {
 
 // Singleton instance
 export default new StripePaymentService();
+

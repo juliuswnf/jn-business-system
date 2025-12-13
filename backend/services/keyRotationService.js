@@ -274,7 +274,7 @@ async function reEncryptAllData(oldVersion, newVersion) {
 /**
  * Store keys securely (production implementation)
  */
-async function storeKeysSecurely(keys) {
+async function storeKeysSecurely(_keys) {
   // In production, use:
   // - AWS KMS (Key Management Service)
   // - Azure Key Vault

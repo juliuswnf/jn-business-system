@@ -53,7 +53,7 @@ export const exportCustomerData = async (req, res) => {
       if (error) {
         logger.error('Failed to send export file:', error);
       }
-      
+
       // Clean up file after download
       setTimeout(() => {
         try {
@@ -251,18 +251,18 @@ async function generateExportFile(data, format, customerId) {
 /**
  * Convert data to CSV format
  */
-function convertToCSV(data, type) {
+function convertToCSV(data, _type) {
   if (!data || data.length === 0) {
     return 'No data available';
   }
 
   // Get headers from first object
-  const headers = Object.keys(data[0]).filter(key => 
+  const headers = Object.keys(data[0]).filter(key =>
     typeof data[0][key] !== 'object' || data[0][key] === null
   );
 
   // Create CSV rows
-  const rows = data.map(item => 
+  const rows = data.map(item =>
     headers.map(header => {
       const value = item[header];
       if (value === null || value === undefined) return '';
@@ -334,7 +334,7 @@ export const requestDataDeletion = async (req, res) => {
 
     // Create deletion request (requires manual review for compliance)
     const DeletionRequest = (await import('../models/DeletionRequest.js')).default;
-    
+
     const request = await DeletionRequest.create({
       customerId,
       requestedBy: req.user.id,

@@ -220,7 +220,7 @@ export const updateResource = async (req, res) => {
 export const scheduleMaintenance = async (req, res) => {
   try {
     const { id } = req.params;
-    const { startDate, endDate, reason, isRecurring, recurringPattern } = req.body;
+    const { startDate, endDate, reason } = req.body;
     const userId = req.user.id;
 
     const resource = await Resource.findById(id).maxTimeMS(5000);

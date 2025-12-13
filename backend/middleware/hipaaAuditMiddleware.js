@@ -81,7 +81,7 @@ async function logPHIAccess(req, res, dataType, action, startTime, options) {
       },
       ipAddress: getClientIp(req),
       timestamp: new Date(),
-      
+
       // HIPAA-specific fields
       isPHIAccess: true,
       phiAccessDetails: {
@@ -116,7 +116,7 @@ async function logPHIAccess(req, res, dataType, action, startTime, options) {
 /**
  * Extract PHI-specific details from request
  */
-function extractPHIDetails(req, dataType, options) {
+function extractPHIDetails(req, dataType, _options) {
   const details = {
     dataFields: []
   };

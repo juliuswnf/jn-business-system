@@ -156,7 +156,7 @@ const clinicalNoteSchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'clinical_notes'
   }
@@ -175,14 +175,14 @@ clinicalNoteSchema.index({ salonId: 1, noteType: 1 });
 clinicalNoteSchema.methods.encryptContent = function(plainText) {
   const key = Buffer.from(ENCRYPTION_KEY, 'hex');
   const iv = crypto.randomBytes(16);
-  
+
   const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
-  
+
   let encrypted = cipher.update(plainText, 'utf8', 'hex');
   encrypted += cipher.final('hex');
-  
+
   const authTag = cipher.getAuthTag();
-  
+
   this.encryptedContent = encrypted;
   this.encryptedIV = iv.toString('hex');
   this.encryptedAuthTag = authTag.toString('hex');
@@ -196,13 +196,13 @@ clinicalNoteSchema.methods.decryptContent = function() {
     const key = Buffer.from(ENCRYPTION_KEY, 'hex');
     const iv = Buffer.from(this.encryptedIV, 'hex');
     const authTag = Buffer.from(this.encryptedAuthTag, 'hex');
-    
+
     const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, iv);
     decipher.setAuthTag(authTag);
-    
+
     let decrypted = decipher.update(this.encryptedContent, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    
+
     return decrypted;
   } catch (error) {
     throw new Error('Failed to decrypt clinical note');

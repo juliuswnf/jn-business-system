@@ -136,7 +136,7 @@ const artistPortfolioSchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'artist_portfolios'
   }

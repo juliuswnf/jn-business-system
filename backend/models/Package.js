@@ -121,7 +121,7 @@ const packageSchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'packages'
   }

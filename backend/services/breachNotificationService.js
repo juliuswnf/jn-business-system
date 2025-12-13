@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 
 /**
  * Breach Notification Service
- * HIPAA Breach Notification Rule (45 CFR §§ 164.400-414)
+ * HIPAA Breach Notification Rule (45 CFR ï¿½ï¿½ 164.400-414)
  */
 
 /**
@@ -232,7 +232,7 @@ async function detectUnauthorizedAccess(now, timeWindows) {
   }
 
   // Check for repeated unauthorized attempts
-  for (const [key, attempts] of Object.entries(deniedByUser)) {
+  for (const attempts of Object.values(deniedByUser)) {
     if (attempts.length > 5) {
       breaches.push({
         type: 'unauthorized_access_attempt',
@@ -261,7 +261,7 @@ async function handleBreach(breach) {
 
     // Create breach record
     const BreachIncident = (await import('../models/BreachIncident.js')).default;
-    
+
     const incident = await BreachIncident.create({
       type: breach.type,
       severity: breach.severity,
@@ -314,27 +314,27 @@ async function alertAdministrators(breach, incident) {
 
     const emailContent = `
       SECURITY BREACH DETECTED
-      
+
       Type: ${breach.type}
       Severity: ${breach.severity}
       Detected: ${breach.detectedAt.toISOString()}
       Incident ID: ${incident._id}
-      
+
       Details:
       ${JSON.stringify(breach.details, null, 2)}
-      
+
       Immediate Actions Required:
       1. Review incident details in admin dashboard
       2. Investigate access logs
       3. Determine scope of breach
       4. Take corrective actions
       5. Notify affected patients if required
-      
+
       HIPAA Breach Notification Rule:
       - If 500+ patients affected: Notify HHS and media within 60 days
       - If <500 patients affected: Notify HHS annually
       - Notify affected individuals without unreasonable delay
-      
+
       Dashboard: ${process.env.FRONTEND_URL}/admin/breaches/${incident._id}
     `;
 
@@ -427,9 +427,9 @@ async function preparePatientNotifications(incident) {
 async function getAffectedPatients(incident) {
   try {
     const patientIds = incident.details.patients || [];
-    
+
     const User = (await import('../models/User.js')).default;
-    
+
     const patients = await User.find({
       _id: { $in: patientIds },
       role: 'customer'
@@ -504,7 +504,7 @@ export async function sendBreachNotification(notificationId) {
       - Review the attached information on identity theft protection
 
       We take the privacy and security of your information very seriously. For more information or questions, please contact:
-      
+
       Privacy Officer: ${process.env.PRIVACY_OFFICER_NAME || 'Privacy Office'}
       Phone: ${process.env.PRIVACY_OFFICER_PHONE || '1-800-XXX-XXXX'}
       Email: ${process.env.PRIVACY_OFFICER_EMAIL || 'privacy@jnbusiness.com'}

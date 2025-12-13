@@ -1,7 +1,7 @@
 /**
  * Pricing Configuration for JN Automation
  * Updated: December 13, 2025
- * 
+ *
  * Pricing Structure:
  * - Starter: €69/month (€690/year with 17% discount)
  * - Professional: €169/month (€1,690/year with 17% discount)
@@ -12,12 +12,12 @@ export const PRICING_TIERS = {
   starter: {
     name: 'Starter',
     slug: 'starter',
-    
+
     // Pricing
     priceMonthly: 69,
     priceYearly: 690, // 17% discount (2 months free)
     currency: 'EUR',
-    
+
     // Limits
     limits: {
       staff: 3,
@@ -27,7 +27,7 @@ export const PRICING_TIERS = {
       smsPerMonth: 0, // No SMS in Starter
       storageGB: 5
     },
-    
+
     // Features
     features: {
       // Core Booking
@@ -35,23 +35,23 @@ export const PRICING_TIERS = {
       calendar: true,
       customerCRM: true,
       publicSalonPage: true,
-      
+
       // Notifications
       emailNotifications: true,
       smsNotifications: false, // ? No SMS
-      
+
       // Payments
       stripeIntegration: true,
-      
+
       // Reports
       basicReports: true,
       advancedAnalytics: false,
       customReporting: false,
-      
+
       // Marketing
       marketingAutomation: false,
       emailCampaigns: false,
-      
+
       // Advanced Features
       multiServiceBookings: false,
       recurringAppointments: false,
@@ -61,11 +61,11 @@ export const PRICING_TIERS = {
       beforeAfterPhotos: false,
       portfolioManagement: false,
       servicePackages: false,
-      
+
       // Multi-Location
       multiLocation: false,
       multiLocationDashboard: false,
-      
+
       // Enterprise Features
       whiteLabel: false,
       customDomain: false,
@@ -76,16 +76,16 @@ export const PRICING_TIERS = {
       teamPermissions: false
     }
   },
-  
+
   professional: {
     name: 'Professional',
     slug: 'professional',
-    
+
     // Pricing
     priceMonthly: 169,
     priceYearly: 1690, // 17% discount
     currency: 'EUR',
-    
+
     // Limits
     limits: {
       staff: 10,
@@ -95,7 +95,7 @@ export const PRICING_TIERS = {
       smsPerMonth: 0, // ? No SMS (key change from original spec)
       storageGB: 25
     },
-    
+
     // Features
     features: {
       // All Starter features
@@ -107,7 +107,7 @@ export const PRICING_TIERS = {
       smsNotifications: false, // ? Still no SMS in Professional
       stripeIntegration: true,
       basicReports: true,
-      
+
       // Professional Features
       advancedAnalytics: true,
       marketingAutomation: true,
@@ -120,7 +120,7 @@ export const PRICING_TIERS = {
       beforeAfterPhotos: true,
       portfolioManagement: true,
       servicePackages: true,
-      
+
       // Still locked
       customReporting: false,
       multiLocation: false,
@@ -134,16 +134,16 @@ export const PRICING_TIERS = {
       teamPermissions: false
     }
   },
-  
+
   enterprise: {
     name: 'Enterprise',
     slug: 'enterprise',
-    
+
     // Pricing
     priceMonthly: 399,
     priceYearly: 3990, // 17% discount
     currency: 'EUR',
-    
+
     // Limits
     limits: {
       staff: -1, // Unlimited
@@ -154,7 +154,7 @@ export const PRICING_TIERS = {
       smsPerAdditionalStaff: 50, // +50 SMS per staff member beyond 5
       storageGB: 100
     },
-    
+
     // SMS Pricing (Overage)
     smsPricing: {
       includedSMS: 500, // Included in base price
@@ -169,7 +169,7 @@ export const PRICING_TIERS = {
         pricePerSMS: 0.045 // €0.045 per SMS (volume discount)
       }
     },
-    
+
     // Features
     features: {
       // All Professional features
@@ -192,7 +192,7 @@ export const PRICING_TIERS = {
       beforeAfterPhotos: true,
       portfolioManagement: true,
       servicePackages: true,
-      
+
       // Enterprise Features
       customReporting: true,
       multiLocation: true,
@@ -218,12 +218,12 @@ export const SMS_PRIORITY = {
     '2h_reminder', // 2 hours before appointment
     '24h_reminder' // 24 hours before appointment (OPTIMIZED: added this)
   ],
-  
+
   // Medium priority: Send SMS if budget available
   medium: [
     'same_day_reminder' // Morning of appointment
   ],
-  
+
   // Low priority: Email only
   low: [
     'booking_confirmation',
@@ -247,7 +247,7 @@ export const PAYMENT_METHODS = {
       fixed: 0.30
     }
   },
-  
+
   sepa: {
     name: 'SEPA Direct Debit',
     slug: 'sepa',
@@ -258,7 +258,7 @@ export const PAYMENT_METHODS = {
     },
     requiresVerification: true
   },
-  
+
   invoice: {
     name: 'Invoice (Manual)',
     slug: 'invoice',
@@ -344,15 +344,15 @@ export function tierHasFeature(tierSlug, featureName) {
  */
 export function calculateSMSLimit(tierSlug, staffCount) {
   const tier = getTierConfig(tierSlug);
-  
+
   if (!tier || tier.limits.smsPerMonth === 0) {
     return 0; // No SMS for Starter/Professional
   }
-  
+
   const baseSMS = tier.limits.smsPerMonth; // 500
   const additionalStaff = Math.max(0, staffCount - 5); // Staff beyond 5
   const bonusSMS = additionalStaff * tier.limits.smsPerAdditionalStaff; // 50 per staff
-  
+
   return baseSMS + bonusSMS;
 }
 
@@ -362,31 +362,31 @@ export function calculateSMSLimit(tierSlug, staffCount) {
  */
 export function calculateSMSOverageCost(tierSlug, smsUsed, smsLimit) {
   const tier = getTierConfig(tierSlug);
-  
+
   if (!tier || tierSlug !== 'enterprise') {
     return 0;
   }
-  
+
   const overage = smsUsed - smsLimit;
   if (overage <= 0) {
     return 0;
   }
-  
+
   const pricing = tier.smsPricing;
   let cost = 0;
-  
+
   // Tier 1: 501-1000 (€0.05/SMS)
   const tier1SMS = Math.min(overage, pricing.overageTier1.to - smsLimit);
   if (tier1SMS > 0) {
     cost += tier1SMS * pricing.overageTier1.pricePerSMS;
   }
-  
+
   // Tier 2: 1001+ (€0.045/SMS)
   const tier2SMS = Math.max(0, overage - tier1SMS);
   if (tier2SMS > 0) {
     cost += tier2SMS * pricing.overageTier2.pricePerSMS;
   }
-  
+
   return cost;
 }
 
@@ -425,7 +425,7 @@ export function compareTiers(tier1, tier2) {
   const tierOrder = ['starter', 'professional', 'enterprise'];
   const index1 = tierOrder.indexOf(tier1);
   const index2 = tierOrder.indexOf(tier2);
-  
+
   if (index1 < index2) return -1;
   if (index1 > index2) return 1;
   return 0;
@@ -440,26 +440,26 @@ export function shouldUseSMS(notificationType, smsRemaining, tierSlug) {
   if (tierSlug !== 'enterprise') {
     return false;
   }
-  
+
   // No SMS budget remaining
   if (smsRemaining <= 0) {
     return false;
   }
-  
+
   // High priority: Always use SMS if available
   if (SMS_PRIORITY.high.includes(notificationType)) {
     return true;
   }
-  
+
   // Medium priority: Use SMS if we have >20% budget remaining
   const tier = getTierConfig(tierSlug);
   const smsLimit = tier.limits.smsPerMonth;
   const usagePercentage = ((smsLimit - smsRemaining) / smsLimit) * 100;
-  
+
   if (SMS_PRIORITY.medium.includes(notificationType) && usagePercentage < 80) {
     return true;
   }
-  
+
   // Low priority: Never use SMS
   return false;
 }

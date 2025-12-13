@@ -104,7 +104,7 @@ export async function deleteFromCloudinary(publicId) {
 
   try {
     const result = await cloudinary.uploader.destroy(publicId);
-    
+
     if (result.result === 'ok') {
       logger.info(`? Deleted from Cloudinary: ${publicId}`);
     } else {
@@ -131,7 +131,7 @@ export function generateSignedUrl(publicId, expiresIn = 3600) {
 
   try {
     const timestamp = Math.round(Date.now() / 1000) + expiresIn;
-    
+
     const signedUrl = cloudinary.url(publicId, {
       sign_url: true,
       type: 'authenticated',

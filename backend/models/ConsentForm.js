@@ -178,7 +178,7 @@ const consentFormSchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'consent_forms'
   }

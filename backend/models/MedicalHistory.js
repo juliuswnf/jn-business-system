@@ -166,7 +166,7 @@ const medicalHistorySchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'medical_histories'
   }
@@ -192,7 +192,7 @@ medicalHistorySchema.methods.needsReview = function() {
  */
 medicalHistorySchema.methods.checkContraindications = function(treatmentType) {
   // Logic to check if patient has contraindications for specific treatment
-  return this.contraindications.filter(c => 
+  return this.contraindications.filter(c =>
     c.toLowerCase().includes(treatmentType.toLowerCase())
   );
 };

@@ -220,7 +220,7 @@ const progressEntrySchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'progress_entries'
   }
@@ -271,8 +271,8 @@ progressEntrySchema.statics.getProgressSummary = async function(customerId, star
       start: first.recordedAt,
       end: last.recordedAt
     },
-    weightChange: last.weight?.value && first.weight?.value 
-      ? last.weight.value - first.weight.value 
+    weightChange: last.weight?.value && first.weight?.value
+      ? last.weight.value - first.weight.value
       : null,
     bodyFatChange: last.bodyFatPercentage && first.bodyFatPercentage
       ? last.bodyFatPercentage - first.bodyFatPercentage

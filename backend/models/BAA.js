@@ -146,7 +146,7 @@ baaSchema.virtual('daysUntilExpiration').get(function() {
 // Update status based on expiration
 baaSchema.pre('save', function(next) {
   const daysUntilExpiration = this.daysUntilExpiration;
-  
+
   if (daysUntilExpiration < 0) {
     this.status = 'expired';
   } else if (daysUntilExpiration <= 30) {
@@ -154,7 +154,7 @@ baaSchema.pre('save', function(next) {
   } else {
     this.status = 'active';
   }
-  
+
   next();
 });
 
@@ -162,7 +162,7 @@ baaSchema.pre('save', function(next) {
 baaSchema.statics.getExpiringBAAs = function(salonId, days = 30) {
   const futureDate = new Date();
   futureDate.setDate(futureDate.getDate() + days);
-  
+
   return this.find({
     salonId,
     status: { $in: ['active', 'expiring_soon'] },

@@ -146,7 +146,7 @@ const customerPackageSchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'customer_packages'
   }
@@ -184,7 +184,7 @@ customerPackageSchema.methods.useSession = function(bookingId) {
 
   this.usedSessions += 1;
   this.remainingSessions -= 1;
-  
+
   this.bookings.push({
     bookingId,
     bookedAt: new Date(),
@@ -206,13 +206,13 @@ customerPackageSchema.methods.useSession = function(bookingId) {
 customerPackageSchema.methods.cancelPackage = function(userId, reason) {
   const refundPerSession = this.purchasePrice / this.totalSessions;
   this.refundAmount = Math.round(refundPerSession * this.remainingSessions * 100) / 100;
-  
+
   this.status = 'cancelled';
   this.isActive = false;
   this.cancelledAt = new Date();
   this.cancelledBy = userId;
   this.cancellationReason = reason;
-  
+
   return this.save();
 };
 

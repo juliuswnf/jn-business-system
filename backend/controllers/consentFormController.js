@@ -1,5 +1,6 @@
 import ConsentForm from '../models/ConsentForm.js';
 import Salon from '../models/Salon.js';
+import logger from '../utils/logger.js';
 import { generateConsentPDF } from '../utils/pdfGenerator.js';
 
 /**

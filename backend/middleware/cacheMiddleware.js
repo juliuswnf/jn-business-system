@@ -1,9 +1,9 @@
 /**
  * Response Caching Middleware
- * 
+ *
  * Caches GET request responses in memory to reduce database load.
  * Uses node-cache for simple in-memory caching.
- * 
+ *
  * Usage:
  *   router.get('/api/salons/:slug', cacheResponse(300), getSalon);
  */
@@ -14,7 +14,7 @@ import logger from '../utils/logger.js';
 // Create cache instance
 // stdTTL: Default time-to-live in seconds
 // checkperiod: Automatic delete check interval in seconds
-const cache = new NodeCache({ 
+const cache = new NodeCache({
   stdTTL: 300,  // 5 minutes default
   checkperiod: 60,  // Check for expired keys every 60 seconds
   useClones: false  // Faster, but be careful with mutations
@@ -47,7 +47,7 @@ export function cacheResponse(duration = 300) {
 
     // Check if response is in cache
     const cachedResponse = cache.get(key);
-    
+
     if (cachedResponse) {
       cacheHits++;
       logger.debug(`Cache HIT: ${key}`);
@@ -58,7 +58,7 @@ export function cacheResponse(duration = 300) {
     // Cache miss
     cacheMisses++;
     logger.debug(`Cache MISS: ${key}`);
-    
+
     // Override res.json to cache the response
     const originalJson = res.json.bind(res);
     res.json = (data) => {
@@ -67,7 +67,7 @@ export function cacheResponse(duration = 300) {
         cache.set(key, data, duration);
         logger.debug(`Cached response: ${key} (TTL: ${duration}s)`);
       }
-      
+
       res.setHeader('X-Cache', 'MISS');
       return originalJson(data);
     };
@@ -83,9 +83,9 @@ export function cacheResponse(duration = 300) {
 export function clearCache(pattern) {
   const keys = cache.keys();
   const matchedKeys = keys.filter(key => key.includes(pattern));
-  
+
   matchedKeys.forEach(key => cache.del(key));
-  
+
   logger.info(`Cache cleared: ${matchedKeys.length} keys matching "${pattern}"`);
   return matchedKeys.length;
 }
@@ -125,7 +125,7 @@ export function invalidateCache(pattern) {
   return (req, res, next) => {
     // Store original json method
     const originalJson = res.json.bind(res);
-    
+
     // Override json to clear cache after response
     res.json = function(data) {
       // Only clear cache on successful mutations
@@ -134,15 +134,15 @@ export function invalidateCache(pattern) {
       }
       return originalJson(data);
     };
-    
+
     next();
   };
 }
 
-export default { 
-  cacheResponse, 
-  clearCache, 
-  clearAllCache, 
+export default {
+  cacheResponse,
+  clearCache,
+  clearAllCache,
   getCacheStats,
   invalidateCache
 };

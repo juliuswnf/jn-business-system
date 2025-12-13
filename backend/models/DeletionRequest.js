@@ -215,7 +215,7 @@ deletionRequestSchema.pre('save', function(next) {
 // Virtual: Days until deadline
 deletionRequestSchema.virtual('daysUntilDeadline').get(function() {
   if (!this.requestDeadline) return null;
-  
+
   const now = new Date();
   const deadline = new Date(this.requestDeadline);
   const diffTime = deadline - now;

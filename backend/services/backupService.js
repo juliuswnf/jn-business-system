@@ -72,7 +72,7 @@ const createMongoBackup = async () => {
     };
   } catch (error) {
     logger.error('? Backup creation failed:', error);
-    
+
     // Send alert
     await alertingService.sendAlert({
       severity: 'high',
@@ -92,7 +92,7 @@ const exportCollectionsManually = async (backupPath) => {
   await fs.mkdir(backupPath, { recursive: true });
 
   const collections = await mongoose.connection.db.listCollections().toArray();
-  
+
   for (const collInfo of collections) {
     const collName = collInfo.name;
     const collection = mongoose.connection.db.collection(collName);
@@ -100,7 +100,7 @@ const exportCollectionsManually = async (backupPath) => {
 
     const filePath = path.join(backupPath, `${collName}.json`);
     await fs.writeFile(filePath, JSON.stringify(documents, null, 2), 'utf8');
-    
+
     logger.log(`  ? Exported ${collName}: ${documents.length} documents`);
   }
 };

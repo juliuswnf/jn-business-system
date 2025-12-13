@@ -60,9 +60,9 @@ const structuredLogger = winston.createLogger({
  */
 const redactSensitiveData = (data) => {
   if (!data) return data;
-  
+
   const sensitive = ['email', 'password', 'token', 'secret', 'apiKey', 'customerEmail', 'phone', 'customerPhone'];
-  
+
   if (typeof data === 'object') {
     const redacted = { ...data };
     for (const key of Object.keys(redacted)) {
@@ -74,7 +74,7 @@ const redactSensitiveData = (data) => {
     }
     return redacted;
   }
-  
+
   return data;
 };
 
@@ -84,10 +84,10 @@ const redactSensitiveData = (data) => {
 export const addRequestContext = (req, res, next) => {
   // Generate unique request ID
   req.id = req.headers['x-request-id'] || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   // Add to response headers for tracing
   res.setHeader('X-Request-ID', req.id);
-  
+
   // Store in request for logging
   req.logContext = {
     requestId: req.id,
@@ -98,7 +98,7 @@ export const addRequestContext = (req, res, next) => {
     method: req.method,
     path: req.path
   };
-  
+
   next();
 };
 
@@ -109,19 +109,19 @@ export default {
   info: (message, meta = {}) => {
     structuredLogger.info(message, redactSensitiveData(meta));
   },
-  
+
   warn: (message, meta = {}) => {
     structuredLogger.warn(message, redactSensitiveData(meta));
   },
-  
+
   error: (message, meta = {}) => {
     structuredLogger.error(message, redactSensitiveData(meta));
   },
-  
+
   debug: (message, meta = {}) => {
     structuredLogger.debug(message, redactSensitiveData(meta));
   },
-  
+
   // Log with request context
   logRequest: (req, message, meta = {}) => {
     structuredLogger.info(message, {
@@ -129,7 +129,7 @@ export default {
       ...redactSensitiveData(meta)
     });
   },
-  
+
   // Log errors with request context
   logError: (req, message, error, meta = {}) => {
     structuredLogger.error(message, {
@@ -139,7 +139,7 @@ export default {
       ...redactSensitiveData(meta)
     });
   },
-  
+
   // Backward compatibility (fallback to console for old logger)
   log: (message) => {
     structuredLogger.info(message);

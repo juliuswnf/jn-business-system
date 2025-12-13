@@ -5,18 +5,18 @@ import logger from '../utils/logger.js';
 /**
  * Feature Access Middleware
  * Checks if salon's subscription tier has access to requested feature
- * 
+ *
  * Usage:
  * router.post('/send-sms', authenticateToken, checkFeatureAccess('smsNotifications'), smsController.send);
  * router.post('/portfolio', authenticateToken, checkFeatureAccess('portfolioManagement'), portfolioController.create);
  */
 
-export const checkFeatureAccess = (featureName, options = {}) => {
+export const checkFeatureAccess = (featureName, _options = {}) => {
   return async (req, res, next) => {
     try {
       // Get salon from database
       const salonId = req.user.salonId || req.body.salonId || req.params.salonId;
-      
+
       if (!salonId) {
         return res.status(400).json({
           success: false,
@@ -59,7 +59,7 @@ export const checkFeatureAccess = (featureName, options = {}) => {
 
       if (!hasFeature) {
         const requiredTier = getRequiredTierForFeature(featureName);
-        
+
         logger.warn('Feature access denied', {
           salonId,
           salonName: salon.businessName,
@@ -112,11 +112,11 @@ export const checkFeatureAccess = (featureName, options = {}) => {
 /**
  * Check multiple features (OR condition - at least one must be available)
  */
-export const checkAnyFeatureAccess = (featureNames = [], options = {}) => {
+export const checkAnyFeatureAccess = (featureNames = [], _options = {}) => {
   return async (req, res, next) => {
     try {
       const salonId = req.user.salonId || req.body.salonId || req.params.salonId;
-      
+
       if (!salonId) {
         return res.status(400).json({
           success: false,
@@ -149,7 +149,7 @@ export const checkAnyFeatureAccess = (featureNames = [], options = {}) => {
       }
 
       // Check if any feature is available
-      const hasAnyFeature = featureNames.some(feature => 
+      const hasAnyFeature = featureNames.some(feature =>
         tierHasFeature(currentTier, feature)
       );
 
@@ -184,7 +184,7 @@ export const checkAnyFeatureAccess = (featureNames = [], options = {}) => {
 export const requireActiveSubscription = async (req, res, next) => {
   try {
     const salonId = req.user.salonId;
-    
+
     if (!salonId) {
       return res.status(400).json({
         success: false,
@@ -234,7 +234,7 @@ export const requireMinimumTier = (minimumTier) => {
   return async (req, res, next) => {
     try {
       const salonId = req.user.salonId;
-      
+
       const salon = await Salon.findById(salonId)
         .select('subscription businessName')
         .lean();
@@ -280,25 +280,25 @@ export const requireMinimumTier = (minimumTier) => {
 function getFeatureUnavailableMessage(featureName, currentTier, requiredTier) {
   const messages = {
     smsNotifications: `SMS notifications are only available in Enterprise tier. Upgrade to send appointment reminders via SMS and reduce no-shows.`,
-    
+
     portfolioManagement: `Portfolio management is available in Professional and Enterprise tiers. Upgrade to showcase your work and attract more clients.`,
-    
+
     apiAccess: `API access is exclusive to Enterprise tier. Upgrade to integrate with your existing tools and build custom workflows.`,
-    
+
     multiLocation: `Multi-location support is available in Enterprise tier. Upgrade to manage multiple salons from one dashboard.`,
-    
+
     whiteLabel: `White-label branding is exclusive to Enterprise tier. Upgrade to remove JN Automation branding and use your own logo.`,
-    
+
     customDomain: `Custom domains are available in Enterprise tier. Upgrade to use your own domain (e.g., bookings.yoursalon.com).`,
-    
+
     advancedAnalytics: `Advanced analytics are available in Professional and Enterprise tiers. Upgrade to get detailed insights into your business performance.`,
-    
+
     marketingAutomation: `Marketing automation is available in Professional and Enterprise tiers. Upgrade to send automated email campaigns and win-back sequences.`,
-    
+
     hipaaCompliance: `HIPAA compliance features are exclusive to Enterprise tier. Upgrade to handle medical data securely and meet regulatory requirements.`
   };
 
-  return messages[featureName] || 
+  return messages[featureName] ||
     `This feature is not available in ${currentTier} tier. Upgrade to ${requiredTier} to unlock this feature.`;
 }
 
@@ -311,7 +311,7 @@ export const softFeatureGate = (featureName) => {
     try {
       const salonId = req.user.salonId;
       const salon = await Salon.findById(salonId).select('subscription').lean();
-      
+
       if (!salon) {
         return next();
       }
@@ -325,7 +325,7 @@ export const softFeatureGate = (featureName) => {
           feature: featureName,
           tier: currentTier
         });
-        
+
         // Set warning in response (controller can display upgrade banner)
         req.featureWarning = {
           feature: featureName,

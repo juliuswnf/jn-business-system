@@ -25,7 +25,7 @@ export const createSubscription = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Missing required fields',
-        message: 'Tier and billing cycle are required',
+        message: 'Tier and billing cycle are required'
       });
     }
 
@@ -33,7 +33,7 @@ export const createSubscription = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Invalid tier',
-        message: `Tier must be one of: starter, professional, enterprise`,
+        message: `Tier must be one of: starter, professional, enterprise`
       });
     }
 
@@ -41,7 +41,7 @@ export const createSubscription = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Invalid billing cycle',
-        message: 'Billing cycle must be monthly or yearly',
+        message: 'Billing cycle must be monthly or yearly'
       });
     }
 
@@ -52,7 +52,7 @@ export const createSubscription = async (req, res) => {
       billingCycle,
       paymentMethodId,
       email: email || salon.email,
-      trial: trial || false,
+      trial: trial || false
     });
 
     res.json({
@@ -60,14 +60,14 @@ export const createSubscription = async (req, res) => {
       subscription: result,
       message: trial
         ? 'Trial subscription created successfully'
-        : 'Subscription created successfully',
+        : 'Subscription created successfully'
     });
   } catch (error) {
     console.error('[Subscription Controller] Error creating subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create subscription',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -83,7 +83,7 @@ export const upgradeSubscription = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Missing required field',
-        message: 'New tier is required',
+        message: 'New tier is required'
       });
     }
 
@@ -91,7 +91,7 @@ export const upgradeSubscription = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Invalid tier',
-        message: `Tier must be one of: starter, professional, enterprise`,
+        message: `Tier must be one of: starter, professional, enterprise`
       });
     }
 
@@ -105,7 +105,7 @@ export const upgradeSubscription = async (req, res) => {
         error: 'Invalid upgrade',
         message: 'New tier must be higher than current tier',
         currentTier,
-        newTier,
+        newTier
       });
     }
 
@@ -113,21 +113,21 @@ export const upgradeSubscription = async (req, res) => {
     const result = await stripePaymentService.upgradeSubscription({
       salon,
       newTier,
-      billingCycle: billingCycle || salon.subscription.billingCycle,
+      billingCycle: billingCycle || salon.subscription.billingCycle
     });
 
     res.json({
       success: true,
       subscription: result,
       message: `Successfully upgraded from ${currentTier} to ${newTier}`,
-      proratedAmount: result.proratedAmount / 100, // Convert to euros
+      proratedAmount: result.proratedAmount / 100 // Convert to euros
     });
   } catch (error) {
     console.error('[Subscription Controller] Error upgrading subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to upgrade subscription',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -143,7 +143,7 @@ export const downgradeSubscription = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Missing required field',
-        message: 'New tier is required',
+        message: 'New tier is required'
       });
     }
 
@@ -151,7 +151,7 @@ export const downgradeSubscription = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Invalid tier',
-        message: `Tier must be one of: starter, professional, enterprise`,
+        message: `Tier must be one of: starter, professional, enterprise`
       });
     }
 
@@ -165,7 +165,7 @@ export const downgradeSubscription = async (req, res) => {
         error: 'Invalid downgrade',
         message: 'New tier must be lower than current tier',
         currentTier,
-        newTier,
+        newTier
       });
     }
 
@@ -181,7 +181,7 @@ export const downgradeSubscription = async (req, res) => {
       salon,
       newTier,
       billingCycle: billingCycle || salon.subscription.billingCycle,
-      immediate: immediate || false,
+      immediate: immediate || false
     });
 
     res.json({
@@ -193,14 +193,14 @@ export const downgradeSubscription = async (req, res) => {
       lostFeatures,
       warning: lostFeatures.length > 0
         ? `You will lose access to: ${lostFeatures.join(', ')}`
-        : null,
+        : null
     });
   } catch (error) {
     console.error('[Subscription Controller] Error downgrading subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to downgrade subscription',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -222,14 +222,14 @@ export const cancelSubscription = async (req, res) => {
       cancellation: result,
       message: immediately
         ? 'Subscription canceled immediately'
-        : 'Subscription will be canceled at the end of the billing period',
+        : 'Subscription will be canceled at the end of the billing period'
     });
   } catch (error) {
     console.error('[Subscription Controller] Error canceling subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to cancel subscription',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -248,7 +248,7 @@ export const setupSEPA = async (req, res) => {
         message: 'SEPA payments are only available for Enterprise tier',
         currentTier: salon.subscription.tier,
         requiredTier: 'enterprise',
-        upgradeUrl: '/pricing',
+        upgradeUrl: '/pricing'
       });
     }
 
@@ -257,7 +257,7 @@ export const setupSEPA = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Missing required fields',
-        message: 'Email, name, and IBAN are required',
+        message: 'Email, name, and IBAN are required'
       });
     }
 
@@ -266,20 +266,20 @@ export const setupSEPA = async (req, res) => {
       salon,
       email,
       name,
-      iban,
+      iban
     });
 
     res.json({
       success: true,
       setup: result,
-      message: 'SEPA Direct Debit setup initiated',
+      message: 'SEPA Direct Debit setup initiated'
     });
   } catch (error) {
     console.error('[Subscription Controller] Error setting up SEPA:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to setup SEPA',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -298,7 +298,7 @@ export const createInvoice = async (req, res) => {
         message: 'Invoice payments are only available for Enterprise tier',
         currentTier: salon.subscription.tier,
         requiredTier: 'enterprise',
-        upgradeUrl: '/pricing',
+        upgradeUrl: '/pricing'
       });
     }
 
@@ -307,7 +307,7 @@ export const createInvoice = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Missing required fields',
-        message: 'Amount and description are required',
+        message: 'Amount and description are required'
       });
     }
 
@@ -316,20 +316,20 @@ export const createInvoice = async (req, res) => {
       salon,
       amount: Math.round(amount * 100), // Convert to cents
       description,
-      dueDate: dueDate || 14,
+      dueDate: dueDate || 14
     });
 
     res.json({
       success: true,
       invoice: result,
-      message: 'Invoice created and sent successfully',
+      message: 'Invoice created and sent successfully'
     });
   } catch (error) {
     console.error('[Subscription Controller] Error creating invoice:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create invoice',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -346,7 +346,7 @@ export const convertTrialToPaid = async (req, res) => {
         success: false,
         error: 'Not on trial',
         message: 'Salon is not currently on a trial subscription',
-        currentStatus: salon.subscription.status,
+        currentStatus: salon.subscription.status
       });
     }
 
@@ -356,14 +356,14 @@ export const convertTrialToPaid = async (req, res) => {
     res.json({
       success: true,
       subscription: result,
-      message: 'Trial converted to paid subscription successfully',
+      message: 'Trial converted to paid subscription successfully'
     });
   } catch (error) {
     console.error('[Subscription Controller] Error converting trial:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to convert trial',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -393,16 +393,16 @@ export const getSubscriptionStatus = async (req, res) => {
           current:
             salon.subscription.billingCycle === 'yearly'
               ? tierConfig.priceYearly
-              : tierConfig.priceMonthly,
-        },
-      },
+              : tierConfig.priceMonthly
+        }
+      }
     });
   } catch (error) {
     console.error('[Subscription Controller] Error getting subscription status:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get subscription status',
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -415,5 +415,6 @@ export default {
   setupSEPA,
   createInvoice,
   convertTrialToPaid,
-  getSubscriptionStatus,
+  getSubscriptionStatus
 };
+

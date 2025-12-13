@@ -1,12 +1,12 @@
 /**
  * Verify Database Backup Integrity
- * 
+ *
  * Run after restoring from backup to verify:
  * - Record counts match expectations
  * - All references are valid
  * - No duplicate data
  * - Data integrity constraints are met
- * 
+ *
  * Usage:
  *   node backend/scripts/verify-backup.js
  */
@@ -54,7 +54,7 @@ async function verifyBackup() {
     const salonCount = await Salon.countDocuments();
     const bookingCount = await Booking.countDocuments();
     const userCount = await User.countDocuments();
-    
+
     logSuccess(`Salons: ${salonCount}`);
     logSuccess(`Bookings: ${bookingCount}`);
     logSuccess(`Users: ${userCount}`);
@@ -97,20 +97,20 @@ async function verifyBackup() {
     console.log('');
     console.log('?? Checking for duplicate idempotency keys...');
     const duplicateKeys = await Booking.aggregate([
-      { 
-        $match: { 
-          idempotencyKey: { $exists: true, $ne: null } 
-        } 
+      {
+        $match: {
+          idempotencyKey: { $exists: true, $ne: null }
+        }
       },
-      { 
-        $group: { 
-          _id: '$idempotencyKey', 
+      {
+        $group: {
+          _id: '$idempotencyKey',
           count: { $sum: 1 },
           bookings: { $push: '$_id' }
-        } 
+        }
       },
-      { 
-        $match: { count: { $gt: 1 } } 
+      {
+        $match: { count: { $gt: 1 } }
       }
     ]);
 
@@ -126,7 +126,7 @@ async function verifyBackup() {
     // 5. Verify Required Fields
     console.log('');
     console.log('?? Verifying required fields...');
-    
+
     const salonsWithoutName = await Salon.countDocuments({ name: { $in: [null, ''] } });
     const salonsWithoutSlug = await Salon.countDocuments({ slug: { $in: [null, ''] } });
     const bookingsWithoutDate = await Booking.countDocuments({ date: { $in: [null, ''] } });
@@ -147,7 +147,7 @@ async function verifyBackup() {
     // 6. Verify Date Formats
     console.log('');
     console.log('?? Verifying date formats...');
-    
+
     const bookingsWithInvalidDate = await Booking.countDocuments({
       date: { $not: /^\d{4}-\d{2}-\d{2}$/ }
     });
@@ -161,7 +161,7 @@ async function verifyBackup() {
     // 7. Check for Orphaned Data
     console.log('');
     console.log('??? Checking for orphaned data...');
-    
+
     const salonsWithoutOwner = await Salon.countDocuments({
       owner: { $nin: userIds }
     });
@@ -175,7 +175,7 @@ async function verifyBackup() {
     // 8. Summary Statistics
     console.log('');
     console.log('?? Summary Statistics:');
-    
+
     const bookingsByStatus = await Booking.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
@@ -195,7 +195,7 @@ async function verifyBackup() {
     // 9. Final Verdict
     console.log('');
     console.log('-----------------------------------------------------------');
-    
+
     if (hasErrors) {
       console.log('');
       console.error('? BACKUP VERIFICATION FAILED');

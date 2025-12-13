@@ -1,4 +1,5 @@
 import axios from 'axios';
+import logger from '../utils/logger.js';
 import {
   SMS_PRIORITY,
   shouldUseSMS,
@@ -10,7 +11,7 @@ import {
  *
  * Handles SMS notifications with:
  * - Priority-based sending (high: 2h+24h, medium: same-day, low: email-only)
- * - Plivo integration (€0.038/SMS)
+ * - Plivo integration (ï¿½0.038/SMS)
  * - SMS limit enforcement with overage tracking
  * - Email fallback on failure/limit exceeded
  * - Usage tracking per salon
@@ -24,12 +25,12 @@ class SMSService {
     this.authId = process.env.PLIVO_AUTH_ID;
     this.authToken = process.env.PLIVO_AUTH_TOKEN;
     this.phoneNumber = process.env.PLIVO_PHONE_NUMBER;
-    
+
     // Base URL for Plivo API
     this.baseUrl = `https://api.plivo.com/v1/Account/${this.authId}`;
-    
+
     // SMS cost (Plivo Germany rate)
-    this.SMS_COST = 0.038; // €0.038 per SMS
+    this.SMS_COST = 0.038; // ï¿½0.038 per SMS
   }
 
   /**
@@ -46,11 +47,11 @@ class SMSService {
   async sendSMS({ to, message, salon, notificationType, booking: _booking }) {
     try {
       // ==================== ENTERPRISE-ONLY CHECK ====================
-      
+
       // Check if salon has SMS feature (Enterprise only)
       if (!salon.hasFeature('smsNotifications')) {
         logger.warn(`[SMS Service] Salon ${salon._id} (${salon.subscription.tier}) tried to send SMS - NOT ENTERPRISE`);
-        
+
         return {
           success: false,
           error: 'SMS_NOT_AVAILABLE',
@@ -62,18 +63,18 @@ class SMSService {
       }
 
       // ==================== PRIORITY-BASED SENDING ====================
-      
+
       // Calculate SMS limit based on tier and staff count
       const smsLimit = salon.getSMSLimit();
       const smsRemaining = salon.getRemainingSMS();
-      
+
       // Check if we should use SMS based on priority and remaining budget
       const useSMS = shouldUseSMS(notificationType, smsRemaining, salon.subscription.tier);
-      
+
       if (!useSMS) {
         logger.info(`[SMS Service] Skipping SMS for ${notificationType} - priority too low or budget exhausted`);
         logger.info(`[SMS Service] SMS remaining: ${smsRemaining}/${smsLimit}`);
-        
+
         return {
           success: false,
           error: 'LOW_PRIORITY_OR_BUDGET_EXHAUSTED',
@@ -86,22 +87,22 @@ class SMSService {
       }
 
       // ==================== SMS LIMIT CHECK ====================
-      
+
       // Check if salon can send SMS (under limit)
       if (!salon.canSendSMS()) {
         logger.warn(`[SMS Service] Salon ${salon._id} SMS limit exceeded: ${salon.subscription.smsUsedThisMonth}/${smsLimit}`);
-        
+
         // Calculate overage cost
         const overageCost = calculateSMSOverageCost(
           salon.subscription.tier,
           salon.subscription.smsUsedThisMonth + 1,
           smsLimit
         );
-        
+
         return {
           success: false,
           error: 'SMS_LIMIT_EXCEEDED',
-          message: `SMS limit exceeded (${salon.subscription.smsUsedThisMonth}/${smsLimit}). Overage cost: €${overageCost.toFixed(4)}/SMS`,
+          message: `SMS limit exceeded (${salon.subscription.smsUsedThisMonth}/${smsLimit}). Overage cost: ï¿½${overageCost.toFixed(4)}/SMS`,
           fallbackToEmail: true,
           smsUsed: salon.subscription.smsUsedThisMonth,
           smsLimit,
@@ -111,12 +112,12 @@ class SMSService {
       }
 
       // ==================== PHONE NUMBER VALIDATION ====================
-      
+
       // Validate phone number format (E.164)
       const phoneRegex = /^\+[1-9]\d{1,14}$/;
       if (!phoneRegex.test(to)) {
         console.error(`[SMS Service] Invalid phone number format: ${to}`);
-        
+
         return {
           success: false,
           error: 'INVALID_PHONE_NUMBER',
@@ -126,11 +127,11 @@ class SMSService {
       }
 
       // ==================== PLIVO CONFIGURATION CHECK ====================
-      
+
       // Check if Plivo is configured
       if (!this.authId || !this.authToken || !this.phoneNumber) {
         console.error('[SMS Service] Plivo credentials not configured');
-        
+
         return {
           success: false,
           error: 'SMS_NOT_CONFIGURED',
@@ -170,13 +171,13 @@ class SMSService {
       if (response.data.message === 'message(s) queued') {
         // Increment SMS usage counter
         await salon.incrementSMSUsage();
-        
+
         const newRemaining = salon.getRemainingSMS();
-        
+
         logger.info(`[SMS Service] SMS sent successfully to ${to}`);
         logger.info(`[SMS Service] Message ID: ${response.data.message_uuid[0]}`);
         logger.info(`[SMS Service] SMS remaining: ${newRemaining}/${smsLimit}`);
-        
+
         return {
           success: true,
           messageId: response.data.message_uuid[0],
@@ -189,7 +190,7 @@ class SMSService {
         };
       } else {
         console.error(`[SMS Service] Unexpected response from Plivo:`, response.data);
-        
+
         return {
           success: false,
           error: 'PLIVO_ERROR',
@@ -201,9 +202,9 @@ class SMSService {
 
     } catch (error) {
       // ==================== ERROR HANDLING ====================
-      
+
       console.error(`[SMS Service] Error sending SMS:`, error.response?.data || error.message);
-      
+
       // Plivo API error
       if (error.response?.data) {
         return {
@@ -214,7 +215,7 @@ class SMSService {
           plivoError: error.response.data
         };
       }
-      
+
       // Network or other error
       return {
         success: false,
@@ -237,7 +238,7 @@ class SMSService {
     try {
       // Get customer phone number
       const customerPhone = booking.customerPhone || booking.customer?.phone;
-      
+
       if (!customerPhone) {
         logger.warn(`[SMS Service] No phone number for booking ${booking._id}`);
         return {
@@ -260,7 +261,7 @@ class SMSService {
       // Build SMS message based on reminder type
       let message;
       const notificationType = reminderType === '2h' ? '2h_reminder' : '24h_reminder';
-      
+
       if (reminderType === '2h') {
         message = `Erinnerung: Ihr Termin bei ${salon.name} ist in 2 Stunden (${appointmentTime}). Bis gleich!`;
       } else if (reminderType === '24h') {
@@ -280,7 +281,7 @@ class SMSService {
 
     } catch (error) {
       console.error(`[SMS Service] Error sending booking reminder SMS:`, error);
-      
+
       return {
         success: false,
         error: 'REMINDER_SMS_ERROR',
@@ -300,7 +301,7 @@ class SMSService {
   async sendBookingConfirmationSMS(booking, salon) {
     try {
       const customerPhone = booking.customerPhone || booking.customer?.phone;
-      
+
       if (!customerPhone) {
         return {
           success: false,
@@ -318,7 +319,7 @@ class SMSService {
         minute: '2-digit'
       });
 
-      const message = `Buchung bestätigt! ${salon.name} am ${appointmentTime}. Details per E-Mail.`;
+      const message = `Buchung bestï¿½tigt! ${salon.name} am ${appointmentTime}. Details per E-Mail.`;
 
       return await this.sendSMS({
         to: customerPhone,
@@ -330,7 +331,7 @@ class SMSService {
 
     } catch (error) {
       console.error(`[SMS Service] Error sending confirmation SMS:`, error);
-      
+
       return {
         success: false,
         error: 'CONFIRMATION_SMS_ERROR',
@@ -364,13 +365,13 @@ class SMSService {
     const smsUsed = salon.subscription.smsUsedThisMonth || 0;
     const smsRemaining = salon.getRemainingSMS();
     const resetDate = salon.subscription.smsResetDate;
-    
+
     // Calculate overage cost if over limit
     let overageCost = 0;
     if (smsUsed > smsLimit) {
       overageCost = calculateSMSOverageCost(salon.subscription.tier, smsUsed, smsLimit);
     }
-    
+
     return {
       tier: salon.subscription.tier,
       hasAccess: salon.hasFeature('smsNotifications'),

@@ -193,7 +193,7 @@ const resourceSchema = new mongoose.Schema(
       default: null
     }
   },
-  { 
+  {
     timestamps: true,
     collection: 'resources'
   }
@@ -215,7 +215,7 @@ resourceSchema.methods.isAvailableAt = function(dateTime) {
   }
 
   // Check maintenance schedule
-  const isMaintenance = this.maintenanceSchedule.some(m => 
+  const isMaintenance = this.maintenanceSchedule.some(m =>
     dateTime >= m.startDate && dateTime <= m.endDate
   );
 

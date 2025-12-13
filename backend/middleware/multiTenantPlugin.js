@@ -30,17 +30,17 @@ export const multiTenantPlugin = (schema, options = {}) => {
 
   // Pre-find hooks: Auto-inject salonId filter
   const preFindHooks = ['find', 'findOne', 'countDocuments', 'count'];
-  
+
   preFindHooks.forEach(method => {
     schema.pre(method, function() {
       // Only apply if salonId provided in query options
       if (this.options && this.options.salonId) {
         const filter = this.getFilter();
-        
+
         // Don't override if salonId already in filter
         if (!filter[tenantField]) {
           this.where({ [tenantField]: this.options.salonId });
-          
+
           if (IS_DEVELOPMENT) {
             logger.debug(`[MultiTenant] Auto-injected ${tenantField}: ${this.options.salonId}`);
           }
@@ -51,15 +51,15 @@ export const multiTenantPlugin = (schema, options = {}) => {
 
   // Pre-update hooks: Prevent updating across tenants
   const preUpdateHooks = ['updateOne', 'updateMany', 'findOneAndUpdate'];
-  
+
   preUpdateHooks.forEach(method => {
     schema.pre(method, function() {
       if (this.options && this.options.salonId) {
         const filter = this.getFilter();
-        
+
         if (!filter[tenantField]) {
           this.where({ [tenantField]: this.options.salonId });
-          
+
           if (IS_DEVELOPMENT) {
             logger.debug(`[MultiTenant] Auto-injected ${tenantField} in update: ${this.options.salonId}`);
           }
@@ -70,15 +70,15 @@ export const multiTenantPlugin = (schema, options = {}) => {
 
   // Pre-delete hooks: Prevent deleting across tenants
   const preDeleteHooks = ['deleteOne', 'deleteMany', 'findOneAndDelete'];
-  
+
   preDeleteHooks.forEach(method => {
     schema.pre(method, function() {
       if (this.options && this.options.salonId) {
         const filter = this.getFilter();
-        
+
         if (!filter[tenantField]) {
           this.where({ [tenantField]: this.options.salonId });
-          
+
           if (IS_DEVELOPMENT) {
             logger.debug(`[MultiTenant] Auto-injected ${tenantField} in delete: ${this.options.salonId}`);
           }
@@ -90,15 +90,15 @@ export const multiTenantPlugin = (schema, options = {}) => {
   // Aggregate hook: Warn if $match doesn't include salonId
   schema.pre('aggregate', function() {
     const pipeline = this.pipeline();
-    
+
     if (pipeline.length > 0) {
       const firstStage = pipeline[0];
-      
+
       // Check if first stage is $match with salonId
       if (!firstStage.$match || !firstStage.$match[tenantField]) {
         logger.warn(`[MultiTenant] ?? Aggregation without ${tenantField} filter detected. Possible data leakage!`);
         logger.warn(`[MultiTenant] Pipeline: ${JSON.stringify(pipeline[0])}`);
-        
+
         // In strict mode, throw error
         if (process.env.MULTI_TENANT_STRICT === 'true') {
           throw new Error(`Aggregation MUST include ${tenantField} in first $match stage`);
@@ -147,10 +147,10 @@ export const injectTenantContext = (req, res, next) => {
   // Extract salonId from authenticated user
   if (req.user && req.user.salonId) {
     req.tenantId = req.user.salonId;
-    
+
     // Store in request for easy access in controllers
     req.tenantFilter = { salonId: req.user.salonId };
-    
+
     if (IS_DEVELOPMENT) {
       logger.debug(`[MultiTenant] Tenant context set: ${req.user.salonId}`);
     }
@@ -158,7 +158,7 @@ export const injectTenantContext = (req, res, next) => {
     // CEO can access all tenants - set flag
     req.isSuperUser = true;
   }
-  
+
   next();
 };
 
@@ -173,7 +173,7 @@ export const requireTenant = (controllerMethod) => {
         message: 'Tenant context required'
       });
     }
-    
+
     return controllerMethod(req, res, next);
   };
 };
