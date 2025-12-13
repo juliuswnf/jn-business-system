@@ -1,4 +1,5 @@
-﻿import { v2 as cloudinary } from 'cloudinary';
+﻿import pkg from 'cloudinary';
+const { v2: cloudinary } = pkg;
 import fs from 'fs';
 import path from 'path';
 import logger from './logger.js';

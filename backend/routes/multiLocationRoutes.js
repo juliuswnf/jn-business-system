@@ -6,7 +6,7 @@
 
 import express from 'express';
 import { body } from 'express-validator';
-import { validateRequest } from '../middleware/validateRequest.js';
+import { validateBody } from '../middleware/validationMiddleware.js';
 import {
   getLocations,
   getConsolidatedDashboard,
@@ -44,7 +44,7 @@ router.post(
     body('name').trim().notEmpty().withMessage('Name ist erforderlich'),
     body('email').isEmail().withMessage('Gültige E-Mail erforderlich')
   ],
-  validateRequest,
+  validateBody,
   addLocation
 );
 

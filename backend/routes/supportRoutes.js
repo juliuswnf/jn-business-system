@@ -1,6 +1,6 @@
 import express from 'express';
 import * as supportController from '../controllers/supportController.js';
-import { authenticateToken } from '../middleware/authMiddleware.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 import { validateContentType } from '../middleware/securityMiddleware.js';
 
 const router = express.Router();
@@ -13,7 +13,7 @@ const router = express.Router();
 // Create a new support ticket
 router.post(
   '/tickets',
-  authenticateToken,
+  authMiddleware.protect,
   validateContentType,
   supportController.createTicket
 );
@@ -21,21 +21,21 @@ router.post(
 // Get all tickets for current user
 router.get(
   '/tickets',
-  authenticateToken,
+  authMiddleware.protect,
   supportController.getMyTickets
 );
 
 // Get single ticket details
 router.get(
   '/tickets/:ticketId',
-  authenticateToken,
+  authMiddleware.protect,
   supportController.getTicketDetails
 );
 
 // Add message to ticket
 router.post(
   '/tickets/:ticketId/messages',
-  authenticateToken,
+  authMiddleware.protect,
   validateContentType,
   supportController.addMessage
 );
@@ -43,7 +43,7 @@ router.post(
 // Close ticket
 router.patch(
   '/tickets/:ticketId/close',
-  authenticateToken,
+  authMiddleware.protect,
   supportController.closeTicket
 );
 
