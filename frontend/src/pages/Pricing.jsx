@@ -353,11 +353,15 @@ export default function Pricing() {
               </div>
             </div>
           </div>
-        </div>        {/* All Plans Include */}
+        </div>
+
+        {/* All Plans Include */}
         <div className="mb-20">
-          <h2 className="text-xl font-semibold text-center mb-8">
-            In allen Plänen enthalten
-          </h2>
+          <div className="flex items-center justify-center mb-12">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+            <h2 className="text-2xl font-bold mx-8">In allen Plänen enthalten</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+          </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[
               'Online-Buchung rund um die Uhr',
@@ -381,7 +385,11 @@ export default function Pricing() {
 
         {/* FAQ */}
         <div className="max-w-2xl mx-auto mb-20">
-          <h2 className="text-xl font-semibold text-center mb-8">Häufige Fragen</h2>
+          <div className="flex items-center justify-center mb-12">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+            <h2 className="text-2xl font-bold mx-8">Häufige Fragen</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+          </div>
           <div className="space-y-2">
             {faq.map((item, i) => (
               <div key={i} className="border border-zinc-800 rounded-lg">
