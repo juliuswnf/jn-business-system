@@ -21,7 +21,11 @@ if (isCloudinaryConfigured()) {
   });
   logger.info('? Cloudinary configured successfully');
 } else {
-  logger.warn('?? Cloudinary not configured - files will be stored locally');
+  // Cloudinary is optional - local storage is used as fallback
+  // Only log in production environment
+  if (process.env.NODE_ENV === 'production') {
+    logger.warn('?? Cloudinary not configured in production - using local storage');
+  }
 }
 
 /**

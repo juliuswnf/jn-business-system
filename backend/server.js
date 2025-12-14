@@ -19,6 +19,10 @@ import { initializeCronJobs } from './services/cronService.js';
 import emailQueueWorker from './workers/emailQueueWorker.js';
 import lifecycleEmailWorker from './workers/lifecycleEmailWorker.js';
 import { getHealthStatus } from './services/healthCheckService.js';
+import alertingService from './services/alertingService.js';
+
+// Suppress iconv-lite encoding warning (UTF-8 is correctly used)
+process.env.ICONV_PURE = '1';
 
 // Load environment variables
 dotenv.config();
@@ -346,7 +350,9 @@ const startEmailWorker = () => {
     emailWorkerIntervals = emailQueueWorker.startWorker();
     logger.info('? Email queue worker started');
   } catch (error) {
-    logger.error('?? Email worker initialization error:', error.message);
+    logger.error('?? Email worker initialization error:', error.message || error);
+    logger.error('Error stack:', error.stack);
+    throw error; // Re-throw to prevent silent failures
   }
 };
 
@@ -356,7 +362,9 @@ const startLifecycleWorker = () => {
     lifecycleWorkerIntervalId = lifecycleEmailWorker.startLifecycleEmailWorker();
     logger.info('? Lifecycle email worker started');
   } catch (error) {
-    logger.error('?? Lifecycle email worker initialization error:', error.message);
+    logger.error('?? Lifecycle email worker initialization error:', error.message || error);
+    logger.error('Error stack:', error.stack);
+    throw error; // Re-throw to prevent silent failures
   }
 };
 
@@ -367,7 +375,9 @@ const startAlertingService = () => {
     alertingService.startHealthChecks(getMetrics, 60000);
     logger.info('? Alerting service started');
   } catch (error) {
-    logger.error('?? Alerting service initialization error:', error.message);
+    logger.error('?? Alerting service initialization error:', error.message || error);
+    logger.error('Error stack:', error.stack);
+    throw error; // Re-throw to prevent silent failures
   }
 };
 

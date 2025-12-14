@@ -146,12 +146,23 @@ const calculateTrialDaysLeft = (trialEndsAt) => {
  * Runs every hour
  */
 export const startLifecycleEmailWorker = () => {
-  // Run immediately on startup
+  // Run immediately on startup (wrapped in safe handler)
   logger.log('🚀 Starting lifecycle email worker...');
-  processLifecycleEmails();
+  
+  // Safe wrapper to prevent crashes
+  const processLifecycleEmailsSafe = async () => {
+    try {
+      await processLifecycleEmails();
+    } catch (error) {
+      logger.error('❌ Lifecycle email worker error (continuing):', error);
+    }
+  };
+
+  // Run immediately
+  processLifecycleEmailsSafe();
 
   // Then run every hour
-  intervalId = setInterval(processLifecycleEmails, 60 * 60 * 1000); // 1 hour
+  intervalId = setInterval(processLifecycleEmailsSafe, 60 * 60 * 1000); // 1 hour
 
   logger.log('✅ Lifecycle email worker started (runs every hour)');
 

@@ -233,6 +233,18 @@ const cleanupOldEmails = async () => {
 };
 
 /**
+ * Safe wrapper for processEmailQueue
+ * Catches and logs errors without crashing the worker
+ */
+const processEmailQueueSafe = async () => {
+  try {
+    await processEmailQueue();
+  } catch (error) {
+    logger.error('❌ Email queue worker error (continuing):', error);
+  }
+};
+
+/**
  * Start the email queue worker
  * Runs every minute to process pending emails
  */
