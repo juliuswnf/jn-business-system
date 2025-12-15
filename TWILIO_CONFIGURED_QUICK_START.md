@@ -12,7 +12,7 @@ Your Twilio credentials have been successfully configured:
 
 ```
 ✅ SMS Provider: TWILIO
-✅ Account SID: AC61a66070142ada5c972365f4ed91cd72
+✅ Account SID: 
 ✅ Auth Token: Configured
 ✅ Phone Number: +18777804236
 ✅ Provider Available: true
