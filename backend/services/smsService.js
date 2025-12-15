@@ -26,7 +26,7 @@ if (process.env.REDIS_URL) {
     redisAvailable = true;
   });
 
-  redisClient.connect().catch(err => {
+  redisClient.connect().catch(_err => {
     console.warn('⚠️ Redis not available, using in-memory rate limiting (not production-safe)');
     redisAvailable = false;
   });

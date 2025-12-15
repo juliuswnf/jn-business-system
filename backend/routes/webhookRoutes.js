@@ -77,7 +77,7 @@ router.post('/messagebird', async (req, res) => {
 
       case 'delivery_failed':
       case 'expired':
-      case 'failed':
+      case 'failed': {
         const errorMessage = errors && errors.length > 0
           ? errors[0].description
           : `Delivery failed with status: ${status}`;
@@ -89,6 +89,7 @@ router.post('/messagebird', async (req, res) => {
         await smsLog.markAsFailed(errorMessage, errorCode);
         console.error(`❌ SMS ${messageId} failed: ${errorMessage}`);
         break;
+      }
 
       default:
         console.log(`ℹ️ SMS ${messageId} status update: ${status}`);
