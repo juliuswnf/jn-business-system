@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  
+
   server: {
     port: 3000,
     host: 'localhost',
@@ -30,10 +30,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Core React libraries
-          if (id.includes('node_modules/react') || 
-              id.includes('node_modules/react-dom') ||
-              id.includes('node_modules/react-router-dom')) {
+          // Core React + charts libraries (keep together to avoid circular chunk deps)
+          if (
+            id.includes('node_modules/react') ||
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/react-router-dom') ||
+            id.includes('node_modules/recharts') ||
+            id.includes('node_modules/d3')
+          ) {
             return 'react-vendor';
           }
           // UI libraries
@@ -41,11 +45,6 @@ export default defineConfig({
               id.includes('node_modules/lucide-react') ||
               id.includes('node_modules/react-icons')) {
             return 'icons';
-          }
-          // Charts
-          if (id.includes('node_modules/recharts') ||
-              id.includes('node_modules/d3')) {
-            return 'charts';
           }
           // Utils
           if (id.includes('node_modules/axios') ||
