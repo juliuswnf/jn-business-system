@@ -1,12 +1,11 @@
-﻿import messagebird from 'messagebird';
-import { createClient } from 'redis';
+﻿import { createClient } from 'redis';
 import SMSLog from '../models/SMSLog.js';
 import SMSConsent from '../models/SMSConsent.js';
+import SMSProviderFactory from './smsProviders/SMSProviderFactory.js';
 
-// Initialize MessageBird client
-const messagebirdClient = messagebird(process.env.MESSAGEBIRD_API_KEY);
-const ORIGINATOR = process.env.MESSAGEBIRD_ORIGINATOR || 'JN_Business';
-const RATE_LIMIT = parseInt(process.env.MESSAGEBIRD_RATE_LIMIT_PER_SECOND || '10');
+// Get SMS Provider (Twilio or MessageBird)
+const smsProvider = SMSProviderFactory.getProvider();
+const RATE_LIMIT = parseInt(process.env.SMS_RATE_LIMIT_PER_SECOND || '10');
 
 // Redis client for rate limiting
 let redisClient = null;
@@ -191,37 +190,32 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
       throw new Error('Cannot send SMS during Do-Not-Disturb hours (22:00-08:00)');
     }
 
-    // Send via MessageBird
-    const result = await new Promise((resolve, reject) => {
-      messagebirdClient.messages.create(
-        {
-          originator: ORIGINATOR,
-          recipients: [phoneNumber],
-          body: message
-        },
-        (err, response) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(response);
-          }
-        }
-      );
+    // Send via configured SMS provider
+    const result = await smsProvider.sendSMS({
+      phoneNumber,
+      message,
+      from: process.env.SMS_ORIGINATOR || process.env.TWILIO_PHONE_NUMBER
     });
 
-    // Mark as sent
-    await smsLog.markAsSent(result.id, 7); // 7 cents = €0.07
+    if (!result.success) {
+      throw new Error(result.error || 'SMS provider returned failure');
+    }
 
-    console.log(`✅ SMS sent successfully:`, {
-      messageId: result.id,
+    // Mark as sent with actual cost from provider
+    await smsLog.markAsSent(result.messageId, result.cost);
+
+    console.log(`✅ SMS sent successfully via ${result.provider}:`, {
+      messageId: result.messageId,
       phoneNumber,
       template,
-      salonId
+      salonId,
+      cost: result.cost,
+      status: result.status
     });
 
     return {
       success: true,
-      messageId: result.id,
+      messageId: result.messageId,
       smsLogId: smsLog._id
     };
 
