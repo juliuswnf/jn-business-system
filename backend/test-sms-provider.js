@@ -5,10 +5,27 @@
  * Verifies Twilio credentials and provider setup
  */
 
-import 'dotenv/config';
-import SMSProviderFactory from './services/smsProviders/SMSProviderFactory.js';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-console.log('\n🔧 SMS Provider Configuration Test\n');
+// Load .env from backend directory FIRST (before any imports that use process.env)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const result = dotenv.config({ path: join(__dirname, '.env') });
+
+if (result.error) {
+  console.error('❌ Error loading .env file:', result.error);
+  process.exit(1);
+}
+
+console.log('✅ .env file loaded from:', join(__dirname, '.env'));
+console.log('');
+
+// NOW import the factory (after env is loaded)
+const SMSProviderFactory = (await import('./services/smsProviders/SMSProviderFactory.js')).default;
+
+console.log('🔧 SMS Provider Configuration Test\n');
 console.log('Environment Variables:');
 console.log('  SMS_PROVIDER:', process.env.SMS_PROVIDER || 'NOT SET');
 console.log('  TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID ? '✅ SET' : '❌ NOT SET');
