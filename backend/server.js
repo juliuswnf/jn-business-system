@@ -21,6 +21,12 @@ import lifecycleEmailWorker from './workers/lifecycleEmailWorker.js';
 import { getHealthStatus } from './services/healthCheckService.js';
 import alertingService from './services/alertingService.js';
 
+// NO-SHOW-KILLER Workers
+import { startConfirmationSender } from './workers/confirmationSenderWorker.js';
+import { startAutoCancelWorker } from './workers/autoCancelWorker.js';
+import { startWaitlistMatcher } from './workers/waitlistMatcherWorker.js';
+import { startReminderWorker } from './workers/reminderWorker.js';
+
 // Suppress iconv-lite encoding warning (UTF-8 is correctly used)
 process.env.ICONV_PURE = '1';
 
@@ -63,6 +69,12 @@ import brandingRoutes from './routes/brandingRoutes.js';
 
 // Multi-Location Routes
 import multiLocationRoutes from './routes/multiLocationRoutes.js';
+
+// NO-SHOW-KILLER Routes
+import smsConsentRoutes from './routes/smsConsentRoutes.js';
+import confirmationRoutes from './routes/confirmationRoutes.js';
+import waitlistRoutes from './routes/waitlistRoutes.js';
+import slotSuggestionRoutes from './routes/slotSuggestionRoutes.js';
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
@@ -240,6 +252,12 @@ app.use('/api/crm', authMiddleware.protect, crmRoutes); // CRM - Customer Manage
 app.use('/api/branding', authMiddleware.protect, brandingRoutes); // Custom Branding
 app.use('/api/locations', authMiddleware.protect, multiLocationRoutes); // Multi-Location (Enterprise)
 
+// NO-SHOW-KILLER Routes - Phase 2
+app.use('/api/sms-consent', smsConsentRoutes); // SMS GDPR Consent (Public + Protected)
+app.use('/api/confirmations', confirmationRoutes); // Booking Confirmations (Mixed: public confirm link)
+app.use('/api/waitlist', waitlistRoutes); // Waitlist Management (Public join + Protected admin)
+app.use('/api/slot-suggestions', slotSuggestionRoutes); // Slot Suggestions (Public accept/reject)
+
 // ==================== 404 HANDLER (BEFORE ERROR HANDLER) ====================
 app.use('*', (req, res, _next) => {
   res.status(404).json({
@@ -381,6 +399,25 @@ const startAlertingService = () => {
   }
 };
 
+// ==================== NO-SHOW-KILLER WORKERS ====================
+const startNoShowKillerWorkers = () => {
+  try {
+    logger.info('? Starting NO-SHOW-KILLER workers...');
+    
+    // Start all 4 workers
+    startConfirmationSender(); // Every 5 min
+    startAutoCancelWorker(); // Every 15 min
+    startWaitlistMatcher(); // Every 15 min
+    startReminderWorker(); // Every 30 min
+    
+    logger.info('? NO-SHOW-KILLER workers started successfully');
+  } catch (error) {
+    logger.error('?? NO-SHOW-KILLER worker initialization error:', error.message || error);
+    logger.error('Error stack:', error.stack);
+    throw error;
+  }
+};
+
 // ==================== SERVER STARTUP ====================
 const startServer = async () => {
   try {
@@ -395,6 +432,7 @@ const startServer = async () => {
     startEmailWorker();
     startLifecycleWorker();
     startAlertingService();
+    startNoShowKillerWorkers(); // 🔥 NO-SHOW-KILLER System
 
     server.listen(PORT, () => {
       logger.info('\n----------------------------------------');

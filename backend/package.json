@@ -40,6 +40,7 @@
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.7.2",
+    "messagebird": "^4.0.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.45",
     "mongodb": "^6.21.0",
