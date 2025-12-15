@@ -92,7 +92,7 @@ export default function Employees() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white">Mitarbeiter</h1>
-          <p className="text-gray-400">Verwalten Sie Ihr Team</p>
+          <p className="text-gray-300">Verwalten Sie Ihr Team</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -106,9 +106,9 @@ export default function Employees() {
       {/* Employees List */}
       {employees.length === 0 ? (
         <div className="text-center py-12 bg-zinc-900 rounded-xl border border-zinc-800">
-          <Users className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+          <Users className="w-12 h-12 mx-auto text-gray-600 mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">Keine Mitarbeiter</h3>
-          <p className="text-gray-400 mb-4">Fügen Sie Ihren ersten Mitarbeiter hinzu</p>
+          <p className="text-gray-300 mb-4">Fügen Sie Ihren ersten Mitarbeiter hinzu</p>
           <button
             onClick={() => setShowModal(true)}
             className="px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-zinc-200 transition"
@@ -129,7 +129,7 @@ export default function Employees() {
                 </div>
                 <div>
                   <h3 className="font-medium text-white">{employee.name}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                  <div className="flex items-center gap-4 text-sm text-gray-300">
                     <span className="flex items-center gap-1">
                       <Mail size={14} />
                       {employee.email}
@@ -166,7 +166,7 @@ export default function Employees() {
             <h2 className="text-xl font-bold text-white mb-4">Neuer Mitarbeiter</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Name</label>
+                <label className="block text-sm text-gray-300 mb-1">Name</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -176,7 +176,7 @@ export default function Employees() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">E-Mail</label>
+                <label className="block text-sm text-gray-300 mb-1">E-Mail</label>
                 <input
                   type="email"
                   value={formData.email}
@@ -186,7 +186,7 @@ export default function Employees() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Telefon</label>
+                <label className="block text-sm text-gray-300 mb-1">Telefon</label>
                 <input
                   type="tel"
                   value={formData.phone}
@@ -216,3 +216,4 @@ export default function Employees() {
     </div>
   );
 }
+

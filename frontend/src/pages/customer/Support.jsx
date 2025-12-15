@@ -219,7 +219,7 @@ const Support = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white">Support</h1>
-            <p className="text-gray-400 mt-1">Haben Sie Fragen? Wir helfen Ihnen gerne.</p>
+            <p className="text-gray-300 mt-1">Haben Sie Fragen? Wir helfen Ihnen gerne.</p>
           </div>
           <button
             onClick={() => setShowNewTicket(!showNewTicket)}
@@ -305,19 +305,19 @@ const Support = () => {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-sm text-gray-400">{selectedTicket.ticketNumber}</span>
+                  <span className="text-sm text-gray-300">{selectedTicket.ticketNumber}</span>
                   <span className={`text-xs px-2 py-1 rounded-full ${getStatusDisplay(selectedTicket.status).color}`}>
                     {getStatusDisplay(selectedTicket.status).label}
                   </span>
                 </div>
                 <h2 className="text-xl font-semibold text-white">{selectedTicket.subject}</h2>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-gray-300 mt-1">
                   {getCategoryDisplay(selectedTicket.category)} â€¢ Erstellt am {formatDate(selectedTicket.createdAt)}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-300 hover:text-white"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -333,7 +333,7 @@ const Support = () => {
             {/* Replies */}
             {selectedTicket.replies && selectedTicket.replies.length > 0 && (
               <div className="space-y-4 mb-6">
-                <h3 className="text-sm font-medium text-gray-400">Antworten</h3>
+                <h3 className="text-sm font-medium text-gray-300">Antworten</h3>
                 {selectedTicket.replies.map((reply, index) => (
                   <div
                     key={index}
@@ -343,7 +343,7 @@ const Support = () => {
                       <span className={`text-sm font-medium ${reply.isStaff ? 'text-blue-400' : 'text-gray-300'}`}>
                         {reply.isStaff ? 'Support-Team' : 'Sie'}
                       </span>
-                      <span className="text-xs text-gray-500">{formatDate(reply.createdAt)}</span>
+                      <span className="text-xs text-gray-600">{formatDate(reply.createdAt)}</span>
                     </div>
                     <p className="text-gray-300 whitespace-pre-wrap">{reply.message}</p>
                   </div>
@@ -365,7 +365,7 @@ const Support = () => {
                   <button
                     type="button"
                     onClick={handleCloseTicket}
-                    className="text-gray-400 hover:text-white text-sm"
+                    className="text-gray-300 hover:text-white text-sm"
                   >
                     Ticket schlieÃŸen
                   </button>
@@ -385,7 +385,7 @@ const Support = () => {
         {/* Tickets List */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Meine Tickets</h2>
-          
+
           {loading ? (
             <div className="flex items-center justify-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
@@ -393,7 +393,7 @@ const Support = () => {
           ) : tickets.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-5xl mb-4">ðŸ“©</div>
-              <p className="text-gray-400 mb-4">Keine Support-Tickets vorhanden</p>
+              <p className="text-gray-300 mb-4">Keine Support-Tickets vorhanden</p>
               <button
                 onClick={() => setShowNewTicket(true)}
                 className="text-red-500 hover:text-red-400"
@@ -412,17 +412,17 @@ const Support = () => {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
-                        <span className="text-sm text-gray-500">{ticket.ticketNumber}</span>
+                        <span className="text-sm text-gray-600">{ticket.ticketNumber}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusDisplay(ticket.status).color}`}>
                           {getStatusDisplay(ticket.status).label}
                         </span>
                       </div>
                       <h3 className="text-white font-medium">{ticket.subject}</h3>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-gray-300 mt-1">
                         {getCategoryDisplay(ticket.category)} â€¢ {formatDate(ticket.createdAt)}
                       </p>
                     </div>
-                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
@@ -434,7 +434,7 @@ const Support = () => {
 
         {/* Back to Dashboard */}
         <div className="mt-8 text-center">
-          <Link to="/customer/dashboard" className="text-gray-400 hover:text-white">
+          <Link to="/customer/dashboard" className="text-gray-300 hover:text-white">
             â† ZurÃ¼ck zum Dashboard
           </Link>
         </div>

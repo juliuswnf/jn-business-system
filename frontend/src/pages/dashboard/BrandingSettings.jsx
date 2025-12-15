@@ -195,7 +195,7 @@ export default function BrandingSettings() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Branding</h1>
-        <p className="text-gray-400">Passen Sie das Aussehen Ihrer Buchungsseite an</p>
+        <p className="text-gray-300">Passen Sie das Aussehen Ihrer Buchungsseite an</p>
       </div>
 
       {/* Tier Warning */}
@@ -253,7 +253,7 @@ export default function BrandingSettings() {
                   Logo entfernen
                 </button>
               )}
-              <p className="text-xs text-gray-500">JPEG, PNG, SVG oder WebP. Max 5MB.</p>
+              <p className="text-xs text-gray-600">JPEG, PNG, SVG oder WebP. Max 5MB.</p>
             </div>
           </div>
         </div>
@@ -263,7 +263,7 @@ export default function BrandingSettings() {
           <h2 className="text-lg font-semibold text-white mb-4">Farben</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm text-gray-400 mb-2">PrimÃ¤rfarbe</label>
+              <label className="block text-sm text-gray-300 mb-2">PrimÃ¤rfarbe</label>
               <div className="flex items-center gap-3">
                 <input
                   type="color"
@@ -280,7 +280,7 @@ export default function BrandingSettings() {
               </div>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-2">SekundÃ¤rfarbe</label>
+              <label className="block text-sm text-gray-300 mb-2">SekundÃ¤rfarbe</label>
               <div className="flex items-center gap-3">
                 <input
                   type="color"
@@ -297,7 +297,7 @@ export default function BrandingSettings() {
               </div>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Akzentfarbe</label>
+              <label className="block text-sm text-gray-300 mb-2">Akzentfarbe</label>
               <div className="flex items-center gap-3">
                 <input
                   type="color"
@@ -321,7 +321,7 @@ export default function BrandingSettings() {
           <h2 className="text-lg font-semibold text-white mb-4">Typografie & Stil</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Schriftart</label>
+              <label className="block text-sm text-gray-300 mb-2">Schriftart</label>
               <select
                 value={branding.fontFamily}
                 onChange={(e) => setBranding({ ...branding, fontFamily: e.target.value })}
@@ -333,7 +333,7 @@ export default function BrandingSettings() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Button-Stil</label>
+              <label className="block text-sm text-gray-300 mb-2">Button-Stil</label>
               <select
                 value={branding.buttonStyle}
                 onChange={(e) => setBranding({ ...branding, buttonStyle: e.target.value })}
@@ -352,7 +352,7 @@ export default function BrandingSettings() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-white">White-Label</h2>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-gray-300 mt-1">
                 "Powered by JN Business System" ausblenden
               </p>
             </div>
@@ -409,7 +409,7 @@ export default function BrandingSettings() {
               Mehr erfahren
             </button>
             {branding.showPoweredBy && (
-              <p className="text-xs text-gray-500 mt-4">Powered by JN Business System</p>
+              <p className="text-xs text-gray-600 mt-4">Powered by JN Business System</p>
             )}
           </div>
         </div>
@@ -418,7 +418,7 @@ export default function BrandingSettings() {
         <div className="flex justify-between items-center">
           <button
             onClick={handleReset}
-            className="text-gray-400 hover:text-white text-sm"
+            className="text-gray-300 hover:text-white text-sm"
           >
             Auf Standard zurÃ¼cksetzen
           </button>
@@ -434,3 +434,4 @@ export default function BrandingSettings() {
     </div>
   );
 }
+

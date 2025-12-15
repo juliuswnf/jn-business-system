@@ -13,7 +13,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
  */
 export default function Booking() {
   const { showNotification } = useNotification();
-  
+
   const [customerProfile, setCustomerProfile] = useState({
     name: '',
     email: '',
@@ -24,7 +24,7 @@ export default function Booking() {
 
   // Step 0 = Salon, 1 = Service, 2 = Zeit, 3 = Bestätigung
   const [bookingStep, setBookingStep] = useState(0);
-  
+
   const [bookingData, setBookingData] = useState({
     salonId: '',
     salonName: '',
@@ -109,7 +109,7 @@ export default function Booking() {
             price: `${s.price || 0}€`,
             durationMinutes: s.duration || 30
           })) || []);
-          
+
           setEmployees(data.employees?.map(e => ({
             id: e._id,
             name: e.name,
@@ -143,7 +143,7 @@ export default function Booking() {
           employeeId: bookingData.employeeId || undefined
         })
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.slots) {
@@ -165,16 +165,16 @@ export default function Booking() {
   };
 
   const handleServiceSelect = (service) => {
-    setBookingData(prev => ({ 
-      ...prev, 
+    setBookingData(prev => ({
+      ...prev,
       service: service.name,
       serviceId: service.id
     }));
   };
 
   const handleEmployeeSelect = (emp) => {
-    setBookingData(prev => ({ 
-      ...prev, 
+    setBookingData(prev => ({
+      ...prev,
       employee: emp.name,
       employeeId: emp.id
     }));
@@ -187,7 +187,7 @@ export default function Booking() {
     try {
       // ✅ SRE FIX #30: Generate idempotency key
       const idempotencyKey = `booking-${customerProfile.email}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await fetch(`${API_URL}/bookings/public/s/${bookingData.salonSlug}/book`, {
         method: 'POST',
@@ -216,7 +216,7 @@ export default function Booking() {
         } else {
           showNotification('Termin erfolgreich gebucht! Bestätigung per E-Mail.', 'success');
         }
-        
+
         // Reset form
         setBookingStep(0);
         setBookingData({
@@ -251,7 +251,7 @@ export default function Booking() {
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="text-gray-400 mt-4">Lade Buchungsoptionen...</p>
+          <p className="text-gray-300 mt-4">Lade Buchungsoptionen...</p>
         </div>
       </div>
     );
@@ -272,10 +272,10 @@ export default function Booking() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-1">Neuen Termin buchen</h1>
-              <p className="text-gray-400 text-sm">Wähle einen Salon und buche deinen Termin</p>
+              <p className="text-gray-300 text-sm">Wähle einen Salon und buche deinen Termin</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-400">Angemeldet als:</p>
+              <p className="text-sm text-gray-300">Angemeldet als:</p>
               <p className="font-semibold">{customerProfile.name}</p>
             </div>
           </div>
@@ -291,11 +291,11 @@ export default function Booking() {
               <div key={step} className="flex items-center flex-1">
                 <div className="flex flex-col items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium transition ${
-                    step <= bookingStep ? 'bg-white text-black' : 'bg-zinc-800 text-gray-400'
+                    step <= bookingStep ? 'bg-white text-black' : 'bg-zinc-800 text-gray-300'
                   }`}>
                     {step + 1}
                   </div>
-                  <span className={`text-sm mt-2 ${step <= bookingStep ? 'text-white' : 'text-gray-400'}`}>
+                  <span className={`text-sm mt-2 ${step <= bookingStep ? 'text-white' : 'text-gray-300'}`}>
                     {label}
                   </span>
                 </div>
@@ -311,8 +311,8 @@ export default function Booking() {
         {bookingStep === 0 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <h2 className="text-2xl font-bold mb-2">Wähle einen Anbieter</h2>
-            <p className="text-gray-400 mb-6">Suche nach einem Anbieter in deiner Nähe</p>
-            
+            <p className="text-gray-300 mb-6">Suche nach einem Anbieter in deiner Nähe</p>
+
             <SalonSelector
               onSelect={handleSalonSelect}
               selectedSalonId={bookingData.salonId}
@@ -324,14 +324,14 @@ export default function Booking() {
         {bookingStep === 1 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <div className="mb-6">
-              <p className="text-sm text-gray-400 mb-1">Ausgewählter Salon</p>
+              <p className="text-sm text-gray-300 mb-1">Ausgewählter Salon</p>
               <h3 className="text-xl font-semibold">{bookingData.salonName}</h3>
             </div>
 
             <h2 className="text-2xl font-bold mb-6">Welcher Service interessiert dich?</h2>
-            
+
             {services.length === 0 ? (
-              <p className="text-gray-400 mb-6">Keine Services verfügbar für diesen Salon.</p>
+              <p className="text-gray-300 mb-6">Keine Services verfügbar für diesen Salon.</p>
             ) : (
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 {services.map((service) => (
@@ -346,7 +346,7 @@ export default function Booking() {
                   >
                     <h3 className="font-semibold mb-2">{service.name}</h3>
                     <div className="flex justify-between text-sm text-gray-300">
-                      <span className="flex items-center gap-2"><FiClock className="text-gray-400" /> {service.duration}</span>
+                      <span className="flex items-center gap-2"><FiClock className="text-gray-300" /> {service.duration}</span>
                       <span className="text-white font-bold">{service.price}</span>
                     </div>
                   </div>
@@ -407,12 +407,12 @@ export default function Booking() {
         {bookingStep === 2 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <div className="mb-6">
-              <p className="text-sm text-gray-400 mb-1">{bookingData.salonName}</p>
+              <p className="text-sm text-gray-300 mb-1">{bookingData.salonName}</p>
               <p className="text-gray-300">{bookingData.service}</p>
             </div>
 
             <h2 className="text-2xl font-bold mb-6">Wann möchtest du kommen?</h2>
-            
+
             <div className="mb-6">
               <label className="block text-sm font-medium mb-3">Datum wählen *</label>
               <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
@@ -501,7 +501,7 @@ export default function Booking() {
         {bookingStep === 3 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <h2 className="text-2xl font-bold mb-6">Termin-Übersicht</h2>
-            
+
             <div className="space-y-4 mb-8 p-6 bg-zinc-800 bg-opacity-50 rounded-lg">
               <div className="flex justify-between">
                 <span className="text-gray-300">Salon:</span>

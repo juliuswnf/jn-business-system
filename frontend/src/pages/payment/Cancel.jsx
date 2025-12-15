@@ -9,7 +9,7 @@ const Cancel = () => {
       <div className="text-center max-w-md">
         <div className="text-6xl mb-6">✕</div>
         <h1 className="text-4xl font-bold mb-4">Payment Cancelled</h1>
-        <p className="text-gray-300 mb-8">
+        <p className="text-gray-100 mb-8">
           Your payment was cancelled. You can try again at any time.
         </p>
         <button

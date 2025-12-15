@@ -42,7 +42,7 @@ const SalonsByCity = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings/public/salons/city/${displayCityName}`
       );
@@ -98,7 +98,7 @@ const SalonsByCity = () => {
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg mb-4">{error}</p>
+            <p className="text-gray-700 text-lg mb-4">{error}</p>
             <Link
               to="/salons"
               className="text-indigo-600 hover:text-indigo-700 font-medium"
@@ -108,7 +108,7 @@ const SalonsByCity = () => {
           </div>
         ) : salons.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg mb-4">
+            <p className="text-gray-700 text-lg mb-4">
               Aktuell keine Anbieter in {displayCityName} verfügbar.
             </p>
             <Link
@@ -121,7 +121,7 @@ const SalonsByCity = () => {
         ) : (
           <>
             <div className="mb-6">
-              <p className="text-gray-600">
+              <p className="text-gray-700">
                 {salons.length} {salons.length === 1 ? 'Anbieter' : 'Anbieter'} in {displayCityName}
               </p>
             </div>
@@ -137,8 +137,8 @@ const SalonsByCity = () => {
                   </h3>
 
                   {/* Location */}
-                  <div className="flex items-start gap-2 text-gray-600 mb-3">
-                    <MapPinIcon className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex items-start gap-2 text-gray-700 mb-3">
+                    <MapPinIcon className="h-5 w-5 text-gray-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm">
                       {salon.address?.street && <div>{salon.address.street}</div>}
                       <div>
@@ -149,7 +149,7 @@ const SalonsByCity = () => {
 
                   {/* Service Count */}
                   {salon.serviceCount > 0 && (
-                    <div className="text-sm text-gray-500 mb-4">
+                    <div className="text-sm text-gray-700 mb-4">
                       {salon.serviceCount} {salon.serviceCount === 1 ? 'Service' : 'Services'} verfügbar
                     </div>
                   )}
@@ -176,15 +176,15 @@ const SalonsByCity = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Dienstleister {displayCityName} - Online Termin buchen
             </h2>
-            <p className="text-gray-600 mb-4">
-              Entdecke die besten Dienstleister in {displayCityName}. Buche deinen Termin 
-              bequem online - 24/7 verfügbar mit sofortiger Bestätigung. Egal ob Beratung, 
+            <p className="text-gray-700 mb-4">
+              Entdecke die besten Dienstleister in {displayCityName}. Buche deinen Termin
+              bequem online - 24/7 verfügbar mit sofortiger Bestätigung. Egal ob Beratung,
               Behandlung, Training oder Wellness - finde den perfekten Anbieter in deiner Nähe.
             </p>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Vorteile der Online-Buchung in {displayCityName}
             </h3>
-            <ul className="space-y-2 text-gray-600">
+            <ul className="space-y-2 text-gray-700">
               <li>✓ Sofortige Terminbestätigung ohne Wartezeit</li>
               <li>✓ Übersicht aller verfügbaren Termine</li>
               <li>✓ Einfache Verwaltung und Umbuchung</li>

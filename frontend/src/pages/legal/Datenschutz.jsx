@@ -8,7 +8,7 @@ export default function Datenschutz() {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="mb-12">
-          <Link to="/" className="text-zinc-400 hover:text-white text-sm mb-4 inline-block">
+          <Link to="/" className="text-zinc-300 hover:text-white text-sm mb-4 inline-block">
             ← Zurück zur Startseite
           </Link>
           <h1 className="text-4xl font-bold mb-4">Datenschutzerklärung</h1>
@@ -50,14 +50,14 @@ export default function Datenschutz() {
                 Deutschland
               </p>
               <p className="text-gray-300">
-                E-Mail: <a href="mailto:datenschutz@jn-automation.de" className="text-zinc-400 hover:text-white">datenschutz@jn-automation.de</a>
+                E-Mail: <a href="mailto:datenschutz@jn-automation.de" className="text-zinc-300 hover:text-white">datenschutz@jn-automation.de</a>
               </p>
             </div>
           </section>
 
           <section className="mb-10">
             <h2 className="text-2xl font-bold text-white mb-4">2. Welche Daten wir erheben</h2>
-            
+
             <h3 className="text-xl font-semibold text-white mt-6 mb-3">2.1 Bei der Registrierung (Salon-Betreiber)</h3>
             <ul className="list-disc list-inside text-gray-300 space-y-2">
               <li>Name und E-Mail-Adresse</li>
@@ -237,7 +237,7 @@ export default function Datenschutz() {
               </p>
               <p className="text-white">
                 <strong>E-Mail:</strong>{' '}
-                <a href="mailto:datenschutz@jn-automation.de" className="text-zinc-400 hover:text-white">
+                <a href="mailto:datenschutz@jn-automation.de" className="text-zinc-300 hover:text-white">
                   datenschutz@jn-automation.de
                 </a>
               </p>
@@ -250,10 +250,10 @@ export default function Datenschutz() {
 
         {/* Footer Links */}
         <div className="mt-12 pt-8 border-t border-gray-800 flex justify-between items-center">
-          <Link to="/impressum" className="text-zinc-400 hover:text-white">
+          <Link to="/impressum" className="text-zinc-300 hover:text-white">
             Impressum
           </Link>
-          <Link to="/agb" className="text-zinc-400 hover:text-white">
+          <Link to="/agb" className="text-zinc-300 hover:text-white">
             AGB
           </Link>
         </div>

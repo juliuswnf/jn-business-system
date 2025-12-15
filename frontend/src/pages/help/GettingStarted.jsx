@@ -130,7 +130,7 @@ export default function GettingStarted() {
     const newCompleted = completedSteps.includes(stepId)
       ? completedSteps.filter(id => id !== stepId)
       : [...completedSteps, stepId];
-    
+
     setCompletedSteps(newCompleted);
     localStorage.setItem('jn_setup_steps', JSON.stringify(newCompleted));
   };
@@ -140,17 +140,17 @@ export default function GettingStarted() {
   return (
     <div className="min-h-screen bg-black text-white py-8">
       <div className="max-w-4xl mx-auto px-6">
-        
+
         {/* Header */}
         <div className="mb-10">
-          <Link to="/dashboard" className="text-gray-400 hover:text-white text-sm mb-4 inline-flex items-center gap-2">
+          <Link to="/dashboard" className="text-gray-300 hover:text-white text-sm mb-4 inline-flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Zurück zum Dashboard
           </Link>
           <h1 className="text-3xl font-bold mb-2">Getting Started</h1>
-          <p className="text-gray-400">
+          <p className="text-gray-300">
             Folge diesen Schritten, um dein Buchungssystem einzurichten.
           </p>
         </div>
@@ -159,10 +159,10 @@ export default function GettingStarted() {
         <div className="bg-gray-900 rounded-2xl p-6 mb-8 border border-gray-800">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium">Setup-Fortschritt</span>
-            <span className="text-sm text-gray-400">{completedSteps.length} von {setupSteps.length} Schritten</span>
+            <span className="text-sm text-gray-300">{completedSteps.length} von {setupSteps.length} Schritten</span>
           </div>
           <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-white transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
@@ -215,7 +215,7 @@ export default function GettingStarted() {
                         {step.title}
                       </h3>
                     </div>
-                    <p className="text-gray-400 mb-4">{step.description}</p>
+                    <p className="text-gray-300 mb-4">{step.description}</p>
 
                     {/* Tips */}
                     <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
@@ -284,7 +284,7 @@ export default function GettingStarted() {
                 >
                   <span className="font-medium">{faq.question}</span>
                   <svg
-                    className={`w-5 h-5 text-gray-400 transition-transform ${
+                    className={`w-5 h-5 text-gray-300 transition-transform ${
                       expandedFaq === index ? 'rotate-180' : ''
                     }`}
                     fill="none"
@@ -296,7 +296,7 @@ export default function GettingStarted() {
                 </button>
                 {expandedFaq === index && (
                   <div className="px-5 pb-5">
-                    <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
+                    <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                   </div>
                 )}
               </div>
@@ -307,7 +307,7 @@ export default function GettingStarted() {
         {/* Support CTA */}
         <div className="bg-zinc-900 rounded-lg p-8 text-center border border-zinc-800">
           <h3 className="text-xl font-bold mb-2">Noch Fragen?</h3>
-          <p className="text-gray-400 mb-6">Unser Support-Team hilft dir gerne weiter.</p>
+          <p className="text-gray-300 mb-6">Unser Support-Team hilft dir gerne weiter.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="mailto:support@jn-automation.de"

@@ -53,7 +53,7 @@ const CustomerDashboard = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white">Meine Termine</h1>
-        <p className="text-gray-400 mt-2">Willkommen zurück, {user.name}!</p>
+        <p className="text-gray-300 mt-2">Willkommen zurück, {user.name}!</p>
       </div>
 
       {/* Upcoming Bookings */}
@@ -61,11 +61,11 @@ const CustomerDashboard = () => {
         <h2 className="text-2xl font-semibold text-white mb-4">Bevorstehende Termine</h2>
         {loading ? (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
-            <p className="text-gray-400">Lade Termine...</p>
+            <p className="text-gray-300">Lade Termine...</p>
           </div>
         ) : upcomingBookings.length === 0 ? (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
-            <p className="text-gray-400">Keine bevorstehenden Termine</p>
+            <p className="text-gray-300">Keine bevorstehenden Termine</p>
             <Link to="/customer/booking" className="text-indigo-400 hover:text-indigo-300 mt-2 inline-block">
               Neuen Termin buchen
             </Link>
@@ -79,7 +79,7 @@ const CustomerDashboard = () => {
                     <h3 className="text-lg font-semibold text-white">
                       {booking.serviceId?.name || 'Service'}
                     </h3>
-                    <div className="mt-2 space-y-1 text-sm text-gray-400">
+                    <div className="mt-2 space-y-1 text-sm text-gray-300">
                       <div className="flex items-center">
                         <CalendarIcon className="h-4 w-4 mr-2" />
                         {new Date(booking.date).toLocaleDateString('de-DE')}
@@ -116,14 +116,14 @@ const CustomerDashboard = () => {
                     <h3 className="text-lg font-semibold text-gray-300">
                       {booking.serviceId?.name || 'Service'}
                     </h3>
-                    <div className="mt-2 space-y-1 text-sm text-gray-500">
+                    <div className="mt-2 space-y-1 text-sm text-gray-600">
                       <div className="flex items-center">
                         <CalendarIcon className="h-4 w-4 mr-2" />
                         {new Date(booking.date).toLocaleDateString('de-DE')}
                       </div>
                     </div>
                   </div>
-                  <span className="px-3 py-1 bg-gray-800 text-gray-400 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-sm">
                     Abgeschlossen
                   </span>
                 </div>

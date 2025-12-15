@@ -131,7 +131,7 @@ export default function Pricing() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4">Preise</h1>
-          <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+          <p className="text-gray-200 text-xl max-w-2xl mx-auto">
             Transparente Preise. Keine versteckten Kosten.
             <br />
             <span className="text-white font-medium">Sie behalten 100% Ihrer Einnahmen.</span>
@@ -140,7 +140,7 @@ export default function Pricing() {
 
         {/* Toggle */}
         <div className="flex items-center justify-center gap-4 mb-16">
-          <span className={yearly ? 'text-gray-500' : 'text-white font-medium'}>
+          <span className={yearly ? 'text-gray-200' : 'text-white font-medium'}>
             Monatlich
           </span>
           <button
@@ -156,7 +156,7 @@ export default function Pricing() {
               }`}
             />
           </button>
-          <span className={yearly ? 'text-white font-medium' : 'text-gray-500'}>
+          <span className={yearly ? 'text-white font-medium' : 'text-gray-200'}>
             Jährlich
           </span>
           {yearly && (
@@ -174,7 +174,7 @@ export default function Pricing() {
             </svg>
             <h3 className="text-xl font-bold">14-Tage Enterprise Trial</h3>
           </div>
-          <p className="text-gray-300 mb-4">
+          <p className="text-gray-200 mb-4">
             Teste alle Enterprise Features kostenlos - inkl. 50 SMS. Keine Kreditkarte erforderlich.
           </p>
           <Link
@@ -214,7 +214,7 @@ export default function Pricing() {
 
               <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">{plan.name}</h2>
-                <p className="text-gray-400 text-sm">{plan.description}</p>
+                <p className="text-gray-200 text-sm">{plan.description}</p>
               </div>
 
               <div className="mb-8">
@@ -224,7 +224,7 @@ export default function Pricing() {
                       <span className="text-5xl font-bold">
                         €{plan.yearlyMonthlyCost.toFixed(0)}
                       </span>
-                      <span className="text-gray-400">/ Monat</span>
+                      <span className="text-gray-200">/ Monat</span>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
                       €{plan.yearlyPrice} jährlich (spare €{calculateSavings(plan)})
@@ -234,7 +234,7 @@ export default function Pricing() {
                   <>
                     <div className="flex items-baseline gap-2">
                       <span className="text-5xl font-bold">€{plan.price}</span>
-                      <span className="text-gray-400">/ Monat</span>
+                      <span className="text-gray-200">/ Monat</span>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
                       Monatlich kündbar
@@ -273,7 +273,7 @@ export default function Pricing() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div className="flex-1">
-                      <div className={feature.bold ? 'font-semibold text-white' : 'text-gray-300'}>
+                      <div className={feature.bold ? 'font-semibold text-white' : 'text-gray-200'}>
                         {feature.name}
                         {feature.value && (
                           <span className="ml-1 text-white font-medium">
@@ -287,7 +287,7 @@ export default function Pricing() {
                         )}
                       </div>
                       {feature.description && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-gray-300 mt-1">
                           {feature.description}
                         </div>
                       )}
@@ -298,10 +298,10 @@ export default function Pricing() {
 
               {plan.notIncluded && plan.notIncluded.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-zinc-800">
-                  <p className="text-xs text-gray-500 mb-2">Nicht enthalten:</p>
+                  <p className="text-xs text-gray-300 mb-2">Nicht enthalten:</p>
                   <ul className="space-y-2">
                     {plan.notIncluded.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs text-gray-500">
+                      <li key={idx} className="flex items-start gap-2 text-xs text-gray-300">
                         <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -334,25 +334,25 @@ export default function Pricing() {
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-300">2h & 24h Erinnerungen</span>
+                  <span className="text-gray-200">2h & 24h Erinnerungen</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-300">Prioritäts-System</span>
+                  <span className="text-gray-200">Prioritäts-System</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-300">Überschreitung möglich (€0.05/SMS)</span>
+                  <span className="text-gray-200">Überschreitung möglich (€0.05/SMS)</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-300">Email-Fallback automatisch</span>
+                  <span className="text-gray-200">Email-Fallback automatisch</span>
                 </div>
               </div>
             </div>
@@ -377,7 +377,7 @@ export default function Pricing() {
               'Tägliche Backups',
               'Kostenlose Einrichtung',
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-gray-400">
+              <div key={i} className="flex items-center gap-2 text-sm text-gray-200">
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
@@ -402,10 +402,10 @@ export default function Pricing() {
                   className="w-full flex items-center justify-between p-4 text-left"
                 >
                   <span className="text-sm font-medium">{item.q}</span>
-                  <svg 
-                    className={`w-4 h-4 text-gray-500 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className={`w-4 h-4 text-gray-500 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -413,7 +413,7 @@ export default function Pricing() {
                 </button>
                 {openFaq === i && (
                   <div className="px-4 pb-4">
-                    <p className="text-sm text-gray-400">{item.a}</p>
+                    <p className="text-sm text-gray-200">{item.a}</p>
                   </div>
                 )}
               </div>
@@ -424,19 +424,21 @@ export default function Pricing() {
         {/* CTA */}
         <div className="text-center border border-zinc-800 rounded-lg p-8">
           <h2 className="text-xl font-semibold mb-2">Noch Fragen?</h2>
-          <p className="text-gray-400 text-sm mb-6">
+          <p className="text-gray-200 text-sm mb-6">
             Schreiben Sie uns - wir antworten innerhalb von 24 Stunden.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <a 
+            <a
               href="mailto:support@jn-automation.de"
               className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-sm transition"
+              aria-label="Support kontaktieren per E-Mail"
             >
               E-Mail schreiben
             </a>
             <Link
               to="/demo"
               className="px-5 py-2 bg-white text-black hover:bg-gray-100 rounded text-sm transition"
+              aria-label="Demo-Video ansehen"
             >
               Demo ansehen
             </Link>

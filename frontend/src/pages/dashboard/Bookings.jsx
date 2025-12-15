@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Phone, 
-  Mail, 
+import {
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
   MessageSquare,
   CheckCircle,
   XCircle,
@@ -20,7 +20,7 @@ import axios from 'axios';
 
 /**
  * Bookings Page with SMS Confirmation Integration
- * 
+ *
  * Features:
  * - Display all bookings with filters
  * - Send SMS confirmation button (48-96h window)
@@ -33,12 +33,12 @@ export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sendingConfirmation, setSendingConfirmation] = useState({});
-  
+
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all'); // all, today, week, month
-  
+
   // Pagination
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -62,7 +62,7 @@ export default function Bookings() {
   const loadBookings = async () => {
     try {
       setLoading(true);
-      
+
       const params = {
         page,
         limit: 20,
@@ -92,11 +92,11 @@ export default function Bookings() {
       }
 
       const response = await axios.get('/api/bookings', { params });
-      
+
       if (response.data.success) {
         // Load confirmations for these bookings
         const bookingsWithConfirmations = await loadConfirmationsForBookings(response.data.bookings);
-        
+
         setBookings(bookingsWithConfirmations);
         setTotalPages(response.data.totalPages || 1);
         setTotal(response.data.total || 0);
@@ -116,7 +116,7 @@ export default function Bookings() {
     try {
       // Get confirmation status for each booking
       const bookingIds = bookings.map(b => b._id);
-      
+
       // Fetch confirmations in parallel
       const confirmationPromises = bookingIds.map(async (bookingId) => {
         try {
@@ -132,7 +132,7 @@ export default function Bookings() {
       });
 
       const confirmations = await Promise.all(confirmationPromises);
-      
+
       // Merge confirmations into bookings
       return bookings.map(booking => {
         const confirmationData = confirmations.find(c => c.bookingId === booking._id);
@@ -158,12 +158,12 @@ export default function Bookings() {
 
       if (response.data.success) {
         toast.success(`✅ SMS-Bestätigung gesendet an ${booking.customerPhone}`);
-        
+
         // Update booking in state
-        setBookings(prev => prev.map(b => 
-          b._id === booking._id 
-            ? { 
-                ...b, 
+        setBookings(prev => prev.map(b =>
+          b._id === booking._id
+            ? {
+                ...b,
                 confirmation: {
                   status: 'pending',
                   reminderSentAt: new Date(),
@@ -244,7 +244,7 @@ export default function Bookings() {
         icon: <XCircle className="w-3 h-3" />,
         text: 'Auto-storniert',
         bg: 'bg-gray-500/20',
-        textColor: 'text-gray-400'
+        textColor: 'text-gray-300'
       }
     };
 
@@ -256,7 +256,7 @@ export default function Bookings() {
           {badge.icon}
           {badge.text}
         </span>
-        
+
         {/* Tooltip with details */}
         <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-10">
           <div className="bg-zinc-800 text-white text-xs rounded px-3 py-2 shadow-lg border border-zinc-700 whitespace-nowrap">
@@ -301,7 +301,7 @@ export default function Bookings() {
    */
   const filteredBookings = bookings.filter(booking => {
     if (!searchQuery) return true;
-    
+
     const query = searchQuery.toLowerCase();
     return (
       booking.customerName?.toLowerCase().includes(query) ||
@@ -321,7 +321,7 @@ export default function Bookings() {
             {total} Buchungen insgesamt
           </p>
         </div>
-        
+
         <button
           onClick={loadBookings}
           disabled={loading}
@@ -515,7 +515,7 @@ export default function Bookings() {
                             )}
                           </button>
                         )}
-                        
+
                         {booking.confirmation?.status === 'pending' && (
                           <div className="text-xs text-zinc-500">
                             SMS gesendet
@@ -537,7 +537,7 @@ export default function Bookings() {
           <div className="text-sm text-zinc-400">
             Seite {page} von {totalPages}
           </div>
-          
+
           <div className="flex gap-2">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
@@ -559,3 +559,4 @@ export default function Bookings() {
     </div>
   );
 }
+

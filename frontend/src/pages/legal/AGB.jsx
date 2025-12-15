@@ -7,7 +7,7 @@ export default function AGB() {
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="mb-12">
-          <Link to="/" className="text-zinc-400 hover:text-white text-sm mb-4 inline-block">
+          <Link to="/" className="text-zinc-300 hover:text-white text-sm mb-4 inline-block">
             ← Zurück zur Startseite
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
@@ -20,18 +20,18 @@ export default function AGB() {
 
         {/* Content */}
         <div className="prose prose-invert prose-lg max-w-none">
-          
+
           {/* §1 */}
           <section className="mb-10">
             <h2 className="text-xl font-bold text-white mb-4">§1 Geltungsbereich</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge zwischen 
-                JN Automation (nachfolgend "Anbieter") und dem Kunden (nachfolgend "Kunde") 
+                (1) Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge zwischen
+                JN Automation (nachfolgend "Anbieter") und dem Kunden (nachfolgend "Kunde")
                 über die Nutzung der Online-Buchungssoftware.
               </p>
               <p>
-                (2) Abweichende Bedingungen des Kunden werden nicht anerkannt, es sei denn, 
+                (2) Abweichende Bedingungen des Kunden werden nicht anerkannt, es sei denn,
                 der Anbieter stimmt ihrer Geltung ausdrücklich schriftlich zu.
               </p>
             </div>
@@ -42,12 +42,12 @@ export default function AGB() {
             <h2 className="text-xl font-bold text-white mb-4">§2 Vertragsgegenstand</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) Gegenstand des Vertrages ist die Bereitstellung der JN Automation 
-                Buchungssoftware als Software-as-a-Service (SaaS) zur Online-Terminbuchung 
+                (1) Gegenstand des Vertrages ist die Bereitstellung der JN Automation
+                Buchungssoftware als Software-as-a-Service (SaaS) zur Online-Terminbuchung
                 für Salons, Studios und Dienstleistungsbetriebe.
               </p>
               <p>
-                (2) Der Funktionsumfang richtet sich nach dem vom Kunden gewählten Tarif 
+                (2) Der Funktionsumfang richtet sich nach dem vom Kunden gewählten Tarif
                 (Starter, Professional, Enterprise).
               </p>
             </div>
@@ -58,14 +58,14 @@ export default function AGB() {
             <h2 className="text-xl font-bold text-white mb-4">§3 Kostenlose Testphase</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) Jeder Neukunde erhält eine <strong className="text-white">kostenlose 30-tägige Testphase</strong> 
+                (1) Jeder Neukunde erhält eine <strong className="text-white">kostenlose 30-tägige Testphase</strong>
                 mit vollem Funktionsumfang des gewählten Tarifs.
               </p>
               <p>
                 (2) Während der Testphase ist keine Zahlungsmethode erforderlich.
               </p>
               <p>
-                (3) Nach Ablauf der Testphase endet der Zugang automatisch, es sei denn, 
+                (3) Nach Ablauf der Testphase endet der Zugang automatisch, es sei denn,
                 der Kunde entscheidet sich für ein kostenpflichtiges Abonnement.
               </p>
             </div>
@@ -78,22 +78,22 @@ export default function AGB() {
             </h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) <strong className="text-white">Garantie:</strong> Der Kunde hat das Recht, 
-                innerhalb von <strong className="text-white">30 Tagen nach der ersten Zahlung</strong> 
-                ohne Angabe von Gründen vom Vertrag zurückzutreten und eine vollständige 
+                (1) <strong className="text-white">Garantie:</strong> Der Kunde hat das Recht,
+                innerhalb von <strong className="text-white">30 Tagen nach der ersten Zahlung</strong>
+                ohne Angabe von Gründen vom Vertrag zurückzutreten und eine vollständige
                 Rückerstattung zu erhalten.
               </p>
               <p>
-                (2) <strong className="text-white">Beantragung:</strong> Die Rückerstattung kann 
-                per E-Mail an <a href="mailto:support@jn-automation.de" className="text-zinc-400 hover:text-white hover:underline">
+                (2) <strong className="text-white">Beantragung:</strong> Die Rückerstattung kann
+                per E-Mail an <a href="mailto:support@jn-automation.de" className="text-zinc-300 hover:text-white hover:underline">
                 support@jn-automation.de</a> beantragt werden.
               </p>
               <p>
-                (3) <strong className="text-white">Bearbeitung:</strong> Die Rückerstattung erfolgt 
+                (3) <strong className="text-white">Bearbeitung:</strong> Die Rückerstattung erfolgt
                 innerhalb von 14 Werktagen auf das ursprüngliche Zahlungsmittel.
               </p>
               <p>
-                (4) <strong className="text-white">Umfang:</strong> Erstattet wird der volle Betrag 
+                (4) <strong className="text-white">Umfang:</strong> Erstattet wird der volle Betrag
                 der ersten Monatsgebühr. Bei Jahreszahlung wird der anteilige Monatsbetrag erstattet.
               </p>
               <p>
@@ -107,18 +107,18 @@ export default function AGB() {
             <h2 className="text-xl font-bold text-white mb-4">§5 Preise und Zahlungsbedingungen</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) Die aktuellen Preise sind auf der Website unter 
-                <Link to="/pricing" className="text-zinc-400 hover:text-white hover:underline ml-1">/pricing</Link> einsehbar.
+                (1) Die aktuellen Preise sind auf der Website unter
+                <Link to="/pricing" className="text-zinc-300 hover:text-white hover:underline ml-1">/pricing</Link> einsehbar.
               </p>
               <p>
                 (2) Alle Preise verstehen sich netto zzgl. der gesetzlichen Mehrwertsteuer.
               </p>
               <p>
-                (3) Die Zahlung erfolgt monatlich oder jährlich im Voraus per SEPA-Lastschrift, 
+                (3) Die Zahlung erfolgt monatlich oder jährlich im Voraus per SEPA-Lastschrift,
                 Kreditkarte oder Sofortüberweisung.
               </p>
               <p>
-                (4) Bei Zahlungsverzug behält sich der Anbieter vor, den Zugang zur Software 
+                (4) Bei Zahlungsverzug behält sich der Anbieter vor, den Zugang zur Software
                 vorübergehend zu sperren.
               </p>
             </div>
@@ -129,17 +129,17 @@ export default function AGB() {
             <h2 className="text-xl font-bold text-white mb-4">§6 Vertragslaufzeit und Kündigung</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) <strong className="text-white">Monatliche Zahlung:</strong> Der Vertrag verlängert 
-                sich automatisch um einen weiteren Monat, wenn er nicht vor Ablauf des Abrechnungszeitraums 
+                (1) <strong className="text-white">Monatliche Zahlung:</strong> Der Vertrag verlängert
+                sich automatisch um einen weiteren Monat, wenn er nicht vor Ablauf des Abrechnungszeitraums
                 gekündigt wird. <strong className="text-white">Keine Mindestlaufzeit.</strong>
               </p>
               <p>
-                (2) <strong className="text-white">Jährliche Zahlung:</strong> Der Vertrag verlängert 
+                (2) <strong className="text-white">Jährliche Zahlung:</strong> Der Vertrag verlängert
                 sich automatisch um ein weiteres Jahr. Kündigung bis 30 Tage vor Ablauf möglich.
               </p>
               <p>
-                (3) Die Kündigung kann jederzeit im Dashboard oder per E-Mail an 
-                <a href="mailto:support@jn-automation.de" className="text-zinc-400 hover:text-white hover:underline ml-1">
+                (3) Die Kündigung kann jederzeit im Dashboard oder per E-Mail an
+                <a href="mailto:support@jn-automation.de" className="text-zinc-300 hover:text-white hover:underline ml-1">
                 support@jn-automation.de</a> erfolgen.
               </p>
               <p>
@@ -153,8 +153,8 @@ export default function AGB() {
             <h2 className="text-xl font-bold text-white mb-4">§7 Datenschutz</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) Der Anbieter verarbeitet personenbezogene Daten gemäß der 
-                <Link to="/datenschutz" className="text-zinc-400 hover:text-white hover:underline ml-1">Datenschutzerklärung</Link> 
+                (1) Der Anbieter verarbeitet personenbezogene Daten gemäß der
+                <Link to="/datenschutz" className="text-zinc-300 hover:text-white hover:underline ml-1">Datenschutzerklärung</Link>
                 und im Einklang mit der DSGVO.
               </p>
               <p>
@@ -190,7 +190,7 @@ export default function AGB() {
                 (1) Die Haftung des Anbieters ist auf Vorsatz und grobe Fahrlässigkeit beschränkt.
               </p>
               <p>
-                (2) Der Anbieter haftet nicht für entgangenen Gewinn, Datenverlust oder 
+                (2) Der Anbieter haftet nicht für entgangenen Gewinn, Datenverlust oder
                 mittelbare Schäden, soweit gesetzlich zulässig.
               </p>
               <p>
@@ -204,7 +204,7 @@ export default function AGB() {
             <h2 className="text-xl font-bold text-white mb-4">§10 Widerrufsrecht</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) Verbraucher haben das Recht, binnen 14 Tagen ohne Angabe von Gründen 
+                (1) Verbraucher haben das Recht, binnen 14 Tagen ohne Angabe von Gründen
                 den Vertrag zu widerrufen.
               </p>
               <p>
@@ -215,8 +215,8 @@ export default function AGB() {
                 </span>
               </p>
               <p>
-                (3) Mit Beginn der Nutzung der Software während der Widerrufsfrist erklärt 
-                sich der Kunde damit einverstanden, dass der Anbieter vor Ablauf der 
+                (3) Mit Beginn der Nutzung der Software während der Widerrufsfrist erklärt
+                sich der Kunde damit einverstanden, dass der Anbieter vor Ablauf der
                 Widerrufsfrist mit der Vertragserfüllung beginnt.
               </p>
             </div>
@@ -230,11 +230,11 @@ export default function AGB() {
                 (1) Es gilt das Recht der Bundesrepublik Deutschland.
               </p>
               <p>
-                (2) Gerichtsstand für alle Streitigkeiten ist, soweit gesetzlich zulässig, 
+                (2) Gerichtsstand für alle Streitigkeiten ist, soweit gesetzlich zulässig,
                 der Sitz des Anbieters.
               </p>
               <p>
-                (3) Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit 
+                (3) Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit
                 der übrigen Bestimmungen unberührt.
               </p>
             </div>
@@ -246,7 +246,7 @@ export default function AGB() {
             <div className="text-gray-300">
               <p>
                 Bei Fragen zu diesen AGB wenden Sie sich bitte an:<br />
-                <a href="mailto:support@jn-automation.de" className="text-zinc-400 hover:text-white hover:underline">
+                <a href="mailto:support@jn-automation.de" className="text-zinc-300 hover:text-white hover:underline">
                   support@jn-automation.de
                 </a>
               </p>

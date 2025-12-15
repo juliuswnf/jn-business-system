@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { 
-  TrendingUp, 
+import {
+  TrendingUp,
   TrendingDown,
-  Calendar, 
-  Users, 
+  Calendar,
+  Users,
   DollarSign,
   Clock,
   Star,
@@ -107,7 +107,7 @@ const SuccessMetrics = () => {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <RefreshCcw className="w-8 h-8 animate-spin text-indigo-400 mx-auto mb-4" />
-          <p className="text-gray-400">Lade Statistiken...</p>
+          <p className="text-gray-300">Lade Statistiken...</p>
         </div>
       </div>
     );
@@ -124,7 +124,7 @@ const SuccessMetrics = () => {
                 <BarChart3 className="w-7 h-7 text-indigo-400" />
                 Erfolgs-Dashboard
               </h1>
-              <p className="text-gray-400 text-sm mt-1">Deine KPIs auf einen Blick</p>
+              <p className="text-gray-300 text-sm mt-1">Deine KPIs auf einen Blick</p>
             </div>
             <div className="flex items-center gap-3">
               <select
@@ -139,7 +139,7 @@ const SuccessMetrics = () => {
               </select>
               <button
                 onClick={fetchAllData}
-                className="p-2 text-gray-400 hover:text-indigo-400 hover:bg-zinc-800 rounded-lg transition-colors"
+                className="p-2 text-gray-300 hover:text-indigo-400 hover:bg-zinc-800 rounded-lg transition-colors"
               >
                 <RefreshCcw className="w-5 h-5" />
               </button>
@@ -160,7 +160,7 @@ const SuccessMetrics = () => {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.id
                     ? 'border-indigo-400 text-indigo-400'
-                    : 'border-transparent text-gray-400 hover:text-white'
+                    : 'border-transparent text-gray-300 hover:text-white'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -179,11 +179,11 @@ const SuccessMetrics = () => {
             <div className="bg-zinc-900 rounded-lg p-6 text-white border border-zinc-800">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-medium text-gray-400">Dein Erfolg mit JN Automation</h2>
+                  <h2 className="text-lg font-medium text-gray-300">Dein Erfolg mit JN Automation</h2>
                   <div className="text-3xl font-bold mt-1">
                     {metrics?.timeSavedHours || 0} Stunden gespart
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-600 mt-1">
                     Durch {formatNumber(metrics?.totalBookings)} Online-Buchungen (ca. 5 Min. pro Anruf)
                   </p>
                 </div>
@@ -210,13 +210,13 @@ const SuccessMetrics = () => {
               <div className="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-gray-400">Buchungen (Monat)</p>
+                    <p className="text-sm text-gray-300">Buchungen (Monat)</p>
                     <p className="text-2xl font-bold text-white mt-1">
                       {formatNumber(metrics?.thisMonthBookings)}
                     </p>
                   </div>
                   <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    (metrics?.bookingGrowth || 0) >= 0 
+                    (metrics?.bookingGrowth || 0) >= 0
                       ? 'bg-green-500/20 text-green-400'
                       : 'bg-red-500/20 text-red-400'
                   }`}>
@@ -224,14 +224,14 @@ const SuccessMetrics = () => {
                     {Math.abs(metrics?.bookingGrowth || 0)}%
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">vs. Vormonat ({metrics?.lastMonthBookings || 0})</p>
+                <p className="text-xs text-gray-600 mt-2">vs. Vormonat ({metrics?.lastMonthBookings || 0})</p>
               </div>
 
               {/* This Month Revenue */}
               <div className="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-gray-400">Umsatz (Monat)</p>
+                    <p className="text-sm text-gray-300">Umsatz (Monat)</p>
                     <p className="text-2xl font-bold text-white mt-1">
                       {formatCurrency(metrics?.thisMonthRevenue)}
                     </p>
@@ -240,14 +240,14 @@ const SuccessMetrics = () => {
                     <DollarSign className="w-5 h-5 text-green-400" />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Ø {formatCurrency(metrics?.avgBookingValue)} pro Buchung</p>
+                <p className="text-xs text-gray-600 mt-2">Ø {formatCurrency(metrics?.avgBookingValue)} pro Buchung</p>
               </div>
 
               {/* New Customers */}
               <div className="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-gray-400">Neue Kunden (Monat)</p>
+                    <p className="text-sm text-gray-300">Neue Kunden (Monat)</p>
                     <p className="text-2xl font-bold text-white mt-1">
                       {formatNumber(metrics?.newCustomersThisMonth)}
                     </p>
@@ -256,14 +256,14 @@ const SuccessMetrics = () => {
                     <Users className="w-5 h-5 text-blue-400" />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">von {metrics?.totalCustomers || 0} gesamt</p>
+                <p className="text-xs text-gray-600 mt-2">von {metrics?.totalCustomers || 0} gesamt</p>
               </div>
 
               {/* No-Show Rate */}
               <div className="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-gray-400">Stornierungsrate</p>
+                    <p className="text-sm text-gray-300">Stornierungsrate</p>
                     <p className="text-2xl font-bold text-white mt-1">
                       {metrics?.noShowRate || 0}%
                     </p>
@@ -272,7 +272,7 @@ const SuccessMetrics = () => {
                     <Calendar className={`w-5 h-5 ${(metrics?.noShowRate || 0) < 10 ? 'text-green-400' : 'text-yellow-400'}`} />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-600 mt-2">
                   {(metrics?.noShowRate || 0) < 10 ? '✓ Sehr gut!' : 'Erinnerungen aktiviert?'}
                 </p>
               </div>
@@ -287,7 +287,7 @@ const SuccessMetrics = () => {
                     const maxBookings = Math.max(...trends.map(t => t.bookings), 1);
                     const height = (point.bookings / maxBookings) * 100;
                     return (
-                      <div 
+                      <div
                         key={idx}
                         className="flex-1 bg-indigo-500/30 hover:bg-indigo-500/50 rounded-t transition-colors relative group"
                         style={{ height: `${Math.max(height, 5)}%` }}
@@ -302,11 +302,11 @@ const SuccessMetrics = () => {
                   })}
                 </div>
               ) : (
-                <div className="h-48 flex items-center justify-center text-gray-500">
+                <div className="h-48 flex items-center justify-center text-gray-600">
                   Noch keine Daten verfügbar
                 </div>
               )}
-              <div className="flex justify-between mt-2 text-xs text-gray-500">
+              <div className="flex justify-between mt-2 text-xs text-gray-600">
                 <span>{trends[0]?.date || '-'}</span>
                 <span>{trends[trends.length - 1]?.date || '-'}</span>
               </div>
@@ -337,10 +337,10 @@ const SuccessMetrics = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-medium text-white truncate">{service.name}</span>
-                          <span className="text-sm text-gray-400">{service.bookings} Buchungen</span>
+                          <span className="text-sm text-gray-300">{service.bookings} Buchungen</span>
                         </div>
                         <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full bg-indigo-500 rounded-full transition-all"
                             style={{ width: `${service.percentage}%` }}
                           />
@@ -348,13 +348,13 @@ const SuccessMetrics = () => {
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-white">{formatCurrency(service.revenue)}</div>
-                        <div className="text-xs text-gray-400">{service.percentage}%</div>
+                        <div className="text-xs text-gray-300">{service.percentage}%</div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-center py-8">Noch keine Service-Daten verfügbar</p>
+                <p className="text-gray-300 text-center py-8">Noch keine Service-Daten verfügbar</p>
               )}
             </div>
           </div>
@@ -372,7 +372,7 @@ const SuccessMetrics = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{customerInsights?.totalCustomers || 0}</p>
-                    <p className="text-sm text-gray-400">Gesamtkunden</p>
+                    <p className="text-sm text-gray-300">Gesamtkunden</p>
                   </div>
                 </div>
               </div>
@@ -384,7 +384,7 @@ const SuccessMetrics = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{customerInsights?.repeatRate || 0}%</p>
-                    <p className="text-sm text-gray-400">Wiederkehrend</p>
+                    <p className="text-sm text-gray-300">Wiederkehrend</p>
                   </div>
                 </div>
               </div>
@@ -396,7 +396,7 @@ const SuccessMetrics = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{formatCurrency(customerInsights?.avgLifetimeValue)}</p>
-                    <p className="text-sm text-gray-400">Ø Kundenwert</p>
+                    <p className="text-sm text-gray-300">Ø Kundenwert</p>
                   </div>
                 </div>
               </div>
@@ -409,7 +409,7 @@ const SuccessMetrics = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="text-left text-sm text-gray-400 border-b border-zinc-700">
+                      <tr className="text-left text-sm text-gray-300 border-b border-zinc-700">
                         <th className="pb-3 font-medium">Kunde</th>
                         <th className="pb-3 font-medium text-center">Buchungen</th>
                         <th className="pb-3 font-medium text-right">Umsatz</th>
@@ -426,7 +426,7 @@ const SuccessMetrics = () => {
                               </div>
                               <div>
                                 <div className="font-medium text-white">{customer.name}</div>
-                                <div className="text-xs text-gray-500">{customer.email}</div>
+                                <div className="text-xs text-gray-600">{customer.email}</div>
                               </div>
                             </div>
                           </td>
@@ -438,8 +438,8 @@ const SuccessMetrics = () => {
                           <td className="py-3 text-right font-medium text-white">
                             {formatCurrency(customer.totalSpent)}
                           </td>
-                          <td className="py-3 text-right text-sm text-gray-400">
-                            {customer.lastVisit 
+                          <td className="py-3 text-right text-sm text-gray-300">
+                            {customer.lastVisit
                               ? new Date(customer.lastVisit).toLocaleDateString('de-DE')
                               : '-'
                             }
@@ -450,7 +450,7 @@ const SuccessMetrics = () => {
                   </table>
                 </div>
               ) : (
-                <p className="text-gray-400 text-center py-8">Noch keine Kundendaten verfügbar</p>
+                <p className="text-gray-300 text-center py-8">Noch keine Kundendaten verfügbar</p>
               )}
             </div>
           </div>
@@ -470,17 +470,17 @@ const SuccessMetrics = () => {
                     const height = data ? (data.bookings / maxBookings) * 100 : 0;
                     return (
                       <div key={hour} className="flex-1 flex flex-col items-center">
-                        <div 
+                        <div
                           className={`w-full rounded-t transition-colors ${height > 60 ? 'bg-indigo-500' : height > 30 ? 'bg-indigo-400/60' : 'bg-indigo-500/30'}`}
                           style={{ height: `${Math.max(height, 5)}%` }}
                         />
-                        <span className="text-xs text-gray-500 mt-2">{hour}h</span>
+                        <span className="text-xs text-gray-600 mt-2">{hour}h</span>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">Noch keine Daten verfügbar</p>
+                <p className="text-gray-600 text-center py-8">Noch keine Daten verfügbar</p>
               )}
             </div>
 
@@ -495,22 +495,22 @@ const SuccessMetrics = () => {
                     const intensity = data ? (data.bookings / maxBookings) : 0;
                     return (
                       <div key={day} className="text-center">
-                        <div 
+                        <div
                           className={`h-16 rounded-lg flex items-center justify-center font-bold text-lg transition-colors ${
                             intensity > 0.6 ? 'bg-indigo-500 text-white' :
                             intensity > 0.3 ? 'bg-indigo-500/50 text-indigo-200' :
-                            'bg-zinc-800 text-gray-500'
+                            'bg-zinc-800 text-gray-600'
                           }`}
                         >
                           {data?.bookings || 0}
                         </div>
-                        <span className="text-sm text-gray-400 mt-1">{day}</span>
+                        <span className="text-sm text-gray-300 mt-1">{day}</span>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">Noch keine Daten verfügbar</p>
+                <p className="text-gray-600 text-center py-8">Noch keine Daten verfügbar</p>
               )}
             </div>
           </div>
@@ -521,3 +521,4 @@ const SuccessMetrics = () => {
 };
 
 export default SuccessMetrics;
+

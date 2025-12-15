@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { 
-  TrendingUp, 
-  DollarSign, 
-  MessageSquare, 
+import {
+  TrendingUp,
+  DollarSign,
+  MessageSquare,
   Activity,
   Plus,
   Play,
@@ -76,7 +76,7 @@ const Marketing = () => {
     try {
       const token = localStorage.getItem('token');
       const newStatus = campaign.status === 'active' ? 'paused' : 'active';
-      
+
       await axios.put(
         `${API_BASE_URL}/marketing/campaigns/${campaign._id}`,
         { status: newStatus },
@@ -182,7 +182,7 @@ const Marketing = () => {
                 {limits.tier.charAt(0).toUpperCase() + limits.tier.slice(1)} Tier
               </h3>
               <p className="text-sm text-blue-700">
-                {limits.activeCampaigns} / {limits.maxActiveCampaigns} aktive Kampagnen Â· 
+                {limits.activeCampaigns} / {limits.maxActiveCampaigns} aktive Kampagnen Â·
                 {' '}{limits.smsUsed} / {limits.smsLimit} SMS diesen Monat
               </p>
             </div>
@@ -202,7 +202,7 @@ const Marketing = () => {
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'templates'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             ðŸ“‹ Templates
@@ -212,7 +212,7 @@ const Marketing = () => {
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'campaigns'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             ðŸš€ Meine Kampagnen ({campaigns.length})
@@ -241,7 +241,7 @@ const Marketing = () => {
             <div className="text-center py-12">
               <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">Keine Kampagnen</h3>
-              <p className="text-gray-500 mb-4">Erstelle deine erste Marketing-Kampagne</p>
+              <p className="text-gray-600 mb-4">Erstelle deine erste Marketing-Kampagne</p>
               <button
                 onClick={() => setActiveTab('templates')}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -253,12 +253,12 @@ const Marketing = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stats</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aktionen</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Typ</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Stats</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ROI</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Aktionen</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -304,7 +304,7 @@ const StatCard = ({ icon, label, value, subtext, color }) => {
       </div>
       <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
       <div className="text-sm text-gray-600">{label}</div>
-      {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+      {subtext && <div className="text-xs text-gray-600 mt-1">{subtext}</div>}
     </motion.div>
   );
 };
@@ -325,32 +325,32 @@ const TemplateCard = ({ template, onActivate, canActivate }) => {
           </span>
         )}
       </div>
-      
+
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{template.name}</h3>
       <p className="text-sm text-gray-600 mb-4">{template.description}</p>
-      
+
       <div className="space-y-2 mb-4">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Tier:</span>
+          <span className="text-gray-600">Tier:</span>
           <span className="font-medium text-gray-900 capitalize">{template.tier}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">ROI:</span>
+          <span className="text-gray-600">ROI:</span>
           <span className="font-medium text-green-600">{template.estimatedROI}%</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Conversion:</span>
+          <span className="text-gray-600">Conversion:</span>
           <span className="font-medium text-blue-600">{template.estimatedConversionRate}%</span>
         </div>
       </div>
-      
+
       <button
         onClick={() => onActivate(template)}
         disabled={!canActivate}
         className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium ${
           canActivate
             ? 'bg-blue-600 text-white hover:bg-blue-700'
-            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+            : 'bg-gray-200 text-gray-600 cursor-not-allowed'
         }`}
       >
         <Plus className="w-4 h-4" />
@@ -374,7 +374,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
         <div className="text-sm font-medium text-gray-900">{campaign.name}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-500 capitalize">
+        <div className="text-sm text-gray-600 capitalize">
           {campaign.type.replace('_', ' ')}
         </div>
       </td>
@@ -387,7 +387,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
         <div className="text-sm text-gray-900">
           {campaign.stats?.totalSent || 0} versendet
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-600">
           {campaign.stats?.totalBooked || 0} conversions
         </div>
       </td>
@@ -395,7 +395,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
         <div className="text-sm font-medium text-green-600">
           {campaign.roi}%
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-600">
           {campaign.stats?.totalRevenue?.toFixed(0) || 0}â‚¬
         </div>
       </td>
@@ -444,3 +444,4 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
 };
 
 export default Marketing;
+

@@ -200,7 +200,7 @@ export default function MultiLocationDashboard() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Multi-Location</h1>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-300 mb-6">
             Verwalten Sie bis zu 5 Standorte von einem Dashboard aus.
             Diese Funktion ist exklusiv fÃ¼r Enterprise-Kunden.
           </p>
@@ -220,7 +220,7 @@ export default function MultiLocationDashboard() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Multi-Location Dashboard</h1>
-          <p className="text-gray-400">Alle Ihre Standorte auf einen Blick</p>
+          <p className="text-gray-300">Alle Ihre Standorte auf einen Blick</p>
         </div>
         {locations.length < 5 && (
           <button
@@ -236,19 +236,19 @@ export default function MultiLocationDashboard() {
       {dashboard && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-400 text-sm mb-1">Standorte</p>
+            <p className="text-gray-300 text-sm mb-1">Standorte</p>
             <p className="text-3xl font-bold text-white">{dashboard.overview.locationCount}</p>
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-400 text-sm mb-1">Termine heute</p>
+            <p className="text-gray-300 text-sm mb-1">Termine heute</p>
             <p className="text-3xl font-bold text-blue-500">{dashboard.overview.todayBookings}</p>
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-400 text-sm mb-1">Buchungen diesen Monat</p>
+            <p className="text-gray-300 text-sm mb-1">Buchungen diesen Monat</p>
             <p className="text-3xl font-bold text-green-500">{dashboard.overview.monthlyBookings}</p>
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-400 text-sm mb-1">Umsatz diesen Monat</p>
+            <p className="text-gray-300 text-sm mb-1">Umsatz diesen Monat</p>
             <p className="text-3xl font-bold text-purple-500">â‚¬{dashboard.overview.monthlyRevenue.toLocaleString()}</p>
           </div>
         </div>
@@ -270,7 +270,7 @@ export default function MultiLocationDashboard() {
                       )}
                     </div>
                     {location.address?.city && (
-                      <p className="text-sm text-gray-400">{location.address.city}</p>
+                      <p className="text-sm text-gray-300">{location.address.city}</p>
                     )}
                   </div>
                   <span className={`w-3 h-3 rounded-full ${location.isActive ? 'bg-green-500' : 'bg-gray-500'}`}></span>
@@ -280,11 +280,11 @@ export default function MultiLocationDashboard() {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <p className="text-2xl font-bold text-white">{locationData.bookings}</p>
-                      <p className="text-xs text-gray-500">Buchungen</p>
+                      <p className="text-xs text-gray-600">Buchungen</p>
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-green-500">â‚¬{locationData.revenue}</p>
-                      <p className="text-xs text-gray-500">Umsatz</p>
+                      <p className="text-xs text-gray-600">Umsatz</p>
                     </div>
                   </div>
                 )}
@@ -320,12 +320,12 @@ export default function MultiLocationDashboard() {
             className="bg-gray-900/50 border border-dashed border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center min-h-[200px] hover:border-gray-600 transition"
           >
             <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <p className="text-gray-400">Standort hinzufÃ¼gen</p>
-            <p className="text-xs text-gray-500 mt-1">{5 - locations.length} verfÃ¼gbar</p>
+            <p className="text-gray-300">Standort hinzufÃ¼gen</p>
+            <p className="text-xs text-gray-600 mt-1">{5 - locations.length} verfÃ¼gbar</p>
           </button>
         )}
       </div>
@@ -338,11 +338,11 @@ export default function MultiLocationDashboard() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-800">
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Standort</th>
-                  <th className="text-right py-3 px-4 text-gray-400 font-medium">Buchungen</th>
-                  <th className="text-right py-3 px-4 text-gray-400 font-medium">Abgeschlossen</th>
-                  <th className="text-right py-3 px-4 text-gray-400 font-medium">Storniert</th>
-                  <th className="text-right py-3 px-4 text-gray-400 font-medium">Umsatz</th>
+                  <th className="text-left py-3 px-4 text-gray-300 font-medium">Standort</th>
+                  <th className="text-right py-3 px-4 text-gray-300 font-medium">Buchungen</th>
+                  <th className="text-right py-3 px-4 text-gray-300 font-medium">Abgeschlossen</th>
+                  <th className="text-right py-3 px-4 text-gray-300 font-medium">Storniert</th>
+                  <th className="text-right py-3 px-4 text-gray-300 font-medium">Umsatz</th>
                 </tr>
               </thead>
               <tbody>
@@ -367,7 +367,7 @@ export default function MultiLocationDashboard() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-white">Neuen Standort hinzufÃ¼gen</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-white">
+              <button onClick={() => setShowAddModal(false)} className="text-gray-300 hover:text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -376,7 +376,7 @@ export default function MultiLocationDashboard() {
 
             <form onSubmit={handleAddLocation} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Name</label>
+                <label className="block text-sm text-gray-300 mb-2">Name</label>
                 <input
                   type="text"
                   value={newLocation.name}
@@ -388,7 +388,7 @@ export default function MultiLocationDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">E-Mail</label>
+                <label className="block text-sm text-gray-300 mb-2">E-Mail</label>
                 <input
                   type="email"
                   value={newLocation.email}
@@ -400,7 +400,7 @@ export default function MultiLocationDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">GeschÃ¤ftsart</label>
+                <label className="block text-sm text-gray-300 mb-2">GeschÃ¤ftsart</label>
                 <select
                   value={newLocation.businessType}
                   onChange={(e) => setNewLocation({ ...newLocation, businessType: e.target.value })}
@@ -435,3 +435,4 @@ export default function MultiLocationDashboard() {
     </div>
   );
 }
+

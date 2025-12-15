@@ -27,7 +27,7 @@ export default function StudioDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       const [statsResponse, bookingsResponse] = await Promise.all([
         salonAPI.getDashboard().catch(() => ({ data: {} })),
         bookingAPI.getAll({ limit: 5, sort: '-createdAt' }).catch(() => ({ data: { data: [] } }))
@@ -91,31 +91,32 @@ export default function StudioDashboard() {
       {/* Booking Limit Warning */}
       {bookingLimits && bookingLimits.percentUsed >= 80 && (
         <div className={`mb-6 p-4 rounded-xl border ${
-          bookingLimits.percentUsed >= 100 
-            ? 'bg-red-500/10 border-red-500/30' 
+          bookingLimits.percentUsed >= 100
+            ? 'bg-red-500/10 border-red-500/30'
             : 'bg-yellow-500/10 border-yellow-500/30'
         }`}>
           <div className="flex items-center justify-between">
             <div>
               <h3 className={`font-semibold ${bookingLimits.percentUsed >= 100 ? 'text-red-400' : 'text-yellow-400'}`}>
-                {bookingLimits.percentUsed >= 100 
-                  ? '⚠️ Buchungslimit erreicht!' 
+                {bookingLimits.percentUsed >= 100
+                  ? '⚠️ Buchungslimit erreicht!'
                   : `⚠️ ${bookingLimits.remaining} Buchungen verbleibend`}
               </h3>
-              <p className="text-sm text-zinc-400 mt-1">
-                {bookingLimits.used} von {bookingLimits.limit} Buchungen diesen Monat 
+              <p className="text-sm text-zinc-300 mt-1">
+                {bookingLimits.used} von {bookingLimits.limit} Buchungen diesen Monat
                 ({bookingLimits.planType === 'trial' ? 'Testphase' : 'Starter Plan'})
               </p>
             </div>
-            <a 
-              href="/pricing" 
+            <a
+              href="/pricing"
               className="px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 transition"
+              aria-label="Auf Pro Plan upgraden - Preise ansehen"
             >
               Auf Pro upgraden
             </a>
           </div>
           <div className="mt-3 h-2 bg-zinc-800 rounded-full overflow-hidden">
-            <div 
+            <div
               className={`h-full transition-all ${bookingLimits.percentUsed >= 100 ? 'bg-red-500' : 'bg-yellow-500'}`}
               style={{ width: `${Math.min(100, bookingLimits.percentUsed)}%` }}
             />
@@ -182,8 +183,8 @@ export default function StudioDashboard() {
         <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
           <div className="p-4 md:p-6 border-b border-zinc-800 flex items-center justify-between">
             <h2 className="text-lg md:text-xl font-semibold text-white">Letzte Buchungen</h2>
-            <Link 
-              to="/dashboard/bookings" 
+            <Link
+              to="/dashboard/bookings"
               className="text-sm text-zinc-400 hover:text-white flex items-center gap-1 transition"
             >
               Alle anzeigen <ArrowRight className="w-4 h-4" />
@@ -231,7 +232,7 @@ export default function StudioDashboard() {
         {/* Quick Actions */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6">
           <h2 className="text-lg md:text-xl font-semibold text-white mb-4">Schnellaktionen</h2>
-          
+
           <div className="space-y-3">
             <Link
               to="/dashboard/services"

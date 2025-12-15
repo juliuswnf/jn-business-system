@@ -13,7 +13,7 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState('profile');
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   const [profile, setProfile] = useState({
     firstName: '',
     lastName: '',
@@ -204,7 +204,7 @@ export default function Settings() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
-          <p className="text-gray-400 mt-4">Lade Profil...</p>
+          <p className="text-gray-300 mt-4">Lade Profil...</p>
         </div>
       </div>
     );
@@ -216,7 +216,7 @@ export default function Settings() {
       <div className="border-b border-zinc-800 bg-black">
         <div className="max-w-5xl mx-auto px-6 py-6">
           <h1 className="text-3xl font-bold">Einstellungen & Profil</h1>
-          <p className="text-gray-400 text-sm mt-1">Verwalte dein Konto und deine Präferenzen</p>
+          <p className="text-gray-300 text-sm mt-1">Verwalte dein Konto und deine Präferenzen</p>
         </div>
       </div>
 
@@ -236,7 +236,7 @@ export default function Settings() {
               className={`px-6 py-4 font-medium transition border-b-2 whitespace-nowrap ${
                 activeTab === tab.key
                   ? 'border-white text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300'
+                  : 'border-transparent text-gray-300 hover:text-gray-300'
               }`}
             >
               {tab.label}
@@ -416,7 +416,7 @@ export default function Settings() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-semibold">{booking.service}</h3>
-                    <p className="text-gray-400 text-sm">mit {booking.employee}</p>
+                    <p className="text-gray-300 text-sm">mit {booking.employee}</p>
                   </div>
                   <div className="text-right">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -431,15 +431,15 @@ export default function Settings() {
 
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-400">Datum & Zeit</p>
+                    <p className="text-gray-300">Datum & Zeit</p>
                     <p className="font-semibold">{booking.date} um {booking.time}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400">Dauer</p>
+                    <p className="text-gray-300">Dauer</p>
                     <p className="font-semibold">30-120 Minuten</p>
                   </div>
                   <div>
-                    <p className="text-gray-400">Preis</p>
+                    <p className="text-gray-300">Preis</p>
                     <p className="font-semibold text-white">{booking.price}</p>
                   </div>
                 </div>
@@ -475,7 +475,7 @@ export default function Settings() {
                 <div key={pref.key} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
                   <div>
                     <p className="font-semibold">{pref.label}</p>
-                    <p className="text-sm text-gray-400">{pref.desc}</p>
+                    <p className="text-sm text-gray-300">{pref.desc}</p>
                   </div>
                   <button
                     onClick={() => handlePreferenceChange(pref.key)}

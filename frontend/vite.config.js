@@ -21,7 +21,7 @@ export default defineConfig({
 
   build: {
     outDir: 'dist',
-    sourcemap: false,
+    sourcemap: true, // ✅ Enable source maps for production debugging
     minify: 'terser',
     target: 'ES2020',
     cssCodeSplit: true,

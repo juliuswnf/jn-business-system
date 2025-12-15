@@ -1,0 +1,20 @@
+# robots.txt for JN Business System
+# https://jn-automation.vercel.app
+
+User-agent: *
+Allow: /
+
+# Public pages
+Allow: /pricing
+Allow: /impressum
+Allow: /datenschutz
+Allow: /agb
+Allow: /help
+
+# Disallow admin/internal pages from search engines
+Disallow: /admin
+Disallow: /ceo
+Disallow: /api
+
+# Sitemap
+Sitemap: https://jn-automation.vercel.app/sitemap.xml
