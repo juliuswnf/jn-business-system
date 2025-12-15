@@ -20,7 +20,7 @@ let intervalId = null;
  */
 export const processLifecycleEmails = async () => {
   if (isRunning) {
-    logger.log('? Lifecycle email worker already running, skipping...');
+    logger.log('[INFO] Lifecycle email worker already running, skipping...');
     return;
   }
 
@@ -33,15 +33,15 @@ export const processLifecycleEmails = async () => {
       return;
     }
 
-    logger.log(`?? Processing ${pendingEmails.length} lifecycle emails...`);
+    logger.log(`[INFO] Processing ${pendingEmails.length} lifecycle emails...`);
 
     for (const emailDoc of pendingEmails) {
       await processLifecycleEmail(emailDoc);
     }
 
-    logger.log('? Finished processing lifecycle emails');
+    logger.log('[INFO] Finished processing lifecycle emails');
   } catch (error) {
-    logger.error('? Error in lifecycle email worker:', error);
+    logger.error('[ERROR] Error in lifecycle email worker:', error);
   } finally {
     isRunning = false;
   }
@@ -67,7 +67,7 @@ const processLifecycleEmail = async (emailDoc) => {
       emailDoc.status = 'skipped';
       emailDoc.error = 'Salon already converted';
       await emailDoc.save();
-      logger.log(`??  Skipping ${emailType} for ${salonId.name} (already converted)`);
+      logger.log(`[INFO] Skipping ${emailType} for ${salonId.name} (already converted)`);
       return;
     }
 
@@ -81,7 +81,7 @@ const processLifecycleEmail = async (emailDoc) => {
 
     // Get email template
     const template = getLifecycleEmailTemplate(emailType, {
-      userName: userId.name || userId.email?.split('@')[0] || 'Geschätzter Kunde',
+      userName: userId.name || userId.email?.split('@')[0] || 'Geschaetzter Kunde',
       salonName: salonId.name || 'Ihr Studio',
       salonSlug: salonId.slug || 'demo',
       trialDaysLeft: calculateTrialDaysLeft(salonId.subscription?.trialEndsAt)
@@ -109,9 +109,9 @@ const processLifecycleEmail = async (emailDoc) => {
     emailDoc.subject = template.subject;
     await emailDoc.save();
 
-    logger.log(`? Sent lifecycle email: ${emailType} to ${userId.email}`);
+    logger.log(`[SUCCESS] Sent lifecycle email: ${emailType} to ${userId.email}`);
   } catch (error) {
-    logger.error(`? Failed to send lifecycle email ${emailDoc.emailType}:`, error);
+    logger.error(`[ERROR] Failed to send lifecycle email ${emailDoc.emailType}:`, error);
 
     // Increment retry count
     emailDoc.retries = (emailDoc.retries || 0) + 1;
@@ -147,14 +147,14 @@ const calculateTrialDaysLeft = (trialEndsAt) => {
  */
 export const startLifecycleEmailWorker = () => {
   // Run immediately on startup (wrapped in safe handler)
-  logger.log('?? Starting lifecycle email worker...');
+  logger.log('[WORKER] Starting lifecycle email worker...');
   
   // Safe wrapper to prevent crashes
   const processLifecycleEmailsSafe = async () => {
     try {
       await processLifecycleEmails();
     } catch (error) {
-      logger.error('? Lifecycle email worker error (continuing):', error);
+      logger.error('[ERROR] Lifecycle email worker error (continuing):', error);
     }
   };
 
@@ -164,7 +164,7 @@ export const startLifecycleEmailWorker = () => {
   // Then run every hour
   intervalId = setInterval(processLifecycleEmailsSafe, 60 * 60 * 1000); // 1 hour
 
-  logger.log('? Lifecycle email worker started (runs every hour)');
+  logger.log('[WORKER] Lifecycle email worker started (runs every hour)');
 
   return intervalId;
 };
@@ -176,7 +176,7 @@ export const stopLifecycleEmailWorker = () => {
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
-    logger.log('?? Lifecycle email worker stopped');
+    logger.log('[WORKER] Lifecycle email worker stopped');
   }
 };
 
