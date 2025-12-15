@@ -192,9 +192,9 @@ smsConsentSchema.virtual('isInDndHours').get(function() {
   const hour = now.getHours();
   const minute = now.getMinutes();
   const currentTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-  
+
   const { startTime, endTime } = this.doNotDisturbHours;
-  
+
   // If DND spans midnight (e.g., 22:00 - 08:00)
   if (startTime > endTime) {
     return currentTime >= startTime || currentTime < endTime;
@@ -232,12 +232,12 @@ smsConsentSchema.methods.addMessageToHistory = function(type, messageId, status 
     messageId,
     status
   });
-  
+
   // Keep only last 10 messages
   if (this.recentMessages.length > 10) {
     this.recentMessages = this.recentMessages.slice(-10);
   }
-  
+
   return this.save();
 };
 
@@ -254,13 +254,13 @@ smsConsentSchema.statics.findOptedInForSalon = function(salonId, type = 'transac
     salonId,
     opted: true
   };
-  
+
   if (type === 'transactional') {
     query['consentTypes.transactional'] = true;
   } else if (type === 'marketing') {
     query['consentTypes.marketing'] = true;
   }
-  
+
   return this.find(query);
 };
 
@@ -280,13 +280,13 @@ smsConsentSchema.statics.processScheduledDeletions = async function() {
   const toDelete = await this.find({
     deletionScheduledAt: { $lte: now }
   });
-  
+
   const deletedIds = [];
   for (const consent of toDelete) {
     deletedIds.push(consent._id);
     await consent.deleteOne();
   }
-  
+
   return { count: deletedIds.length, ids: deletedIds };
 };
 

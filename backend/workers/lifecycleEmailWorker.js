@@ -148,7 +148,7 @@ const calculateTrialDaysLeft = (trialEndsAt) => {
 export const startLifecycleEmailWorker = () => {
   // Run immediately on startup (wrapped in safe handler)
   logger.log('[WORKER] Starting lifecycle email worker...');
-  
+
   // Safe wrapper to prevent crashes
   const processLifecycleEmailsSafe = async () => {
     try {

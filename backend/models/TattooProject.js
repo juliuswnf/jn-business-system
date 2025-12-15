@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 /**
  * TattooProject Model
- * 
+ *
  * Manages multi-session tattoo projects for tattoo studios.
  * Tracks overall project progress, estimated duration, and pricing.
  */
@@ -186,7 +186,7 @@ tattooProjectSchema.virtual('sessions', {
 tattooProjectSchema.methods.updateProgress = async function() {
   const TattooSession = mongoose.model('TattooSession');
   const sessions = await TattooSession.find({ projectId: this._id });
-  
+
   if (sessions.length === 0) {
     this.progress = 0;
     return;
@@ -229,14 +229,14 @@ tattooProjectSchema.methods.startProject = function() {
  */
 tattooProjectSchema.methods.cancelProject = async function() {
   this.status = 'cancelled';
-  
+
   // Cancel all pending sessions
   const TattooSession = mongoose.model('TattooSession');
   await TattooSession.updateMany(
     { projectId: this._id, status: { $in: ['scheduled', 'in_progress'] } },
     { status: 'cancelled' }
   );
-  
+
   await this.save();
 };
 
@@ -247,7 +247,7 @@ tattooProjectSchema.methods.cancelProject = async function() {
  */
 tattooProjectSchema.statics.getProjectsWithStats = async function(salonId, filters = {}) {
   const query = { salonId, ...filters };
-  
+
   const projects = await this.find(query)
     .populate('customerId', 'firstName lastName email phone')
     .populate('artistId', 'firstName lastName')
@@ -274,7 +274,7 @@ tattooProjectSchema.statics.getDashboardStats = async function(salonId) {
     averageProgress: Math.round(
       projects
         .filter(p => p.status === 'in_progress')
-        .reduce((sum, p) => sum + p.progress, 0) / 
+        .reduce((sum, p) => sum + p.progress, 0) /
       (projects.filter(p => p.status === 'in_progress').length || 1)
     )
   };

@@ -27,7 +27,7 @@ const slotSuggestionSchema = new mongoose.Schema({
     ref: 'Service',
     required: true
   },
-  
+
   // Original Booking (that was cancelled)
   originalBookingId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -51,7 +51,7 @@ const slotSuggestionSchema = new mongoose.Schema({
     customerName: String,
     customerPhone: String,
     customerEmail: String,
-    
+
     // Match Scoring
     matchScore: {
       type: Number,
@@ -67,7 +67,7 @@ const slotSuggestionSchema = new mongoose.Schema({
       recency: Number,          // 0-15 points
       responseSpeed: Number     // 0-10 points
     },
-    
+
     // Why This Customer?
     reasonCode: {
       type: String,
@@ -85,7 +85,7 @@ const slotSuggestionSchema = new mongoose.Schema({
       type: String,
       comment: 'Human-readable reason'
     },
-    
+
     // Notification Tracking
     notifiedAt: Date,
     messageId: String,
@@ -96,7 +96,7 @@ const slotSuggestionSchema = new mongoose.Schema({
       default: 'pending'
     },
     respondedAt: Date,
-    
+
     // Ranking
     rank: {
       type: Number,
@@ -119,7 +119,7 @@ const slotSuggestionSchema = new mongoose.Schema({
     max: 100,
     comment: 'How urgent to fill (based on time remaining)'
   },
-  
+
   // Status
   status: {
     type: String,
@@ -134,7 +134,7 @@ const slotSuggestionSchema = new mongoose.Schema({
   },
   firstNotifiedAt: Date,
   lastNotifiedAt: Date,
-  
+
   // Resolution
   filledAt: Date,
   filledByWaitlistId: {
@@ -148,7 +148,7 @@ const slotSuggestionSchema = new mongoose.Schema({
     ref: 'Booking',
     comment: 'New booking created from waitlist'
   },
-  
+
   // Expiry
   expiresAt: {
     type: Date,
@@ -156,7 +156,7 @@ const slotSuggestionSchema = new mongoose.Schema({
     index: true,
     comment: 'Suggestion expires when slot time passes'
   },
-  
+
   // Metadata
   algorithm: {
     type: String,
@@ -203,11 +203,11 @@ slotSuggestionSchema.methods.markCustomerResponse = function(waitlistId, respons
   const customer = this.suggestedCustomers.find(
     c => c.waitlistId.toString() === waitlistId.toString()
   );
-  
+
   if (customer) {
     customer.response = response;
     customer.respondedAt = new Date();
-    
+
     // If accepted, mark slot as filled
     if (response === 'accepted') {
       this.status = 'filled';
@@ -216,7 +216,7 @@ slotSuggestionSchema.methods.markCustomerResponse = function(waitlistId, respons
       this.filledByCustomerId = customer.customerId;
     }
   }
-  
+
   return this.save();
 };
 
@@ -224,23 +224,23 @@ slotSuggestionSchema.methods.markCustomerResponse = function(waitlistId, respons
 slotSuggestionSchema.methods.notifyNextCustomer = async function() {
   // Find first customer not yet notified
   const nextCustomer = this.suggestedCustomers.find(c => !c.notifiedAt);
-  
+
   if (!nextCustomer) {
     this.status = 'expired';
     return { success: false, message: 'All customers already notified' };
   }
-  
+
   nextCustomer.notifiedAt = new Date();
   nextCustomer.response = 'pending';
-  
+
   this.notificationsSent += 1;
   this.lastNotifiedAt = new Date();
   if (!this.firstNotifiedAt) {
     this.firstNotifiedAt = new Date();
   }
-  
+
   await this.save();
-  
+
   return {
     success: true,
     customer: {
@@ -279,20 +279,20 @@ slotSuggestionSchema.statics.expireOld = async function() {
 // Static: Get Fill Rate Statistics
 slotSuggestionSchema.statics.getFillRateStats = async function(salonId, days = 30) {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-  
+
   const total = await this.countDocuments({
     salonId,
     createdAt: { $gte: since }
   });
-  
+
   const filled = await this.countDocuments({
     salonId,
     status: 'filled',
     createdAt: { $gte: since }
   });
-  
+
   const fillRate = total > 0 ? (filled / total) * 100 : 0;
-  
+
   return {
     total,
     filled,

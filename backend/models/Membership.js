@@ -111,7 +111,7 @@ membershipSchema.methods.cancel = async function(reason = null) {
   this.status = 'cancelled';
   this.cancelledAt = new Date();
   this.autoRenew = false;
-  
+
   if (reason) {
     this.cancellationReason = reason;
   }
@@ -123,7 +123,7 @@ membershipSchema.methods.cancel = async function(reason = null) {
 membershipSchema.methods.pause = async function(reason = null) {
   this.status = 'paused';
   this.pausedAt = new Date();
-  
+
   if (reason) {
     this.pauseReason = reason;
   }
@@ -265,7 +265,7 @@ membershipSchema.statics.getDashboardStats = async function(salonId) {
       : 0,
     averageCreditsUsage: memberships
       .filter(m => m.creditsMonthly > 0)
-      .reduce((sum, m) => sum + ((m.creditsUsedThisMonth / m.creditsMonthly) * 100), 0) / 
+      .reduce((sum, m) => sum + ((m.creditsUsedThisMonth / m.creditsMonthly) * 100), 0) /
       (memberships.filter(m => m.creditsMonthly > 0).length || 1)
   };
 };

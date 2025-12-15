@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 /**
  * TattooSession Model
- * 
+ *
  * Represents individual sessions within a tattoo project.
  * Tracks session progress, photos, and links to bookings.
  */
@@ -263,7 +263,7 @@ tattooSessionSchema.statics.getProjectSessions = async function(projectId) {
  */
 tattooSessionSchema.statics.createWithBooking = async function(sessionData, bookingData) {
   const Booking = mongoose.model('Booking');
-  
+
   // Create booking first
   const booking = await Booking.create(bookingData);
 

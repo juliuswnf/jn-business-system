@@ -105,7 +105,7 @@ workflowProjectSchema.virtual('paymentStatus').get(function() {
 workflowProjectSchema.methods.updateProgress = async function() {
   const WorkflowSession = mongoose.model('WorkflowSession');
   const sessions = await WorkflowSession.find({ projectId: this._id, status: 'completed' });
-  
+
   if (sessions.length === 0) {
     this.progress = 0;
   } else {
@@ -136,7 +136,7 @@ workflowProjectSchema.methods.startProject = async function() {
 
 workflowProjectSchema.methods.cancelProject = async function() {
   const WorkflowSession = mongoose.model('WorkflowSession');
-  
+
   // Cancel all pending sessions
   await WorkflowSession.updateMany(
     { projectId: this._id, status: { $in: ['scheduled', 'draft'] } },
@@ -175,7 +175,7 @@ workflowProjectSchema.statics.getProjectsWithStats = async function(salonId, fil
   if (filters.customerId) query.customerId = filters.customerId;
   if (filters.artistId) query.artistId = filters.artistId;
   if (filters.type) query.type = filters.type;
-  
+
   if (filters.search) {
     query.$or = [
       { name: { $regex: filters.search, $options: 'i' } },

@@ -119,10 +119,10 @@ pricingWizardResponseSchema.methods.markConverted = async function(selectedTier)
 // Statics
 pricingWizardResponseSchema.statics.getConversionRate = async function(tier = null) {
   const query = tier ? { recommendedTier: tier } : {};
-  
+
   const total = await this.countDocuments(query);
   const converted = await this.countDocuments({ ...query, converted: true });
-  
+
   return {
     total,
     converted,
@@ -142,13 +142,13 @@ pricingWizardResponseSchema.statics.getTierDistribution = async function() {
       }
     }
   ]);
-  
+
   return distribution;
 };
 
 pricingWizardResponseSchema.statics.getAverageScore = async function(tier = null) {
   const query = tier ? { recommendedTier: tier } : {};
-  
+
   const result = await this.aggregate([
     { $match: query },
     {
@@ -160,14 +160,14 @@ pricingWizardResponseSchema.statics.getAverageScore = async function(tier = null
       }
     }
   ]);
-  
+
   return result[0] || { avgScore: 0, avgConfidence: 0, avgTimeToComplete: 0 };
 };
 
 pricingWizardResponseSchema.statics.getMismatchRate = async function() {
   const total = await this.countDocuments({ converted: true });
   const mismatches = await this.countDocuments({ tierMismatch: true });
-  
+
   return {
     total,
     mismatches,

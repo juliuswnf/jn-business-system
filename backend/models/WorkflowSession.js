@@ -91,7 +91,7 @@ workflowSessionSchema.methods.completeSession = async function(progressPercent, 
   this.status = 'completed';
   this.progress = progressPercent || 100;
   this.completedAt = new Date();
-  
+
   if (notes) {
     this.notes = notes;
   }
@@ -191,7 +191,7 @@ workflowSessionSchema.statics.getProjectSessions = async function(projectId) {
 
 workflowSessionSchema.statics.createWithBooking = async function(sessionData, bookingData) {
   const Booking = mongoose.model('Booking');
-  
+
   // Create booking first
   const booking = await Booking.create({
     ...bookingData,

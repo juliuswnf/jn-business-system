@@ -15,7 +15,7 @@ import logger from '../utils/logger.js';
 export const getAvailableIndustries = async (req, res) => {
   try {
     const industries = IndustryWorkflow.getAvailableIndustries();
-    
+
     res.json({
       success: true,
       count: industries.length,
