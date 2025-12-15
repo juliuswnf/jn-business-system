@@ -11,13 +11,27 @@ class SMSProviderFactory {
   constructor() {
     this.providers = new Map();
     this.activeProvider = null;
+    this.initialized = false;
+  }
+
+  /**
+   * Initialize the factory (lazy loading)
+   */
+  initialize() {
+    if (this.initialized) return;
 
     // Register available providers
     this.registerProvider(new TwilioProvider());
     this.registerProvider(new MessageBirdProvider());
 
-    // Select active provider
-    this.selectProvider();
+    // Select active provider (only if env vars are set)
+    try {
+      this.selectProvider();
+      this.initialized = true;
+    } catch (error) {
+      console.warn('⚠️ SMS Provider initialization deferred:', error.message);
+      // Don't throw - allow the app to start without SMS configured
+    }
   }
 
   /**
@@ -50,7 +64,7 @@ class SMSProviderFactory {
       }
     }
 
-    console.error('❌ No SMS provider available! Check environment variables.');
+    // No provider available - throw error so initialization can catch it
     throw new Error('No SMS provider configured. Set TWILIO_* or MESSAGEBIRD_* env variables.');
   }
 
@@ -58,8 +72,13 @@ class SMSProviderFactory {
    * Get active provider
    */
   getProvider() {
+    // Lazy initialization
+    if (!this.initialized) {
+      this.initialize();
+    }
+
     if (!this.activeProvider) {
-      throw new Error('No SMS provider available');
+      throw new Error('No SMS provider available. Please configure TWILIO_* or MESSAGEBIRD_* environment variables.');
     }
     return this.activeProvider;
   }
