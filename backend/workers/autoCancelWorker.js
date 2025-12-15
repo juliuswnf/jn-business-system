@@ -1,5 +1,4 @@
 import cron from 'node-cron';
-import mongoose from 'mongoose';
 import BookingConfirmation from '../models/BookingConfirmation.js';
 import Booking from '../models/Booking.js';
 import SlotSuggestion from '../models/SlotSuggestion.js';
@@ -8,7 +7,7 @@ import { sendWaitlistOffer } from '../services/smsService.js';
 
 /**
  * Auto-Cancel Worker
- * 
+ *
  * Runs every 15 minutes
  * Finds expired confirmations (deadline passed, not confirmed)
  * Auto-cancels the booking and triggers waitlist matcher

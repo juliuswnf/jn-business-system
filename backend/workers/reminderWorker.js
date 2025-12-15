@@ -1,12 +1,11 @@
 import cron from 'node-cron';
-import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import BookingConfirmation from '../models/BookingConfirmation.js';
 import { sendReminderSMS } from '../services/smsService.js';
 
 /**
  * Reminder Worker
- * 
+ *
  * Runs every 30 minutes
  * Finds confirmed bookings that are 24h away
  * Sends reminder SMS

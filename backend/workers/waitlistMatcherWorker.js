@@ -1,5 +1,4 @@
 import cron from 'node-cron';
-import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import Waitlist from '../models/Waitlist.js';
 import SlotSuggestion from '../models/SlotSuggestion.js';
@@ -7,7 +6,7 @@ import { sendWaitlistOffer } from '../services/smsService.js';
 
 /**
  * Waitlist Matcher Worker
- * 
+ *
  * Runs every 15 minutes
  * Finds free/cancelled slots and matches them with waitlist customers
  * Uses rule-based matching with priority scoring

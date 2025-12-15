@@ -1,6 +1,5 @@
 import express from 'express';
 import SlotSuggestion from '../models/SlotSuggestion.js';
-import Waitlist from '../models/Waitlist.js';
 import Booking from '../models/Booking.js';
 import { authenticateToken } from '../middleware/auth.js';
 

@@ -344,8 +344,8 @@ noShowAnalyticsSchema.statics.generateForPeriod = async function(salonId, period
   
   const confirmationsSent = confirmations.length;
   const confirmationsReceived = confirmations.filter(c => c.confirmedAt).length;
-  const confirmationRate = confirmationsSent > 0 
-    ? (confirmationsReceived / confirmationsSent) * 100 
+  const confirmationRate = confirmationsSent > 0
+    ? (confirmationsReceived / confirmationsSent) * 100
     : 0;
   
   // Waitlist stats

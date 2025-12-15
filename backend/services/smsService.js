@@ -225,7 +225,7 @@ Abmelden: Antworten Sie mit STOP`;
  * Template 2: Waitlist Offer SMS (when slot becomes available)
  */
 export async function sendWaitlistOffer(waitlistEntry, slotSuggestion) {
-  const { customer, salon, preferredService, preferredDate, preferredTime } = waitlistEntry;
+  const { customer, salon, preferredService } = waitlistEntry;
   const { suggestedSlot } = slotSuggestion;
 
   // Format suggested slot

@@ -1,12 +1,11 @@
 import cron from 'node-cron';
-import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import BookingConfirmation from '../models/BookingConfirmation.js';
 import { sendBookingConfirmation } from '../services/smsService.js';
 
 /**
  * Confirmation Sender Worker
- * 
+ *
  * Runs every 5 minutes
  * Finds bookings that are 48-72h away and don't have a confirmation yet
  * Creates BookingConfirmation and sends SMS
