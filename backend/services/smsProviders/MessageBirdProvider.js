@@ -1,6 +1,10 @@
-import messagebird from 'messagebird';
+import { createRequire } from 'module';
 import crypto from 'crypto';
 import ISMSProvider from './ISMSProvider.js';
+
+// Use require for CommonJS module
+const require = createRequire(import.meta.url);
+const messagebirdLib = require('messagebird');
 
 /**
  * MessageBird SMS Provider Implementation
@@ -17,7 +21,7 @@ export default class MessageBirdProvider extends ISMSProvider {
     this.client = null;
 
     if (this.isAvailable()) {
-      this.client = messagebird(this.apiKey);
+      this.client = messagebirdLib.initClient(this.apiKey);
     }
   }
 
