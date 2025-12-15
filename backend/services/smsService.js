@@ -1,4 +1,5 @@
 ﻿import messagebird from 'messagebird';
+import { createClient } from 'redis';
 import SMSLog from '../models/SMSLog.js';
 import SMSConsent from '../models/SMSConsent.js';
 
@@ -7,10 +8,39 @@ const messagebirdClient = messagebird(process.env.MESSAGEBIRD_API_KEY);
 const ORIGINATOR = process.env.MESSAGEBIRD_ORIGINATOR || 'JN_Business';
 const RATE_LIMIT = parseInt(process.env.MESSAGEBIRD_RATE_LIMIT_PER_SECOND || '10');
 
+// Redis client for rate limiting
+let redisClient = null;
+let redisAvailable = false;
+
+// Initialize Redis (if available)
+if (process.env.REDIS_URL) {
+  redisClient = createClient({ url: process.env.REDIS_URL });
+  
+  redisClient.on('error', (err) => {
+    console.error('Redis connection error:', err);
+    redisAvailable = false;
+  });
+
+  redisClient.on('connect', () => {
+    console.log('✅ Redis connected for SMS rate limiting');
+    redisAvailable = true;
+  });
+
+  redisClient.connect().catch(err => {
+    console.warn('⚠️ Redis not available, using in-memory rate limiting (not production-safe)');
+    redisAvailable = false;
+  });
+} else {
+  console.warn('⚠️ REDIS_URL not configured, using in-memory rate limiting (not production-safe)');
+}
+
 // Rate Limiting Queue
 let smsQueue = [];
 let isProcessingQueue = false;
 let lastSentTime = 0;
+
+// In-memory rate limit fallback (per salon per minute)
+const inMemoryRateLimits = new Map();
 
 /**
  * Add SMS to queue and process
@@ -35,6 +65,59 @@ async function queueSMS(phoneNumber, message, salonId, template, bookingId = nul
 }
 
 /**
+ * Check rate limit for salon (Redis-based with in-memory fallback)
+ */
+async function checkRateLimit(salonId) {
+  const currentMinute = Math.floor(Date.now() / 60000); // Current minute timestamp
+  const key = `sms:ratelimit:${salonId}:${currentMinute}`;
+
+  if (redisAvailable && redisClient) {
+    try {
+      // Redis-based rate limiting (production-safe)
+      const count = await redisClient.incr(key);
+      
+      // Set TTL on first increment
+      if (count === 1) {
+        await redisClient.expire(key, 60); // Expire after 60 seconds
+      }
+
+      if (count > RATE_LIMIT * 60) { // 10 SMS/sec * 60 sec = 600/min
+        console.warn(`⚠️ Rate limit exceeded for salon ${salonId}: ${count} SMS/min`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Redis rate limit check failed, falling back to in-memory:', error);
+      // Fall through to in-memory fallback
+    }
+  }
+
+  // In-memory fallback (not production-safe, resets on server restart)
+  if (!inMemoryRateLimits.has(key)) {
+    inMemoryRateLimits.set(key, { count: 0, expiresAt: Date.now() + 60000 });
+  }
+
+  const limit = inMemoryRateLimits.get(key);
+
+  // Clean up expired entries
+  if (limit.expiresAt < Date.now()) {
+    inMemoryRateLimits.delete(key);
+    inMemoryRateLimits.set(key, { count: 1, expiresAt: Date.now() + 60000 });
+    return true;
+  }
+
+  limit.count++;
+
+  if (limit.count > RATE_LIMIT * 60) {
+    console.warn(`⚠️ Rate limit exceeded for salon ${salonId} (in-memory): ${limit.count} SMS/min`);
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Process SMS queue with rate limiting
  */
 async function processQueue() {
@@ -55,6 +138,13 @@ async function processQueue() {
 
     const sms = smsQueue.shift();
     
+    // Check rate limit before sending
+    const canSend = await checkRateLimit(sms.salonId);
+    if (!canSend) {
+      sms.reject(new Error('Rate limit exceeded. Please try again in 1 minute.'));
+      continue;
+    }
+
     try {
       const result = await sendSMSImmediate(
         sms.phoneNumber,

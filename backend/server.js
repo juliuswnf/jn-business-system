@@ -75,6 +75,7 @@ import smsConsentRoutes from './routes/smsConsentRoutes.js';
 import confirmationRoutes from './routes/confirmationRoutes.js';
 import waitlistRoutes from './routes/waitlistRoutes.js';
 import slotSuggestionRoutes from './routes/slotSuggestionRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js'; // MessageBird webhooks
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
@@ -133,8 +134,9 @@ app.use(hpp());
 // Compression should be applied after security middleware
 app.use(compression());
 
-// 2?? STRIPE WEBHOOKS (MUST BE BEFORE JSON PARSING!)
+// 2️⃣ STRIPE & MESSAGEBIRD WEBHOOKS (MUST BE BEFORE JSON PARSING!)
 app.post('/api/webhooks/stripe', webhookMiddleware, stripeWebhookController.handleStripeWebhook);
+app.use('/api/webhooks', webhookRoutes); // MessageBird webhooks
 
 // 3?? CORS & BODY PARSING
 app.use(cors({
