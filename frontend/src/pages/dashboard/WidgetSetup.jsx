@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy, Check, Code, Palette, Type, Image, Eye } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
 import { widgetAPI, serviceAPI } from '../../utils/api';

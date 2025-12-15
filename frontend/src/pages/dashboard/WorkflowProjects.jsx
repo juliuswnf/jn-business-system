@@ -54,18 +54,18 @@ export default function WorkflowProjects() {
   };
 
   const handleDeleteProject = async (id) => {
-    if (!confirm('Projekt wirklich löschen?')) return;
+    if (!confirm('Projekt wirklich lÃ¶schen?')) return;
 
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`${API_URL}/api/workflows/projects/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Projekt gelöscht');
+      toast.success('Projekt gelÃ¶scht');
       fetchData();
     } catch (error) {
       console.error('Error deleting project:', error);
-      toast.error('Fehler beim Löschen');
+      toast.error('Fehler beim LÃ¶schen');
     }
   };
 
@@ -81,16 +81,16 @@ export default function WorkflowProjects() {
 
   const getIndustryIcon = (industry) => {
     const icons = {
-      tattoo: '🎨',
-      medical_aesthetics: '💉',
-      spa_wellness: '🧖',
-      barbershop: '💈',
-      nails: '💅',
-      massage: '💆',
-      physiotherapy: '🩺',
-      generic: '🏪'
+      tattoo: 'ðŸŽ¨',
+      medical_aesthetics: 'ðŸ’‰',
+      spa_wellness: 'ðŸ§–',
+      barbershop: 'ðŸ’ˆ',
+      nails: 'ðŸ’…',
+      massage: 'ðŸ’†',
+      physiotherapy: 'ðŸ©º',
+      generic: 'ðŸª'
     };
-    return icons[industry] || '📋';
+    return icons[industry] || 'ðŸ“‹';
   };
 
   if (loading) {
@@ -125,31 +125,31 @@ export default function WorkflowProjects() {
           <StatCard
             title="Gesamt"
             value={stats.total}
-            icon="📊"
+            icon="ðŸ“Š"
             color="bg-blue-50 border-blue-200"
           />
           <StatCard
             title="Aktiv"
             value={stats.active}
-            icon="🔄"
+            icon="ðŸ”„"
             color="bg-blue-50 border-blue-200"
           />
           <StatCard
             title="Abgeschlossen"
             value={stats.completed}
-            icon="✅"
+            icon="âœ…"
             color="bg-green-50 border-green-200"
           />
           <StatCard
-            title="Ø Fortschritt"
+            title="Ã˜ Fortschritt"
             value={`${stats.averageProgress}%`}
-            icon="📈"
+            icon="ðŸ“ˆ"
             color="bg-purple-50 border-purple-200"
           />
           <StatCard
             title="Umsatz"
-            value={`${stats.totalRevenue.toLocaleString()}€`}
-            icon="💰"
+            value={`${stats.totalRevenue.toLocaleString()}â‚¬`}
+            icon="ðŸ’°"
             color="bg-green-50 border-green-200"
           />
         </div>
@@ -171,13 +171,13 @@ export default function WorkflowProjects() {
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Alle Branchen</option>
-            <option value="tattoo">🎨 Tattoo</option>
-            <option value="medical_aesthetics">💉 Medical Aesthetics</option>
-            <option value="spa_wellness">🧖 Spa & Wellness</option>
-            <option value="barbershop">💈 Barbershop</option>
-            <option value="nails">💅 Nails</option>
-            <option value="massage">💆 Massage</option>
-            <option value="physiotherapy">🩺 Physiotherapie</option>
+            <option value="tattoo">ðŸŽ¨ Tattoo</option>
+            <option value="medical_aesthetics">ðŸ’‰ Medical Aesthetics</option>
+            <option value="spa_wellness">ðŸ§– Spa & Wellness</option>
+            <option value="barbershop">ðŸ’ˆ Barbershop</option>
+            <option value="nails">ðŸ’… Nails</option>
+            <option value="massage">ðŸ’† Massage</option>
+            <option value="physiotherapy">ðŸ©º Physiotherapie</option>
           </select>
           <select
             value={filters.status}
@@ -301,7 +301,7 @@ export default function WorkflowProjects() {
                         onClick={() => handleDeleteProject(project._id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        Löschen
+                        LÃ¶schen
                       </button>
                     </div>
                   </td>

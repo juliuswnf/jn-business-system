@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { customerAPI, formatError } from '../../utils/api';
 import { LoadingSpinner } from '../common';
 import './CustomerReports.css';

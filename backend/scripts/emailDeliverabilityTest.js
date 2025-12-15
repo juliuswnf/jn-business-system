@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Email Deliverability Test Script
  *
  * Tests:

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Verify Database Backup Integrity
  *
  * Run after restoring from backup to verify:

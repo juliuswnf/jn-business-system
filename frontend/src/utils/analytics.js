@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Analytics Helper - Track Events & Conversions
  * Works with Plausible Analytics or Google Analytics
  */

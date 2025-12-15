@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import BookingFlow from './BookingFlow';
 
 const Widget = ({ salonSlug }) => {

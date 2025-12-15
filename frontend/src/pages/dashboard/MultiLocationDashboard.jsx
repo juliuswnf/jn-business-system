@@ -95,7 +95,7 @@ export default function MultiLocationDashboard() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        showNotification('Standort hinzugefügt', 'success');
+        showNotification('Standort hinzugefÃ¼gt', 'success');
         setShowAddModal(false);
         setNewLocation({ name: '', email: '', businessType: 'hair-salon' });
         fetchLocations();
@@ -138,7 +138,7 @@ export default function MultiLocationDashboard() {
 
   // Remove location
   const handleRemoveLocation = async (salonId, name) => {
-    if (!confirm(`Möchten Sie "${name}" wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+    if (!confirm(`MÃ¶chten Sie "${name}" wirklich entfernen? Diese Aktion kann nicht rÃ¼ckgÃ¤ngig gemacht werden.`)) {
       return;
     }
 
@@ -176,7 +176,7 @@ export default function MultiLocationDashboard() {
     { value: 'physiotherapy', label: 'Physiotherapie' },
     { value: 'personal-training', label: 'Personal Training' },
     { value: 'yoga-studio', label: 'Yoga-Studio' },
-    { value: 'medical-aesthetics', label: 'Medizinische Ästhetik' },
+    { value: 'medical-aesthetics', label: 'Medizinische Ã„sthetik' },
     { value: 'other', label: 'Sonstiges' }
   ];
 
@@ -202,7 +202,7 @@ export default function MultiLocationDashboard() {
           <h1 className="text-2xl font-bold text-white mb-2">Multi-Location</h1>
           <p className="text-gray-400 mb-6">
             Verwalten Sie bis zu 5 Standorte von einem Dashboard aus.
-            Diese Funktion ist exklusiv für Enterprise-Kunden.
+            Diese Funktion ist exklusiv fÃ¼r Enterprise-Kunden.
           </p>
           <Link
             to="/pricing"
@@ -227,7 +227,7 @@ export default function MultiLocationDashboard() {
             onClick={() => setShowAddModal(true)}
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition"
           >
-            + Standort hinzufügen
+            + Standort hinzufÃ¼gen
           </button>
         )}
       </div>
@@ -249,7 +249,7 @@ export default function MultiLocationDashboard() {
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <p className="text-gray-400 text-sm mb-1">Umsatz diesen Monat</p>
-            <p className="text-3xl font-bold text-purple-500">€{dashboard.overview.monthlyRevenue.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-purple-500">â‚¬{dashboard.overview.monthlyRevenue.toLocaleString()}</p>
           </div>
         </div>
       )}
@@ -283,7 +283,7 @@ export default function MultiLocationDashboard() {
                       <p className="text-xs text-gray-500">Buchungen</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-green-500">€{locationData.revenue}</p>
+                      <p className="text-2xl font-bold text-green-500">â‚¬{locationData.revenue}</p>
                       <p className="text-xs text-gray-500">Umsatz</p>
                     </div>
                   </div>
@@ -294,7 +294,7 @@ export default function MultiLocationDashboard() {
                     onClick={() => handleSwitchLocation(location.id)}
                     className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg text-sm transition"
                   >
-                    Öffnen
+                    Ã–ffnen
                   </button>
                   {!location.isPrimary && (
                     <button
@@ -324,8 +324,8 @@ export default function MultiLocationDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <p className="text-gray-400">Standort hinzufügen</p>
-            <p className="text-xs text-gray-500 mt-1">{5 - locations.length} verfügbar</p>
+            <p className="text-gray-400">Standort hinzufÃ¼gen</p>
+            <p className="text-xs text-gray-500 mt-1">{5 - locations.length} verfÃ¼gbar</p>
           </button>
         )}
       </div>
@@ -352,7 +352,7 @@ export default function MultiLocationDashboard() {
                     <td className="py-3 px-4 text-right text-white">{loc.bookings}</td>
                     <td className="py-3 px-4 text-right text-green-400">{loc.completed}</td>
                     <td className="py-3 px-4 text-right text-red-400">{loc.cancelled}</td>
-                    <td className="py-3 px-4 text-right text-white font-medium">€{loc.revenue.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right text-white font-medium">â‚¬{loc.revenue.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -366,7 +366,7 @@ export default function MultiLocationDashboard() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-white">Neuen Standort hinzufügen</h2>
+              <h2 className="text-xl font-semibold text-white">Neuen Standort hinzufÃ¼gen</h2>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -400,7 +400,7 @@ export default function MultiLocationDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Geschäftsart</label>
+                <label className="block text-sm text-gray-400 mb-2">GeschÃ¤ftsart</label>
                 <select
                   value={newLocation.businessType}
                   onChange={(e) => setNewLocation({ ...newLocation, businessType: e.target.value })}
@@ -425,7 +425,7 @@ export default function MultiLocationDashboard() {
                   disabled={adding}
                   className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white py-2 rounded-lg font-medium transition"
                 >
-                  {adding ? 'Wird erstellt...' : 'Hinzufügen'}
+                  {adding ? 'Wird erstellt...' : 'HinzufÃ¼gen'}
                 </button>
               </div>
             </form>

@@ -81,7 +81,7 @@ const CampaignAnalytics = () => {
       r.sentAt ? new Date(r.sentAt).toLocaleString('de-DE') : 'N/A',
       r.clickedAt ? new Date(r.clickedAt).toLocaleString('de-DE') : 'N/A',
       r.bookedAt ? new Date(r.bookedAt).toLocaleString('de-DE') : 'N/A',
-      r.revenue ? `${r.revenue}€` : '0€'
+      r.revenue ? `${r.revenue}â‚¬` : '0â‚¬'
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -272,7 +272,7 @@ const CampaignAnalytics = () => {
         <StatCard
           icon={<Euro className="w-6 h-6" />}
           label="Umsatz"
-          value={`${campaign.stats?.totalRevenue || 0}€`}
+          value={`${campaign.stats?.totalRevenue || 0}â‚¬`}
           subtext={`${roi}% ROI`}
           color="emerald"
         />
@@ -284,7 +284,7 @@ const CampaignAnalytics = () => {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-lg shadow p-6 mb-8"
       >
-        <h2 className="text-xl font-semibold mb-4">📈 Verlauf über Zeit</h2>
+        <h2 className="text-xl font-semibold mb-4">ðŸ“ˆ Verlauf Ã¼ber Zeit</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={prepareTimelineData()}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -307,14 +307,14 @@ const CampaignAnalytics = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-lg shadow p-6 mb-8"
         >
-          <h2 className="text-xl font-semibold mb-4">💰 Top 10 Umsatz-Bringer</h2>
+          <h2 className="text-xl font-semibold mb-4">ðŸ’° Top 10 Umsatz-Bringer</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={prepareRevenueData()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="revenue" fill="#059669" name="Umsatz (€)" />
+              <Bar dataKey="revenue" fill="#059669" name="Umsatz (â‚¬)" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -328,7 +328,7 @@ const CampaignAnalytics = () => {
       >
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">👥 Empfänger ({filteredRecipients.length})</h2>
+            <h2 className="text-xl font-semibold">ðŸ‘¥ EmpfÃ¤nger ({filteredRecipients.length})</h2>
             <select
               value={statusFilter}
               onChange={(e) => {
@@ -406,7 +406,7 @@ const CampaignAnalytics = () => {
                     }) : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {recipient.revenue ? `${recipient.revenue}€` : '-'}
+                    {recipient.revenue ? `${recipient.revenue}â‚¬` : '-'}
                   </td>
                 </tr>
               ))}
@@ -426,7 +426,7 @@ const CampaignAnalytics = () => {
                 disabled={currentPage === 1}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Zurück
+                ZurÃ¼ck
               </button>
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}

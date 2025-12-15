@@ -1,4 +1,4 @@
-﻿import cron from 'node-cron';
+import cron from 'node-cron';
 import logger from '../utils/logger.js';
 import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, X, Check, Clock, DollarSign } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
 import { serviceAPI } from '../../utils/api';

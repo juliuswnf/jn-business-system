@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { paymentAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';
 

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 
 /**

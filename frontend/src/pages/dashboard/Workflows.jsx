@@ -73,7 +73,7 @@ export default function Workflows() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Branchen-Workflows</h1>
         <p className="text-gray-600">
-          Aktiviere branchenspezifische Features für dein Business
+          Aktiviere branchenspezifische Features fÃ¼r dein Business
         </p>
       </div>
 
@@ -122,7 +122,7 @@ export default function Workflows() {
       {/* Available Workflows */}
       <div>
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Verfügbare Workflows
+          VerfÃ¼gbare Workflows
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {industries

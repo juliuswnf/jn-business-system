@@ -1,80 +1,80 @@
 /**
- * SMS Templates für JN Business System
+ * SMS Templates fÃ¼r JN Business System
  * 
- * Branchen-spezifische SMS-Templates für verschiedene Workflows
+ * Branchen-spezifische SMS-Templates fÃ¼r verschiedene Workflows
  */
 
 export const SMS_TEMPLATES = {
   // ==================== STANDARD BOOKING ====================
   booking_confirmation: {
-    name: 'Buchungsbestätigung',
-    text: `Hey {{customerName}}! 👋
+    name: 'BuchungsbestÃ¤tigung',
+    text: `Hey {{customerName}}! ðŸ‘‹
 
-Dein Termin ist bestätigt:
-📅 {{date}} um {{time}}
-⏱️ Dauer: {{duration}} Min
-📍 {{salonName}}
+Dein Termin ist bestÃ¤tigt:
+ðŸ“… {{date}} um {{time}}
+â±ï¸ Dauer: {{duration}} Min
+ðŸ“ {{salonName}}
 
 Bei Fragen: {{salonPhone}}
 
-Bis bald! 💪`
+Bis bald! ðŸ’ª`
   },
 
   booking_reminder_24h: {
     name: 'Erinnerung 24h vorher',
-    text: `Hey {{customerName}}! 🔔
+    text: `Hey {{customerName}}! ðŸ””
 
 Morgen ist dein Termin:
-📅 {{date}} um {{time}}
-⏱️ {{duration}} Min
-📍 {{salonName}}
+ðŸ“… {{date}} um {{time}}
+â±ï¸ {{duration}} Min
+ðŸ“ {{salonName}}
 
-Nicht vergessen! 😊`
+Nicht vergessen! ðŸ˜Š`
   },
 
   booking_reminder_2h: {
     name: 'Erinnerung 2h vorher',
-    text: `Hey {{customerName}}! ⏰
+    text: `Hey {{customerName}}! â°
 
 In 2 Stunden ist dein Termin:
-📅 {{time}}
-📍 {{salonName}}
+ðŸ“… {{time}}
+ðŸ“ {{salonName}}
 
-Wir freuen uns auf dich! 💪`
+Wir freuen uns auf dich! ðŸ’ª`
   },
 
   // ==================== TATTOO STUDIO ====================
   tattoo_session_reminder: {
     name: 'Tattoo Session Erinnerung',
-    text: `Hey {{customerName}}! 🎨
+    text: `Hey {{customerName}}! ðŸŽ¨
 
 Morgen ist deine Tattoo-Session {{sessionNumber}}/{{totalSessions}}!
 
-📅 {{date}} um {{time}}
-⏱️ Dauer: {{duration}}h
-📍 {{salonName}}
+ðŸ“… {{date}} um {{time}}
+â±ï¸ Dauer: {{duration}}h
+ðŸ“ {{salonName}}
 
 Bring bitte mit:
 {{checklist}}
 
 Wichtig:
-❌ Kein Alkohol 24h vorher
-❌ Keine Blutverdünner
+âŒ Kein Alkohol 24h vorher
+âŒ Keine BlutverdÃ¼nner
 
-Bis morgen! 💪
+Bis morgen! ðŸ’ª
 {{salonName}}`
   },
 
   tattoo_aftercare_reminder: {
     name: 'Tattoo Nachsorge',
-    text: `Hey {{customerName}}! 🎨
+    text: `Hey {{customerName}}! ðŸŽ¨
 
-Wichtige Nachsorge für dein Tattoo:
+Wichtige Nachsorge fÃ¼r dein Tattoo:
 
-✅ 3x täglich waschen (pH-neutral)
-✅ Dünn eincremen (Panthenol)
-❌ Keine Sonneneinstrahlung
-❌ Keine Sauna/Schwimmen (2 Wochen)
+âœ… 3x tÃ¤glich waschen (pH-neutral)
+âœ… DÃ¼nn eincremen (Panthenol)
+âŒ Keine Sonneneinstrahlung
+âŒ Keine Sauna/Schwimmen (2 Wochen)
 
 Bei Fragen: {{salonPhone}}
 
@@ -83,12 +83,12 @@ Bei Fragen: {{salonPhone}}
 
   tattoo_followup_appointment: {
     name: 'Tattoo Follow-up Termin',
-    text: `Hey {{customerName}}! 🎨
+    text: `Hey {{customerName}}! ðŸŽ¨
 
 Dein Tattoo sollte jetzt gut verheilt sein!
 
-Nächster Termin für Session {{nextSession}}/{{totalSessions}}:
-📅 In {{weeks}} Wochen empfohlen
+NÃ¤chster Termin fÃ¼r Session {{nextSession}}/{{totalSessions}}:
+ðŸ“… In {{weeks}} Wochen empfohlen
 
 Jetzt buchen: {{bookingLink}}
 
@@ -98,12 +98,12 @@ Jetzt buchen: {{bookingLink}}
   // ==================== MEDICAL AESTHETICS ====================
   treatment_follow_up: {
     name: 'Behandlungs-Follow-up',
-    text: `Hey {{customerName}}! 💉
+    text: `Hey {{customerName}}! ðŸ’‰
 
 Deine {{treatmentType}}-Behandlung wirkt bald aus.
 
 Empfohlener Nachtermin:
-⏰ In {{weeks}} Wochen
+â° In {{weeks}} Wochen
 
 Jetzt buchen: {{bookingLink}}
 
@@ -114,14 +114,14 @@ Fragen? {{salonPhone}}
 
   treatment_aftercare: {
     name: 'Behandlungs-Nachsorge',
-    text: `Hey {{customerName}}! 💉
+    text: `Hey {{customerName}}! ðŸ’‰
 
 Wichtige Nachsorge nach {{treatmentType}}:
 
-✅ Kühlen bei Schwellung (24h)
-✅ Nicht massieren (48h)
-❌ Keine Sauna/Sport (24h)
-❌ Kein Alkohol (24h)
+âœ… KÃ¼hlen bei Schwellung (24h)
+âœ… Nicht massieren (48h)
+âŒ Keine Sauna/Sport (24h)
+âŒ Kein Alkohol (24h)
 
 Bei Komplikationen sofort melden: {{salonPhone}}
 
@@ -129,32 +129,32 @@ Bei Komplikationen sofort melden: {{salonPhone}}
   },
 
   treatment_confirmation: {
-    name: 'Behandlungs-Bestätigung',
-    text: `Hey {{customerName}}! 💉
+    name: 'Behandlungs-BestÃ¤tigung',
+    text: `Hey {{customerName}}! ðŸ’‰
 
-Deine {{treatmentType}}-Behandlung ist bestätigt:
+Deine {{treatmentType}}-Behandlung ist bestÃ¤tigt:
 
-📅 {{date}} um {{time}}
-⏱️ ca. {{duration}} Min
-📍 {{salonName}}
+ðŸ“… {{date}} um {{time}}
+â±ï¸ ca. {{duration}} Min
+ðŸ“ {{salonName}}
 
 Bitte mitbringen:
-✅ Ausgefüllte Anamnesebogen
-✅ Personalausweis
+âœ… AusgefÃ¼llte Anamnesebogen
+âœ… Personalausweis
 
 Bei Fragen: {{salonPhone}}
 
-Bis bald! 💪`
+Bis bald! ðŸ’ª`
   },
 
   // ==================== SPA & WELLNESS ====================
   package_reminder: {
     name: 'Package Erinnerung',
-    text: `Hey {{customerName}}! 🎁
+    text: `Hey {{customerName}}! ðŸŽ
 
-Du hast noch {{creditsRemaining}} Credits übrig in deinem "{{packageName}}"!
+Du hast noch {{creditsRemaining}} Credits Ã¼brig in deinem "{{packageName}}"!
 
-⚠️ Verfällt am {{expiryDate}}
+âš ï¸ VerfÃ¤llt am {{expiryDate}}
 
 Jetzt buchen: {{bookingLink}}
 
@@ -162,12 +162,12 @@ Jetzt buchen: {{bookingLink}}
   },
 
   package_expiring_soon: {
-    name: 'Package läuft ab',
-    text: `Hey {{customerName}}! ⏰
+    name: 'Package lÃ¤uft ab',
+    text: `Hey {{customerName}}! â°
 
-Dein "{{packageName}}" läuft in {{daysLeft}} Tagen ab!
+Dein "{{packageName}}" lÃ¤uft in {{daysLeft}} Tagen ab!
 
-Noch {{creditsRemaining}} Credits verfügbar.
+Noch {{creditsRemaining}} Credits verfÃ¼gbar.
 
 Schnell buchen: {{bookingLink}}
 
@@ -175,14 +175,14 @@ Schnell buchen: {{bookingLink}}
   },
 
   package_purchase_confirmation: {
-    name: 'Package Kauf bestätigt',
-    text: `Hey {{customerName}}! 🎁
+    name: 'Package Kauf bestÃ¤tigt',
+    text: `Hey {{customerName}}! ðŸŽ
 
-Danke für deinen Kauf!
+Danke fÃ¼r deinen Kauf!
 
 "{{packageName}}"
-✅ {{creditsTotal}} Credits
-📅 Gültig bis {{expiryDate}}
+âœ… {{creditsTotal}} Credits
+ðŸ“… GÃ¼ltig bis {{expiryDate}}
 
 Jetzt buchen: {{bookingLink}}
 
@@ -192,14 +192,14 @@ Jetzt buchen: {{bookingLink}}
   // ==================== MEMBERSHIP ====================
   membership_welcome: {
     name: 'Membership Willkommen',
-    text: `Hey {{customerName}}! 🎉
+    text: `Hey {{customerName}}! ðŸŽ‰
 
 Willkommen bei "{{membershipName}}"!
 
 Deine Benefits:
 {{benefits}}
 
-Nächste Abrechnung: {{nextBillingDate}}
+NÃ¤chste Abrechnung: {{nextBillingDate}}
 
 Jetzt buchen: {{bookingLink}}
 
@@ -208,12 +208,12 @@ Jetzt buchen: {{bookingLink}}
 
   membership_billing_reminder: {
     name: 'Membership Abrechnung',
-    text: `Hey {{customerName}}! 💳
+    text: `Hey {{customerName}}! ðŸ’³
 
 Deine "{{membershipName}}"-Abrechnung steht an:
 
-📅 {{nextBillingDate}}
-💰 {{priceMonthly}}€
+ðŸ“… {{nextBillingDate}}
+ðŸ’° {{priceMonthly}}â‚¬
 
 Zahlungsmethode: {{paymentMethod}}
 
@@ -222,12 +222,12 @@ Zahlungsmethode: {{paymentMethod}}
 
   membership_credits_reset: {
     name: 'Membership Credits erneuert',
-    text: `Hey {{customerName}}! 🔄
+    text: `Hey {{customerName}}! ðŸ”„
 
 Deine monatlichen Credits wurden erneuert!
 
-✅ {{creditsMonthly}} Credits verfügbar
-📅 Gültig bis {{nextReset}}
+âœ… {{creditsMonthly}} Credits verfÃ¼gbar
+ðŸ“… GÃ¼ltig bis {{nextReset}}
 
 Jetzt buchen: {{bookingLink}}
 
@@ -236,11 +236,11 @@ Jetzt buchen: {{bookingLink}}
 
   membership_paused: {
     name: 'Membership pausiert',
-    text: `Hey {{customerName}}! ⏸️
+    text: `Hey {{customerName}}! â¸ï¸
 
 Deine "{{membershipName}}" wurde pausiert.
 
-Keine Abrechnung während der Pause.
+Keine Abrechnung wÃ¤hrend der Pause.
 
 Fortsetzen: {{resumeLink}}
 
@@ -249,14 +249,14 @@ Fortsetzen: {{resumeLink}}
 
   // ==================== WAITLIST ====================
   waitlist_spot_available: {
-    name: 'Warteliste - Termin verfügbar',
-    text: `Hey {{customerName}}! 🎉
+    name: 'Warteliste - Termin verfÃ¼gbar',
+    text: `Hey {{customerName}}! ðŸŽ‰
 
 Ein Termin ist frei geworden!
 
-📅 {{date}} um {{time}}
-⏱️ {{duration}} Min
-📍 {{salonName}}
+ðŸ“… {{date}} um {{time}}
+â±ï¸ {{duration}} Min
+ðŸ“ {{salonName}}
 
 Schnell buchen: {{bookingLink}}
 
@@ -267,31 +267,31 @@ Angebot gilt 2h!
 
   // ==================== NO-SHOW PREVENTION ====================
   booking_confirmation_required: {
-    name: 'Bestätigung erforderlich',
-    text: `Hey {{customerName}}! ⏰
+    name: 'BestÃ¤tigung erforderlich',
+    text: `Hey {{customerName}}! â°
 
-Bitte bestätige deinen Termin:
-📅 {{date}} um {{time}}
+Bitte bestÃ¤tige deinen Termin:
+ðŸ“… {{date}} um {{time}}
 
-Bestätigen: {{confirmLink}}
+BestÃ¤tigen: {{confirmLink}}
 Absagen: {{cancelLink}}
 
-Ohne Bestätigung wird der Termin storniert.
+Ohne BestÃ¤tigung wird der Termin storniert.
 
 {{salonName}}`
   },
 
   no_show_warning: {
     name: 'No-Show Warnung',
-    text: `Hey {{customerName}}! ⚠️
+    text: `Hey {{customerName}}! âš ï¸
 
 Du hast deinen letzten Termin verpasst.
 
-Bei 3 No-Shows müssen wir leider:
+Bei 3 No-Shows mÃ¼ssen wir leider:
 - Vorauszahlung verlangen
-- Terminbuchung einschränken
+- Terminbuchung einschrÃ¤nken
 
-Verständnis? 🙏
+VerstÃ¤ndnis? ðŸ™
 
 {{salonName}}`
   }

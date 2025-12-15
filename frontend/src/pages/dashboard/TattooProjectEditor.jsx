@@ -174,7 +174,7 @@ const TattooProjectEditor = () => {
                   onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="">Kunde wählen...</option>
+                  <option value="">Kunde wÃ¤hlen...</option>
                   {customers.map((customer) => (
                     <option key={customer._id} value={customer._id}>
                       {customer.firstName} {customer.lastName}
@@ -192,7 +192,7 @@ const TattooProjectEditor = () => {
                   onChange={(e) => setFormData({ ...formData, artistId: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="">Artist wählen...</option>
+                  <option value="">Artist wÃ¤hlen...</option>
                   {employees.map((emp) => (
                     <option key={emp._id} value={emp._id}>
                       {emp.firstName} {emp.lastName}
@@ -211,7 +211,7 @@ const TattooProjectEditor = () => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="z.B. Japanischer Drache Rücken"
+                placeholder="z.B. Japanischer Drache RÃ¼cken"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -244,21 +244,21 @@ const TattooProjectEditor = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Körperteil *
+                  KÃ¶rperteil *
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.bodyPart}
                   onChange={(e) => setFormData({ ...formData, bodyPart: e.target.value })}
-                  placeholder="z.B. Rücken, Arm"
+                  placeholder="z.B. RÃ¼cken, Arm"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Größe *
+                  GrÃ¶ÃŸe *
                 </label>
                 <select
                   required
@@ -268,8 +268,8 @@ const TattooProjectEditor = () => {
                 >
                   <option value="small">Klein</option>
                   <option value="medium">Mittel</option>
-                  <option value="large">Groß</option>
-                  <option value="full-body">Ganzkörper</option>
+                  <option value="large">GroÃŸ</option>
+                  <option value="full-body">GanzkÃ¶rper</option>
                 </select>
               </div>
             </div>
@@ -291,7 +291,7 @@ const TattooProjectEditor = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Geschätzte Stunden
+                  GeschÃ¤tzte Stunden
                 </label>
                 <input
                   type="number"
@@ -305,7 +305,7 @@ const TattooProjectEditor = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Geschätzter Preis (€)
+                  GeschÃ¤tzter Preis (â‚¬)
                 </label>
                 <input
                   type="number"
@@ -337,14 +337,14 @@ const TattooProjectEditor = () => {
                   onClick={addChecklistItem}
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
                 >
-                  Hinzufügen
+                  HinzufÃ¼gen
                 </button>
               </div>
               {formData.checklist.length > 0 && (
                 <ul className="space-y-2">
                   {formData.checklist.map((item, index) => (
                     <li key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                      <span className="text-sm">✓ {item.item}</span>
+                      <span className="text-sm">âœ“ {item.item}</span>
                       <button
                         type="button"
                         onClick={() => removeChecklistItem(index)}

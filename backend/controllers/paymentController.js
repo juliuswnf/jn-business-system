@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * Payment Controller - MVP Simplified
  * Essential payment operations only

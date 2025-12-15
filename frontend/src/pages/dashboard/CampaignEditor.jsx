@@ -108,7 +108,7 @@ const CampaignEditor = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPreview(response.data.data);
-      toast.success(`${response.data.data.totalRecipients} Empfänger gefunden`);
+      toast.success(`${response.data.data.totalRecipients} EmpfÃ¤nger gefunden`);
     } catch (error) {
       toast.error('Fehler beim Laden der Vorschau');
     }
@@ -190,12 +190,12 @@ const CampaignEditor = () => {
         {/* Main Form */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Info */}
-          <Section title="📋 Grundeinstellungen">
+          <Section title="ðŸ“‹ Grundeinstellungen">
             <Input
               label="Campaign Name"
               value={campaign.name}
               onChange={(e) => updateField('name', e.target.value)}
-              placeholder="z.B. Inaktive Kunden zurückgewinnen"
+              placeholder="z.B. Inaktive Kunden zurÃ¼ckgewinnen"
             />
 
             <Select
@@ -224,7 +224,7 @@ const CampaignEditor = () => {
           </Section>
 
           {/* Targeting Rules */}
-          <Section title="🎯 Zielgruppen-Regeln">
+          <Section title="ðŸŽ¯ Zielgruppen-Regeln">
             {campaign.type === 'inactive_customers' && (
               <Slider
                 label="Inaktive Tage"
@@ -276,7 +276,7 @@ const CampaignEditor = () => {
             )}
 
             <Slider
-              label="Max. Empfänger"
+              label="Max. EmpfÃ¤nger"
               value={campaign.rules.maxRecipients}
               onChange={(value) => updateRules('maxRecipients', value)}
               min={10}
@@ -287,7 +287,7 @@ const CampaignEditor = () => {
           </Section>
 
           {/* Message Editor */}
-          <Section title="✉️ Nachricht & Rabatt">
+          <Section title="âœ‰ï¸ Nachricht & Rabatt">
             <Textarea
               label="SMS Template"
               value={campaign.message.template}
@@ -307,7 +307,7 @@ const CampaignEditor = () => {
                 onChange={(e) => updateMessage('discountType', e.target.value)}
                 options={[
                   { value: 'percentage', label: 'Prozent (%)' },
-                  { value: 'fixed_amount', label: 'Fixer Betrag (€)' },
+                  { value: 'fixed_amount', label: 'Fixer Betrag (â‚¬)' },
                   { value: 'none', label: 'Kein Rabatt' }
                 ]}
               />
@@ -326,7 +326,7 @@ const CampaignEditor = () => {
 
             {campaign.message.discountType !== 'none' && (
               <Slider
-                label="Gültigkeit"
+                label="GÃ¼ltigkeit"
                 value={campaign.message.validDays}
                 onChange={(value) => updateMessage('validDays', value)}
                 min={1}
@@ -338,15 +338,15 @@ const CampaignEditor = () => {
           </Section>
 
           {/* Schedule */}
-          <Section title="📅 Zeitplan">
+          <Section title="ðŸ“… Zeitplan">
             <Select
-              label="Ausführung"
+              label="AusfÃ¼hrung"
               value={campaign.schedule.type}
               onChange={(e) => updateSchedule('type', e.target.value)}
               options={[
                 { value: 'manual', label: 'Manuell (nur auf Knopfdruck)' },
-                { value: 'daily', label: 'Täglich' },
-                { value: 'weekly', label: 'Wöchentlich' }
+                { value: 'daily', label: 'TÃ¤glich' },
+                { value: 'weekly', label: 'WÃ¶chentlich' }
               ]}
             />
 
@@ -388,18 +388,18 @@ const CampaignEditor = () => {
               animate={{ opacity: 1, x: 0 }}
               className="bg-white rounded-lg shadow-lg p-6 sticky top-6"
             >
-              <h3 className="text-lg font-semibold mb-4">📊 Vorschau</h3>
+              <h3 className="text-lg font-semibold mb-4">ðŸ“Š Vorschau</h3>
               
               <div className="space-y-4">
                 <PreviewStat
                   icon={<Users className="w-5 h-5" />}
-                  label="Empfänger"
+                  label="EmpfÃ¤nger"
                   value={preview.totalRecipients}
                 />
                 <PreviewStat
                   icon={<Euro className="w-5 h-5" />}
-                  label="Geschätzte Kosten"
-                  value={`${preview.estimatedCost}€`}
+                  label="GeschÃ¤tzte Kosten"
+                  value={`${preview.estimatedCost}â‚¬`}
                 />
               </div>
 
@@ -418,7 +418,7 @@ const CampaignEditor = () => {
               {preview.recipients && preview.recipients.length > 0 && (
                 <div className="mt-6">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    Erste {preview.recipients.length} Empfänger:
+                    Erste {preview.recipients.length} EmpfÃ¤nger:
                   </h4>
                   <div className="space-y-2">
                     {preview.recipients.map((r, i) => (

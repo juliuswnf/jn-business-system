@@ -23,7 +23,7 @@ export const getSalonBranding = async (salonId) => {
     primaryColor: '#EF4444',
     showPoweredBy: true,
     emailSignature: 'JN Business System Team',
-    footerText: 'JN Business System • Das Buchungssystem für Salons & Studios'
+    footerText: 'JN Business System â€¢ Das Buchungssystem fÃ¼r Salons & Studios'
   };
 
   if (!salonId) {
@@ -91,10 +91,10 @@ export const getEmailFooter = async (salonId) => {
   return `
     <div style="text-align: center; padding: 20px; border-top: 1px solid #e5e5e5; margin-top: 30px;">
       <p style="color: #666; font-size: 12px; margin: 0;">
-        ${branding.salonName ? `${branding.salonName} • Powered by ` : ''}JN Business System
+        ${branding.salonName ? `${branding.salonName} â€¢ Powered by ` : ''}JN Business System
       </p>
       <p style="color: #999; font-size: 11px; margin: 5px 0 0 0;">
-        Das Buchungssystem für Salons & Studios
+        Das Buchungssystem fÃ¼r Salons & Studios
       </p>
     </div>
   `;

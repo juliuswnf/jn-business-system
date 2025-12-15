@@ -330,7 +330,7 @@ export const getEmailTemplates = async (req, res) => {
       {
         id: 'welcome',
         name: 'Willkommen',
-        description: 'Willkommens-E-Mail für neue Kunden',
+        description: 'Willkommens-E-Mail fÃ¼r neue Kunden',
         subject: 'Willkommen bei JN Business System!',
         content: 'Hallo {name},\n\nwillkommen bei JN Business System...'
       },
@@ -343,7 +343,7 @@ export const getEmailTemplates = async (req, res) => {
       },
       {
         id: 'feature_announcement',
-        name: 'Feature Ankündigung',
+        name: 'Feature AnkÃ¼ndigung',
         description: 'Neue Features vorstellen',
         subject: 'Neu: {feature_name}',
         content: 'Hallo {name},\n\nwir haben ein neues Feature...'
@@ -352,8 +352,8 @@ export const getEmailTemplates = async (req, res) => {
         id: 'promotion',
         name: 'Promotion',
         description: 'Rabattaktionen und Angebote',
-        subject: 'Exklusives Angebot für Sie!',
-        content: 'Hallo {name},\n\nnur für kurze Zeit...'
+        subject: 'Exklusives Angebot fÃ¼r Sie!',
+        content: 'Hallo {name},\n\nnur fÃ¼r kurze Zeit...'
       },
       {
         id: 'newsletter',

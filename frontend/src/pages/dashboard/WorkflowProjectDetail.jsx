@@ -57,7 +57,7 @@ export default function WorkflowProjectDetail() {
       fetchProjectDetails();
     } catch (error) {
       console.error('Error completing session:', error);
-      toast.error('Fehler beim Abschließen');
+      toast.error('Fehler beim AbschlieÃŸen');
     }
   };
 
@@ -71,16 +71,16 @@ export default function WorkflowProjectDetail() {
 
   const getIndustryIcon = (industry) => {
     const icons = {
-      tattoo: '🎨',
-      medical_aesthetics: '💉',
-      spa_wellness: '🧖',
-      barbershop: '💈',
-      nails: '💅',
-      massage: '💆',
-      physiotherapy: '🩺',
-      generic: '📋'
+      tattoo: 'ðŸŽ¨',
+      medical_aesthetics: 'ðŸ’‰',
+      spa_wellness: 'ðŸ§–',
+      barbershop: 'ðŸ’ˆ',
+      nails: 'ðŸ’…',
+      massage: 'ðŸ’†',
+      physiotherapy: 'ðŸ©º',
+      generic: 'ðŸ“‹'
     };
-    return icons[industry] || '📋';
+    return icons[industry] || 'ðŸ“‹';
   };
 
   const getStatusColor = (status) => {
@@ -103,7 +103,7 @@ export default function WorkflowProjectDetail() {
           onClick={() => navigate('/dashboard/workflow-projects')}
           className="text-blue-600 hover:text-blue-800 mb-4 flex items-center"
         >
-          ← Zurück zu Projekten
+          â† ZurÃ¼ck zu Projekten
         </button>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -140,13 +140,13 @@ export default function WorkflowProjectDetail() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">
-                  {project.totalPrice.toLocaleString()}€
+                  {project.totalPrice.toLocaleString()}â‚¬
                 </div>
                 <div className="text-sm text-gray-600">Gesamtpreis</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-600">
-                  {project.paidAmount.toLocaleString()}€
+                  {project.paidAmount.toLocaleString()}â‚¬
                 </div>
                 <div className="text-sm text-gray-600">Bezahlt</div>
               </div>
@@ -281,13 +281,13 @@ export default function WorkflowProjectDetail() {
 function SessionCard({ session, index, onComplete }) {
   const getStatusIcon = (status) => {
     const icons = {
-      scheduled: '📅',
-      in_progress: '🔄',
-      completed: '✅',
-      cancelled: '❌',
-      no_show: '⚠️'
+      scheduled: 'ðŸ“…',
+      in_progress: 'ðŸ”„',
+      completed: 'âœ…',
+      cancelled: 'âŒ',
+      no_show: 'âš ï¸'
     };
-    return icons[status] || '📋';
+    return icons[status] || 'ðŸ“‹';
   };
 
   const getStatusColor = (status) => {
@@ -323,18 +323,18 @@ function SessionCard({ session, index, onComplete }) {
         </div>
         {session.scheduledDate && (
           <div className="text-sm text-gray-600 mb-1">
-            📅 {new Date(session.scheduledDate).toLocaleString('de-DE')}
+            ðŸ“… {new Date(session.scheduledDate).toLocaleString('de-DE')}
           </div>
         )}
         {session.notes && (
-          <div className="text-sm text-gray-600">💬 {session.notes}</div>
+          <div className="text-sm text-gray-600">ðŸ’¬ {session.notes}</div>
         )}
         {session.status === 'scheduled' && (
           <button
             onClick={() => onComplete(session)}
             className="mt-2 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
           >
-            Session abschließen
+            Session abschlieÃŸen
           </button>
         )}
       </div>
@@ -359,7 +359,7 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
         className="bg-white rounded-lg p-6 max-w-md w-full"
       >
         <h3 className="text-xl font-bold text-gray-900 mb-4">
-          Session {session.sessionNumber} abschließen
+          Session {session.sessionNumber} abschlieÃŸen
         </h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -399,7 +399,7 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
               type="submit"
               className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
             >
-              Abschließen
+              AbschlieÃŸen
             </button>
           </div>
         </form>

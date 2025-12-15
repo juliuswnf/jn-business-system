@@ -1,4 +1,4 @@
-﻿/**
+/**
  * E2E Test: Dashboard & Booking Management
  * Tests the salon owner dashboard and booking management
  * 

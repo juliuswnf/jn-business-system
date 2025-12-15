@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { employeeAPI, formatError } from '../../utils/api';
 import { LoadingSpinner } from '../common';
 import './EmployeeNotificationSettings.css';

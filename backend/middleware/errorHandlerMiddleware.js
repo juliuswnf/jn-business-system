@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import alertingService from '../services/alertingService.js';
 /**
  * Error Handler Middleware Suite

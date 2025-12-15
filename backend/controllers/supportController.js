@@ -65,7 +65,7 @@ export const createTicket = async (req, res) => {
         subject: `Support-Ticket erstellt: ${ticket.ticketNumber}`,
         html: `
           <h2>Ihr Support-Ticket wurde erstellt</h2>
-          <p>Vielen Dank für Ihre Anfrage. Wir werden uns schnellstmöglich bei Ihnen melden.</p>
+          <p>Vielen Dank fÃ¼r Ihre Anfrage. Wir werden uns schnellstmÃ¶glich bei Ihnen melden.</p>
           <hr>
           <p><strong>Ticket-Nummer:</strong> ${ticket.ticketNumber}</p>
           <p><strong>Betreff:</strong> ${subject}</p>
@@ -74,8 +74,8 @@ export const createTicket = async (req, res) => {
           <p><strong>Ihre Nachricht:</strong></p>
           <p>${description}</p>
           <hr>
-          <p>Sie können auf diese E-Mail antworten, um weitere Informationen hinzuzufügen.</p>
-          <p>Mit freundlichen Grüßen,<br>Ihr JN Business System Support-Team</p>
+          <p>Sie kÃ¶nnen auf diese E-Mail antworten, um weitere Informationen hinzuzufÃ¼gen.</p>
+          <p>Mit freundlichen GrÃ¼ÃŸen,<br>Ihr JN Business System Support-Team</p>
         `
       });
     } catch (emailError) {
@@ -93,7 +93,7 @@ export const createTicket = async (req, res) => {
           <p><strong>Von:</strong> ${req.user.firstName} ${req.user.lastName} (${req.user.email})</p>
           <p><strong>Salon:</strong> ${salon?.businessName || 'Kein Salon'}</p>
           <p><strong>Kategorie:</strong> ${category || 'Sonstige'}</p>
-          <p><strong>Priorität:</strong> ${priority || 'Mittel'}</p>
+          <p><strong>PrioritÃ¤t:</strong> ${priority || 'Mittel'}</p>
           <hr>
           <p><strong>Betreff:</strong> ${subject}</p>
           <p><strong>Beschreibung:</strong></p>
@@ -268,7 +268,7 @@ export const addMessage = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Nachricht hinzugefügt',
+      message: 'Nachricht hinzugefÃ¼gt',
       ticket: {
         id: ticket._id,
         ticketNumber: ticket.ticketNumber,
@@ -280,7 +280,7 @@ export const addMessage = async (req, res) => {
     logger.error('Error adding message to ticket:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim Hinzufügen der Nachricht'
+      error: 'Fehler beim HinzufÃ¼gen der Nachricht'
     });
   }
 };
@@ -324,7 +324,7 @@ export const closeTicket = async (req, res) => {
     logger.error('Error closing ticket:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim Schließen des Tickets'
+      error: 'Fehler beim SchlieÃŸen des Tickets'
     });
   }
 };

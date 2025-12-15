@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 import Salon from '../models/Salon.js';
 import { createCheckoutSession, createBillingPortalSession } from '../services/stripeService.js';
 

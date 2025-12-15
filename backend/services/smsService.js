@@ -1,4 +1,4 @@
-﻿import { createClient } from 'redis';
+import { createClient } from 'redis';
 import SMSLog from '../models/SMSLog.js';
 import SMSConsent from '../models/SMSConsent.js';
 import SMSProviderFactory from './smsProviders/SMSProviderFactory.js';

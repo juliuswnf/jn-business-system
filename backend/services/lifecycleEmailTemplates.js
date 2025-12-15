@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Lifecycle Email Templates
  * Automated trial nurturing emails for conversion optimization
  *

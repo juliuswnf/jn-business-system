@@ -273,10 +273,10 @@ PHOTO RELEASE CONSENT
 
 I hereby grant permission to the artist and studio to photograph my tattoo work and use these photographs for:
 
-☐ Social media (Instagram, Facebook, etc.)
-☐ Website portfolio
-☐ Marketing materials
-☐ Promotional use
+â˜ Social media (Instagram, Facebook, etc.)
+â˜ Website portfolio
+â˜ Marketing materials
+â˜ Promotional use
 
 I understand that:
 - My face may be visible in photos unless I request otherwise

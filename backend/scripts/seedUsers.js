@@ -77,7 +77,7 @@ const seedUsers = async () => {
     const employees = [];
     const employeeNames = [
       { first: 'Maria', last: 'Schmidt' },
-      { first: 'Clara', last: 'Müller' },
+      { first: 'Clara', last: 'MÃ¼ller' },
       { first: 'Sophie', last: 'Weber' }
     ];
 
@@ -209,12 +209,12 @@ const seedServices = async (admin) => {
         shortDescription: 'Friseurschnitt'
       },
       {
-        name: 'Haarfärben',
+        name: 'HaarfÃ¤rben',
         price: 60,
         duration: 90,
         category: 'Hairstyling',
-        description: 'Komplette Haarfärbung mit hochwertigen Produkten',
-        shortDescription: 'Vollständige Haarfärbung'
+        description: 'Komplette HaarfÃ¤rbung mit hochwertigen Produkten',
+        shortDescription: 'VollstÃ¤ndige HaarfÃ¤rbung'
       },
       {
         name: 'Gesichtsmassage',
@@ -225,20 +225,20 @@ const seedServices = async (admin) => {
         shortDescription: 'Entspannende Massage'
       },
       {
-        name: 'Maniküre',
+        name: 'ManikÃ¼re',
         price: 30,
         duration: 45,
         category: 'Nails',
-        description: 'Professionelle Maniküre mit hochwertigen Nagellacken',
+        description: 'Professionelle ManikÃ¼re mit hochwertigen Nagellacken',
         shortDescription: 'Hand- und Nagelpflege'
       },
       {
-        name: 'Pediküre',
+        name: 'PedikÃ¼re',
         price: 40,
         duration: 60,
         category: 'Nails',
-        description: 'Professionelle Fußpflege und Nagelpflege',
-        shortDescription: 'Fuß- und Nagelpflege'
+        description: 'Professionelle FuÃŸpflege und Nagelpflege',
+        shortDescription: 'FuÃŸ- und Nagelpflege'
       },
       {
         name: 'Gesichtsbehandlung',
@@ -288,7 +288,7 @@ const seedCustomers = async (admin) => {
 
     const customers = [
       {
-        name: 'Max Müller',
+        name: 'Max MÃ¼ller',
         email: 'max.mueller@example.de',
         phone: '+49301234567',
         address: {
@@ -303,7 +303,7 @@ const seedCustomers = async (admin) => {
         email: 'lisa.schmidt@example.de',
         phone: '+49301234568',
         address: {
-          street: 'Kurfürstendamm 12',
+          street: 'KurfÃ¼rstendamm 12',
           city: 'Berlin',
           zipCode: '10719',
           country: 'DE'
@@ -321,7 +321,7 @@ const seedCustomers = async (admin) => {
         }
       },
       {
-        name: 'Tom König',
+        name: 'Tom KÃ¶nig',
         email: 'tom.koenig@example.de',
         phone: '+49301234570',
         address: {
@@ -405,7 +405,7 @@ const seedAppointments = async (admin, employees, customers, services) => {
         customerName: randomCustomer.name,
         customerEmail: randomCustomer.email,
         customerPhone: randomCustomer.phone,
-        notes: 'Gebucht über System'
+        notes: 'Gebucht Ã¼ber System'
       });
       appointments.push(appointment);
       logger.log(`? Appointment created for ${randomCustomer.name}`);

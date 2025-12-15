@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Security Middleware Suite
  * Version: 1.0.0
  * Provides: Rate limiting, input validation, XSS/CSRF protection

@@ -67,7 +67,7 @@ export const createProject = async (req, res) => {
     await project.populate('customerId', 'firstName lastName email phone');
     await project.populate('artistId', 'firstName lastName');
 
-    logger.log(`✅ Tattoo project created: ${project.name} for ${customer.firstName} ${customer.lastName}`);
+    logger.log(`âœ… Tattoo project created: ${project.name} for ${customer.firstName} ${customer.lastName}`);
 
     res.status(201).json({
       success: true,
@@ -195,7 +195,7 @@ export const updateProject = async (req, res) => {
       });
     }
 
-    logger.log(`✅ Tattoo project updated: ${project.name}`);
+    logger.log(`âœ… Tattoo project updated: ${project.name}`);
 
     res.json({
       success: true,
@@ -237,7 +237,7 @@ export const deleteProject = async (req, res) => {
     // Delete project
     await project.deleteOne();
 
-    logger.log(`🗑️ Tattoo project deleted: ${project.name}`);
+    logger.log(`ðŸ—‘ï¸ Tattoo project deleted: ${project.name}`);
 
     res.json({
       success: true,
@@ -355,7 +355,7 @@ export const createSession = async (req, res) => {
 
     await session.populate('bookingId');
 
-    logger.log(`✅ Tattoo session created: Session ${sessionNumber} for project ${project.name}`);
+    logger.log(`âœ… Tattoo session created: Session ${sessionNumber} for project ${project.name}`);
 
     res.status(201).json({
       success: true,
@@ -430,7 +430,7 @@ export const updateSession = async (req, res) => {
       });
     }
 
-    logger.log(`✅ Tattoo session updated: Session ${session.sessionNumber}`);
+    logger.log(`âœ… Tattoo session updated: Session ${session.sessionNumber}`);
 
     res.json({
       success: true,
@@ -471,7 +471,7 @@ export const completeSession = async (req, res) => {
     // Complete session
     await session.completeSession(progress, notes);
 
-    logger.log(`✅ Tattoo session completed: Session ${session.sessionNumber} - ${progress}% progress`);
+    logger.log(`âœ… Tattoo session completed: Session ${session.sessionNumber} - ${progress}% progress`);
 
     res.json({
       success: true,
@@ -515,7 +515,7 @@ export const uploadSessionPhotos = async (req, res) => {
 
     await session.addPhotos(photos, type || 'during');
 
-    logger.log(`📸 Photos uploaded to session ${session.sessionNumber}: ${photos.length} photos`);
+    logger.log(`ðŸ“¸ Photos uploaded to session ${session.sessionNumber}: ${photos.length} photos`);
 
     res.json({
       success: true,
@@ -566,7 +566,7 @@ export const createConsent = async (req, res) => {
       await consent.populate('projectId', 'name');
     }
 
-    logger.log(`📝 Consent created: ${type} for ${customer.firstName} ${customer.lastName}`);
+    logger.log(`ðŸ“ Consent created: ${type} for ${customer.firstName} ${customer.lastName}`);
 
     res.status(201).json({
       success: true,
@@ -635,7 +635,7 @@ export const signConsent = async (req, res) => {
 
     await consent.sign(signature, { ipAddress, userAgent });
 
-    logger.log(`✅ Consent signed: ${consent.type} by customer ${consent.customerId}`);
+    logger.log(`âœ… Consent signed: ${consent.type} by customer ${consent.customerId}`);
 
     res.json({
       success: true,

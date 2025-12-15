@@ -153,7 +153,7 @@ router.get('/confirm/:token', async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Booking confirmed successfully! ✅',
+      message: 'Booking confirmed successfully! âœ…',
       confirmation: {
         status: confirmation.status,
         confirmedAt: confirmation.confirmedAt,

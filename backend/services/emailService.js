@@ -1,4 +1,4 @@
-﻿import nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer';
 import EmailQueue from '../models/EmailQueue.js';
 import EmailLog from '../models/EmailLog.js';
 import logger from '../utils/logger.js';

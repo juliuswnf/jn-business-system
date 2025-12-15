@@ -1,4 +1,4 @@
-﻿import AuditLog from '../models/AuditLog.js';
+import AuditLog from '../models/AuditLog.js';
 import logger from '../utils/logger.js';
 import nodemailer from 'nodemailer';
 

@@ -44,7 +44,7 @@ export default function PackagesMemberships() {
   };
 
   const handleCancelMembership = async (id, reason) => {
-    if (!confirm('Membership wirklich kündigen?')) return;
+    if (!confirm('Membership wirklich kÃ¼ndigen?')) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -53,11 +53,11 @@ export default function PackagesMemberships() {
         { reason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Membership gekündigt');
+      toast.success('Membership gekÃ¼ndigt');
       fetchData();
     } catch (error) {
       console.error('Error cancelling membership:', error);
-      toast.error('Fehler beim Kündigen');
+      toast.error('Fehler beim KÃ¼ndigen');
     }
   };
 
@@ -87,7 +87,7 @@ export default function PackagesMemberships() {
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          🎁 Packages ({packages.length})
+          ðŸŽ Packages ({packages.length})
         </button>
         <button
           onClick={() => setActiveTab('memberships')}
@@ -97,7 +97,7 @@ export default function PackagesMemberships() {
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          💎 Memberships ({memberships.length})
+          ðŸ’Ž Memberships ({memberships.length})
         </button>
       </div>
 
@@ -142,7 +142,7 @@ function PackagesTab({ packages }) {
                 className="bg-white border-2 border-green-500 rounded-lg p-6"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-3xl">🎁</span>
+                  <span className="text-3xl">ðŸŽ</span>
                   <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(pkg.status)}`}>
                     {pkg.status}
                   </span>
@@ -171,7 +171,7 @@ function PackagesTab({ packages }) {
                 </div>
                 {pkg.validUntil && (
                   <div className="text-sm text-gray-600">
-                    ⏰ Gültig bis: {new Date(pkg.validUntil).toLocaleDateString('de-DE')}
+                    â° GÃ¼ltig bis: {new Date(pkg.validUntil).toLocaleDateString('de-DE')}
                   </div>
                 )}
               </motion.div>
@@ -249,12 +249,12 @@ function MembershipsTab({ memberships, onCancel }) {
 
   const getPlanIcon = (plan) => {
     const icons = {
-      basic: '🥉',
-      premium: '🥈',
-      vip: '🥇',
-      custom: '💎'
+      basic: 'ðŸ¥‰',
+      premium: 'ðŸ¥ˆ',
+      vip: 'ðŸ¥‡',
+      custom: 'ðŸ’Ž'
     };
-    return icons[plan] || '💎';
+    return icons[plan] || 'ðŸ’Ž';
   };
 
   const activeMemberships = memberships.filter(m => m.status === 'active');
@@ -291,7 +291,7 @@ function MembershipsTab({ memberships, onCancel }) {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Preis:</span>
-                    <span className="font-medium">{membership.priceMonthly}€/Monat</span>
+                    <span className="font-medium">{membership.priceMonthly}â‚¬/Monat</span>
                   </div>
                   {membership.creditsMonthly > 0 && (
                     <div className="flex justify-between text-sm">
@@ -302,7 +302,7 @@ function MembershipsTab({ memberships, onCancel }) {
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Nächste Abrechnung:</span>
+                    <span className="text-gray-600">NÃ¤chste Abrechnung:</span>
                     <span className="font-medium">
                       {new Date(membership.nextBillingDate).toLocaleDateString('de-DE')}
                     </span>
@@ -312,7 +312,7 @@ function MembershipsTab({ memberships, onCancel }) {
                   onClick={() => onCancel(membership._id, 'User request')}
                   className="w-full bg-red-100 text-red-800 py-2 px-4 rounded-lg hover:bg-red-200 text-sm"
                 >
-                  Kündigen
+                  KÃ¼ndigen
                 </button>
               </motion.div>
             ))}

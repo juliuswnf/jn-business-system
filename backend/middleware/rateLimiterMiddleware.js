@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * Rate Limiter Middleware Suite
  * Version: 1.0.0

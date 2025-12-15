@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { bookingAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';

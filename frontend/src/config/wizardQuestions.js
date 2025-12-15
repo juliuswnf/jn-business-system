@@ -9,16 +9,16 @@ export const wizardQuestions = [
     id: 1,
     key: 'customerCount',
     title: 'Wie viele Kunden hast du aktuell?',
-    subtitle: 'Hilft uns, die richtige Größe für dein Business zu finden',
+    subtitle: 'Hilft uns, die richtige GrÃ¶ÃŸe fÃ¼r dein Business zu finden',
     type: 'single',
-    icon: '👥',
+    icon: 'ðŸ‘¥',
     required: true,
     options: [
       { 
         value: '0-50', 
         label: '0-50 Kunden', 
         subtitle: 'Gerade gestartet',
-        description: 'Perfekt für neue Businesses'
+        description: 'Perfekt fÃ¼r neue Businesses'
       },
       { 
         value: '51-200', 
@@ -35,7 +35,7 @@ export const wizardQuestions = [
       { 
         value: '500+', 
         label: '500+ Kunden', 
-        subtitle: 'Großes Business',
+        subtitle: 'GroÃŸes Business',
         description: 'Enterprise-Level Operation'
       }
     ]
@@ -46,7 +46,7 @@ export const wizardQuestions = [
     title: 'Wie viele Termine hast du pro Woche?',
     subtitle: 'Zeigt uns, wie viel Automatisierung du brauchst',
     type: 'single',
-    icon: '📅',
+    icon: 'ðŸ“…',
     required: true,
     options: [
       { 
@@ -71,7 +71,7 @@ export const wizardQuestions = [
         value: '100+', 
         label: '100+ Termine/Woche', 
         subtitle: 'Sehr hohes Volumen',
-        description: '20+ Termine täglich - Multi-Team'
+        description: '20+ Termine tÃ¤glich - Multi-Team'
       }
     ]
   },
@@ -81,7 +81,7 @@ export const wizardQuestions = [
     title: 'Wie viele Standorte hast du?',
     subtitle: 'Multi-Location Features ab Professional',
     type: 'single',
-    icon: '📍',
+    icon: 'ðŸ“',
     required: true,
     options: [
       { 
@@ -94,7 +94,7 @@ export const wizardQuestions = [
         value: 2, 
         label: '2-3 Standorte', 
         subtitle: 'Expandierend',
-        description: 'Multi-Location Management nötig'
+        description: 'Multi-Location Management nÃ¶tig'
       },
       { 
         value: 4, 
@@ -108,9 +108,9 @@ export const wizardQuestions = [
     id: 4,
     key: 'features',
     title: 'Welche Features brauchst du?',
-    subtitle: 'Wähle alles, was für dich wichtig ist (mehrere möglich)',
+    subtitle: 'WÃ¤hle alles, was fÃ¼r dich wichtig ist (mehrere mÃ¶glich)',
     type: 'multiple',
-    icon: '✨',
+    icon: 'âœ¨',
     required: true,
     minSelections: 1,
     options: [
@@ -118,7 +118,7 @@ export const wizardQuestions = [
         value: 'sms_reminders', 
         label: 'SMS-Erinnerungen', 
         subtitle: 'Reduziere No-Shows um 70%',
-        icon: '📱',
+        icon: 'ðŸ“±',
         tier: 'professional',
         description: 'Automatische SMS 24h und 2h vor Termin'
       },
@@ -126,31 +126,31 @@ export const wizardQuestions = [
         value: 'marketing', 
         label: 'Marketing-Kampagnen', 
         subtitle: 'Email & SMS Automation',
-        icon: '📧',
+        icon: 'ðŸ“§',
         tier: 'professional',
-        description: 'Gezielte Kampagnen für mehr Umsatz'
+        description: 'Gezielte Kampagnen fÃ¼r mehr Umsatz'
       },
       { 
         value: 'multi_session', 
         label: 'Multi-Session-Projekte', 
-        subtitle: 'Für Tattoo, Medical',
-        icon: '🎨',
+        subtitle: 'FÃ¼r Tattoo, Medical',
+        icon: 'ðŸŽ¨',
         tier: 'professional',
-        description: 'Projekte über mehrere Termine hinweg'
+        description: 'Projekte Ã¼ber mehrere Termine hinweg'
       },
       { 
         value: 'memberships', 
         label: 'Packages & Memberships', 
         subtitle: 'Recurring Revenue',
-        icon: '💎',
+        icon: 'ðŸ’Ž',
         tier: 'professional',
         description: 'Monatliche Mitgliedschaften verwalten'
       },
       { 
         value: 'waitlist', 
         label: 'Waitlist-Management', 
-        subtitle: 'Fülle freie Slots automatisch',
-        icon: '⏰',
+        subtitle: 'FÃ¼lle freie Slots automatisch',
+        icon: 'â°',
         tier: 'professional',
         description: 'Wartelisten-Automation bei Absagen'
       },
@@ -158,7 +158,7 @@ export const wizardQuestions = [
         value: 'analytics', 
         label: 'Analytics & Reports', 
         subtitle: 'Datenbasierte Entscheidungen',
-        icon: '📊',
+        icon: 'ðŸ“Š',
         tier: 'professional',
         description: 'Detaillierte Business-Insights'
       },
@@ -166,9 +166,9 @@ export const wizardQuestions = [
         value: 'white_label', 
         label: 'White-Label Branding', 
         subtitle: 'Deine eigene Brand',
-        icon: '🏷️',
+        icon: 'ðŸ·ï¸',
         tier: 'enterprise',
-        description: 'Komplett gebrandete Lösung'
+        description: 'Komplett gebrandete LÃ¶sung'
       }
     ]
   },
@@ -178,7 +178,7 @@ export const wizardQuestions = [
     title: 'Wie viele Mitarbeiter hast du?',
     subtitle: 'Team-Features und User-Limits variieren',
     type: 'single',
-    icon: '👔',
+    icon: 'ðŸ‘”',
     required: true,
     options: [
       { 
@@ -197,12 +197,12 @@ export const wizardQuestions = [
         value: '6-10', 
         label: '6-10 Mitarbeiter', 
         subtitle: 'Mittleres Team',
-        description: 'Erweiterte Rechteverwaltung nötig'
+        description: 'Erweiterte Rechteverwaltung nÃ¶tig'
       },
       { 
         value: '10+', 
         label: '10+ Mitarbeiter', 
-        subtitle: 'Großes Team',
+        subtitle: 'GroÃŸes Team',
         description: 'Enterprise-Team-Management'
       }
     ]
@@ -210,35 +210,35 @@ export const wizardQuestions = [
   {
     id: 6,
     key: 'budget',
-    title: 'Was ist dein monatliches Budget für Software?',
-    subtitle: 'Ehrlich sein hilft uns, das beste Preis-Leistungs-Verhältnis zu finden',
+    title: 'Was ist dein monatliches Budget fÃ¼r Software?',
+    subtitle: 'Ehrlich sein hilft uns, das beste Preis-Leistungs-VerhÃ¤ltnis zu finden',
     type: 'single',
-    icon: '💰',
+    icon: 'ðŸ’°',
     required: true,
     options: [
       { 
         value: 'under-100', 
-        label: 'Unter €100/Monat', 
+        label: 'Unter â‚¬100/Monat', 
         subtitle: 'Budget-bewusst',
         description: 'Kosteneffizienz steht im Vordergrund'
       },
       { 
         value: '100-200', 
-        label: '€100-200/Monat', 
+        label: 'â‚¬100-200/Monat', 
         subtitle: 'Standard-Budget',
-        description: 'Gutes Preis-Leistungs-Verhältnis wichtig'
+        description: 'Gutes Preis-Leistungs-VerhÃ¤ltnis wichtig'
       },
       { 
         value: '200-500', 
-        label: '€200-500/Monat', 
-        subtitle: 'Großzügiges Budget',
-        description: 'Bereit für Premium-Features'
+        label: 'â‚¬200-500/Monat', 
+        subtitle: 'GroÃŸzÃ¼giges Budget',
+        description: 'Bereit fÃ¼r Premium-Features'
       },
       { 
         value: '500+', 
-        label: '€500+/Monat', 
+        label: 'â‚¬500+/Monat', 
         subtitle: 'Premium-Budget',
-        description: 'Beste Lösung ohne Kompromisse'
+        description: 'Beste LÃ¶sung ohne Kompromisse'
       }
     ]
   }

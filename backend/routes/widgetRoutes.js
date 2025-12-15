@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import Booking from '../models/Booking.js';

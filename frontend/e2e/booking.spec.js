@@ -1,4 +1,4 @@
-﻿/**
+/**
  * E2E Test: Public Booking Flow
  * Tests the complete customer booking journey
  * 

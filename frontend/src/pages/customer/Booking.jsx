@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../hooks/useNotification';
 import { FiClock, FiStar } from 'react-icons/fi';
 import SalonSelector from '../../components/booking/SalonSelector';

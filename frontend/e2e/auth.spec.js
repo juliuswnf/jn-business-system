@@ -1,4 +1,4 @@
-﻿/**
+/**
  * E2E Test: Authentication Flow
  * Tests login, registration, and session management
  * 

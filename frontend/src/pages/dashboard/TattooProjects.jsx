@@ -70,7 +70,7 @@ const TattooProjects = () => {
   };
 
   const handleDeleteProject = async (projectId) => {
-    if (!confirm('Projekt wirklich löschen? Alle Sessions werden abgebrochen.')) return;
+    if (!confirm('Projekt wirklich lÃ¶schen? Alle Sessions werden abgebrochen.')) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -83,11 +83,11 @@ const TattooProjects = () => {
 
       const data = await res.json();
       if (data.success) {
-        toast.success('Projekt gelöscht');
+        toast.success('Projekt gelÃ¶scht');
         fetchProjects();
         fetchStats();
       } else {
-        toast.error(data.error || 'Fehler beim Löschen');
+        toast.error(data.error || 'Fehler beim LÃ¶schen');
       }
     } catch (error) {
       console.error('Error deleting project:', error);
@@ -123,7 +123,7 @@ const TattooProjects = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">🎨 Tattoo Projekte</h1>
+            <h1 className="text-3xl font-bold text-gray-900">ðŸŽ¨ Tattoo Projekte</h1>
             <p className="text-gray-600 mt-1">Verwalte Multi-Session Tattoo-Projekte</p>
           </div>
           <Link
@@ -140,31 +140,31 @@ const TattooProjects = () => {
             <StatCard
               label="Gesamt"
               value={stats.total}
-              icon="📊"
+              icon="ðŸ“Š"
               color="bg-gray-100"
             />
             <StatCard
               label="In Arbeit"
               value={stats.inProgress}
-              icon="🚧"
+              icon="ðŸš§"
               color="bg-blue-100"
             />
             <StatCard
               label="Fertig"
               value={stats.completed}
-              icon="✅"
+              icon="âœ…"
               color="bg-green-100"
             />
             <StatCard
               label="Durchschnitt"
               value={`${stats.averageProgress}%`}
-              icon="📈"
+              icon="ðŸ“ˆ"
               color="bg-purple-100"
             />
             <StatCard
               label="Umsatz"
-              value={`€${(stats.totalRevenue / 100).toLocaleString()}`}
-              icon="💰"
+              value={`â‚¬${(stats.totalRevenue / 100).toLocaleString()}`}
+              icon="ðŸ’°"
               color="bg-yellow-100"
             />
           </div>
@@ -175,7 +175,7 @@ const TattooProjects = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
-              placeholder="🔍 Suche nach Name, Style..."
+              placeholder="ðŸ” Suche nach Name, Style..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -198,7 +198,7 @@ const TattooProjects = () => {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-gray-500">
-              Lädt Projekte...
+              LÃ¤dt Projekte...
             </div>
           ) : projects.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
@@ -276,7 +276,7 @@ const TattooProjects = () => {
                             onClick={() => handleDeleteProject(project._id)}
                             className="text-red-600 hover:text-red-800 text-sm"
                           >
-                            Löschen
+                            LÃ¶schen
                           </button>
                         </div>
                       </td>

@@ -1,4 +1,4 @@
-﻿import EmailQueue from '../models/EmailQueue.js';
+import EmailQueue from '../models/EmailQueue.js';
 import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
 

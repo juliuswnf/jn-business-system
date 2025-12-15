@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Industry Terminology Frontend Helper
  * Provides UI-friendly labels and feature flags
  */

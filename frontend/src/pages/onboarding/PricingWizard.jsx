@@ -60,12 +60,12 @@ const PricingWizard = () => {
     if (currentQuestion.required) {
       if (currentQuestion.type === 'multiple') {
         if (!currentAnswer || currentAnswer.length === 0) {
-          toast.error('Bitte wähle mindestens eine Option');
+          toast.error('Bitte wÃ¤hle mindestens eine Option');
           return;
         }
       } else {
         if (!currentAnswer && currentAnswer !== 0) {
-          toast.error('Bitte wähle eine Option');
+          toast.error('Bitte wÃ¤hle eine Option');
           return;
         }
       }
@@ -152,7 +152,7 @@ const PricingWizard = () => {
 
   // Handle skip wizard
   const handleSkip = () => {
-    if (window.confirm('Möchtest du den Wizard wirklich überspringen?')) {
+    if (window.confirm('MÃ¶chtest du den Wizard wirklich Ã¼berspringen?')) {
       navigate('/pricing');
     }
   };
@@ -187,7 +187,7 @@ const PricingWizard = () => {
                 onClick={handleSkip}
                 className="text-gray-600 hover:text-gray-800 text-sm font-medium"
               >
-                Überspringen →
+                Ãœberspringen â†’
               </button>
             )}
           </div>
@@ -251,7 +251,7 @@ const PricingWizard = () => {
                   <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  Zurück
+                  ZurÃ¼ck
                 </button>
 
                 <button
@@ -265,7 +265,7 @@ const PricingWizard = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      Lädt...
+                      LÃ¤dt...
                     </>
                   ) : currentStep === totalSteps ? (
                     <>
@@ -316,7 +316,7 @@ const PricingWizard = () => {
                   }}
                   className="text-gray-600 hover:text-gray-800 text-sm font-medium"
                 >
-                  ← Nochmal von vorne starten
+                  â† Nochmal von vorne starten
                 </button>
               </div>
             </motion.div>
@@ -328,7 +328,7 @@ const PricingWizard = () => {
       <div className="bg-white border-t mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between text-sm text-gray-600">
-            <p>© 2024 JN Business System. Alle Rechte vorbehalten.</p>
+            <p>Â© 2024 JN Business System. Alle Rechte vorbehalten.</p>
             <div className="flex items-center space-x-4">
               <a href="/pricing" className="hover:text-blue-600">
                 Alle Preise

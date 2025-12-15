@@ -116,7 +116,7 @@ const trackBookingConversions = async () => {
         await recipient.markAsBooked(booking._id, booking.totalPrice || 0);
         conversions++;
 
-        logger.log(`[SUCCESS] Conversion tracked: ${recipient.discountCode} -> ${booking.totalPrice}€`);
+        logger.log(`[SUCCESS] Conversion tracked: ${recipient.discountCode} -> ${booking.totalPrice}â‚¬`);
       }
     }
 
@@ -180,7 +180,7 @@ const updateCampaignROI = async () => {
         
         await campaign.save();
 
-        logger.log(`[INFO] Updated stats for campaign ${campaign.name}: ${stats.totalBooked} conversions, ${stats.totalRevenue}€ revenue`);
+        logger.log(`[INFO] Updated stats for campaign ${campaign.name}: ${stats.totalBooked} conversions, ${stats.totalRevenue}â‚¬ revenue`);
       }
     }
   } catch (error) {

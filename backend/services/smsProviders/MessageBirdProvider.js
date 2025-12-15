@@ -10,7 +10,7 @@ const messagebirdLib = require('messagebird');
  * MessageBird SMS Provider Implementation
  *
  * Docs: https://developers.messagebird.com/api/sms-messaging/
- * Pricing: ~€0.0675 per SMS (Germany)
+ * Pricing: ~â‚¬0.0675 per SMS (Germany)
  */
 
 export default class MessageBirdProvider extends ISMSProvider {

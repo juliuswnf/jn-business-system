@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * Test Script für alle 3 Schritte
- * Führt automatisierte Überprüfungen durch
+ * Test Script fÃ¼r alle 3 Schritte
+ * FÃ¼hrt automatisierte ÃœberprÃ¼fungen durch
  *
- * Ausführen: node scripts/testAllSteps.js
+ * AusfÃ¼hren: node scripts/testAllSteps.js
  */
 
 const http = require('http');
 
 const API_URL = process.env.API_URL || 'http://localhost:5000';
 
-// Colors für Console
+// Colors fÃ¼r Console
 const colors = {
   reset: '\x1b[0m',
   green: '\x1b[32m',

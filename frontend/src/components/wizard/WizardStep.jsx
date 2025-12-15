@@ -180,7 +180,7 @@ const WizardStep = ({
       {type === 'multiple' && (
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
-            {Array.isArray(selectedValue) ? selectedValue.length : 0} von {options.length} ausgewählt
+            {Array.isArray(selectedValue) ? selectedValue.length : 0} von {options.length} ausgewÃ¤hlt
           </p>
         </div>
       )}

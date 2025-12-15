@@ -343,7 +343,7 @@ export const ceoLogin = async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        message: 'Ung�ltige Anmeldedaten'
+        message: 'UngÃ¼ltige Anmeldedaten'
       });
     }
 
@@ -387,7 +387,7 @@ export const ceoLogin = async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        message: 'Ung�ltige Anmeldedaten'
+        message: 'UngÃ¼ltige Anmeldedaten'
       });
     }
 
@@ -430,7 +430,7 @@ export const ceoLogin = async (req, res) => {
           logger.warn(`[CEO-SECURITY] Invalid 2FA code during setup: ${email}, IP: ${clientIP}`);
           return res.status(401).json({
             success: false,
-            message: 'Ung�ltiger 2FA-Code. Bitte versuchen Sie es erneut.'
+            message: 'UngÃ¼ltiger 2FA-Code. Bitte versuchen Sie es erneut.'
           });
         }
       }
@@ -452,7 +452,7 @@ export const ceoLogin = async (req, res) => {
       return res.status(200).json({
         success: false,
         requiresTwoFactorSetup: true,
-        message: '2FA ist f�r CEO-Zugang Pflicht. Bitte richten Sie die Zwei-Faktor-Authentifizierung ein.',
+        message: '2FA ist fÃ¼r CEO-Zugang Pflicht. Bitte richten Sie die Zwei-Faktor-Authentifizierung ein.',
         qrCode,
         secret, // Allow manual entry
         setupInstructions: 'Scannen Sie den QR-Code mit einer Authenticator-App (Google Authenticator, Authy, etc.)'
@@ -486,7 +486,7 @@ export const ceoLogin = async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        message: 'Ung�ltiger 2FA-Code'
+        message: 'UngÃ¼ltiger 2FA-Code'
       });
     }
 
@@ -818,8 +818,8 @@ export const forgotPassword = async (req, res) => {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
         to: user.email,
-        subject: 'Passwort zur�cksetzen - JN Business',
-        body: `Hallo ${user.name},\n\nSie haben eine Passwort-Zur�cksetzung angefordert.\n\nKlicken Sie auf den folgenden Link, um Ihr Passwort zur�ckzusetzen:\n${resetUrl}\n\nDer Link ist 10 Minuten g�ltig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n\nMit freundlichen Gr��en,\nIhr JN Business Team`,
+        subject: 'Passwort zurÃ¼cksetzen - JN Business',
+        body: `Hallo ${user.name},\n\nSie haben eine Passwort-ZurÃ¼cksetzung angefordert.\n\nKlicken Sie auf den folgenden Link, um Ihr Passwort zurÃ¼ckzusetzen:\n${resetUrl}\n\nDer Link ist 10 Minuten gÃ¼ltig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n\nMit freundlichen GrÃ¼ÃŸen,\nIhr JN Business Team`,
         type: 'password_reset'
       });
       logger.log(`?? Password reset email sent to: ${user.email}`);
@@ -953,8 +953,8 @@ export const sendVerificationEmail = async (req, res) => {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
         to: user.email,
-        subject: 'E-Mail best�tigen - JN Business',
-        body: `Hallo ${user.name},\n\nBitte best�tigen Sie Ihre E-Mail-Adresse, indem Sie auf den folgenden Link klicken:\n${verificationUrl}\n\nDer Link ist 24 Stunden g�ltig.\n\nMit freundlichen Gr��en,\nIhr JN Business Team`,
+        subject: 'E-Mail bestÃ¤tigen - JN Business',
+        body: `Hallo ${user.name},\n\nBitte bestÃ¤tigen Sie Ihre E-Mail-Adresse, indem Sie auf den folgenden Link klicken:\n${verificationUrl}\n\nDer Link ist 24 Stunden gÃ¼ltig.\n\nMit freundlichen GrÃ¼ÃŸen,\nIhr JN Business Team`,
         type: 'email_verification'
       });
       logger.log(`?? Verification email sent to: ${user.email}`);

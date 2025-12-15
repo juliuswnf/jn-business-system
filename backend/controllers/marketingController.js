@@ -209,7 +209,7 @@ export const deleteCampaign = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Campaign gelöscht'
+      message: 'Campaign gelÃ¶scht'
     });
   } catch (error) {
     logger.error('[ERROR] Delete campaign error:', error);
@@ -690,7 +690,7 @@ function formatDiscount(messageConfig) {
   if (messageConfig.discountType === 'percentage') {
     return `${messageConfig.discountValue}%`;
   } else if (messageConfig.discountType === 'fixed_amount') {
-    return `${messageConfig.discountValue}€`;
+    return `${messageConfig.discountValue}â‚¬`;
   }
   return '';
 }

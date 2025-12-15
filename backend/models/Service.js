@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
 import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 

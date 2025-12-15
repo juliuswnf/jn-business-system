@@ -1,4 +1,4 @@
-﻿import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 /**
  * CEO Controller - MVP Optimized
  * Essential CEO dashboard and salon management only

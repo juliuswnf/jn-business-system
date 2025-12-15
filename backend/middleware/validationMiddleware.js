@@ -1,4 +1,4 @@
-﻿import Joi from 'joi';
+import Joi from 'joi';
 import validator from 'validator';
 import logger from '../utils/logger.js';
 

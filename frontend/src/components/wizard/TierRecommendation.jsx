@@ -27,10 +27,10 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
 
   const getTierIcon = (tier) => {
     switch (tier) {
-      case 'starter': return '🥉';
-      case 'professional': return '🥈';
-      case 'enterprise': return '🥇';
-      default: return '💎';
+      case 'starter': return 'ðŸ¥‰';
+      case 'professional': return 'ðŸ¥ˆ';
+      case 'enterprise': return 'ðŸ¥‡';
+      default: return 'ðŸ’Ž';
     }
   };
 
@@ -66,7 +66,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           transition={{ delay: 0.2, type: 'spring' }}
           className="text-7xl mb-4"
         >
-          🎉
+          ðŸŽ‰
         </motion.div>
         
         <h2 className="text-4xl font-bold text-gray-900 mb-2">
@@ -74,7 +74,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
         </h2>
         
         <p className="text-gray-600 text-lg">
-          Basierend auf deinen Angaben haben wir das optimale Paket für dich gefunden
+          Basierend auf deinen Angaben haben wir das optimale Paket fÃ¼r dich gefunden
         </p>
       </div>
 
@@ -147,7 +147,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Geschätzte Ersparnis pro Monat</p>
+                <p className="text-sm text-gray-600 mb-1">GeschÃ¤tzte Ersparnis pro Monat</p>
                 <p className="text-2xl font-bold text-green-700">
                   ~{formatPrice(recommendation.estimatedMonthlySavings)}
                 </p>
@@ -173,7 +173,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           disabled={loading}
           className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Wird geladen...' : `${recommendation.tierDetails.name.toUpperCase()} WÄHLEN`}
+          {loading ? 'Wird geladen...' : `${recommendation.tierDetails.name.toUpperCase()} WÃ„HLEN`}
         </motion.button>
       </motion.div>
 
@@ -257,7 +257,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
                   disabled={loading}
                   className="w-full py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Wählen
+                  WÃ¤hlen
                 </button>
               </motion.div>
             );
@@ -271,7 +271,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           href="/pricing"
           className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
         >
-          Alle Features im Detail vergleichen →
+          Alle Features im Detail vergleichen â†’
         </a>
       </div>
     </motion.div>

@@ -29,7 +29,7 @@ class SMSProviderFactory {
       this.selectProvider();
       this.initialized = true;
     } catch (error) {
-      console.warn('⚠️ SMS Provider initialization deferred:', error.message);
+      console.warn('âš ï¸ SMS Provider initialization deferred:', error.message);
       // Don't throw - allow the app to start without SMS configured
     }
   }
@@ -51,7 +51,7 @@ class SMSProviderFactory {
     const provider = this.providers.get(configuredProvider);
     if (provider && provider.isAvailable()) {
       this.activeProvider = provider;
-      console.log(`✅ SMS Provider: ${provider.getName().toUpperCase()}`);
+      console.log(`âœ… SMS Provider: ${provider.getName().toUpperCase()}`);
       return;
     }
 
@@ -59,7 +59,7 @@ class SMSProviderFactory {
     for (const [name, prov] of this.providers.entries()) {
       if (prov.isAvailable()) {
         this.activeProvider = prov;
-        console.log(`⚠️ SMS Provider ${configuredProvider} not available, using ${name.toUpperCase()} as fallback`);
+        console.log(`âš ï¸ SMS Provider ${configuredProvider} not available, using ${name.toUpperCase()} as fallback`);
         return;
       }
     }
@@ -112,7 +112,7 @@ class SMSProviderFactory {
     }
 
     this.activeProvider = provider;
-    console.log(`🔄 Switched SMS provider to ${providerName.toUpperCase()}`);
+    console.log(`ðŸ”„ Switched SMS provider to ${providerName.toUpperCase()}`);
     return provider;
   }
 }

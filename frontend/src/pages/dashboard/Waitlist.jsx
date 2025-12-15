@@ -52,7 +52,7 @@ export default function Waitlist() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Möchten Sie diesen Eintrag wirklich löschen?')) return;
+    if (!confirm('MÃ¶chten Sie diesen Eintrag wirklich lÃ¶schen?')) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -60,11 +60,11 @@ export default function Waitlist() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      toast.success('Eintrag gelöscht');
+      toast.success('Eintrag gelÃ¶scht');
       fetchWaitlist();
     } catch (error) {
       console.error('Error deleting waitlist entry:', error);
-      toast.error('Fehler beim Löschen');
+      toast.error('Fehler beim LÃ¶schen');
     }
   };
 
@@ -82,7 +82,7 @@ export default function Waitlist() {
           onClick={() => setShowAddForm(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
         >
-          + Kunde hinzufügen
+          + Kunde hinzufÃ¼gen
         </button>
       </div>
 
@@ -98,21 +98,21 @@ export default function Waitlist() {
         <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg">
           <div className="flex items-center gap-2 text-red-500 mb-1">
             <AlertCircle size={16} />
-            <span className="text-sm">Hohe Priorität</span>
+            <span className="text-sm">Hohe PrioritÃ¤t</span>
           </div>
           <p className="text-2xl font-bold text-red-500">{stats.highPriority}</p>
         </div>
         <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg">
           <div className="flex items-center gap-2 text-yellow-500 mb-1">
             <Clock size={16} />
-            <span className="text-sm">Mittlere Priorität</span>
+            <span className="text-sm">Mittlere PrioritÃ¤t</span>
           </div>
           <p className="text-2xl font-bold text-yellow-500">{stats.mediumPriority}</p>
         </div>
         <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg">
           <div className="flex items-center gap-2 text-green-500 mb-1">
             <CheckCircle size={16} />
-            <span className="text-sm">Niedrige Priorität</span>
+            <span className="text-sm">Niedrige PrioritÃ¤t</span>
           </div>
           <p className="text-2xl font-bold text-green-500">{stats.lowPriority}</p>
         </div>
@@ -142,7 +142,7 @@ export default function Waitlist() {
         <div className="text-center py-12 text-zinc-400">Laden...</div>
       ) : waitlist.length === 0 ? (
         <div className="text-center py-12 text-zinc-400">
-          Keine Einträge in der Warteliste
+          Keine EintrÃ¤ge in der Warteliste
         </div>
       ) : (
         <div className="bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden">
@@ -152,7 +152,7 @@ export default function Waitlist() {
                 <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Kunde</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Service</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Bevorzugte Zeit</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Priorität</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">PrioritÃ¤t</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Status</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Erstellt</th>
                 <th className="text-right px-4 py-3 text-sm font-medium text-zinc-400">Aktionen</th>
@@ -189,13 +189,13 @@ export default function Waitlist() {
                   </td>
                   <td className="px-4 py-3">
                     {entry.status === 'active' && (
-                      <span className="text-green-500">● Aktiv</span>
+                      <span className="text-green-500">â— Aktiv</span>
                     )}
                     {entry.status === 'matched' && (
-                      <span className="text-blue-500">● Gematcht</span>
+                      <span className="text-blue-500">â— Gematcht</span>
                     )}
                     {entry.status === 'expired' && (
-                      <span className="text-zinc-500">● Abgelaufen</span>
+                      <span className="text-zinc-500">â— Abgelaufen</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-zinc-400 text-sm">
@@ -212,7 +212,7 @@ export default function Waitlist() {
                       <button
                         onClick={() => handleDelete(entry._id)}
                         className="p-1 hover:bg-red-500/20 rounded transition"
-                        title="Löschen"
+                        title="LÃ¶schen"
                       >
                         <Trash2 size={16} className="text-red-500" />
                       </button>
@@ -229,13 +229,13 @@ export default function Waitlist() {
       {showAddForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full">
-            <h2 className="text-xl font-bold text-white mb-4">Kunde zur Warteliste hinzufügen</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Kunde zur Warteliste hinzufÃ¼gen</h2>
             <p className="text-zinc-400 mb-4">Feature wird noch implementiert...</p>
             <button
               onClick={() => setShowAddForm(false)}
               className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg w-full"
             >
-              Schließen
+              SchlieÃŸen
             </button>
           </div>
         </div>
