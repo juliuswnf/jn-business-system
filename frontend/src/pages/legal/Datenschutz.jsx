@@ -43,14 +43,14 @@ export default function Datenschutz() {
             <h2 className="text-2xl font-bold text-white mb-4">1. Verantwortlicher</h2>
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
               <p className="text-gray-300 mb-2">
-                <strong className="text-white">JN Automation</strong><br />
+                <strong className="text-white">JN Business System</strong><br />
                 Julius Wagenfeldt<br />
                 [Adresse einfügen]<br />
                 [PLZ Stadt]<br />
                 Deutschland
               </p>
               <p className="text-gray-300">
-                E-Mail: <a href="mailto:datenschutz@jn-automation.de" className="text-zinc-300 hover:text-white">datenschutz@jn-automation.de</a>
+                E-Mail: <a href="mailto:datenschutz@jn-business-system.de" className="text-zinc-300 hover:text-white">datenschutz@jn-business-system.de</a>
               </p>
             </div>
           </section>
@@ -237,8 +237,8 @@ export default function Datenschutz() {
               </p>
               <p className="text-white">
                 <strong>E-Mail:</strong>{' '}
-                <a href="mailto:datenschutz@jn-automation.de" className="text-zinc-300 hover:text-white">
-                  datenschutz@jn-automation.de
+                <a href="mailto:datenschutz@jn-business-system.de" className="text-zinc-300 hover:text-white">
+                  datenschutz@jn-business-system.de
                 </a>
               </p>
               <p className="text-gray-400 text-sm mt-4">

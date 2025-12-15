@@ -310,7 +310,7 @@ export default function GettingStarted() {
           <p className="text-gray-300 mb-6">Unser Support-Team hilft dir gerne weiter.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="mailto:support@jn-automation.de"
+              href="mailto:support@jn-business-system.de"
               className="inline-flex items-center gap-2 px-5 py-2 bg-white text-black hover:bg-gray-100 rounded text-sm transition"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

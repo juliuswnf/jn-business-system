@@ -66,7 +66,7 @@ const CEODashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Stats State
   const [stats, setStats] = useState({
     totalCustomers: 0,
@@ -75,13 +75,13 @@ const CEODashboard = () => {
     trialAbos: 0,
     totalRevenue: 0
   });
-  
+
   // Error Logs State
   const [errors, setErrors] = useState([]);
-  
+
   // Customers State (Unternehmen die das Tool kaufen)
   const [customers, setCustomers] = useState([]);
-  
+
   // Subscriptions State
   const [subscriptions, setSubscriptions] = useState([]);
 
@@ -95,7 +95,7 @@ const CEODashboard = () => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      
+
       const token = getToken();
       if (!token) {
         setError('Nicht autorisiert');
@@ -235,7 +235,7 @@ const CEODashboard = () => {
               <span className="text-white font-bold text-sm">CEO</span>
             </div>
             <div>
-              <span className="text-white font-semibold block">JN Automation</span>
+              <span className="text-white font-semibold block">JN Business System</span>
               <span className="text-xs text-gray-500">CEO Portal</span>
             </div>
           </Link>
@@ -362,7 +362,7 @@ const CEODashboard = () => {
                 </div>
               </div>
 
-              <Link 
+              <Link
                 to="/ceo/settings"
                 className="p-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-gray-800"
                 title="Einstellungen"
@@ -396,16 +396,16 @@ const CEODashboard = () => {
 
 const OverviewTab = ({ stats, errors, setActiveTab }) => {
   const unresolvedErrors = errors.filter(e => !e.resolved).length;
-  
+
   // Calculate metrics
   const totalPaidCustomers = stats.starterAbos + stats.proAbos;
-  const conversionRate = stats.totalCustomers > 0 
-    ? Math.round((totalPaidCustomers / stats.totalCustomers) * 100) 
+  const conversionRate = stats.totalCustomers > 0
+    ? Math.round((totalPaidCustomers / stats.totalCustomers) * 100)
     : 0;
-  const avgRevenue = totalPaidCustomers > 0 
-    ? Math.round(stats.totalRevenue / totalPaidCustomers) 
+  const avgRevenue = totalPaidCustomers > 0
+    ? Math.round(stats.totalRevenue / totalPaidCustomers)
     : 0;
-  
+
   return (
     <div className="space-y-8">
       {/* Error Alert - Only show if there are unresolved errors */}
@@ -420,7 +420,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
             <h3 className="font-bold text-red-300 text-lg">System-Alarme</h3>
             <p className="text-red-200/70 text-sm">{unresolvedErrors} ungelöste {unresolvedErrors === 1 ? 'Meldung erfordert' : 'Meldungen erfordern'} Ihre Aufmerksamkeit</p>
           </div>
-          <button 
+          <button
             onClick={() => setActiveTab('errors')}
             className="px-5 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition shadow-lg shadow-red-500/20"
           >
@@ -535,7 +535,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
           </div>
           <p className="text-4xl font-black text-white">{conversionRate}%</p>
           <div className="mt-3 h-2 bg-gray-800 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-1000"
               style={{ width: `${conversionRate}%` }}
             ></div>
@@ -933,11 +933,11 @@ const CustomersTab = ({ customers }) => {
     else if (filter === 'trial') matchesFilter = c.status === 'trial';
     else if (filter === 'starter') matchesFilter = c.plan === 'starter';
     else if (filter === 'pro') matchesFilter = c.plan === 'pro';
-    
-    const matchesSearch = searchTerm === '' || 
+
+    const matchesSearch = searchTerm === '' ||
       c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesFilter && matchesSearch;
   });
 
@@ -961,7 +961,7 @@ const CustomersTab = ({ customers }) => {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
             <h2 className="text-xl font-semibold text-white">Kunden</h2>
-            <p className="text-gray-500 text-sm">Alle Unternehmen die JN Automation nutzen</p>
+            <p className="text-gray-500 text-sm">Alle Unternehmen die JN Business System nutzen</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
@@ -1147,7 +1147,7 @@ const CustomersTab = ({ customers }) => {
               </span>
             </div>
             <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
                 style={{ width: `${trialCount > 0 ? (activeCount / (activeCount + trialCount)) * 100 : 0}%` }}
               />
@@ -1161,7 +1161,7 @@ const CustomersTab = ({ customers }) => {
               </span>
             </div>
             <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-purple-500 to-pink-400 rounded-full"
                 style={{ width: `${starterCount > 0 ? (proCount / (starterCount + proCount)) * 100 : 0}%` }}
               />
@@ -1257,8 +1257,8 @@ const SubscriptionsTab = ({ subscriptions }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      sub.plan === 'Pro' 
-                        ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
+                      sub.plan === 'Pro'
+                        ? 'bg-gradient-to-br from-purple-500 to-pink-500'
                         : 'bg-gradient-to-br from-blue-500 to-cyan-500'
                     }`}>
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1405,36 +1405,36 @@ const SubscriptionsTab = ({ subscriptions }) => {
 
 const SystemControlTab = () => {
   const [services, setServices] = useState([
-    { 
-      id: 'mongodb', 
-      name: 'MongoDB', 
+    {
+      id: 'mongodb',
+      name: 'MongoDB',
       description: 'Datenbank-Container',
       status: 'unknown',
       port: 27017,
       type: 'database',
       command: 'docker'
     },
-    { 
-      id: 'backend', 
-      name: 'Backend Server', 
+    {
+      id: 'backend',
+      name: 'Backend Server',
       description: 'Node.js API Server',
       status: 'unknown',
       port: 5000,
       type: 'server',
       command: 'node'
     },
-    { 
-      id: 'frontend', 
-      name: 'Frontend', 
+    {
+      id: 'frontend',
+      name: 'Frontend',
       description: 'React Development Server',
       status: 'unknown',
       port: 3000,
       type: 'server',
       command: 'vite'
     },
-    { 
-      id: 'redis', 
-      name: 'Redis', 
+    {
+      id: 'redis',
+      name: 'Redis',
       description: 'Cache & Queue Service',
       status: 'unknown',
       port: 6379,
@@ -1442,7 +1442,7 @@ const SystemControlTab = () => {
       command: 'docker'
     }
   ]);
-  
+
   const [actionLoading, setActionLoading] = useState({});
   const [logs, setLogs] = useState([]);
   const [allStarting, setAllStarting] = useState(false);
@@ -1462,10 +1462,10 @@ const SystemControlTab = () => {
       const response = await fetch(`${API_URL}/ceo/system/status/${serviceId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        setServices(prev => prev.map(s => 
+        setServices(prev => prev.map(s =>
           s.id === serviceId ? { ...s, status: data.status } : s
         ));
       }
@@ -1477,12 +1477,12 @@ const SystemControlTab = () => {
   // Check all services on mount
   useEffect(() => {
     services.forEach(s => checkServiceStatus(s.id));
-    
+
     // Poll status every 10 seconds
     const interval = setInterval(() => {
       services.forEach(s => checkServiceStatus(s.id));
     }, 10000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -1496,7 +1496,7 @@ const SystemControlTab = () => {
   const startService = async (serviceId) => {
     setActionLoading(prev => ({ ...prev, [serviceId]: 'starting' }));
     addLog(`Starte ${serviceId}...`, 'info');
-    
+
     const token = getToken();
     if (!token) {
       addLog('Nicht autorisiert', 'error');
@@ -1507,17 +1507,17 @@ const SystemControlTab = () => {
     try {
       const response = await fetch(`${API_URL}/ceo/system/start/${serviceId}`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok && data.success) {
         addLog(`[OK] ${serviceId} erfolgreich gestartet`, 'success');
-        setServices(prev => prev.map(s => 
+        setServices(prev => prev.map(s =>
           s.id === serviceId ? { ...s, status: 'running' } : s
         ));
       } else {
@@ -1534,7 +1534,7 @@ const SystemControlTab = () => {
   const stopService = async (serviceId) => {
     setActionLoading(prev => ({ ...prev, [serviceId]: 'stopping' }));
     addLog(`Stoppe ${serviceId}...`, 'info');
-    
+
     const token = getToken();
     if (!token) {
       addLog('Nicht autorisiert', 'error');
@@ -1545,17 +1545,17 @@ const SystemControlTab = () => {
     try {
       const response = await fetch(`${API_URL}/ceo/system/stop/${serviceId}`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok && data.success) {
         addLog(`[OK] ${serviceId} gestoppt`, 'success');
-        setServices(prev => prev.map(s => 
+        setServices(prev => prev.map(s =>
           s.id === serviceId ? { ...s, status: 'stopped' } : s
         ));
       } else {
@@ -1572,7 +1572,7 @@ const SystemControlTab = () => {
   const startAllServices = async () => {
     setAllStarting(true);
     addLog('[SYS] Starte alle Services...', 'info');
-    
+
     const token = getToken();
     if (!token) {
       addLog('Nicht autorisiert', 'error');
@@ -1583,20 +1583,20 @@ const SystemControlTab = () => {
     try {
       const response = await fetch(`${API_URL}/ceo/system/start-all`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok && data.success) {
         addLog('[OK] Alle Services werden gestartet...', 'success');
         // Update all service statuses
         data.results?.forEach(result => {
           if (result.success) {
-            setServices(prev => prev.map(s => 
+            setServices(prev => prev.map(s =>
               s.id === result.service ? { ...s, status: 'running' } : s
             ));
             addLog(`  > ${result.service} gestartet`, 'success');
@@ -1620,7 +1620,7 @@ const SystemControlTab = () => {
   const stopAllServices = async () => {
     setAllStopping(true);
     addLog('[SYS] Stoppe alle Services...', 'info');
-    
+
     const token = getToken();
     if (!token) {
       addLog('Nicht autorisiert', 'error');
@@ -1631,14 +1631,14 @@ const SystemControlTab = () => {
     try {
       const response = await fetch(`${API_URL}/ceo/system/stop-all`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok && data.success) {
         addLog('[OK] Alle Services werden gestoppt...', 'success');
         setServices(prev => prev.map(s => ({ ...s, status: 'stopped' })));
@@ -1678,25 +1678,25 @@ const SystemControlTab = () => {
   const getTypeIcon = (type) => {
     const iconClass = "w-6 h-6 text-gray-400";
     switch (type) {
-      case 'database': 
+      case 'database':
         return (
           <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
           </svg>
         );
-      case 'server': 
+      case 'server':
         return (
           <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
           </svg>
         );
-      case 'cache': 
+      case 'cache':
         return (
           <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         );
-      default: 
+      default:
         return (
           <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -1720,8 +1720,8 @@ const SystemControlTab = () => {
               onClick={startAllServices}
               disabled={allStarting || allStopping}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition ${
-                allStarting 
-                  ? 'bg-green-500/20 text-green-400 cursor-wait' 
+                allStarting
+                  ? 'bg-green-500/20 text-green-400 cursor-wait'
                   : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700'
               }`}
             >
@@ -1736,8 +1736,8 @@ const SystemControlTab = () => {
               onClick={stopAllServices}
               disabled={allStarting || allStopping}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition ${
-                allStopping 
-                  ? 'bg-red-500/20 text-red-400 cursor-wait' 
+                allStopping
+                  ? 'bg-red-500/20 text-red-400 cursor-wait'
                   : 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20'
               }`}
             >
@@ -1756,13 +1756,13 @@ const SystemControlTab = () => {
           {services.map((service) => {
             const isRunning = service.status === 'running';
             const isStopped = service.status === 'stopped';
-            
+
             return (
-              <div 
+              <div
                 key={service.id}
                 className={`bg-gray-900/50 border rounded-xl p-5 transition-all ${
-                  isRunning 
-                    ? 'border-green-500/30 shadow-lg shadow-green-500/10' 
+                  isRunning
+                    ? 'border-green-500/30 shadow-lg shadow-green-500/10'
                     : 'border-gray-800 hover:border-gray-700'
                 }`}
               >
@@ -1779,7 +1779,7 @@ const SystemControlTab = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
@@ -1865,8 +1865,8 @@ const SystemControlTab = () => {
               </div>
             ) : (
               logs.map((log, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={`py-1.5 border-b border-gray-900 last:border-0 ${
                     log.type === 'error' ? 'text-red-400' :
                     log.type === 'success' ? 'text-green-400' :
@@ -1906,7 +1906,7 @@ const SystemControlTab = () => {
               </span>
             </div>
           </div>
-          
+
           {/* Health Bar */}
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm mb-2">
@@ -1916,7 +1916,7 @@ const SystemControlTab = () => {
               </span>
             </div>
             <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
                 style={{ width: `${(services.filter(s => s.status === 'running').length / services.length) * 100}%` }}
               ></div>

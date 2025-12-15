@@ -38,11 +38,11 @@ export default function WidgetSetup() {
 
       const servicesList = servicesRes.data?.data || servicesRes.data || [];
       setServices(servicesList);
-      
+
       if (servicesList.length > 0 && config.selectedServices.length === 0) {
-        setConfig(prev => ({ 
-          ...prev, 
-          selectedServices: servicesList.map(s => s._id) 
+        setConfig(prev => ({
+          ...prev,
+          selectedServices: servicesList.map(s => s._id)
         }));
       }
     } catch (error) {
@@ -61,7 +61,7 @@ export default function WidgetSetup() {
     }
   };
 
-  const embedCode = `<script src="https://jn-automation.com/widget.js" data-studio-id="YOUR_STUDIO_ID"></script>
+  const embedCode = `<script src="https://jn-business-system.com/widget.js" data-studio-id="YOUR_STUDIO_ID"></script>
 <div id="jn-booking-widget"></div>`;
 
   const handleCopy = () => {
@@ -287,15 +287,15 @@ export default function WidgetSetup() {
             </div>
 
           {/* Widget Preview */}
-          <div 
+          <div
             className="border border-zinc-700 overflow-hidden"
-            style={{ 
+            style={{
               backgroundColor: config.backgroundColor,
               borderRadius: `${config.borderRadius}px`
             }}
           >
             <div className="p-6">
-              <h3 
+              <h3
                 className="text-xl font-bold mb-4"
                 style={{ color: config.primaryColor }}
               >
@@ -304,10 +304,10 @@ export default function WidgetSetup() {
 
               <div className="space-y-3 mb-6">
                 {services.filter(s => config.selectedServices.includes(s._id)).slice(0, 3).map((service) => (
-                  <div 
+                  <div
                     key={service._id}
                     className="p-3 rounded-lg border"
-                    style={{ 
+                    style={{
                       borderColor: config.accentColor + '40',
                       borderRadius: `${Math.max(4, config.borderRadius - 4)}px`
                     }}
@@ -327,7 +327,7 @@ export default function WidgetSetup() {
 
               <button
                 className="w-full py-3 px-6 font-semibold transition"
-                style={{ 
+                style={{
                   backgroundColor: config.accentColor,
                   color: '#ffffff',
                   borderRadius: `${config.borderRadius}px`

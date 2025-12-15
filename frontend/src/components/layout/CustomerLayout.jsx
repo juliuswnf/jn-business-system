@@ -8,14 +8,14 @@ import UserMenu from '../common/UserMenu';
  */
 const CustomerLayout = ({ children }) => {
   const location = useLocation();
-  
+
   const navLinks = [
     { to: '/customer/dashboard', label: 'Meine Termine' },
     { to: '/customer/booking', label: 'Neuer Termin' },
     { to: '/customer/support', label: 'Support' },
     { to: '/customer/settings', label: 'Einstellungen' },
   ];
-  
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -29,9 +29,9 @@ const CustomerLayout = ({ children }) => {
               <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
                 <span className="text-black font-bold text-sm">JN</span>
               </div>
-              <span className="text-white font-semibold text-lg hidden sm:block">JN Automation</span>
+              <span className="text-white font-semibold text-lg hidden sm:block">JN Business System</span>
             </Link>
-            
+
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => (
@@ -48,12 +48,12 @@ const CustomerLayout = ({ children }) => {
                 </Link>
               ))}
             </nav>
-            
+
             {/* User Menu */}
             <UserMenu />
           </div>
         </div>
-        
+
         {/* Mobile Navigation */}
         <div className="md:hidden border-t border-zinc-800">
           <div className="px-4 py-2 flex gap-1 overflow-x-auto">
@@ -73,18 +73,18 @@ const CustomerLayout = ({ children }) => {
           </div>
         </div>
       </header>
-      
+
       {/* Main Content */}
       <main>
         {children}
       </main>
-      
+
       {/* Footer */}
       <footer className="bg-gray-900 border-t border-gray-800 py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} JN Automation. Alle Rechte vorbehalten.
+              © {new Date().getFullYear()} JN Business System. Alle Rechte vorbehalten.
             </p>
             <div className="flex items-center gap-4">
               <Link to="/privacy" className="text-gray-500 hover:text-gray-400 text-sm">Datenschutz</Link>

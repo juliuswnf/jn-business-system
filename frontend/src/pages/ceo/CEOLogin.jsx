@@ -122,7 +122,7 @@ const CEOLogin = () => {
         <p className="text-xs text-gray-500 text-center">Zwei-Faktor-Authentifizierung wird empfohlen</p>
       </form>
 
-      <div className="mt-6 text-sm text-gray-400">Support: <strong className="text-gray-200">security@jn-automation.de</strong></div>
+      <div className="mt-6 text-sm text-gray-400">Support: <strong className="text-gray-200">security@jn-business-system.de</strong></div>
     </AuthLayout>
   );
 };

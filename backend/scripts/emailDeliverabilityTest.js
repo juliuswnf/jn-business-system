@@ -486,7 +486,7 @@ ${c.cyan}DKIM:${c.reset}
 
 async function main() {
   console.log(`\n${c.bold}${c.blue}╔════════════════════════════════════════════════════════════╗${c.reset}`);
-  console.log(`${c.bold}${c.blue}║        JN AUTOMATION - EMAIL DELIVERABILITY TEST           ║${c.reset}`);
+  console.log(`${c.bold}${c.blue}║        JN BUSINESS SYSTEM - EMAIL DELIVERABILITY TEST           ║${c.reset}`);
   console.log(`${c.bold}${c.blue}╚════════════════════════════════════════════════════════════╝${c.reset}\n`);
 
   console.log(`${c.dim}Domain: ${FROM_DOMAIN}${c.reset}`);

@@ -179,7 +179,7 @@ const SuccessMetrics = () => {
             <div className="bg-zinc-900 rounded-lg p-6 text-white border border-zinc-800">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-medium text-gray-300">Dein Erfolg mit JN Automation</h2>
+                  <h2 className="text-lg font-medium text-gray-300">Dein Erfolg mit JN Business System</h2>
                   <div className="text-3xl font-bold mt-1">
                     {metrics?.timeSavedHours || 0} Stunden gespart
                   </div>

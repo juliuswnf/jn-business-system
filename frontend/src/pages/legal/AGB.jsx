@@ -14,7 +14,7 @@ export default function AGB() {
             Allgemeine Geschäftsbedingungen (AGB)
           </h1>
           <p className="text-gray-400">
-            Stand: Dezember 2024 | JN Automation
+            Stand: Dezember 2024 | JN Business System
           </p>
         </div>
 
@@ -27,7 +27,7 @@ export default function AGB() {
             <div className="text-gray-300 space-y-3">
               <p>
                 (1) Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge zwischen
-                JN Automation (nachfolgend "Anbieter") und dem Kunden (nachfolgend "Kunde")
+                JN Business System (nachfolgend "Anbieter") und dem Kunden (nachfolgend "Kunde")
                 über die Nutzung der Online-Buchungssoftware.
               </p>
               <p>
@@ -42,7 +42,7 @@ export default function AGB() {
             <h2 className="text-xl font-bold text-white mb-4">§2 Vertragsgegenstand</h2>
             <div className="text-gray-300 space-y-3">
               <p>
-                (1) Gegenstand des Vertrages ist die Bereitstellung der JN Automation
+                (1) Gegenstand des Vertrages ist die Bereitstellung der JN Business System
                 Buchungssoftware als Software-as-a-Service (SaaS) zur Online-Terminbuchung
                 für Salons, Studios und Dienstleistungsbetriebe.
               </p>
@@ -85,8 +85,8 @@ export default function AGB() {
               </p>
               <p>
                 (2) <strong className="text-white">Beantragung:</strong> Die Rückerstattung kann
-                per E-Mail an <a href="mailto:support@jn-automation.de" className="text-zinc-300 hover:text-white hover:underline">
-                support@jn-automation.de</a> beantragt werden.
+                per E-Mail an <a href="mailto:support@jn-business-system.de" className="text-zinc-300 hover:text-white hover:underline">
+                support@jn-business-system.de</a> beantragt werden.
               </p>
               <p>
                 (3) <strong className="text-white">Bearbeitung:</strong> Die Rückerstattung erfolgt
@@ -139,8 +139,8 @@ export default function AGB() {
               </p>
               <p>
                 (3) Die Kündigung kann jederzeit im Dashboard oder per E-Mail an
-                <a href="mailto:support@jn-automation.de" className="text-zinc-300 hover:text-white hover:underline ml-1">
-                support@jn-automation.de</a> erfolgen.
+                <a href="mailto:support@jn-business-system.de" className="text-zinc-300 hover:text-white hover:underline ml-1">
+                support@jn-business-system.de</a> erfolgen.
               </p>
               <p>
                 (4) Nach Kündigung hat der Kunde 30 Tage Zeit, seine Daten zu exportieren.
@@ -210,8 +210,8 @@ export default function AGB() {
               <p>
                 (2) Der Widerruf ist zu richten an:<br />
                 <span className="text-white">
-                  JN Automation<br />
-                  E-Mail: support@jn-automation.de
+                  JN Business System<br />
+                  E-Mail: support@jn-business-system.de
                 </span>
               </p>
               <p>
@@ -246,8 +246,8 @@ export default function AGB() {
             <div className="text-gray-300">
               <p>
                 Bei Fragen zu diesen AGB wenden Sie sich bitte an:<br />
-                <a href="mailto:support@jn-automation.de" className="text-zinc-300 hover:text-white hover:underline">
-                  support@jn-automation.de
+                <a href="mailto:support@jn-business-system.de" className="text-zinc-300 hover:text-white hover:underline">
+                  support@jn-business-system.de
                 </a>
               </p>
             </div>

@@ -68,7 +68,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('tempUser');
-    
+
     // Then call logout and redirect
     logout();
     window.location.replace('/');
@@ -83,7 +83,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
       {/* Header */}
       <div className="p-6 border-b border-gray-700">
         <div className="flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold hover:text-gray-300 transition-colors">JN Automation</Link>
+          <Link to="/" className="text-2xl font-bold hover:text-gray-300 transition-colors">JN Business System</Link>
           {onClose && (
             <button onClick={onClose} className="md:hidden">
               <FiX size={24} />

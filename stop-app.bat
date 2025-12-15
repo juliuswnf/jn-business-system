@@ -1,10 +1,10 @@
 @echo off
-title JN Automation - System Stopper
+title JN Business System - System Stopper
 color 0C
 
 echo.
 echo ===============================================
-echo   JN AUTOMATION - SYSTEM STOPPER
+echo   JN BUSINESS SYSTEM - SYSTEM STOPPER
 echo ===============================================
 echo.
 
@@ -25,7 +25,7 @@ echo       Backend stopped.
 
 echo.
 echo [3/3] Stopping Redis Docker container...
-docker stop jn-automation-redis 2>nul
+docker stop jn-business-system-redis 2>nul
 echo       Redis stopped.
 
 echo.

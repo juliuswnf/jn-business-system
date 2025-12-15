@@ -2,7 +2,7 @@
  * White-Label Utility
  *
  * Provides white-label branding information for emails and widgets.
- * Enterprise users can hide JN Automation branding.
+ * Enterprise users can hide JN Business System branding.
  *
  * @module utils/whiteLabelUtils
  */
@@ -11,7 +11,7 @@ import Salon from '../models/Salon.js';
 
 /**
  * Get branding info for a salon
- * Returns default JN Automation branding if not Enterprise or no custom branding
+ * Returns default JN Business System branding if not Enterprise or no custom branding
  *
  * @param {string} salonId - The salon ID
  * @returns {Object} Branding information

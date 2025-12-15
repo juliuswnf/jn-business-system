@@ -124,7 +124,7 @@ const sendEmailAlert = async (alert) => {
 
   await emailService.sendRawEmail({
     to: process.env.ALERT_EMAIL,
-    subject: `[${severity.toUpperCase()}] ${title} - JN Automation`,
+    subject: `[${severity.toUpperCase()}] ${title} - JN Business System`,
     html
   });
 };

@@ -21,7 +21,7 @@ const Navbar = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('tempUser');
-    
+
     // Then call logout and redirect
     logout();
     setShowUserMenu(false);
@@ -61,7 +61,7 @@ const Navbar = () => {
           <div className="w-8 h-8 rounded bg-white flex items-center justify-center">
             <span className="text-black font-bold text-sm">JN</span>
           </div>
-          <span className="text-white font-semibold text-lg hidden sm:block">JN Automation</span>
+          <span className="text-white font-semibold text-lg hidden sm:block">JN Business System</span>
         </Link>
 
         {/* Navigation Links */}
@@ -94,10 +94,10 @@ const Navbar = () => {
                 <div className="w-9 h-9 bg-zinc-800 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
-                <svg 
-                  className={`dropdown-arrow w-4 h-4 text-gray-400 transition-all duration-200 ${showUserMenu ? 'opacity-100 rotate-180' : 'opacity-0'}`} 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className={`dropdown-arrow w-4 h-4 text-gray-400 transition-all duration-200 ${showUserMenu ? 'opacity-100 rotate-180' : 'opacity-0'}`}
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -107,8 +107,8 @@ const Navbar = () => {
               {showUserMenu && (
                 <>
                   {/* Backdrop */}
-                  <div 
-                    className="fixed inset-0 z-40" 
+                  <div
+                    className="fixed inset-0 z-40"
                     onClick={() => setShowUserMenu(false)}
                   />
                   {/* Dropdown */}

@@ -1,7 +1,7 @@
 .PHONY: help setup dev prod logs down build test lint format clean reset
 
 help:
-	@echo "🚀 JN Automation - Available Commands"
+	@echo "🚀 JN Business System - Available Commands"
 	@echo ""
 	@echo "Setup & Development:"
 	@echo "  make setup           - Initial setup"

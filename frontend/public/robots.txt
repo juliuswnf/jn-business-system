@@ -1,5 +1,5 @@
 # robots.txt for JN Business System
-# https://jn-automation.vercel.app
+# https://jn-business-system.vercel.app
 
 User-agent: *
 Allow: /
@@ -17,4 +17,4 @@ Disallow: /ceo
 Disallow: /api
 
 # Sitemap
-Sitemap: https://jn-automation.vercel.app/sitemap.xml
+Sitemap: https://jn-business-system.vercel.app/sitemap.xml

@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 // MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jn-automation';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jn-business-system';
 
 // Define schemas (can't import ES6 modules in CJS)
 const userSchema = new mongoose.Schema({

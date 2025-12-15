@@ -78,7 +78,7 @@ const plans = [
       { name: 'Alles aus Professional', included: true, bold: true, description: 'Alle Funktionen vom Professional-Plan inklusive' },
       { name: 'SMS-Benachrichtigungen', value: '500/Monat', included: true, highlight: true, description: 'SMS-Erinnerungen direkt aufs Handy - verhindert vergessene Termine' },
       { name: 'Multi-Standort Support', included: true, description: 'Mehrere Standorte zentral verwalten mit einer Übersicht' },
-      { name: 'White-Label Optionen', included: true, description: 'Komplett in Ihrem Design - kein JN Automation Logo sichtbar' },
+      { name: 'White-Label Optionen', included: true, description: 'Komplett in Ihrem Design - kein JN Business System Logo sichtbar' },
       { name: 'REST API-Zugang', included: true, description: 'Anbindung an Ihre eigene Software möglich' },
       { name: 'Webhook Integrationen', included: true, description: 'Automatische Benachrichtigungen an andere Programme' },
       { name: 'HIPAA Compliance', included: true, description: 'Medizinische Daten nach höchstem Standard geschützt' },
@@ -429,7 +429,7 @@ export default function Pricing() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href="mailto:support@jn-automation.de"
+              href="mailto:support@jn-business-system.de"
               className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-sm transition"
               aria-label="Support kontaktieren per E-Mail"
             >

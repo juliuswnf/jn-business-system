@@ -141,7 +141,7 @@ async function addServices() {
     console.log(`✅ ${createdServices.length} Services erstellt für "Test Salon"`);
     console.log('═══════════════════════════════════════════════════════');
     console.log('🔗 Booking URL:');
-    console.log('   https://jn-automation.vercel.app/s/mein-test-salon');
+    console.log('   https://jn-business-system.vercel.app/s/mein-test-salon');
     console.log('═══════════════════════════════════════════════════════\n');
 
   } catch (error) {

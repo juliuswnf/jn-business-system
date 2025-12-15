@@ -3,7 +3,7 @@
 set -e
 
 echo "======================================"
-echo "🚀 JN Automation Setup"
+echo "🚀 JN Business System Setup"
 echo "======================================"
 echo ""
 
@@ -81,7 +81,7 @@ echo "   MongoDB:   localhost:27017"
 echo "   Redis:     localhost:6379"
 echo ""
 echo "🎯 Demo Credentials:"
-echo "   CEO: julius@jn-automation.de / CEO@12345"
+echo "   CEO: julius@jn-business-system.de / CEO@12345"
 echo "   Admin: anna@meinsalon.de / Admin@12345"
 echo "   Employee: maria@meinsalon.de / Employee@12345"
 echo ""

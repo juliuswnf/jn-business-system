@@ -8,17 +8,17 @@ import { test as base, expect } from '@playwright/test';
 // Test user credentials
 export const TEST_USERS = {
   owner: {
-    email: 'test-owner@jn-automation.test',
+    email: 'test-owner@jn-business-system.test',
     password: 'TestOwner123!',
     name: 'Test Owner'
   },
   customer: {
-    email: 'test-customer@jn-automation.test',
+    email: 'test-customer@jn-business-system.test',
     password: 'TestCustomer123!',
     name: 'Test Customer'
   },
   ceo: {
-    email: 'ceo@jn-automation.test',
+    email: 'ceo@jn-business-system.test',
     password: 'TestCEO123!',
     name: 'Test CEO'
   }
@@ -43,21 +43,21 @@ export const test = base.extend({
     await page.waitForURL('/dashboard');
     await use(page);
   },
-  
+
   // Storage state for authenticated user
   storageState: async ({ browser }, use) => {
     const context = await browser.newContext();
     const page = await context.newPage();
-    
+
     await page.goto('/login');
     await page.fill('input[name="email"]', TEST_USERS.owner.email);
     await page.fill('input[name="password"]', TEST_USERS.owner.password);
     await page.click('button[type="submit"]');
     await page.waitForURL('/dashboard');
-    
+
     const storage = await context.storageState();
     await context.close();
-    
+
     await use(storage);
   }
 });
@@ -75,7 +75,7 @@ export const helpers = {
       response => response.url().includes(urlPattern) && response.request().method() === method
     );
   },
-  
+
   /**
    * Fill booking form
    */
@@ -85,7 +85,7 @@ export const helpers = {
     if (data.phone) await page.fill('input[name="customerPhone"]', data.phone);
     if (data.notes) await page.fill('textarea[name="notes"]', data.notes);
   },
-  
+
   /**
    * Select date in date picker
    */
@@ -93,14 +93,14 @@ export const helpers = {
     const dateStr = date.toISOString().split('T')[0];
     await page.click(`[data-date="${dateStr}"]`);
   },
-  
+
   /**
    * Select time slot
    */
   async selectTimeSlot(page, time) {
     await page.click(`[data-time="${time}"]`);
   },
-  
+
   /**
    * Check for notification/toast
    */
@@ -108,7 +108,7 @@ export const helpers = {
     const notification = page.locator(`.notification-${type}, [role="alert"]`);
     await expect(notification).toContainText(message);
   },
-  
+
   /**
    * Navigate to page and wait for load
    */

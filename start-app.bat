@@ -1,10 +1,10 @@
 @echo off
-title JN Automation - System Starter
+title JN Business System - System Starter
 color 0A
 
 echo.
 echo ===============================================
-echo   JN AUTOMATION - SYSTEM STARTER
+echo   JN BUSINESS SYSTEM - SYSTEM STARTER
 echo ===============================================
 echo.
 
@@ -33,7 +33,7 @@ if %ERRORLEVEL% EQU 0 (
     echo       Redis is already running on port 6379
 ) else (
     echo       Redis not detected - starting Docker container...
-    docker start jn-automation-redis 2>nul || docker run -d --name jn-automation-redis -p 6379:6379 redis:alpine 2>nul
+    docker start jn-business-system-redis 2>nul || docker run -d --name jn-business-system-redis -p 6379:6379 redis:alpine 2>nul
     if %ERRORLEVEL% EQU 0 (
         echo       Redis started successfully
     ) else (

@@ -1,11 +1,11 @@
-# JN Automation - System Starter
+# JN Business System - System Starter
 # Run with: powershell -ExecutionPolicy Bypass -File start-app.ps1
 
-$Host.UI.RawUI.WindowTitle = "JN Automation - System Starter"
+$Host.UI.RawUI.WindowTitle = "JN Business System - System Starter"
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "   JN AUTOMATION - SYSTEM STARTER" -ForegroundColor Cyan
+Write-Host "   JN BUSINESS SYSTEM - SYSTEM STARTER" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -38,9 +38,9 @@ if (Test-Port -Port 27017) {
 } else {
     Write-Host "      MongoDB not detected - trying Docker..." -ForegroundColor Yellow
     try {
-        docker start jn-automation-mongodb 2>$null
+        docker start jn-business-system-mongodb 2>$null
         if ($LASTEXITCODE -ne 0) {
-            docker run -d --name jn-automation-mongodb -p 27017:27017 mongo:latest 2>$null
+            docker run -d --name jn-business-system-mongodb -p 27017:27017 mongo:latest 2>$null
         }
         Start-Sleep -Seconds 2
         if (Test-Port -Port 27017) {
@@ -61,9 +61,9 @@ if (Test-Port -Port 6379) {
 } else {
     Write-Host "      Redis not detected - trying Docker..." -ForegroundColor Yellow
     try {
-        docker start jn-automation-redis 2>$null
+        docker start jn-business-system-redis 2>$null
         if ($LASTEXITCODE -ne 0) {
-            docker run -d --name jn-automation-redis -p 6379:6379 redis:alpine 2>$null
+            docker run -d --name jn-business-system-redis -p 6379:6379 redis:alpine 2>$null
         }
         Start-Sleep -Seconds 2
         if (Test-Port -Port 6379) {

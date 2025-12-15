@@ -33,7 +33,7 @@ const AuthLayout = ({
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} JN Automation
+            © {new Date().getFullYear()} JN Business System
           </p>
         </div>
       </div>
