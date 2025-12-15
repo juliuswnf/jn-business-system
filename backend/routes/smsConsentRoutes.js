@@ -1,6 +1,6 @@
 import express from 'express';
 import SMSConsent from '../models/SMSConsent.js';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 

@@ -2,7 +2,7 @@ import express from 'express';
 import BookingConfirmation from '../models/BookingConfirmation.js';
 import Booking from '../models/Booking.js';
 import { sendBookingConfirmation } from '../services/smsService.js';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
