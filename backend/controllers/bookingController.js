@@ -3,6 +3,7 @@ import cacheService from '../services/cacheService.js';
 import mongoose from 'mongoose';
 import timezoneHelpers from '../utils/timezoneHelpers.js';
 import Salon from '../models/Salon.js';
+import BookingConfirmation from '../models/BookingConfirmation.js';
 import { 
   parseValidDate, 
   isValidObjectId, 
@@ -250,7 +251,7 @@ export const getBookings = async (req, res) => {
     }
 
     const total = await Booking.countDocuments(filter);
-    const bookings = await Booking.find(filter).lean().maxTimeMS(5000)
+    const bookings = await Booking.find(filter).maxTimeMS(5000)
       .populate('serviceId', 'name price duration')
       .populate('employeeId', 'name')
       .sort({ bookingDate: -1 })
@@ -258,16 +259,33 @@ export const getBookings = async (req, res) => {
       .limit(limit)
       .lean();
 
+    // ? NO-SHOW-KILLER: Add confirmation status to each booking (performance optimized)
+    const bookingIds = bookings.map(b => b._id);
+    const confirmations = await BookingConfirmation.find({
+      bookingId: { $in: bookingIds }
+    }).select('bookingId status reminderSentAt confirmedAt confirmationDeadline autoCancelledAt').lean();
+
+    // Create lookup map for O(1) access
+    const confirmationMap = new Map(
+      confirmations.map(c => [c.bookingId.toString(), c])
+    );
+
+    // Merge confirmation data into bookings
+    const bookingsWithConfirmations = bookings.map(booking => ({
+      ...booking,
+      confirmation: confirmationMap.get(booking._id.toString()) || null
+    }));
+
     const totalPages = Math.ceil(total / limit);
 
     res.status(200).json({
       success: true,
-      count: bookings.length,
+      count: bookingsWithConfirmations.length,
       total,
       page,
       limit,
       totalPages,
-      bookings
+      bookings: bookingsWithConfirmations
     });
   } catch (error) {
     logger.error('GetBookings Error:', error);
