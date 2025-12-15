@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Hero Section - Large with Preview */}
       <section className="min-h-[90vh] flex items-center px-6 py-20">
         <div className="max-w-7xl mx-auto w-full">
@@ -10,31 +10,31 @@ function Home() {
 
             {/* Left: Text Content */}
             <div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900">
-                Online-Buchungssystem fÃ¼r Ihr Unternehmen
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                Online-Buchungssystem für Ihr Unternehmen
               </h1>
-              <p className="text-xl text-gray-600 mb-8 max-w-lg">
-                Kunden buchen Termine direkt Ã¼ber Ihre Website.
+              <p className="text-xl text-gray-400 mb-8 max-w-lg">
+                Kunden buchen Termine direkt über Ihre Website.
                 Automatische Erinnerungen, einfache Verwaltung, faire Preise.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <Link
                   to="/register"
-                  className="px-8 py-4 bg-indigo-600 text-gray-900 font-medium rounded-lg hover:bg-indigo-700 transition text-center"
+                  className="px-8 py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition text-center"
                 >
                   30 Tage kostenlos testen
                 </Link>
                 <Link
                   to="/demo"
-                  className="px-8 py-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition text-center"
+                  className="px-8 py-4 border border-zinc-700 text-white font-medium rounded-lg hover:bg-zinc-900 transition text-center"
                 >
                   Demo ansehen
                 </Link>
               </div>
 
-              <p className="text-sm text-gray-600">
-                Keine Kreditkarte erforderlich Â· Jederzeit kÃ¼ndbar
+              <p className="text-sm text-gray-500">
+                Keine Kreditkarte erforderlich · Jederzeit kündbar
               </p>
             </div>
 
@@ -42,9 +42,9 @@ function Home() {
             <div className="hidden lg:block">
               <div className="relative">
                 {/* Main Dashboard Card */}
-                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-2xl">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl">
                   {/* Header */}
-                  <div className="bg-gray-100 px-5 py-4 border-b border-gray-300 flex items-center justify-between">
+                  <div className="bg-zinc-800 px-5 py-4 border-b border-zinc-700 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                         <span className="text-black font-bold text-sm">JN</span>
@@ -62,17 +62,17 @@ function Home() {
                   <div className="p-5 space-y-5">
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-gray-100 rounded-xl p-4 text-center">
+                      <div className="bg-zinc-800 rounded-xl p-4 text-center">
                         <div className="text-2xl font-bold">47</div>
-                        <div className="text-xs text-gray-600">Buchungen</div>
+                        <div className="text-xs text-gray-500">Buchungen</div>
                       </div>
-                      <div className="bg-gray-100 rounded-xl p-4 text-center">
-                        <div className="text-2xl font-bold text-green-400">â‚¬2.340</div>
-                        <div className="text-xs text-gray-600">Umsatz</div>
+                      <div className="bg-zinc-800 rounded-xl p-4 text-center">
+                        <div className="text-2xl font-bold text-green-400">€2.340</div>
+                        <div className="text-xs text-gray-500">Umsatz</div>
                       </div>
-                      <div className="bg-gray-100 rounded-xl p-4 text-center">
+                      <div className="bg-zinc-800 rounded-xl p-4 text-center">
                         <div className="text-2xl font-bold">4.8</div>
-                        <div className="text-xs text-gray-600">Bewertung</div>
+                        <div className="text-xs text-gray-500">Bewertung</div>
                       </div>
                     </div>
 
@@ -80,35 +80,35 @@ function Home() {
                     <div>
                       <div className="text-sm text-gray-400 mb-3">Heutige Termine</div>
                       <div className="space-y-2">
-                        <div className="bg-gray-100 rounded-xl p-4 flex items-center justify-between">
+                        <div className="bg-zinc-800 rounded-xl p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium">MH</div>
+                            <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">MH</div>
                             <div>
                               <div className="font-medium">Maria H.</div>
-                              <div className="text-sm text-gray-600">Beratung Â· 10:30 Uhr</div>
+                              <div className="text-sm text-gray-500">Beratung · 10:30 Uhr</div>
                             </div>
                           </div>
-                          <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">BestÃ¤tigt</span>
+                          <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Bestätigt</span>
                         </div>
-                        <div className="bg-gray-100 rounded-xl p-4 flex items-center justify-between">
+                        <div className="bg-zinc-800 rounded-xl p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium">SK</div>
+                            <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">SK</div>
                             <div>
                               <div className="font-medium">Sophie K.</div>
-                              <div className="text-sm text-gray-600">Behandlung Â· 14:00 Uhr</div>
+                              <div className="text-sm text-gray-500">Behandlung · 14:00 Uhr</div>
                             </div>
                           </div>
                           <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">Neu</span>
                         </div>
-                        <div className="bg-gray-100 rounded-xl p-4 flex items-center justify-between">
+                        <div className="bg-zinc-800 rounded-xl p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium">LM</div>
+                            <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">LM</div>
                             <div>
                               <div className="font-medium">Lisa M.</div>
-                              <div className="text-sm text-gray-600">Termin Â· 16:30 Uhr</div>
+                              <div className="text-sm text-gray-500">Termin · 16:30 Uhr</div>
                             </div>
                           </div>
-                          <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">BestÃ¤tigt</span>
+                          <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Bestätigt</span>
                         </div>
                       </div>
                     </div>
@@ -125,7 +125,7 @@ function Home() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold">Neue Buchung!</div>
-                      <div className="text-xs text-gray-600">vor 2 Min.</div>
+                      <div className="text-xs text-gray-500">vor 2 Min.</div>
                     </div>
                   </div>
                 </div>
@@ -150,41 +150,41 @@ function Home() {
       </section>
 
       {/* How it works */}
-      <section className="py-24 px-6 bg-gray-50">
+      <section className="py-24 px-6 bg-zinc-950">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">So funktioniert es</h2>
-          <p className="text-gray-600 text-center mb-16 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">So funktioniert es</h2>
+          <p className="text-gray-500 text-center mb-16 max-w-2xl mx-auto">
             In nur 3 Schritten zu Ihrem eigenen Online-Buchungssystem
           </p>
 
           <div className="grid md:grid-cols-3 gap-12">
             <div className="text-center group">
-              <div className="w-16 h-16 bg-gray-100 text-gray-900 rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold group-hover:bg-white group-hover:text-black transition-all duration-300">
+              <div className="w-16 h-16 bg-zinc-800 text-white rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold group-hover:bg-white group-hover:text-black transition-all duration-300">
                 1
               </div>
               <h3 className="font-semibold text-lg mb-3">Account erstellen</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 Registrieren Sie sich kostenlos und richten Sie Ihr Studio in wenigen Minuten ein.
               </p>
             </div>
 
             <div className="text-center group">
-              <div className="w-16 h-16 bg-gray-100 text-gray-900 rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold group-hover:bg-white group-hover:text-black transition-all duration-300">
+              <div className="w-16 h-16 bg-zinc-800 text-white rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold group-hover:bg-white group-hover:text-black transition-all duration-300">
                 2
               </div>
               <h3 className="font-semibold text-lg mb-3">Services eintragen</h3>
-              <p className="text-gray-600">
-                FÃ¼gen Sie Ihre Dienstleistungen mit Preisen und Zeitdauer hinzu.
+              <p className="text-gray-500">
+                Fügen Sie Ihre Dienstleistungen mit Preisen und Zeitdauer hinzu.
               </p>
             </div>
 
             <div className="text-center group">
-              <div className="w-16 h-16 bg-gray-100 text-gray-900 rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold group-hover:bg-white group-hover:text-black transition-all duration-300">
+              <div className="w-16 h-16 bg-zinc-800 text-white rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-bold group-hover:bg-white group-hover:text-black transition-all duration-300">
                 3
               </div>
               <h3 className="font-semibold text-lg mb-3">Buchungen empfangen</h3>
-              <p className="text-gray-600">
-                Kunden buchen Ã¼ber Ihre Website, Sie verwalten alles im Dashboard.
+              <p className="text-gray-500">
+                Kunden buchen über Ihre Website, Sie verwalten alles im Dashboard.
               </p>
             </div>
           </div>
@@ -192,20 +192,20 @@ function Home() {
       </section>
 
       {/* Benefits */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6 text-gray-900">Warum JN Business System?</h2>
-              <p className="text-gray-600 mb-8">
-                Alles was Sie brauchen, um Ihr TermingeschÃ¤ft zu digitalisieren.
+              <h2 className="text-3xl font-bold mb-6">Warum JN Business System?</h2>
+              <p className="text-gray-500 mb-8">
+                Alles was Sie brauchen, um Ihr Termingeschäft zu digitalisieren.
               </p>
 
               <div className="space-y-6">
                 {[
-                  { title: 'Keine Provisionen', desc: 'Sie zahlen nur den monatlichen Festpreis. Keine versteckten GebÃ¼hren pro Buchung.' },
+                  { title: 'Keine Provisionen', desc: 'Sie zahlen nur den monatlichen Festpreis. Keine versteckten Gebühren pro Buchung.' },
                   { title: 'Automatische Erinnerungen', desc: 'Kunden erhalten automatisch Termin-Erinnerungen per E-Mail. Weniger No-Shows.' },
-                  { title: 'Einfaches Widget', desc: 'Ein Code-Snippet auf Ihrer Website und Kunden kÃ¶nnen direkt buchen.' },
+                  { title: 'Einfaches Widget', desc: 'Ein Code-Snippet auf Ihrer Website und Kunden können direkt buchen.' },
                   { title: 'Google Bewertungen', desc: 'Nach jedem Termin wird automatisch um eine Google-Bewertung gebeten.' },
                   { title: 'DSGVO-konform', desc: 'Server in Deutschland, alle Daten sicher und datenschutzkonform gespeichert.' },
                 ].map((item, i) => (
@@ -217,7 +217,7 @@ function Home() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">{item.title}</h3>
-                      <p className="text-gray-600 text-sm">{item.desc}</p>
+                      <p className="text-gray-500 text-sm">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -225,23 +225,23 @@ function Home() {
             </div>
 
             {/* Stats Card */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-8">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
               <div className="grid grid-cols-2 gap-8">
-                <div className="text-center p-6 bg-gray-100/50 rounded-xl">
+                <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">500+</div>
-                  <div className="text-gray-600 text-sm">Aktive Unternehmen</div>
+                  <div className="text-gray-500 text-sm">Aktive Unternehmen</div>
                 </div>
-                <div className="text-center p-6 bg-gray-100/50 rounded-xl">
+                <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">50k+</div>
-                  <div className="text-gray-600 text-sm">Buchungen/Monat</div>
+                  <div className="text-gray-500 text-sm">Buchungen/Monat</div>
                 </div>
-                <div className="text-center p-6 bg-gray-100/50 rounded-xl">
+                <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">4.9</div>
-                  <div className="text-gray-600 text-sm">Bewertung</div>
+                  <div className="text-gray-500 text-sm">Bewertung</div>
                 </div>
-                <div className="text-center p-6 bg-gray-100/50 rounded-xl">
+                <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">2h</div>
-                  <div className="text-gray-600 text-sm">Zeit gespart/Tag</div>
+                  <div className="text-gray-500 text-sm">Zeit gespart/Tag</div>
                 </div>
               </div>
             </div>
@@ -250,20 +250,20 @@ function Home() {
       </section>
 
       {/* Pricing Preview */}
-      <section className="py-24 px-6 bg-gray-50">
+      <section className="py-24 px-6 bg-zinc-950">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Einfache Preisgestaltung</h2>
-          <p className="text-gray-600 mb-12">
-            Ab 49â‚¬ pro Monat. Keine versteckten Kosten, keine Provisionen.
+          <p className="text-gray-500 mb-12">
+            Ab 49€ pro Monat. Keine versteckten Kosten, keine Provisionen.
           </p>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-10 max-w-lg mx-auto">
-            <div className="text-5xl font-bold mb-2">ab 49â‚¬</div>
-            <div className="text-gray-600 mb-8">pro Monat</div>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-10 max-w-lg mx-auto">
+            <div className="text-5xl font-bold mb-2">ab 49€</div>
+            <div className="text-gray-500 mb-8">pro Monat</div>
             <ul className="text-left space-y-4 mb-10">
               {['Online-Buchungen', 'E-Mail-Erinnerungen', 'Eigenes Buchungswidget', '30 Tage kostenlos testen'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-gray-300">
-                  <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   {item}
@@ -284,7 +284,7 @@ function Home() {
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Bereit loszulegen?</h2>
-          <p className="text-gray-600 mb-8 text-lg">
+          <p className="text-gray-500 mb-8 text-lg">
             Testen Sie JN Business System 30 Tage kostenlos. Keine Kreditkarte erforderlich.
           </p>
           <Link
