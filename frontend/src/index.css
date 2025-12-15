@@ -9,12 +9,11 @@
   }
 
   body {
-    background-color: #000;
-    @apply text-white font-sans antialiased;
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
   }
 
   input, textarea, select {
-    @apply font-sans bg-gray-800 border border-gray-700 text-gray-100;
+    @apply font-sans bg-white border border-gray-300 text-gray-900;
   }
 
   button {
@@ -22,31 +21,25 @@
   }
 
   a {
-    @apply transition duration-200 text-gray-200;
+    @apply transition duration-200 text-indigo-600 hover:text-indigo-700;
   }
 }
 
-/* Components adjusted for dark theme */
+/* Components */
 @layer components {
-  /* Primary CTA - white, rounded, subtle shadow (Apple-like) */
+  /* Primary button */
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-black font-semibold shadow-md;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700;
   }
 
-  .btn-primary:hover {
-    @apply opacity-95;
-    transform: translateY(-1px);
-  }
-
-  /* Secondary CTA - outlined */
+  /* Secondary button */
   .btn-outline {
-    @apply inline-flex items-center justify-center px-6 py-3 rounded-full border border-gray-700 text-gray-200 font-semibold bg-transparent;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold bg-white hover:bg-gray-50;
   }
 
-  /* Dark cards */
+  /* Cards */
   .card {
-    @apply rounded-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6;
-    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    @apply rounded-lg bg-white border border-gray-200 p-6 shadow-sm;
   }
 
   .card-hover {
