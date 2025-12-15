@@ -5,7 +5,7 @@ import {
   saveResponse,
   getAnalytics
 } from '../controllers/pricingWizardController.js';
-import { protect, checkRole } from '../middleware/authMiddleware.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -33,8 +33,8 @@ router.post('/save', saveResponse);
  */
 router.get(
   '/analytics',
-  protect,
-  checkRole(['ceo', 'admin']),
+  authMiddleware.protect,
+  authMiddleware.authorize('ceo', 'admin'),
   getAnalytics
 );
 
