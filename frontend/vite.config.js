@@ -30,10 +30,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Keep React and ReactDOM together (fixes __SECRET_INTERNALS error)
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
-            return 'vendor-react';
-          }
+          // Keep React in main bundle to avoid race conditions
+          // React must load before any component that uses it
+
+          // Router (can be separate)
           if (id.includes('node_modules/react-router')) {
             return 'react-router';
           }
@@ -61,6 +61,7 @@ export default defineConfig({
           if (id.includes('node_modules/i18next')) {
             return 'i18n';
           }
+          // Everything else (including React) goes to main bundle
         },
       },
     },
