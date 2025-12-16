@@ -6,9 +6,11 @@
 ```
 Performance:    100 → 100 ✅
 Accessibility:   83 →  95+ ✅ (+12)
-Best Practices:  92 → 100 ✅ (+8)
+Best Practices:  92 →  96 ✅ (+4)
 SEO:            100 → 100 ✅
 ```
+
+**Note:** Trusted Types not implemented (breaks React without policy configuration)
 
 ---
 

@@ -200,31 +200,39 @@ Navigation links without `aria-label` attributes make it impossible for screen r
 
 ### Issue 1: Missing Trusted Types Policy
 **Impact:** -4 points on Best Practices score
+**Status:** ⚠️ NOT IMPLEMENTED (Causes React to break)
 
 ### Root Cause
 DOM-based XSS vulnerabilities without Trusted Types enforcement.
 
-### Solution: Added Trusted Types Meta Tag
+### Solution: NOT APPLIED
+**Reason:** Trusted Types `require-trusted-types-for 'script'` breaks React/Vite without proper policy configuration.
 
-**File Modified:** `frontend/index.html`
-
+**Attempted Fix (REVERTED):**
 ```html
-<!-- Before -->
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-<!-- After -->
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- Trusted Types for XSS Protection (Lighthouse Best Practices) -->
-  <meta http-equiv="Content-Security-Policy" 
-        content="require-trusted-types-for 'script'">
+<!-- THIS BREAKS REACT - DO NOT USE -->
+<meta http-equiv="Content-Security-Policy" 
+      content="require-trusted-types-for 'script'">
 ```
 
-**Result:** Mitigates DOM-based XSS attacks by requiring Trusted Types for script execution.
+**Impact:** Black screen (React cannot render without Trusted Types policy)
+
+**Alternative Solution (Future):**
+Implement Trusted Types with proper policy definition:
+```javascript
+// Requires significant refactoring
+if (window.trustedTypes && trustedTypes.createPolicy) {
+  trustedTypes.createPolicy('default', {
+    createHTML: (string) => string,
+    createScriptURL: (string) => string,
+    createScript: (string) => string,
+  });
+}
+```
+
+**Decision:** Skip Trusted Types for now (-4 Best Practices points acceptable)
+
+**Updated Expected Score:** Best Practices: 96/100 (not 100)
 
 ---
 
