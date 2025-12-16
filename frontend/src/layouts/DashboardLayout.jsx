@@ -7,6 +7,12 @@ export default function DashboardLayout({ children }) {
   const location = useLocation();
   const currentPath = location.pathname;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoSpinning, setLogoSpinning] = useState(false);
+
+  const handleLogoClick = () => {
+    setLogoSpinning(true);
+    setTimeout(() => setLogoSpinning(false), 600);
+  };
 
   const navItems = [
     { path: '/dashboard', label: 'Übersicht', exact: true, dataTour: 'dashboard' },
@@ -44,8 +50,8 @@ export default function DashboardLayout({ children }) {
         {/* Desktop Sidebar */}
         <aside className="w-72 bg-zinc-900 border-r border-zinc-800 min-h-screen p-4 hidden md:block fixed">
           <div className="mb-8">
-            <Link to="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-white flex items-center justify-center text-black font-bold">JN</div>
+            <Link to="/dashboard" className="flex items-center gap-3" onClick={handleLogoClick}>
+              <div className={`w-10 h-10 rounded-md bg-white flex items-center justify-center text-black font-bold transition-transform duration-500 ${logoSpinning ? 'rotate-[360deg]' : ''}`}>JN</div>
               <div className="text-white font-semibold">Studio</div>
             </Link>
           </div>

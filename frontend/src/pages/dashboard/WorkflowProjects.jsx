@@ -320,7 +320,7 @@ function StatCard({ title, value, icon, color }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`border-2 rounded-lg p-4 bg-zinc-900 border-zinc-800`}
+      className={`border-2 rounded-lg p-4 ${color || 'bg-zinc-900 border-zinc-800'}`}
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-2xl">{icon}</span>
