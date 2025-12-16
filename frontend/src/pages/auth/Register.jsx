@@ -20,9 +20,9 @@ export default function Register() {
 
   // Plan details
   const planDetails = {
-    starter: { name: 'Starter', price: 49 },
-    professional: { name: 'Professional', price: 99 },
-    enterprise: { name: 'Enterprise', price: 199 }
+    starter: { name: 'Starter', price: 129 },
+    professional: { name: 'Professional', price: 249 },
+    enterprise: { name: 'Enterprise', price: 599 }
   };
 
   const [formData, setFormData] = useState({
@@ -47,7 +47,7 @@ export default function Register() {
   const planInfo = storedPlan || {
     planId: selectedPlan,
     planName: planDetails[selectedPlan]?.name || 'Starter',
-    price: planDetails[selectedPlan]?.price || 49,
+    price: planDetails[selectedPlan]?.price || 129,
   };
 
   const handleChange = (e) => {

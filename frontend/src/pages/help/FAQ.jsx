@@ -19,7 +19,7 @@ const FAQ = () => {
       questions: [
         {
           question: 'Wie viel kostet JN Business System?',
-          answer: 'Wir bieten verschiedene Pläne an: Starter (€29/Monat), Pro (€49/Monat) und Enterprise (€99/Monat). Jeder Plan enthält eine 14-tägige kostenlose Testphase ohne Kreditkarte.'
+          answer: 'Wir bieten verschiedene Preise an: Starter (€129 pro Monat), Professional (€249 pro Monat) und Enterprise (€599 pro Monat). Jeder Plan kann 30 Tage kostenlos getestet werden ohne Kreditkarte.'
         },
         {
           question: 'Wie schnell kann ich starten?',
@@ -31,7 +31,7 @@ const FAQ = () => {
         },
         {
           question: 'Wie werden meine Kunden benachrichtigt?',
-          answer: 'Automatische E-Mail-Benachrichtigungen bei Buchungsbestätigung, 24h vor dem Termin als Erinnerung und nach dem Termin mit Bewertungsanfrage. Alles vollautomatisch.'
+          answer: 'Automatische E-Mails bei Buchung, 1 Tag vor dem Termin als Erinnerung und nach dem Termin mit Bitte um Bewertung. Alles vollautomatisch.'
         },
         {
           question: 'Kann ich mehrere Mitarbeiter verwalten?',
@@ -39,15 +39,15 @@ const FAQ = () => {
         },
         {
           question: 'Was passiert, wenn ein Kunde nicht erscheint?',
-          answer: 'Sie können No-Show-Termine markieren und optional eine Stornogebühr in den Einstellungen aktivieren. Wir tracken No-Show-Raten für Sie.'
+          answer: 'Sie können vergessene Termine markieren und optional eine Gebühr in den Einstellungen aktivieren. Wir zählen für Sie mit wie oft das passiert.'
         },
         {
           question: 'Kann ich Online-Zahlungen empfangen?',
-          answer: 'Ja, über Stripe-Integration. Kunden können bei der Buchung direkt bezahlen. Sie erhalten Ihr Geld automatisch ausgezahlt (Stripe-Gebühren: 1,5% + €0,25 pro Transaktion).'
+          answer: 'Ja, über den Bezahldienst Stripe. Kunden können bei der Buchung direkt bezahlen. Sie erhalten Ihr Geld automatisch ausgezahlt (Stripe-Gebühren: 1,5% + €0,25 pro Zahlung).'
         },
         {
           question: 'Wie funktioniert die Testphase?',
-          answer: '14 Tage kostenlos, keine Kreditkarte erforderlich. Sie haben Zugriff auf alle Features. Nach der Testphase wählen Sie einen Plan oder Ihr Account wird pausiert (keine Löschung Ihrer Daten).'
+          answer: '30 Tage kostenlos, keine Kreditkarte erforderlich. Sie haben Zugriff auf alle Funktionen. Nach der Testphase wählen Sie einen Preis oder Ihr Konto wird pausiert (keine Löschung Ihrer Daten).'
         }
       ]
     },
@@ -72,7 +72,7 @@ const FAQ = () => {
         },
         {
           question: 'Wie sicher sind meine Daten?',
-          answer: 'Sehr sicher! Alle Daten werden verschlüsselt übertragen (SSL/TLS). Wir speichern nur das Nötigste und geben niemals Daten an Dritte weiter. DSGVO-konform.'
+          answer: 'Sehr sicher! Alle Daten werden verschlüsselt übertragen. Wir speichern nur das Nötigste und geben niemals Daten an andere weiter. Nach deutschem Datenschutz.'
         }
       ]
     },
@@ -89,15 +89,15 @@ const FAQ = () => {
         },
         {
           question: 'Gibt es eine App?',
-          answer: 'Aktuell nicht, aber unsere Web-App ist als Progressive Web App (PWA) entwickelt und funktioniert wie eine native App. Sie können sie auf Ihrem Homescreen speichern.'
+          answer: 'Aktuell nicht, aber unsere Web-Seite funktioniert wie eine App. Sie können sie auf Ihrem Startbildschirm speichern.'
         },
         {
           question: 'Kann ich meine Daten exportieren?',
-          answer: 'Ja, als CEO/Admin können Sie jederzeit Backups erstellen und Ihre Daten als CSV exportieren. Ihre Daten gehören Ihnen!'
+          answer: 'Ja, Sie können jederzeit Sicherungen erstellen und Ihre Daten als Excel-Datei herunterladen. Ihre Daten gehören Ihnen!'
         },
         {
           question: 'Was passiert bei einem Ausfall?',
-          answer: 'Wir haben 99,9% Uptime-Garantie. Unser System läuft auf Railway.app mit automatischen Backups. Bei Problemen werden Sie sofort informiert.'
+          answer: 'Wir garantieren 99,9% Verfügbarkeit. Unser System läuft mit automatischen Sicherungen. Bei Problemen werden Sie sofort informiert.'
         }
       ]
     },

@@ -232,12 +232,12 @@ function Home() {
 
               <div className="space-y-6">
                 {[
-                  { title: 'NO-SHOW-KILLER System', desc: 'SMS-Bestätigungen 48h vor Termin, Auto-Cancel nach 24h, Waitlist Auto-Matching. Spart €544/Mo.', highlight: true },
-                  { title: 'MARKETING-AGENT', desc: 'Automatische Kampagnen: Birthday, Win-Back, Review, Upsell, Referral. Generiert €4.026/Mo zusätzlich.', highlight: true },
+                  { title: 'Automatische Erinnerungen', desc: 'Kunden bekommen 2 Tage vor dem Termin eine Nachricht. Vergessene Termine werden automatisch abgesagt. Spart €544 im Monat.', highlight: true },
+                  { title: 'Automatisches Marketing', desc: 'Schickt automatisch Geburtstagswünsche, erinnert alte Kunden, fragt nach Bewertungen. Bringt €4.026 zusätzlich im Monat.', highlight: true },
                   { title: 'Keine Provisionen', desc: 'Sie zahlen nur den monatlichen Festpreis. Keine versteckten Gebühren pro Buchung.' },
                   { title: 'Branchen-Workflows', desc: 'Tattoo Studios, Medical/Botox, Wellness Spas - spezialisierte Workflows für Ihre Branche.' },
-                  { title: 'Pricing-Wizard', desc: '6-Fragen Wizard findet automatisch den perfekten Tarif für Ihr Business (+25% Conversion).' },
-                  { title: 'DSGVO & HIPAA konform', desc: 'Server in Deutschland, AES-256-GCM Verschlüsselung, Audit-Logs, Breach-Notification.' },
+                  { title: 'Preis-Berater', desc: '6 einfache Fragen beantworten und wir finden den passenden Preis für Ihr Geschäft.', highlight: false },
+                  { title: 'Datenschutz & Sicherheit', desc: 'Server in Deutschland, alle Daten verschlüsselt und sicher gespeichert.', highlight: false },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4">
                     <div className={`w-6 h-6 ${item.highlight ? 'bg-green-500' : 'bg-white'} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5`}>
@@ -256,31 +256,31 @@ function Home() {
 
             {/* Stats Card */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-              <h3 className="text-xl font-bold mb-6 text-center">ROI Impact</h3>
+              <h3 className="text-xl font-bold mb-6 text-center">Was bringt es Ihnen?</h3>
               <div className="grid grid-cols-2 gap-8">
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2 text-green-400">€544</div>
-                  <div className="text-gray-300 text-sm">NO-SHOW Savings/Mo</div>
+                  <div className="text-gray-300 text-sm">Ersparnis pro Monat</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2 text-green-400">€4.026</div>
-                  <div className="text-gray-300 text-sm">Marketing Revenue/Mo</div>
+                  <div className="text-gray-300 text-sm">Zusatz-Umsatz pro Monat</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
-                  <div className="text-4xl font-bold mb-2">4.2x</div>
-                  <div className="text-gray-300 text-sm">NO-SHOW-KILLER ROI</div>
+                  <div className="text-4xl font-bold mb-2">4x</div>
+                  <div className="text-gray-300 text-sm">Lohnt sich 4-fach</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">16x</div>
-                  <div className="text-gray-300 text-sm">Marketing-Agent ROI</div>
+                  <div className="text-gray-300 text-sm">Lohnt sich 16-fach</div>
                 </div>
               </div>
               <div className="mt-6 text-center">
                 <Link
-                  to="/pricing-wizard"
+                  to="/onboarding/pricing-wizard"
                   className="inline-block px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition"
                 >
-                  🎯 Pricing-Wizard starten
+                  🎯 Preis-Berater starten
                 </Link>
               </div>
             </div>

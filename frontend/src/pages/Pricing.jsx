@@ -19,7 +19,7 @@ const plans = [
       { name: 'Kalender & Terminverwaltung', included: true, description: 'Alle Termine übersichtlich im Kalender' },
       { name: 'E-Mail-Benachrichtigungen', included: true, description: 'Automatische E-Mails an Kunden bei Buchung' },
       { name: 'Automatische Erinnerungen', included: true, description: 'Kunden bekommen vor Terminen eine Erinnerungs-E-Mail' },
-      { name: 'NO-SHOW-KILLER (Basic)', included: true, description: 'Buchungsbestätigungen per E-Mail' },
+      { name: 'Automatische Erinnerungen (Basis)', included: true, description: 'Kunden bekommen E-Mails mit Terminbestätigung' },
       { name: 'Kundendatenbank (CRM)', included: true, description: 'Alle Kundendaten sicher an einem Ort gespeichert' },
       { name: 'Zahlungsabwicklung', included: true, description: 'Kunden können direkt online bezahlen' },
       { name: 'Basis-Reporting', included: true, description: 'Einfache Übersicht über Umsätze und Termine' },
@@ -27,10 +27,10 @@ const plans = [
       { name: 'E-Mail-Support', included: true, description: 'Hilfe per E-Mail bei Fragen' },
     ],
     notIncluded: [
-      'SMS-Benachrichtigungen',
-      'Marketing-Automation',
-      'Branchen-Workflows',
-      'Multi-Standort',
+      'Nachrichten per SMS',
+      'Automatisches Marketing',
+      'Spezial-Funktionen für Ihre Branche',
+      'Mehrere Standorte',
     ]
   },
   {
@@ -47,10 +47,10 @@ const plans = [
       { name: 'Buchungen/Monat', value: 'Unbegrenzt', description: 'Keine Begrenzung bei der Anzahl der Termine' },
       { name: 'Kunden', value: 'Unbegrenzt', description: 'Unbegrenzt viele Kundenkontakte speichern' },
       { name: 'Alles aus Starter', included: true, bold: true, description: 'Alle Funktionen vom Starter-Plan inklusive' },
-      { name: 'NO-SHOW-KILLER (Full)', included: true, highlight: true, description: 'SMS-Bestätigungen 48h vor Termin, Auto-Cancel nach 24h, Waitlist Auto-Matching' },
-      { name: 'MARKETING-AGENT (5 Kampagnen/Mo)', included: true, highlight: true, description: 'Birthday, Win-Back, Review, Upsell, Referral Campaigns automatisch' },
+      { name: 'Automatische Erinnerungen (Komplett)', included: true, highlight: true, description: 'Nachrichten 2 Tage vor Termin, automatische Absage nach 1 Tag, Warteliste' },
+      { name: 'Automatisches Marketing (5 pro Monat)', included: true, highlight: true, description: 'Geburtstag, Rückholung, Bewertung, Mehrverkauf, Empfehlung - alles automatisch' },
       { name: 'BRANCHEN-WORKFLOW (1 aktiviert)', included: true, description: 'Tattoo Studio, Medical/Botox oder Wellness Spa Workflow' },
-      { name: 'Erweiterte Analytics', included: true, description: 'Detaillierte Auswertungen zu Umsätzen, No-Show Rate, ROI' },
+      { name: 'Erweiterte Auswertungen', included: true, description: 'Detaillierte Übersicht über Umsätze, vergessene Termine und Gewinn' },
       { name: 'Multi-Service Buchungen', included: true, description: 'Kunden können mehrere Behandlungen auf einmal buchen' },
       { name: 'Portfolio & Galerien', included: true, description: 'Vorher-Nachher Bilder Ihrer Arbeit zeigen' },
       { name: 'Custom Branding', included: true, description: 'Buchungsseite in Ihren Farben und mit Ihrem Logo' },
@@ -81,12 +81,12 @@ const plans = [
       { name: 'Buchungen/Monat', value: 'Unbegrenzt', description: 'Keine Begrenzung bei der Anzahl der Termine' },
       { name: 'Kunden', value: 'Unbegrenzt', description: 'Unbegrenzt viele Kundenkontakte speichern' },
       { name: 'Alles aus Professional', included: true, bold: true, description: 'Alle Funktionen vom Professional-Plan inklusive' },
-      { name: 'NO-SHOW-KILLER (Full + Custom Rules)', included: true, highlight: true, description: 'SMS-Bestätigungen, Auto-Cancel, Waitlist + individuelle Regeln pro Service' },
-      { name: 'MARKETING-AGENT (Unlimited)', included: true, highlight: true, description: 'Unbegrenzte Kampagnen, A/B Testing, ROI-Tracking, Click-Tracking' },
-      { name: 'ALLE 8 BRANCHEN-WORKFLOWS', included: true, highlight: true, description: 'Tattoo, Medical/Botox, Wellness, Barbershop, Beauty, Nails, Massage, Pet Grooming' },
+      { name: 'Automatische Erinnerungen (Komplett + Eigene Regeln)', included: true, highlight: true, description: 'Nachrichten, automatische Absage, Warteliste + eigene Regeln pro Service' },
+      { name: 'Automatisches Marketing (Unbegrenzt)', included: true, highlight: true, description: 'Unbegrenzte Aktionen, verschiedene Versionen testen, Erfolg messen' },
+      { name: 'ALLE 8 BRANCHEN-FUNKTIONEN', included: true, highlight: true, description: 'Tattoo, Medizin/Botox, Wellness, Frisör, Kosmetik, Nägel, Massage, Tier-Pflege' },
       { name: 'Multi-Standort Dashboard', included: true, description: 'Alle Standorte zentral verwalten mit einer Übersicht' },
       { name: 'White-Label Optionen', included: true, description: 'Komplett in Ihrem Design - kein JN Business System Logo sichtbar' },
-      { name: 'REST API-Zugang', included: true, description: 'Anbindung an Ihre eigene Software möglich' },
+      { name: 'Schnittstelle für Entwickler', included: true, description: 'Anbindung an Ihre eigene Software möglich' },
       { name: 'Webhook Integrationen', included: true, description: 'Automatische Benachrichtigungen an andere Programme' },
       { name: 'HIPAA Compliance', included: true, description: 'Medizinische Daten AES-256-GCM verschlüsselt' },
       { name: 'Audit-Logs', included: true, description: 'Nachvollziehen wer was wann geändert hat (90 Tage)' },
@@ -180,19 +180,19 @@ export default function Pricing() {
         </div>
 
         {/* Enterprise Trial Banner */}
-        <div className="max-w-4xl mx-auto mb-12 bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-500/30 rounded-lg p-6 text-center">
+        <div className="max-w-4xl mx-auto mb-12 bg-zinc-900 border-2 border-white rounded-xl p-6 text-center shadow-xl shadow-white/10">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             <h3 className="text-xl font-bold">14-Tage Enterprise Trial</h3>
           </div>
           <p className="text-gray-200 mb-4">
-            Teste alle Enterprise Features kostenlos - inkl. 50 SMS. Keine Kreditkarte erforderlich.
+            Teste alle Enterprise Features kostenlos - inkl. 50 Nachrichten. Keine Kreditkarte erforderlich.
           </p>
           <Link
             to="/register?trial=enterprise"
-            className="inline-block px-8 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition"
+            className="inline-block px-8 py-3 bg-gradient-to-r from-green-500 to-white text-black font-bold rounded-lg hover:scale-105 transition-transform shadow-lg"
           >
             Jetzt Enterprise kostenlos testen
           </Link>
@@ -219,7 +219,7 @@ export default function Pricing() {
 
               {plan.badge && (
                 <div className="absolute -top-4 right-4">
-                  <span className="inline-block text-xs font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1.5 rounded-full">
+                  <span className="inline-block text-xs font-bold bg-white text-black px-4 py-1.5 rounded-full shadow-lg">
                     {plan.badge}
                   </span>
                 </div>
@@ -272,12 +272,12 @@ export default function Pricing() {
                   <li
                     key={idx}
                     className={`flex items-start gap-3 text-sm ${
-                      feature.highlight ? 'bg-purple-500/10 border border-purple-500/30 rounded-lg p-2 -mx-2' : ''
+                      feature.highlight ? 'bg-green-500/10 border border-green-500/30 rounded-lg p-2 -mx-2' : ''
                     }`}
                   >
                     <svg
                       className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                        feature.highlight ? 'text-purple-400' : 'text-green-500'
+                        feature.highlight ? 'text-green-500' : 'text-green-500'
                       }`}
                       fill="none"
                       stroke="currentColor"
@@ -294,8 +294,8 @@ export default function Pricing() {
                           </span>
                         )}
                         {feature.highlight && (
-                          <span className="ml-2 text-xs text-purple-400 font-medium">
-                            NUR ENTERPRISE
+                          <span className="ml-2 text-xs text-green-500 font-bold">
+                            ⚡ PREMIUM
                           </span>
                         )}
                       </div>
@@ -329,18 +329,18 @@ export default function Pricing() {
         </div>
 
         {/* SMS Callout */}
-        <div className="max-w-4xl mx-auto mb-20 bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/20 rounded-xl p-8">
+        <div className="max-w-4xl mx-auto mb-20 bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:border-white/30 transition-all duration-300">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg">
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-bold mb-2">SMS-Benachrichtigungen nur in Enterprise</h3>
+              <h3 className="text-xl font-bold mb-2">Nachrichten per SMS nur in Enterprise</h3>
               <p className="text-gray-300 mb-4">
-                Reduziere No-Shows um bis zu 60% mit automatischen SMS-Erinnerungen 2h & 24h vor Terminen.
-                Inklusive 500 SMS pro Monat (skalierbar mit Team-Größe: +50 SMS pro Mitarbeiter).
+                Reduziere vergessene Termine um bis zu 60% mit automatischen Nachrichten 2 Stunden & 1 Tag vor Terminen.
+                Inklusive 500 Nachrichten pro Monat (mehr bei größerem Team: +50 Nachrichten pro Mitarbeiter).
               </p>
               <div className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-start gap-2">
@@ -359,7 +359,7 @@ export default function Pricing() {
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-200">Überschreitung möglich (€0.05/SMS)</span>
+                  <span className="text-gray-200">Überschreitung möglich (€0.05 pro Nachricht)</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
