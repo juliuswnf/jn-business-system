@@ -1,9 +1,16 @@
 # ==================== ENVIRONMENTS ====================
+# Ignore actual .env files but keep .env.example templates
 .env
 .env.local
 .env.*.local
 .env.production.local
 .env.test.local
+backend/.env
+frontend/.env
+
+# Keep these templates for developers
+!backend/.env.example
+!frontend/.env.example
 
 # ==================== NODE ====================
 node_modules/
