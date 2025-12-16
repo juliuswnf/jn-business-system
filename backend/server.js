@@ -20,6 +20,8 @@ import emailQueueWorker from './workers/emailQueueWorker.js';
 import lifecycleEmailWorker from './workers/lifecycleEmailWorker.js';
 import { getHealthStatus } from './services/healthCheckService.js';
 import alertingService from './services/alertingService.js';
+import { sanitizeInput } from './middleware/sanitizationMiddleware.js';
+import { initSentry, sentryErrorHandler } from './config/sentry.js';
 
 // NO-SHOW-KILLER Workers
 import { startConfirmationSender } from './workers/confirmationSenderWorker.js';
@@ -50,6 +52,8 @@ import widgetRoutes from './routes/widgetRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import systemRoutes from './routes/systemRoutes.js'; // ? MEDIUM FIX #13 & #14
+import gdprRoutes from './routes/gdprRoutes.js'; // GDPR Compliance
+import healthRoutes from './routes/healthRoutes.js'; // Health Checks
 
 // Multi-Industry Routes - Phase 2
 import artistPortfolioRoutes from './routes/artistPortfolioRoutes.js';
@@ -139,19 +143,23 @@ app.get('/api/rate-limit/status', getRateLimitStatus);
 app.post('/api/rate-limit/reset', resetRateLimiter);
 
 // ==================== MIDDLEWARE EXECUTION ORDER ====================
-// 1?? SECURITY FIRST
+// 1️⃣ SENTRY (if production)
+initSentry(app);
+
+// 2️⃣ SECURITY FIRST
 app.use(helmet());
 app.use(mongoSanitize()); // ? Prevent MongoDB injection
 app.use(xss()); // ? FREE OPTIMIZATION: XSS protection
+app.use(sanitizeInput); // ? XSS sanitization for all inputs
 app.use(hpp());
 // Compression should be applied after security middleware
 app.use(compression());
 
-// 2️⃣ STRIPE & MESSAGEBIRD WEBHOOKS (MUST BE BEFORE JSON PARSING!)
+// 3️⃣ STRIPE & MESSAGEBIRD WEBHOOKS (MUST BE BEFORE JSON PARSING!)
 app.post('/api/webhooks/stripe', webhookMiddleware, stripeWebhookController.handleStripeWebhook);
 app.use('/api/webhooks', webhookRoutes); // MessageBird webhooks
 
-// 3?? CORS & BODY PARSING
+// 4️⃣ CORS & BODY PARSING
 app.use(cors({
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
@@ -246,6 +254,7 @@ app.use('/api/subscriptions', subscriptionRoutes); // Stripe Subscription Manage
 app.use('/api/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected)
 app.use('/api/system', systemRoutes); // ? MEDIUM FIX #13 & #14: Health & Backups
 app.use('/api/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: public + protected)
+app.use('/health', healthRoutes); // Health Check Endpoints
 
 // Protected Routes (Auth Required)
 app.use('/api/salon', authMiddleware.protect, salonRoutes);
@@ -254,6 +263,7 @@ app.use('/api/payments', authMiddleware.protect, paymentRoutes);
 app.use('/api/services', authMiddleware.protect, serviceRoutes);
 app.use('/api/employees', authMiddleware.protect, employeeRoutes);
 app.use('/api/ceo', ceoRoutes); // Auth middleware is already in ceoRoutes
+app.use('/api/gdpr', gdprRoutes); // GDPR Compliance (Protected)
 
 // Multi-Industry Routes - Phase 2
 app.use('/api/portfolio', artistPortfolioRoutes); // Mixed: upload protected, galleries public
@@ -295,6 +305,12 @@ app.use('*', (req, res, _next) => {
 });
 
 // ==================== ERROR HANDLER MIDDLEWARE (MUST be LAST) ====================
+// Sentry error handler (if production)
+if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+  app.use(sentryErrorHandler());
+}
+
+// Global error handler
 app.use(errorHandlerMiddleware.globalErrorHandler);
 
 // ==================== SOCKET.IO EVENTS ====================
@@ -365,7 +381,7 @@ const connectDatabase = async () => {
 
     logger.info('? MongoDB Connected Successfully');
     logger.info(`?? Database: ${mongoose.connection.db.databaseName}`);
-    
+
     // Seed Marketing Templates
     try {
       const MarketingTemplate = (await import('./models/MarketingTemplate.js')).default;
@@ -374,7 +390,7 @@ const connectDatabase = async () => {
     } catch (error) {
       logger.error('[MARKETING] Template seeding failed:', error.message);
     }
-    
+
     return true;
   } catch (error) {
     logger.error('? MongoDB Connection Error:', error.message);
@@ -439,13 +455,13 @@ const startAlertingService = () => {
 const startNoShowKillerWorkers = () => {
   try {
     logger.info('? Starting NO-SHOW-KILLER workers...');
-    
+
     // Start all 4 workers
     startConfirmationSender(); // Every 5 min
     startAutoCancelWorker(); // Every 15 min
     startWaitlistMatcher(); // Every 15 min
     startReminderWorker(); // Every 30 min
-    
+
     logger.info('? NO-SHOW-KILLER workers started successfully');
   } catch (error) {
     logger.error('?? NO-SHOW-KILLER worker initialization error:', error.message || error);
@@ -458,11 +474,11 @@ const startNoShowKillerWorkers = () => {
 const startMarketingWorkers = () => {
   try {
     logger.info('[WORKER] Starting Marketing Automation workers...');
-    
+
     // Start marketing workers
     startMarketingCampaignWorker(); // Every 15 min
     startMarketingAnalyticsWorker(); // Every 60 min
-    
+
     logger.info('[WORKER] Marketing Automation workers started successfully');
   } catch (error) {
     logger.error('[ERROR] Marketing worker initialization error:', error.message || error);

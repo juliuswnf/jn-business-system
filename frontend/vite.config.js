@@ -26,19 +26,23 @@ export default defineConfig({
     target: 'ES2020',
     cssCodeSplit: true,
     // Optimize chunk size
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Core React + charts libraries (keep together to avoid circular chunk deps)
-          if (
-            id.includes('node_modules/react') ||
-            id.includes('node_modules/react-dom') ||
-            id.includes('node_modules/react-router-dom') ||
-            id.includes('node_modules/recharts') ||
-            id.includes('node_modules/d3')
-          ) {
-            return 'react-vendor';
+          // Split React core from React DOM
+          if (id.includes('node_modules/react/') && !id.includes('react-dom') && !id.includes('react-router')) {
+            return 'react-core';
+          }
+          if (id.includes('node_modules/react-dom')) {
+            return 'react-dom';
+          }
+          if (id.includes('node_modules/react-router')) {
+            return 'react-router';
+          }
+          // Charts library (large, separate chunk)
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) {
+            return 'charts';
           }
           // UI libraries
           if (id.includes('node_modules/@heroicons') ||
