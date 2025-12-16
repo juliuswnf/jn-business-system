@@ -30,12 +30,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Split React core from React DOM
-          if (id.includes('node_modules/react/') && !id.includes('react-dom') && !id.includes('react-router')) {
-            return 'react-core';
-          }
-          if (id.includes('node_modules/react-dom')) {
-            return 'react-dom';
+          // Keep React and ReactDOM together (fixes __SECRET_INTERNALS error)
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'vendor-react';
           }
           if (id.includes('node_modules/react-router')) {
             return 'react-router';
