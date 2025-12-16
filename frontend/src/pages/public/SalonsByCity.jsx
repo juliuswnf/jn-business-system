@@ -62,14 +62,14 @@ const SalonsByCity = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black text-white">
       {/* SEO Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white py-16">
+      <div className="bg-zinc-900 border-b border-zinc-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Link */}
           <Link
             to="/salons"
-            className="inline-flex items-center gap-2 text-indigo-100 hover:text-white mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
           >
             <ArrowLeftIcon className="h-5 w-5" />
             Alle Anbieter
@@ -78,7 +78,7 @@ const SalonsByCity = () => {
           <h1 className="text-4xl font-bold mb-4">
             Dienstleister in {displayCityName}
           </h1>
-          <p className="text-xl text-indigo-100">
+          <p className="text-xl text-gray-300">
             Die besten Anbieter in {displayCityName} - Online Termin buchen
           </p>
         </div>
@@ -89,31 +89,31 @@ const SalonsByCity = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              <div key={i} className="bg-zinc-900 rounded-lg shadow-sm p-6 animate-pulse border border-zinc-800">
+                <div className="h-6 bg-zinc-800 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-zinc-800 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-zinc-800 rounded w-2/3"></div>
               </div>
             ))}
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-gray-700 text-lg mb-4">{error}</p>
+            <p className="text-gray-300 text-lg mb-4">{error}</p>
             <Link
               to="/salons"
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
+              className="text-white hover:text-gray-300 font-medium">
             >
               Zurück zur Übersicht
             </Link>
           </div>
         ) : salons.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-700 text-lg mb-4">
+            <p className="text-gray-300 text-lg mb-4">
               Aktuell keine Anbieter in {displayCityName} verfügbar.
             </p>
             <Link
               to="/salons"
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
+              className="text-white hover:text-gray-300 font-medium">
             >
               Andere Städte durchsuchen
             </Link>
@@ -121,7 +121,7 @@ const SalonsByCity = () => {
         ) : (
           <>
             <div className="mb-6">
-              <p className="text-gray-700">
+              <p className="text-gray-300">
                 {salons.length} {salons.length === 1 ? 'Anbieter' : 'Anbieter'} in {displayCityName}
               </p>
             </div>
@@ -130,15 +130,15 @@ const SalonsByCity = () => {
               {salons.map((salon) => (
                 <div
                   key={salon._id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-200"
+                  className="bg-zinc-900 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 border border-zinc-800"
                 >
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <h3 className="text-xl font-semibold text-white mb-2">
                     {salon.name}
                   </h3>
 
                   {/* Location */}
-                  <div className="flex items-start gap-2 text-gray-700 mb-3">
-                    <MapPinIcon className="h-5 w-5 text-gray-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex items-start gap-2 text-gray-300 mb-3">
+                    <MapPinIcon className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
                     <div className="text-sm">
                       {salon.address?.street && <div>{salon.address.street}</div>}
                       <div>
@@ -149,7 +149,7 @@ const SalonsByCity = () => {
 
                   {/* Service Count */}
                   {salon.serviceCount > 0 && (
-                    <div className="text-sm text-gray-700 mb-4">
+                    <div className="text-sm text-gray-300 mb-4">
                       {salon.serviceCount} {salon.serviceCount === 1 ? 'Service' : 'Services'} verfügbar
                     </div>
                   )}
@@ -157,7 +157,7 @@ const SalonsByCity = () => {
                   {/* CTA Button */}
                   <button
                     onClick={() => navigate(`/s/${salon.slug}`)}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-white hover:bg-gray-200 text-black font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     Jetzt buchen
                     <ChevronRightIcon className="h-4 w-4" />
@@ -170,21 +170,21 @@ const SalonsByCity = () => {
       </div>
 
       {/* SEO Content Section */}
-      <div className="bg-white border-t">
+      <div className="bg-zinc-950 border-t border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="prose max-w-none">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-white mb-4">
               Dienstleister {displayCityName} - Online Termin buchen
             </h2>
-            <p className="text-gray-700 mb-4">
+            <p className="text-gray-300 mb-4">
               Entdecke die besten Dienstleister in {displayCityName}. Buche deinen Termin
               bequem online - 24/7 verfügbar mit sofortiger Bestätigung. Egal ob Beratung,
               Behandlung, Training oder Wellness - finde den perfekten Anbieter in deiner Nähe.
             </p>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            <h3 className="text-xl font-semibold text-white mb-3">
               Vorteile der Online-Buchung in {displayCityName}
             </h3>
-            <ul className="space-y-2 text-gray-700">
+            <ul className="space-y-2 text-gray-300">
               <li>✓ Sofortige Terminbestätigung ohne Wartezeit</li>
               <li>✓ Übersicht aller verfügbaren Termine</li>
               <li>✓ Einfache Verwaltung und Umbuchung</li>
