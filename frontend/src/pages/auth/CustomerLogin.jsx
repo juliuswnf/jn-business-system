@@ -14,18 +14,18 @@ const CustomerLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (loading) return;
     setLoading(true);
     setError('');
-    
-    console.log('Login attempt with:', email);
+
+    // Login attempt
 
     try {
       const response = await authAPI.login(email, password);
       const data = response.data;
-      
-      console.log('Login response:', data);
+
+      // Login response received
 
       if (data.success && data.token) {
         // Store auth data (both new and legacy keys for compatibility)
@@ -33,12 +33,12 @@ const CustomerLogin = () => {
         localStorage.setItem('jnUser', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
-        console.log('Auth data saved, redirecting...');
-        
+
+        // Auth data saved, redirecting
+
         // Redirect based on role
         const role = data.user?.role || 'customer';
-        
+
         if (role === 'customer') {
           window.location.replace('/customer/dashboard');
         } else if (role === 'ceo') {
@@ -48,7 +48,7 @@ const CustomerLogin = () => {
         }
         return; // Stop execution after redirect
       } else {
-        console.log('Login failed:', data.message);
+        // Login failed
         const msg = data.message || 'Login fehlgeschlagen';
         setError(msg);
         notification.error(msg);
@@ -64,7 +64,7 @@ const CustomerLogin = () => {
   };
 
   useEffect(() => {
-    if (import.meta.env.DEV) console.log('CustomerLogin mounted');
+    // Component mounted
   }, []);
 
   return (

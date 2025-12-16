@@ -52,24 +52,24 @@ export default function Demo() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-5xl mx-auto px-4 py-16">
-        
+
         {/* Header */}
         <div className="text-center mb-12">
           <span className="inline-block text-xs font-medium bg-zinc-800 px-3 py-1 rounded-full mb-4">
             Interaktive Demo
           </span>
           <h1 className="text-3xl font-bold mb-3">Testen Sie das Buchungswidget</h1>
-          <p className="text-gray-400 max-w-lg mx-auto">
+          <p className="text-gray-200 max-w-lg mx-auto">
             Genau so sehen es Ihre Kunden. Keine Registrierung nötig.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-10">
-          
+
           {/* Widget */}
           <div className="order-2 lg:order-1">
             <div className="border border-zinc-800 rounded-lg overflow-hidden">
-              
+
               {/* Widget Header */}
               <div className="bg-zinc-900 p-5 border-b border-zinc-800">
                 <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ export default function Demo() {
                   </div>
                   <div>
                     <h2 className="font-semibold">Muster Salon</h2>
-                    <p className="text-sm text-gray-500">Online Terminbuchung</p>
+                    <p className="text-sm text-gray-200">Online Terminbuchung</p>
                   </div>
                 </div>
               </div>
@@ -88,7 +88,7 @@ export default function Demo() {
               {/* Progress */}
               <div className="flex border-b border-zinc-800 text-xs">
                 {['Service', 'Termin', 'Daten', 'Fertig'].map((label, i) => (
-                  <div 
+                  <div
                     key={label}
                     className={`flex-1 py-2 text-center ${
                       step > i + 1 ? 'text-gray-300 bg-zinc-900' :
@@ -103,7 +103,7 @@ export default function Demo() {
 
               {/* Content */}
               <div className="p-5 bg-zinc-950 min-h-[400px]">
-                
+
                 {/* Step 1: Service */}
                 {step === 1 && !done && (
                   <div>
@@ -117,7 +117,7 @@ export default function Demo() {
                         >
                           <div>
                             <div className="text-sm">{s.name}</div>
-                            <div className="text-xs text-gray-500">{s.duration} Min.</div>
+                            <div className="text-xs text-gray-200">{s.duration} Min.</div>
                           </div>
                           <span className="text-sm font-medium">{s.price}€</span>
                         </button>
@@ -129,13 +129,13 @@ export default function Demo() {
                 {/* Step 2: Date & Time */}
                 {step === 2 && !done && (
                   <div>
-                    <button onClick={() => setStep(1)} className="text-xs text-gray-500 hover:text-white mb-4">
+                    <button onClick={() => setStep(1)} className="text-xs text-gray-200 hover:text-white mb-4">
                       ← Zurück
                     </button>
-                    
+
                     {/* Employee */}
                     <div className="mb-5">
-                      <h4 className="text-xs text-gray-400 mb-2">Mitarbeiter (optional)</h4>
+                      <h4 className="text-xs text-gray-200 mb-2">Mitarbeiter (optional)</h4>
                       <div className="flex flex-wrap gap-2">
                         <button
                           onClick={() => setEmployee(null)}
@@ -157,7 +157,7 @@ export default function Demo() {
 
                     {/* Date */}
                     <div className="mb-5">
-                      <h4 className="text-xs text-gray-400 mb-2">Datum</h4>
+                      <h4 className="text-xs text-gray-200 mb-2">Datum</h4>
                       <div className="flex gap-2 overflow-x-auto pb-2">
                         {dates.map((d, i) => (
                           <button
@@ -167,7 +167,7 @@ export default function Demo() {
                               date?.toDateString() === d.toDateString() ? 'bg-white text-black' : 'bg-zinc-800'
                             }`}
                           >
-                            <div className="text-xs text-gray-400">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</div>
+                            <div className="text-xs text-gray-200">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</div>
                             <div className="font-medium">{d.getDate()}</div>
                           </button>
                         ))}
@@ -177,7 +177,7 @@ export default function Demo() {
                     {/* Time */}
                     {date && (
                       <div>
-                        <h4 className="text-xs text-gray-400 mb-2">Uhrzeit</h4>
+                        <h4 className="text-xs text-gray-200 mb-2">Uhrzeit</h4>
                         <div className="grid grid-cols-4 gap-2">
                           {TIMES.map((t) => (
                             <button
@@ -261,7 +261,7 @@ export default function Demo() {
                       </svg>
                     </div>
                     <h3 className="text-lg font-semibold mb-2">Termin bestätigt</h3>
-                    <p className="text-sm text-gray-400 mb-6">
+                    <p className="text-sm text-gray-200 mb-6">
                       Bestätigung wurde an {form.email} gesendet.
                     </p>
                     <button
@@ -274,7 +274,7 @@ export default function Demo() {
                 )}
               </div>
             </div>
-            
+
             <p className="text-center text-xs text-gray-600 mt-3">
               Demo – keine echte Buchung wird erstellt
             </p>
@@ -282,7 +282,7 @@ export default function Demo() {
 
           {/* Info */}
           <div className="order-1 lg:order-2 space-y-6">
-            
+
             <div className="border border-zinc-800 rounded-lg p-5">
               <h3 className="font-semibold mb-4">So funktioniert es</h3>
               <div className="space-y-4">
@@ -298,7 +298,7 @@ export default function Demo() {
                     </span>
                     <div>
                       <div className="text-sm font-medium">{item.title}</div>
-                      <div className="text-xs text-gray-500">{item.desc}</div>
+                      <div className="text-xs text-gray-200">{item.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -317,7 +317,7 @@ export default function Demo() {
                   </svg>
                   <div>
                     <div className="text-sm font-medium">{b.title}</div>
-                    <div className="text-xs text-gray-500">{b.desc}</div>
+                    <div className="text-xs text-gray-200">{b.desc}</div>
                   </div>
                 </div>
               ))}
@@ -325,7 +325,7 @@ export default function Demo() {
 
             <div className="border border-zinc-800 rounded-lg p-5 text-center">
               <h3 className="font-semibold mb-2">Bereit loszulegen?</h3>
-              <p className="text-sm text-gray-400 mb-4">30 Tage kostenlos testen</p>
+              <p className="text-sm text-gray-200 mb-4">30 Tage kostenlos testen</p>
               <Link
                 to="/register"
                 className="inline-block px-5 py-2 bg-white text-black font-medium rounded text-sm hover:bg-gray-100"

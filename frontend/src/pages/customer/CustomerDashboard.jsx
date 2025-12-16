@@ -66,7 +66,7 @@ const CustomerDashboard = () => {
         ) : upcomingBookings.length === 0 ? (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
             <p className="text-gray-300">Keine bevorstehenden Termine</p>
-            <Link to="/customer/booking" className="text-indigo-400 hover:text-indigo-300 mt-2 inline-block">
+            <Link to="/customer/booking" className="text-indigo-400 hover:text-indigo-300 mt-2 inline-block" aria-label="Neuen Termin buchen">
               Neuen Termin buchen
             </Link>
           </div>

@@ -137,18 +137,18 @@ export default function Customers() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Kunden</h1>
-          <p className="text-gray-400">Verwalten Sie Ihre Kunden und deren Buchungen</p>
+          <p className="text-gray-200">Verwalten Sie Ihre Kunden und deren Buchungen</p>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-gray-900 border border-gray-800 p-4 rounded-lg">
-          <p className="text-gray-400 text-sm mb-2">Gesamt Kunden</p>
+          <p className="text-gray-200 text-sm mb-2">Gesamt Kunden</p>
           <p className="text-3xl font-bold text-white">{stats?.totalCustomers || customers.length}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 p-4 rounded-lg">
-          <p className="text-gray-400 text-sm mb-2">Neu diesen Monat</p>
+          <p className="text-gray-200 text-sm mb-2">Neu diesen Monat</p>
           <div className="flex items-center gap-2">
             <p className="text-3xl font-bold text-green-500">{stats?.newThisMonth || 0}</p>
             {stats?.customerGrowth !== undefined && (
@@ -159,11 +159,11 @@ export default function Customers() {
           </div>
         </div>
         <div className="bg-gray-900 border border-gray-800 p-4 rounded-lg">
-          <p className="text-gray-400 text-sm mb-2">Durchschn. Kundenwert</p>
+          <p className="text-gray-200 text-sm mb-2">Durchschn. Kundenwert</p>
           <p className="text-3xl font-bold text-blue-500">€{stats?.avgLifetimeValue || 0}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 p-4 rounded-lg">
-          <p className="text-gray-400 text-sm mb-2">VIP Kunden</p>
+          <p className="text-gray-200 text-sm mb-2">VIP Kunden</p>
           <p className="text-3xl font-bold text-purple-500">{stats?.tiers?.vip || 0}</p>
         </div>
       </div>
@@ -180,10 +180,10 @@ export default function Customers() {
                     {getTierBadge(customerDetails.tier).label}
                   </span>
                 </div>
-                <p className="text-gray-400">{customerDetails.email}</p>
-                {customerDetails.phone && <p className="text-gray-400">{customerDetails.phone}</p>}
+                <p className="text-gray-200">{customerDetails.email}</p>
+                {customerDetails.phone && <p className="text-gray-200">{customerDetails.phone}</p>}
               </div>
-              <button onClick={() => { setSelectedCustomer(null); setCustomerDetails(null); }} className="text-gray-400 hover:text-white">
+              <button onClick={() => { setSelectedCustomer(null); setCustomerDetails(null); }} className="text-gray-200 hover:text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -198,22 +198,22 @@ export default function Customers() {
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-white">{customerDetails.stats.totalBookings}</p>
-                    <p className="text-sm text-gray-400">Buchungen</p>
+                    <p className="text-sm text-gray-200">Buchungen</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-green-500">€{customerDetails.stats.totalSpent}</p>
-                    <p className="text-sm text-gray-400">Gesamtumsatz</p>
+                    <p className="text-sm text-gray-200">Gesamtumsatz</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-blue-500">€{customerDetails.stats.averageSpent}</p>
-                    <p className="text-sm text-gray-400">Pro Besuch</p>
+                    <p className="text-sm text-gray-200">Pro Besuch</p>
                   </div>
                 </div>
 
                 {/* Favorite Services */}
                 {customerDetails.favoriteServices?.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-sm font-medium text-gray-400 mb-2">Lieblingsleistungen</h3>
+                    <h3 className="text-sm font-medium text-gray-200 mb-2">Lieblingsleistungen</h3>
                     <div className="flex flex-wrap gap-2">
                       {customerDetails.favoriteServices.map((s, i) => (
                         <span key={i} className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm">
@@ -226,20 +226,20 @@ export default function Customers() {
 
                 {/* Recent Bookings */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">Letzte Buchungen</h3>
+                  <h3 className="text-sm font-medium text-gray-200 mb-2">Letzte Buchungen</h3>
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {customerDetails.bookings?.slice(0, 10).map((b, i) => (
                       <div key={i} className="bg-gray-800 rounded-lg p-3 flex justify-between items-center">
                         <div>
                           <p className="text-white font-medium">{b.service}</p>
-                          <p className="text-sm text-gray-400">
+                          <p className="text-sm text-gray-200">
                             {new Date(b.date).toLocaleDateString('de-DE')}
                             {b.employee && ` • ${b.employee}`}
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-white">€{b.price}</p>
-                          <p className={`text-xs ${b.status === 'completed' ? 'text-green-400' : b.status === 'cancelled' ? 'text-red-400' : 'text-gray-400'}`}>
+                          <p className={`text-xs ${b.status === 'completed' ? 'text-green-400' : b.status === 'cancelled' ? 'text-red-400' : 'text-gray-200'}`}>
                             {b.status === 'completed' ? 'Abgeschlossen' : b.status === 'cancelled' ? 'Abgesagt' : b.status}
                           </p>
                         </div>
@@ -280,7 +280,7 @@ export default function Customers() {
             <tbody>
               {customers.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-400">
+                  <td colSpan="6" className="px-6 py-8 text-center text-gray-200">
                     {searchTerm ? 'Keine Kunden gefunden' : 'Noch keine Kunden vorhanden'}
                   </td>
                 </tr>
@@ -289,13 +289,13 @@ export default function Customers() {
                   <tr key={customer.id} className="border-t border-gray-800 hover:bg-gray-800/50 transition">
                     <td className="px-6 py-4">
                       <p className="text-white font-medium">{customer.name}</p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-200">
                         Seit {new Date(customer.firstBooking).toLocaleDateString('de-DE')}
                       </p>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-gray-300">{customer.email}</p>
-                      {customer.phone && <p className="text-sm text-gray-400">{customer.phone}</p>}
+                      {customer.phone && <p className="text-sm text-gray-200">{customer.phone}</p>}
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-white">{customer.bookingCount}</p>

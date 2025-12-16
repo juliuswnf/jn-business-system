@@ -153,7 +153,7 @@ export default function Booking() {
         }
       }
     } catch (error) {
-      console.log('Available slots endpoint not available');
+      // Using default slots
     }
     setAvailableSlots(defaultTimeSlots);
     setBookedSlots([]);

@@ -17,13 +17,13 @@ export default function PublicBooking() {
   const { slug } = useParams();
   // Support both route param (/s/:slug) and query param (?salon=xyz)
   const salonSlug = slug || searchParams.get('salon');
-  
+
   const [loading, setLoading] = useState(true);
   const [salonInfo, setSalonInfo] = useState(null);
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
-  
+
   const [bookingStep, setBookingStep] = useState(1);
   const [bookingData, setBookingData] = useState({
     customerName: '',
@@ -64,7 +64,7 @@ export default function PublicBooking() {
         const data = await res.json();
         if (data.success) {
           setSalonInfo(data.salon || { name: 'Salon' });
-          
+
           // Map services
           if (data.services) {
             setServices(data.services.map(s => ({
@@ -74,7 +74,7 @@ export default function PublicBooking() {
               price: `${s.price || 0}€`
             })));
           }
-          
+
           // Map employees if available
           if (data.employees) {
             setEmployees(data.employees.map(e => ({
@@ -112,7 +112,7 @@ export default function PublicBooking() {
         }
       }
     } catch (error) {
-      console.log('Available slots not available, using defaults');
+      // Using default slots
     }
     setAvailableSlots(defaultTimeSlots);
   };
@@ -125,16 +125,16 @@ export default function PublicBooking() {
   };
 
   const handleServiceSelect = (service) => {
-    setBookingData(prev => ({ 
-      ...prev, 
+    setBookingData(prev => ({
+      ...prev,
       service: service.name,
       serviceId: service.id
     }));
   };
 
   const handleEmployeeSelect = (emp) => {
-    setBookingData(prev => ({ 
-      ...prev, 
+    setBookingData(prev => ({
+      ...prev,
       employee: emp.name,
       employeeId: emp.id
     }));
@@ -144,7 +144,7 @@ export default function PublicBooking() {
     try {
       // ✅ SRE FIX #30: Generate idempotency key for double-click prevention
       const idempotencyKey = `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await fetch(`${API_URL}/widget/${salonSlug}/book`, {
         method: 'POST',
@@ -251,7 +251,7 @@ export default function PublicBooking() {
         {bookingStep === 1 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <h2 className="text-2xl font-bold mb-6">Deine Kontaktdaten</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Vollständiger Name *</label>
@@ -312,7 +312,7 @@ export default function PublicBooking() {
         {bookingStep === 2 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <h2 className="text-2xl font-bold mb-6">Service wählen</h2>
-            
+
             <div className="grid md:grid-cols-2 gap-4 mb-6">
               {services.length === 0 ? (
                 <p className="text-gray-400 col-span-2">Keine Services verfügbar</p>
@@ -387,7 +387,7 @@ export default function PublicBooking() {
         {bookingStep === 3 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <h2 className="text-2xl font-bold mb-6">Datum & Uhrzeit</h2>
-            
+
             <div className="mb-6">
               <label className="block text-sm font-medium mb-2">Datum wählen *</label>
               <input
@@ -441,7 +441,7 @@ export default function PublicBooking() {
         {bookingStep === 4 && (
           <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
             <h2 className="text-2xl font-bold mb-6">Buchung bestätigen</h2>
-            
+
             <div className="space-y-4 mb-8 p-6 bg-gray-800 bg-opacity-50 rounded-lg">
               <div className="flex justify-between">
                 <span className="text-gray-300">Name:</span>

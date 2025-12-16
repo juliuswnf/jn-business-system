@@ -13,7 +13,7 @@ function Home() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 Online-Buchungssystem für Ihr Unternehmen
               </h1>
-              <p className="text-xl text-gray-400 mb-8 max-w-lg">
+              <p className="text-xl text-gray-200 mb-8 max-w-lg">
                 Kunden buchen Termine direkt über Ihre Website.
                 Automatische Erinnerungen, einfache Verwaltung, faire Preise.
               </p>
@@ -78,7 +78,7 @@ function Home() {
 
                     {/* Bookings List */}
                     <div>
-                      <div className="text-sm text-gray-400 mb-3">Heutige Termine</div>
+                      <div className="text-sm text-gray-200 mb-3">Heutige Termine</div>
                       <div className="space-y-2">
                         <div className="bg-zinc-800 rounded-xl p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">

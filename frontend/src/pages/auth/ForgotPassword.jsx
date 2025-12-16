@@ -100,7 +100,7 @@ const ForgotPassword = () => {
         </div>
 
         <div className="mt-6 text-center">
-          <Link to="/login" className="text-gray-400 hover:text-white transition">
+          <Link to="/login" className="text-gray-400 hover:text-white transition" aria-label="Zurück zum Login">
             ← Zurück zum Login
           </Link>
         </div>

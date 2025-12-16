@@ -8,11 +8,11 @@ export default function Datenschutz() {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="mb-12">
-          <Link to="/" className="text-zinc-300 hover:text-white text-sm mb-4 inline-block">
+          <Link to="/" className="text-zinc-300 hover:text-white text-sm mb-4 inline-block" aria-label="Zurück zur Startseite">
             ← Zurück zur Startseite
           </Link>
           <h1 className="text-4xl font-bold mb-4">Datenschutzerklärung</h1>
-          <p className="text-gray-400">
+          <p className="text-gray-200">
             Stand: Dezember 2025 | Zuletzt aktualisiert: 07.12.2025
           </p>
         </div>
@@ -149,7 +149,7 @@ export default function Datenschutz() {
                 <p className="text-gray-300 text-sm">Transaktionale E-Mails über EU-Server</p>
               </div>
             </div>
-            <p className="text-gray-400 mt-4 text-sm">
+            <p className="text-gray-200 mt-4 text-sm">
               Mit allen Auftragsverarbeitern wurden Verträge gemäß Art. 28 DSGVO geschlossen.
             </p>
           </section>
@@ -212,7 +212,7 @@ export default function Datenschutz() {
                 </tbody>
               </table>
             </div>
-            <p className="text-gray-400 mt-4 text-sm">
+            <p className="text-gray-200 mt-4 text-sm">
               Wir verwenden keine Marketing- oder Tracking-Cookies von Drittanbietern.
             </p>
           </section>
@@ -241,7 +241,7 @@ export default function Datenschutz() {
                   datenschutz@jn-business-system.de
                 </a>
               </p>
-              <p className="text-gray-400 text-sm mt-4">
+              <p className="text-gray-200 text-sm mt-4">
                 Wir werden Ihre Anfrage innerhalb von 30 Tagen bearbeiten.
               </p>
             </div>
@@ -250,10 +250,10 @@ export default function Datenschutz() {
 
         {/* Footer Links */}
         <div className="mt-12 pt-8 border-t border-gray-800 flex justify-between items-center">
-          <Link to="/impressum" className="text-zinc-300 hover:text-white">
+          <Link to="/impressum" className="text-zinc-300 hover:text-white" aria-label="Impressum ansehen">
             Impressum
           </Link>
-          <Link to="/agb" className="text-zinc-300 hover:text-white">
+          <Link to="/agb" className="text-zinc-300 hover:text-white" aria-label="Allgemeine Geschäftsbedingungen lesen">
             AGB
           </Link>
         </div>

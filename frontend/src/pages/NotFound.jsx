@@ -9,7 +9,7 @@ export default function NotFound() {
       <div className="text-center max-w-md">
         <div className="text-7xl font-bold text-white mb-4">404</div>
         <h1 className="text-3xl font-bold mb-4 text-white">Seite nicht gefunden</h1>
-        <p className="text-gray-400 mb-8">
+        <p className="text-gray-200 mb-8">
           Die Seite, die Sie suchen, existiert nicht oder wurde verschoben.
         </p>
         <button
