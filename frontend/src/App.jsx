@@ -178,17 +178,7 @@ const ProtectedRoute = ({ children, requiredRole, allowedRoles }) => {
  * Version: 2.0.0 MVP Professional
  */
 function App() {
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log('\n==============================================');
-      console.log('  JN BUSINESS SYSTEM - Frontend Started  ');
-      console.log('==============================================');
-      console.log('Version: 2.0.0 MVP Professional');
-      console.log('Environment:', import.meta.env.MODE);
-      console.log('Backend API:', import.meta.env.VITE_API_URL || 'http://localhost:5000');
-      console.log('==============================================\n');
-    }
-  }, []);
+  // Removed console.log statements for production (Lighthouse Best Practices)
 
   return (
     <Router>
@@ -212,16 +202,16 @@ function App() {
         <Route path="/datenschutz" element={<AppLayout><LazyPage><Datenschutz /></LazyPage></AppLayout>} />
         <Route path="/agb" element={<AppLayout><LazyPage><AGB /></LazyPage></AppLayout>} />
         <Route path="/faq" element={<AppLayout><LazyPage><FAQ /></LazyPage></AppLayout>} />
-        
+
         {/* ==================== PUBLIC SALON PAGES (SEO) ==================== */}
         <Route path="/salons" element={<AppLayout><LazyPage><Salons /></LazyPage></AppLayout>} />
         <Route path="/salons/:city" element={<AppLayout><LazyPage><SalonsByCity /></LazyPage></AppLayout>} />
-        
+
         {/* ==================== HIDDEN CEO LOGIN ==================== */}
         {/* SECURITY: Only accessible via Ctrl+Shift+C on home page */}
         {/* Route uses non-obvious path that won't be guessed */}
         <Route path="/_.admin" element={<CEOLogin />} />
-        
+
         {/* ==================== ONBOARDING ==================== */}
         <Route
           path="/onboarding"
@@ -231,7 +221,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* ==================== PRICING WIZARD (PUBLIC) ==================== */}
         <Route
           path="/onboarding/pricing-wizard"
@@ -241,7 +231,7 @@ function App() {
             </AppLayout>
           }
         />
-        
+
         {/* ==================== CUSTOMER ROUTES ==================== */}
         <Route
           path="/customer/dashboard"
@@ -304,7 +294,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* ==================== EMPLOYEE ROUTES ==================== */}
         <Route
           path="/employee/dashboard"
@@ -316,7 +306,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* ==================== STUDIO DASHBOARD (protected) ==================== */}
         <Route
           path="/dashboard"
@@ -436,7 +426,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* ==================== MARKETING AUTOMATION ==================== */}
         <Route
           path="/dashboard/marketing"
@@ -468,7 +458,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* ==================== TATTOO STUDIO ==================== */}
         <Route
           path="/dashboard/tattoo/projects"
@@ -552,109 +542,109 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* ==================== BUSINESS ROUTES ==================== */}
-        <Route 
-          path="/admin/dashboard" 
+        <Route
+          path="/admin/dashboard"
           element={
             <ProtectedRoute>
               <LazyPage><AdminDashboard /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        
+
         {/* ==================== CEO ROUTES ==================== */}
-        <Route 
-          path="/ceo/dashboard" 
+        <Route
+          path="/ceo/dashboard"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEODashboard /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/settings" 
+        <Route
+          path="/ceo/settings"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOSettings /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/analytics" 
+        <Route
+          path="/ceo/analytics"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOAnalytics /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/email-campaigns" 
+        <Route
+          path="/ceo/email-campaigns"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOEmailCampaigns /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/payments" 
+        <Route
+          path="/ceo/payments"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOPayments /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/support" 
+        <Route
+          path="/ceo/support"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOSupportTickets /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/audit-log" 
+        <Route
+          path="/ceo/audit-log"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOAuditLog /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/lifecycle-emails" 
+        <Route
+          path="/ceo/lifecycle-emails"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOLifecycleEmails /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/feature-flags" 
+        <Route
+          path="/ceo/feature-flags"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOFeatureFlags /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/ceo/backups" 
+        <Route
+          path="/ceo/backups"
           element={
             <ProtectedRoute requiredRole="ceo">
               <LazyPage><CEOBackups /></LazyPage>
             </ProtectedRoute>
-          } 
+          }
         />
-        
+
         {/* ==================== PUBLIC BOOKING (No Auth) ==================== */}
-        <Route 
-          path="/s/:slug" 
-          element={<LazyPage><PublicBooking /></LazyPage>} 
+        <Route
+          path="/s/:slug"
+          element={<LazyPage><PublicBooking /></LazyPage>}
         />
-        <Route 
-          path="/booking/public" 
-          element={<LazyPage><PublicBooking /></LazyPage>} 
+        <Route
+          path="/booking/public"
+          element={<LazyPage><PublicBooking /></LazyPage>}
         />
-        
+
         {/* ==================== ERROR ROUTES ==================== */}
         <Route path="/404" element={<LazyPage><NotFound /></LazyPage>} />
         <Route path="*" element={<Navigate to="/404" replace />} />

@@ -9,7 +9,7 @@ export default function ServerError() {
       <div className="text-center max-w-md">
         <div className="text-7xl font-bold text-red-500 mb-4">500</div>
         <h1 className="text-3xl font-bold mb-4 text-white">Server-Fehler</h1>
-        <p className="text-gray-400 mb-8">
+        <p className="text-gray-200 mb-8">
           Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie später erneut.
         </p>
         <button

@@ -14,22 +14,22 @@ const BusinessLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (loading) return;
     setLoading(true);
     setError('');
-    
-    console.log('Business login attempt with:', email);
+
+    // Login attempt
 
     try {
       const response = await authAPI.login(email, password);
       const data = response.data;
-      
-      console.log('Login response:', data);
+
+      // Login response received
 
       if (data.success && data.token) {
         const role = data.user?.role || 'salon_owner';
-        
+
         // Block customers from business login - they should use customer login
         if (role === 'customer') {
           setError('Dieser Login ist nur für Geschäftskunden. Bitte nutzen Sie den Kunden-Login.');
@@ -37,15 +37,15 @@ const BusinessLogin = () => {
           setLoading(false);
           return;
         }
-        
+
         // Store auth data (both new and legacy keys for compatibility)
         localStorage.setItem('jnAuthToken', data.token);
         localStorage.setItem('jnUser', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
-        console.log('Auth data saved, redirecting...');
-        
+
+        // Auth data saved, redirecting
+
         // Redirect based on role
         if (role === 'ceo') {
           window.location.replace('/ceo/dashboard');
@@ -55,7 +55,7 @@ const BusinessLogin = () => {
         }
         return; // Stop execution after redirect
       } else {
-        console.log('Login failed:', data.message);
+        // Login failed
         const msg = data.message || 'Login fehlgeschlagen';
         setError(msg);
         notification.error(msg);
@@ -71,7 +71,7 @@ const BusinessLogin = () => {
   };
 
   useEffect(() => {
-    if (import.meta.env.DEV) console.log('BusinessLogin mounted');
+    // Component mounted
   }, []);
 
   return (

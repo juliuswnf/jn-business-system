@@ -143,7 +143,7 @@ export default function GettingStarted() {
 
         {/* Header */}
         <div className="mb-10">
-          <Link to="/dashboard" className="text-gray-300 hover:text-white text-sm mb-4 inline-flex items-center gap-2">
+          <Link to="/dashboard" className="text-gray-300 hover:text-white text-sm mb-4 inline-flex items-center gap-2" aria-label="Zurück zum Dashboard">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

@@ -230,13 +230,13 @@ const CEODashboard = () => {
       <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3" aria-label="Zurück zur Startseite - JN Business System">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">CEO</span>
             </div>
             <div>
               <span className="text-white font-semibold block">JN Business System</span>
-              <span className="text-xs text-gray-500">CEO Portal</span>
+              <span className="text-xs text-gray-200">CEO Portal</span>
             </div>
           </Link>
         </div>
@@ -275,7 +275,7 @@ const CEODashboard = () => {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-white">Julius</p>
-              <p className="text-xs text-gray-500">CEO</p>
+              <p className="text-xs text-gray-200">CEO</p>
             </div>
           </div>
         </div>
@@ -290,7 +290,7 @@ const CEODashboard = () => {
               <h1 className="text-2xl font-bold text-white">
                 {navItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
               </h1>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-gray-200 text-sm mt-1">
                 Willkommen im CEO Control Center
               </p>
             </div>
@@ -308,51 +308,51 @@ const CEODashboard = () => {
                 </button>
                 <div className="absolute right-0 top-full mt-1 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                   <div className="py-2">
-                    <Link to="/ceo/analytics" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/analytics" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Analytics - Detaillierte Statistiken ansehen">
                       <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
                       <span className="text-sm">Analytics</span>
                     </Link>
-                    <Link to="/ceo/email-campaigns" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/email-campaigns" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="E-Mail-Kampagnen verwalten">
                       <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span className="text-sm">E-Mail Kampagnen</span>
                     </Link>
-                    <Link to="/ceo/payments" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/payments" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Zahlungen und Transaktionen">
                       <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="text-sm">Payments</span>
                     </Link>
                     <div className="border-t border-gray-700 my-2"></div>
-                    <Link to="/ceo/support" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/support" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Support-Tickets bearbeiten">
                       <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                       <span className="text-sm">Support Tickets</span>
                     </Link>
-                    <Link to="/ceo/audit-log" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/audit-log" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Audit-Log - Systemaktivitäten einsehen">
                       <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       <span className="text-sm">Audit Log</span>
                     </Link>
-                    <Link to="/ceo/lifecycle-emails" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/lifecycle-emails" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Lifecycle-E-Mails konfigurieren">
                       <svg className="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span className="text-sm">Lifecycle E-Mails</span>
                     </Link>
                     <div className="border-t border-gray-700 my-2"></div>
-                    <Link to="/ceo/feature-flags" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/feature-flags" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Feature-Flags aktivieren oder deaktivieren">
                       <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
                       </svg>
                       <span className="text-sm">Feature Flags</span>
                     </Link>
-                    <Link to="/ceo/backups" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition">
+                    <Link to="/ceo/backups" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Backups verwalten und wiederherstellen">
                       <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                       </svg>
@@ -440,7 +440,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
                 <span className="text-6xl font-black text-white">€{stats.totalRevenue.toLocaleString('de-DE')}</span>
                 <span className="text-emerald-400 text-lg font-medium">/ Monat</span>
               </div>
-              <p className="text-gray-400 text-sm mt-3">
+              <p className="text-gray-200 text-sm mt-3">
                 {stats.starterAbos} Starter × €29 + {stats.proAbos} Pro × €69
               </p>
             </div>
@@ -526,7 +526,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
         {/* Conversion Rate */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-gray-400 text-sm font-medium">Conversion Rate</p>
+            <p className="text-gray-200 text-sm font-medium">Conversion Rate</p>
             <div className="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -540,13 +540,13 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               style={{ width: `${conversionRate}%` }}
             ></div>
           </div>
-          <p className="text-gray-500 text-xs mt-2">Trial → Zahlender Kunde</p>
+          <p className="text-gray-200 text-xs mt-2">Trial → Zahlender Kunde</p>
         </div>
 
         {/* Avg Revenue */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-gray-400 text-sm font-medium">Ø Umsatz pro Kunde</p>
+            <p className="text-gray-200 text-sm font-medium">Ø Umsatz pro Kunde</p>
             <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -554,13 +554,13 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
             </div>
           </div>
           <p className="text-4xl font-black text-white">€{avgRevenue}</p>
-          <p className="text-gray-500 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
+          <p className="text-gray-200 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
         </div>
 
         {/* System Status */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-gray-400 text-sm font-medium">System Status</p>
+            <p className="text-gray-200 text-sm font-medium">System Status</p>
             <div className="flex items-center gap-2">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -569,7 +569,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
             </div>
           </div>
           <p className="text-4xl font-black text-green-400">Online</p>
-          <p className="text-gray-500 text-xs mt-3">Alle Dienste aktiv</p>
+          <p className="text-gray-200 text-xs mt-3">Alle Dienste aktiv</p>
         </div>
       </div>
     </div>
@@ -634,9 +634,9 @@ const StatCard = ({ title, value, iconType, color, subtitle }) => {
     <div className={`bg-gradient-to-br ${colors[color]} border rounded-xl p-5`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-gray-400 text-sm">{title}</p>
+          <p className="text-gray-200 text-sm">{title}</p>
           <p className={`text-3xl font-bold ${textColors[color]} mt-1`}>{value}</p>
-          <p className="text-gray-500 text-xs mt-1">{subtitle}</p>
+          <p className="text-gray-200 text-xs mt-1">{subtitle}</p>
         </div>
         {renderIcon()}
       </div>
@@ -688,7 +688,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
             <h2 className="text-xl font-semibold text-white">System Fehlermeldungen</h2>
-            <p className="text-gray-500 text-sm">Überwachen Sie alle Fehler und Warnungen</p>
+            <p className="text-gray-200 text-sm">Überwachen Sie alle Fehler und Warnungen</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
@@ -723,7 +723,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-white">Keine Fehler</h3>
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-200 mt-2">
               {filter === 'all' ? 'Alle Systeme laufen einwandfrei' : 'Keine Ergebnisse für diesen Filter'}
             </p>
           </div>
@@ -803,7 +803,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
       <div className="space-y-4">
         {/* Status Overview */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Status Übersicht</h3>
+          <h3 className="text-sm font-medium text-gray-200 uppercase tracking-wider mb-4">Status Übersicht</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
               <div className="flex items-center gap-3">
@@ -855,14 +855,14 @@ const ErrorsTab = ({ errors, onResolve }) => {
         {/* Selected Error Details */}
         {selectedError && (
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Details</h3>
+            <h3 className="text-sm font-medium text-gray-200 uppercase tracking-wider mb-4">Details</h3>
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-gray-500">Nachricht</p>
+                <p className="text-xs text-gray-200">Nachricht</p>
                 <p className="text-white text-sm mt-1">{selectedError.message}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Zeitpunkt</p>
+                <p className="text-xs text-gray-200">Zeitpunkt</p>
                 <p className="text-white text-sm mt-1">{formatTimestamp(selectedError.timestamp)}</p>
               </div>
               {selectedError.source && (
@@ -893,7 +893,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
 
         {/* Quick Actions */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Schnellaktionen</h3>
+          <h3 className="text-sm font-medium text-gray-200 uppercase tracking-wider mb-3">Schnellaktionen</h3>
           <div className="space-y-2">
             <button
               onClick={() => {
@@ -961,7 +961,7 @@ const CustomersTab = ({ customers }) => {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
             <h2 className="text-xl font-semibold text-white">Kunden</h2>
-            <p className="text-gray-500 text-sm">Alle Unternehmen die JN Business System nutzen</p>
+            <p className="text-gray-200 text-sm">Alle Unternehmen die JN Business System nutzen</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[

@@ -32,13 +32,13 @@ const CustomerDashboard = () => {
       try {
         // Fetch customer's bookings
         const res = await fetch(`${API_URL}/bookings?limit=50`, { headers });
-        
+
         if (res.ok) {
           const data = await res.json();
-          
+
           if (data.success && data.bookings) {
             const now = new Date();
-            
+
             // Split into upcoming and past
             const upcoming = data.bookings
               .filter(b => new Date(b.bookingDate) >= now && b.status !== 'cancelled' && b.status !== 'completed')
@@ -141,23 +141,23 @@ const CustomerDashboard = () => {
               {upcomingBookings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2"></div>
-                  <p className="text-gray-400">Keine bevorstehenden Termine</p>
+                  <p className="text-gray-200">Keine bevorstehenden Termine</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {upcomingBookings.map(booking => (
                     <div key={booking.id} className="border border-gray-800 rounded-lg p-4 hover:bg-gray-800/30 transition">
                       <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-white">{booking.service}</p>
-                          <p className="text-gray-400">{booking.salon}</p>
-                          <p className="text-gray-500 text-sm">{booking.date}</p>
+                      <div>
+                        <p className="font-medium text-white">{booking.service}</p>
+                        <p className="text-gray-200">{booking.salon}</p>
+                        <p className="text-gray-500 text-sm">{booking.date}</p>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusDisplay(booking.status).color}`}>
                             {getStatusDisplay(booking.status).label}
                           </span>
-                          <button 
+                          <button
                             onClick={() => handleCancelBooking(booking.id)}
                             className="px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition text-sm"
                           >
@@ -177,7 +177,7 @@ const CustomerDashboard = () => {
               {pastBookings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2">📋</div>
-                  <p className="text-gray-400">Keine vergangenen Termine</p>
+                  <p className="text-gray-200">Keine vergangenen Termine</p>
                 </div>
               ) : (
                 <div className="space-y-4">

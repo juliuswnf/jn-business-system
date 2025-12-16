@@ -7,13 +7,13 @@ export default function AGB() {
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="mb-12">
-          <Link to="/" className="text-zinc-300 hover:text-white text-sm mb-4 inline-block">
+          <Link to="/" className="text-zinc-300 hover:text-white text-sm mb-4 inline-block" aria-label="Zurück zur Startseite">
             ← Zurück zur Startseite
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Allgemeine Geschäftsbedingungen (AGB)
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-200">
             Stand: Dezember 2024 | JN Business System
           </p>
         </div>

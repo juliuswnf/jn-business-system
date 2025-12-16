@@ -27,12 +27,12 @@ let sentryInitialized = false;
  */
 export const initErrorTracking = async () => {
   const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
-  
+
   if (sentryDsn && !sentryInitialized) {
     try {
       const SentryModule = await import('@sentry/react');
       Sentry = SentryModule;
-      
+
       Sentry.init({
         dsn: sentryDsn,
         environment: import.meta.env.MODE || 'development',
@@ -53,9 +53,9 @@ export const initErrorTracking = async () => {
           return event;
         }
       });
-      
+
       sentryInitialized = true;
-      console.log('[ErrorTracking] Sentry initialized');
+      // Error tracking initialized
     } catch (error) {
       console.warn('[ErrorTracking] Sentry not available:', error.message);
     }
@@ -115,7 +115,7 @@ export const captureMessage = (message, level = ErrorLevel.INFO, context = {}) =
   }
 
   if (import.meta.env.DEV) {
-    console.log(`[ErrorTracking:${level}]`, message, context);
+    // Error logged
   }
 
   if (Sentry && sentryInitialized) {

@@ -9,35 +9,35 @@ const CEOLogin = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  
+
   // 2FA States
   const [step, setStep] = useState('credentials'); // 'credentials' | '2fa' | '2fa-setup'
   const [qrCode, setQrCode] = useState('');
   const [setupSecret, setSetupSecret] = useState('');
-  
+
   const notification = useNotification();
 
   useEffect(() => {
     if (import.meta.env.DEV) {
-      console.log('[SECURITY] CEO Login page accessed at:', new Date().toISOString());
+      // CEO Login page accessed
     }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (loading) return;
     setLoading(true);
     setError('');
 
     const codeToSend = twoFactorCode && twoFactorCode.length === 6 ? twoFactorCode : null;
-    console.log('[CEO Login] Submitting with:', { email, password: '***', twoFactorCode: codeToSend });
+    // CEO Login attempt
 
     try {
       const response = await authAPI.ceoLogin(email, password, codeToSend);
       const data = response.data;
 
-      console.log('[CEO Login] Response:', data);
+      // CEO Login response received
 
       // SUCCESS - Login complete with token
       if (data.success && data.token) {
@@ -45,9 +45,9 @@ const CEOLogin = () => {
         localStorage.setItem('jnUser', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
+
         notification.success(data.message || 'Zugang autorisiert');
-        
+
         // Use setTimeout to ensure state is saved before redirect
         setTimeout(() => {
           window.location.href = '/ceo/dashboard';
@@ -93,7 +93,7 @@ const CEOLogin = () => {
       setError('Bitte geben Sie einen 6-stelligen Code ein');
       return;
     }
-    console.log('[CEO Login] Verifying 2FA with code:', twoFactorCode);
+    // Verifying 2FA code
     await handleSubmit(e);
   };
 
@@ -108,7 +108,7 @@ const CEOLogin = () => {
             backgroundSize: '50px 50px'
           }} />
         </div>
-        
+
         <div className="relative z-10 w-full max-w-md px-6">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 mb-4">
@@ -184,9 +184,9 @@ const CEOLogin = () => {
             backgroundSize: '50px 50px'
           }} />
         </div>
-        
+
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" />
-        
+
         <div className="relative z-10 w-full max-w-md px-6">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-4">
@@ -263,11 +263,11 @@ const CEOLogin = () => {
           backgroundSize: '50px 50px'
         }} />
       </div>
-      
+
       {/* Gradient Orbs */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      
+
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-md px-6">
         {/* Logo/Brand */}

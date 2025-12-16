@@ -103,7 +103,7 @@ export default function Dashboard() {
     <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6 hover:border-zinc-700 transition">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-400 text-sm mb-2">{label}</p>
+          <p className="text-gray-200 text-sm mb-2">{label}</p>
           <p className="text-3xl font-bold text-white">{value}</p>
         </div>
         <div className={`text-4xl p-4 rounded-lg ${color}`}>
@@ -121,7 +121,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-1">Mein Dashboard</h1>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-200 text-sm">
                 Willkommen zurück{employee ? `, ${employee.name}` : ''}!
               </p>
             </div>
@@ -136,7 +136,7 @@ export default function Dashboard() {
       {loading && (
         <div className="max-w-7xl mx-auto px-6 py-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="text-gray-400 mt-4">Lade Daten...</p>
+          <p className="text-gray-200 mt-4">Lade Daten...</p>
         </div>
       )}
 
@@ -145,7 +145,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="bg-red-900/50 border border-red-700 rounded-lg p-4 text-center">
             <p className="text-red-300">{error}</p>
-            <button 
+            <button
               onClick={fetchData}
               className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white"
             >
@@ -176,19 +176,19 @@ export default function Dashboard() {
 
             {upcomingBookings.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-400">Keine Termine für heute</p>
+                <p className="text-gray-200">Keine Termine für heute</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {upcomingBookings.map((booking) => (
-                  <div 
-                    key={booking.id} 
+                  <div
+                    key={booking.id}
                     className="p-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="font-semibold text-white">{booking.customer}</p>
-                        <p className="text-gray-400 text-sm">{booking.service}</p>
+                        <p className="text-gray-200 text-sm">{booking.service}</p>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-300">
                           <span>{booking.time}</span>
                           <span>{booking.duration}</span>
@@ -196,8 +196,8 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right">
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          booking.status === 'Bestätigt' 
-                            ? 'bg-green-500/20 text-green-400' 
+                          booking.status === 'Bestätigt'
+                            ? 'bg-green-500/20 text-green-400'
                             : 'bg-yellow-500/20 text-yellow-400'
                         }`}>
                           {booking.status}
@@ -214,7 +214,7 @@ export default function Dashboard() {
           <div className="mt-12 grid md:grid-cols-2 gap-6">
             <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6 hover:border-zinc-700 transition">
               <h3 className="text-xl font-bold mb-3">Zeitplan verwalten</h3>
-              <p className="text-gray-400 mb-4">Verfügbarkeit und freie Tage einstellen</p>
+              <p className="text-gray-200 mb-4">Verfügbarkeit und freie Tage einstellen</p>
               <button className="w-full px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition">
                 Zeitplan öffnen
               </button>
@@ -222,8 +222,8 @@ export default function Dashboard() {
 
             <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6 hover:border-zinc-700 transition">
               <h3 className="text-xl font-bold mb-3">Aktualisieren</h3>
-              <p className="text-gray-400 mb-4">Termine neu laden</p>
-              <button 
+              <p className="text-gray-200 mb-4">Termine neu laden</p>
+              <button
                 onClick={fetchData}
                 className="w-full px-4 py-2 border border-zinc-700 text-white rounded-lg font-medium hover:bg-zinc-800 transition"
               >

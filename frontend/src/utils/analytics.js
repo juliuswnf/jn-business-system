@@ -14,15 +14,15 @@ export const trackEvent = (eventName, props = {}) => {
     if (window.plausible) {
       window.plausible(eventName, { props });
     }
-    
+
     // Google Analytics 4
     if (window.gtag) {
       window.gtag('event', eventName, props);
     }
-    
+
     // Console log in development
     if (import.meta.env.DEV) {
-      console.log('📊 Analytics Event:', eventName, props);
+      // Analytics event tracked
     }
   } catch (error) {
     console.error('Analytics tracking error:', error);
@@ -38,7 +38,7 @@ export const trackPageView = (path) => {
     if (window.plausible) {
       window.plausible('pageview', { props: { path } });
     }
-    
+
     if (window.gtag) {
       window.gtag('config', window.GA_MEASUREMENT_ID, {
         page_path: path
@@ -57,7 +57,7 @@ export const analytics = {
   bookingStarted: (salonName) => {
     trackEvent('Booking Started', { salon: salonName });
   },
-  
+
   bookingCompleted: (salonName, service, price) => {
     trackEvent('Booking Completed', {
       salon: salonName,
@@ -66,36 +66,36 @@ export const analytics = {
       value: price
     });
   },
-  
+
   bookingCanceled: (reason) => {
     trackEvent('Booking Canceled', { reason });
   },
-  
+
   // User events
   userRegistered: (role) => {
     trackEvent('User Registered', { role });
   },
-  
+
   userLoggedIn: (role) => {
     trackEvent('User Logged In', { role });
   },
-  
+
   // Subscription events
   subscriptionStarted: (plan) => {
     trackEvent('Subscription Started', { plan });
   },
-  
+
   subscriptionUpgraded: (fromPlan, toPlan) => {
     trackEvent('Subscription Upgraded', {
       from_plan: fromPlan,
       to_plan: toPlan
     });
   },
-  
+
   subscriptionCanceled: (plan) => {
     trackEvent('Subscription Canceled', { plan });
   },
-  
+
   // Search & Discovery
   salonSearched: (query, resultsCount) => {
     trackEvent('Salon Searched', {
@@ -103,11 +103,11 @@ export const analytics = {
       results: resultsCount
     });
   },
-  
+
   cityPageViewed: (city) => {
     trackEvent('City Page Viewed', { city });
   },
-  
+
   // CTA clicks
   ctaClicked: (ctaName, location) => {
     trackEvent('CTA Clicked', {
@@ -115,17 +115,17 @@ export const analytics = {
       location
     });
   },
-  
+
   // Demo requests
   demoRequested: () => {
     trackEvent('Demo Requested');
   },
-  
+
   // Widget usage
   widgetInstalled: (salonName) => {
     trackEvent('Widget Installed', { salon: salonName });
   },
-  
+
   widgetBookingCompleted: (salonSlug) => {
     trackEvent('Widget Booking Completed', { salon_slug: salonSlug });
   }

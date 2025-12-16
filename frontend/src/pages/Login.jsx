@@ -8,12 +8,12 @@ const Login = () => {
   const handleLogoClick = () => {
     const newCount = clickCount + 1;
     setClickCount(newCount);
-    
+
     if (newCount >= 3) {
       window.location.href = '/_.admin';
       setClickCount(0);
     }
-    
+
     // Reset after 2 seconds
     setTimeout(() => setClickCount(0), 2000);
   };
@@ -22,13 +22,13 @@ const Login = () => {
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8 p-8 bg-zinc-900 border border-zinc-800 rounded-xl">
         <div className="text-center">
-          <h1 
+          <h1
             className="text-3xl font-bold text-white mb-2 cursor-default select-none"
             onClick={handleLogoClick}
           >
             Willkommen bei JN Business System
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-200">
             Wählen Sie Ihre Rolle aus, um fortzufahren
           </p>
         </div>
@@ -50,7 +50,7 @@ const Login = () => {
 
           <Link
             to="/login/employee"
-            className="block w-full px-6 py-4 border border-zinc-700 text-center font-medium rounded-lg text-gray-400 hover:bg-zinc-800 hover:text-white transition"
+            className="block w-full px-6 py-4 border border-zinc-700 text-center font-medium rounded-lg text-gray-200 hover:bg-zinc-800 hover:text-white transition"
           >
             Mitarbeiter Login
           </Link>

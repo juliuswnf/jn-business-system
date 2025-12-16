@@ -94,7 +94,7 @@ export default function Checkout() {
     try {
       const billing = isYearly ? 'yearly' : 'monthly';
       const response = await subscriptionAPI.createCheckout(plan.id, billing);
-      
+
       if (response.data.success && response.data.url) {
         // Redirect to Stripe Checkout
         window.location.href = response.data.url;
@@ -117,9 +117,9 @@ export default function Checkout() {
     <div className="min-h-screen bg-black text-white py-12">
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
-        <Link 
-          to="/pricing" 
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition"
+        <Link
+          to="/pricing"
+          className="inline-flex items-center gap-2 text-gray-200 hover:text-white mb-8 transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -131,7 +131,7 @@ export default function Checkout() {
           {/* Left: Plan Info */}
           <div>
             <h1 className="text-3xl font-bold mb-2">{plan.name} Plan</h1>
-            <p className="text-gray-400 mb-8">{plan.description}</p>
+            <p className="text-gray-200 mb-8">{plan.description}</p>
 
             {/* Features */}
             <div className="bg-zinc-900 rounded-lg p-5 border border-zinc-800 mb-6">
@@ -142,7 +142,7 @@ export default function Checkout() {
                     <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-300">{feature}</span>
+                    <span className="text-gray-200">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -156,7 +156,7 @@ export default function Checkout() {
                 </svg>
                 <div>
                   <h4 className="font-medium text-white">30 Tage kostenlos testen</h4>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-200 mt-1">
                     Du wirst erst nach Ablauf der Testphase belastet. Jederzeit kündbar.
                   </p>
                 </div>
@@ -170,11 +170,11 @@ export default function Checkout() {
 
             {/* Price Breakdown */}
             <div className="space-y-3 mb-6">
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-gray-200">
                 <span>{plan.name} Plan ({isYearly ? 'jährlich' : 'monatlich'})</span>
                 <span>€{price.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-gray-200">
                 <span>MwSt. (19%)</span>
                 <span>€{vatAmount}</span>
               </div>
@@ -228,9 +228,9 @@ export default function Checkout() {
             </button>
 
             {!isLoggedIn && (
-              <p className="text-center text-gray-500 text-sm mb-4">
+              <p className="text-center text-gray-200 text-sm mb-4">
                 Du hast bereits ein Konto?{' '}
-                                <Link to="/login" className="text-zinc-400 hover:text-white hover:underline">
+                                <Link to="/login" className="text-gray-200 hover:text-white hover:underline">
                   Anmelden
                 </Link>
               </p>
