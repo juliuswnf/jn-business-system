@@ -65,14 +65,14 @@ try {
     Write-Host "   [FAIL] Frontend: Connection Error" -ForegroundColor Red
 }
 
-# Test 6: API Version Endpoint
+# Test 6: API Endpoints
 Write-Host "6. Testing API Endpoints..." -ForegroundColor White
 try {
-    $versionResponse = Invoke-RestMethod -Uri "https://$RAILWAY_DOMAIN/api/system/version" -Method Get -TimeoutSec 10
-    Write-Host "   [OK] API Version: $($versionResponse.version)" -ForegroundColor Green
-    Write-Host "   [INFO] Environment: $($versionResponse.environment)" -ForegroundColor Cyan
+    $pricingResponse = Invoke-RestMethod -Uri "https://$RAILWAY_DOMAIN/api/pricing/tiers" -Method Get -TimeoutSec 10
+    $tierCount = $pricingResponse.tiers.Count
+    Write-Host "   [OK] API Pricing: $tierCount tiers available" -ForegroundColor Green
 } catch {
-    Write-Host "   [WARN] API Endpoint: Failed (check CORS settings)" -ForegroundColor Yellow
+    Write-Host "   [WARN] API Endpoint: Failed (status: $($_.Exception.Response.StatusCode.value__))" -ForegroundColor Yellow
 }
 
 # Test 7: Memory Usage
