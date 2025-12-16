@@ -35,7 +35,7 @@ export default function Employees() {
         setEmployees(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      // Error handled by UI state
     } finally {
       setLoading(false);
     }

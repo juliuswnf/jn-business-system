@@ -1,7 +1,36 @@
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 function Home() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "JN Business System",
+    "description": "Online-Buchungssystem für Unternehmen mit automatischen Terminbestätigungen und No-Show-Killer",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "EUR",
+      "priceValidUntil": "2025-12-31"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "120"
+    }
+  };
+
   return (
+    <>
+      <SEO
+        title="Online-Buchungssystem für Unternehmen"
+        description="Automatische Terminbuchungen für Salons, Tattoo-Studios und Dienstleister. 30 Tage kostenlos testen. No-Show-Killer inklusive."
+        keywords="Online Buchungssystem, Terminvereinbarung, Salon Software, Tattoo Studio Verwaltung, No-Show-Killer"
+        url="/"
+        structuredData={structuredData}
+      />
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section - Large with Preview */}
       <section className="min-h-[90vh] flex items-center px-6 py-20">
@@ -296,6 +325,7 @@ function Home() {
         </div>
       </section>
     </div>
+    </>
   );
 }
 

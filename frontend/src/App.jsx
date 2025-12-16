@@ -1,5 +1,7 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 
 // Critical path - load immediately
@@ -181,10 +183,12 @@ function App() {
   // Removed console.log statements for production (Lighthouse Best Practices)
 
   return (
-    <Router>
-        <ScrollToTop />
-      <KeyboardShortcuts />
-      <Routes>
+    <HelmetProvider>
+      <ErrorBoundary>
+        <Router>
+          <ScrollToTop />
+          <KeyboardShortcuts />
+          <Routes>
         {/* ==================== PUBLIC ROUTES (wrapped in AppLayout) ==================== */}
         <Route path="/" element={<AppLayout><Home /></AppLayout>} />
         <Route path="/demo" element={<AppLayout><LazyPage><Demo /></LazyPage></AppLayout>} />
@@ -650,6 +654,8 @@ function App() {
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
     </Router>
+    </ErrorBoundary>
+  </HelmetProvider>
   );
 }
 

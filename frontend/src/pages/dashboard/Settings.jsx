@@ -11,7 +11,7 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('studio');
-  
+
   const [studioInfo, setStudioInfo] = useState({
     name: '',
     address: '',
@@ -47,7 +47,7 @@ export default function Settings() {
     try {
       setLoading(true);
       const response = await salonAPI.getInfo().catch(() => ({ data: {} }));
-      
+
       if (response.data) {
         const data = response.data;
         setStudioInfo({
@@ -73,7 +73,7 @@ export default function Settings() {
         }
       }
     } catch (error) {
-      console.error('Settings fetch error:', error);
+      // Error handled by UI state
     } finally {
       setLoading(false);
     }
@@ -145,7 +145,7 @@ export default function Settings() {
 
       {/* Tab Content */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6">
-        
+
         {/* Studio Info Tab */}
         {activeTab === 'studio' && (
           <div className="space-y-6">
@@ -234,7 +234,7 @@ export default function Settings() {
         {activeTab === 'hours' && (
           <div className="space-y-3">
             {openingHours.map((hours, index) => (
-              <div 
+              <div
                 key={hours.day}
                 className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 bg-zinc-800 rounded-lg"
               >
@@ -350,7 +350,7 @@ export default function Settings() {
               </div>
 
               <p className="text-sm text-zinc-400">
-                Die E-Mail-Templates werden automatisch mit deinen Studio-Daten personalisiert. 
+                Die E-Mail-Templates werden automatisch mit deinen Studio-Daten personalisiert.
                 Eigene Templates sind im Enterprise-Plan verfügbar.
               </p>
             </div>

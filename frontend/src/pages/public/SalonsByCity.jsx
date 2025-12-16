@@ -101,7 +101,7 @@ const SalonsByCity = () => {
             <p className="text-gray-300 text-lg mb-4">{error}</p>
             <Link
               to="/salons"
-              className="text-white hover:text-gray-300 font-medium">
+              className="text-white hover:text-gray-300 font-medium"
             >
               Zurück zur Übersicht
             </Link>
@@ -113,7 +113,7 @@ const SalonsByCity = () => {
             </p>
             <Link
               to="/salons"
-              className="text-white hover:text-gray-300 font-medium">
+              className="text-white hover:text-gray-300 font-medium"
             >
               Andere Städte durchsuchen
             </Link>

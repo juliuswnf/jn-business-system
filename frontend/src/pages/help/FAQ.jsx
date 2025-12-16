@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import SEO from '../../components/SEO';
 
 /**
  * FAQ Page - Häufig gestellte Fragen
@@ -128,6 +129,13 @@ const FAQ = () => {
   ];
 
   return (
+    <>
+      <SEO
+        title="FAQ - Häufig gestellte Fragen"
+        description="Antworten auf alle Fragen zu JN Business System: Preise, Integration, Support, Datenschutz und mehr."
+        keywords="FAQ, Häufige Fragen, Buchungssystem Hilfe, Support"
+        url="/faq"
+      />
     <div className="min-h-screen bg-black text-white py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -206,6 +214,7 @@ const FAQ = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

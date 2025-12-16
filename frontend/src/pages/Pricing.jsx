@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const plans = [
   {
@@ -125,6 +126,13 @@ export default function Pricing() {
   };
 
   return (
+    <>
+      <SEO
+        title="Preise - Faire Preise ohne versteckte Kosten"
+        description="Starter ab €69/Monat, Professional €199/Monat, Enterprise €499/Monat. 30 Tage kostenlos testen. Keine Kreditkarte erforderlich."
+        keywords="Preise, Buchungssystem Kosten, Salon Software Preis, Tattoo Studio Software"
+        url="/pricing"
+      />
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 py-20">
 
@@ -446,5 +454,6 @@ export default function Pricing() {
         </div>
       </div>
     </div>
+    </>
   );
 }

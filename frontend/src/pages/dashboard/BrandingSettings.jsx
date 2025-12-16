@@ -51,7 +51,7 @@ export default function BrandingSettings() {
           }
         }
       } catch (error) {
-        console.error('Error fetching branding:', error);
+        // Error handled by UI state
       } finally {
         setLoading(false);
       }

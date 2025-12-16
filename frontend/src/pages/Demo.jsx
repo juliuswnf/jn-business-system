@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const SERVICES = [
   { id: 1, name: 'Beratung Standard', duration: 45, price: 45 },
@@ -50,6 +51,13 @@ export default function Demo() {
   };
 
   return (
+    <>
+      <SEO
+        title="Demo - Interaktive Buchungsdemo"
+        description="Testen Sie unser Buchungssystem live. Erleben Sie die intuitive Terminbuchung für Ihre Kunden."
+        keywords="Demo, Buchungssystem Demo, Live Demo, Terminbuchung testen"
+        url="/demo"
+      />
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-5xl mx-auto px-4 py-16">
 
@@ -353,5 +361,6 @@ export default function Demo() {
         </div>
       </div>
     </div>
+    </>
   );
 }

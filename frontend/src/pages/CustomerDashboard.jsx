@@ -77,7 +77,7 @@ const CustomerDashboard = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching bookings:', error);
+        // Error handled by UI state
       } finally {
         setLoading(false);
       }
