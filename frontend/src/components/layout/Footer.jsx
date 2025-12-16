@@ -18,7 +18,7 @@ const Footer = () => {
               </div>
               <div>
                 <h3 className="text-white font-semibold">JN Business System</h3>
-                <p className="text-gray-500 text-xs">Terminbuchungen leicht gemacht</p>
+                <p className="text-gray-300 text-xs">Terminbuchungen leicht gemacht</p>
               </div>
             </Link>
           </div>
