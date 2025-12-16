@@ -33,7 +33,7 @@ function Home() {
                 </Link>
               </div>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-300">
                 Keine Kreditkarte erforderlich · Jederzeit kündbar
               </p>
             </div>
@@ -64,15 +64,15 @@ function Home() {
                     <div className="grid grid-cols-3 gap-3">
                       <div className="bg-zinc-800 rounded-xl p-4 text-center">
                         <div className="text-2xl font-bold">47</div>
-                        <div className="text-xs text-gray-500">Buchungen</div>
+                        <div className="text-xs text-gray-300">Buchungen</div>
                       </div>
                       <div className="bg-zinc-800 rounded-xl p-4 text-center">
                         <div className="text-2xl font-bold text-green-400">€2.340</div>
-                        <div className="text-xs text-gray-500">Umsatz</div>
+                        <div className="text-xs text-gray-300">Umsatz</div>
                       </div>
                       <div className="bg-zinc-800 rounded-xl p-4 text-center">
                         <div className="text-2xl font-bold">4.8</div>
-                        <div className="text-xs text-gray-500">Bewertung</div>
+                        <div className="text-xs text-gray-300">Bewertung</div>
                       </div>
                     </div>
 
@@ -125,7 +125,7 @@ function Home() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold">Neue Buchung!</div>
-                      <div className="text-xs text-gray-300">vor 2 Min.</div>
+                      <div className="text-xs text-gray-600">vor 2 Min.</div>
                     </div>
                   </div>
                 </div>
@@ -229,19 +229,19 @@ function Home() {
               <div className="grid grid-cols-2 gap-8">
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">500+</div>
-                  <div className="text-gray-500 text-sm">Aktive Unternehmen</div>
+                  <div className="text-gray-300 text-sm">Aktive Unternehmen</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">50k+</div>
-                  <div className="text-gray-500 text-sm">Buchungen/Monat</div>
+                  <div className="text-gray-300 text-sm">Buchungen/Monat</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">4.9</div>
-                  <div className="text-gray-500 text-sm">Bewertung</div>
+                  <div className="text-gray-300 text-sm">Bewertung</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
                   <div className="text-4xl font-bold mb-2">2h</div>
-                  <div className="text-gray-500 text-sm">Zeit gespart/Tag</div>
+                  <div className="text-gray-300 text-sm">Zeit gespart/Tag</div>
                 </div>
               </div>
             </div>
