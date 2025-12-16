@@ -26,8 +26,8 @@ function Home() {
     <>
       <SEO
         title="Online-Buchungssystem für Unternehmen"
-        description="Automatische Terminbuchungen für Salons, Tattoo-Studios und Dienstleister. 30 Tage kostenlos testen. No-Show-Killer inklusive."
-        keywords="Online Buchungssystem, Terminvereinbarung, Salon Software, Tattoo Studio Verwaltung, No-Show-Killer"
+        description="Automatische Terminbuchungen für Dienstleister aller Branchen. 30 Tage kostenlos testen. No-Show-Killer inklusive."
+        keywords="Online Buchungssystem, Terminvereinbarung, Business Software, Unternehmensverwaltung, No-Show-Killer"
         url="/"
         structuredData={structuredData}
       />

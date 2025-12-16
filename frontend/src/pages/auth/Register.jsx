@@ -9,12 +9,12 @@ export default function Register() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { success, error: showError } = useNotification();
-  
+
   // Check if coming from checkout or direct signup
   const fromCheckout = location.state?.fromCheckout;
   const selectedPlan = location.state?.plan || searchParams.get('plan') || 'starter';
   const checkoutEmail = location.state?.email || searchParams.get('email') || '';
-  
+
   // Get plan info from sessionStorage
   const storedPlan = JSON.parse(sessionStorage.getItem('selectedPlan') || 'null');
 
@@ -110,10 +110,10 @@ export default function Register() {
         const { token, user } = response.data;
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
-        
+
         // Clear session storage
         sessionStorage.removeItem('selectedPlan');
-        
+
         success('Registrierung erfolgreich! Weiterleitung...');
         setTimeout(() => {
           navigate('/dashboard');
@@ -209,7 +209,7 @@ export default function Register() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="kontakt@salon.de"
+                  placeholder="kontakt@firma.de"
                   className={`input-field ${errors.email ? 'input-error' : ''}`}
                 />
                 {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}

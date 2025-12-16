@@ -87,7 +87,7 @@ export default function Demo() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="font-semibold">Muster Salon</h2>
+                    <h2 className="font-semibold">Muster Business</h2>
                     <p className="text-sm text-gray-200">Online Terminbuchung</p>
                   </div>
                 </div>

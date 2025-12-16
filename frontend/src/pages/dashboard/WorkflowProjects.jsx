@@ -54,18 +54,18 @@ export default function WorkflowProjects() {
   };
 
   const handleDeleteProject = async (id) => {
-    if (!confirm('Projekt wirklich lÃ¶schen?')) return;
+    if (!confirm('Projekt wirklich löschen?')) return;
 
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`${API_URL}/api/workflows/projects/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Projekt gelÃ¶scht');
+      toast.success('Projekt gelöscht');
       fetchData();
     } catch (error) {
       console.error('Error deleting project:', error);
-      toast.error('Fehler beim LÃ¶schen');
+      toast.error('Fehler beim Löschen');
     }
   };
 
@@ -106,8 +106,8 @@ export default function WorkflowProjects() {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Projekte</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-white mb-2">Projekte</h1>
+          <p className="text-zinc-400">
             Verwalte alle branchenspezifischen Projekte
           </p>
         </div>
@@ -141,48 +141,48 @@ export default function WorkflowProjects() {
             color="bg-green-50 border-green-200"
           />
           <StatCard
-            title="Ã˜ Fortschritt"
+            title="Ø Fortschritt"
             value={`${stats.averageProgress}%`}
-            icon="ðŸ“ˆ"
+            icon="📊"
             color="bg-purple-50 border-purple-200"
           />
           <StatCard
             title="Umsatz"
-            value={`${stats.totalRevenue.toLocaleString()}â‚¬`}
-            icon="ðŸ’°"
+            value={`€${stats.totalRevenue.toLocaleString()}`}
+            icon="💰"
             color="bg-green-50 border-green-200"
           />
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
             type="text"
             placeholder="Suche nach Name, Kunde..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <select
             value={filters.industry}
             onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Alle Branchen</option>
-            <option value="tattoo">ðŸŽ¨ Tattoo</option>
-            <option value="medical_aesthetics">ðŸ’‰ Medical Aesthetics</option>
-            <option value="spa_wellness">ðŸ§– Spa & Wellness</option>
-            <option value="barbershop">ðŸ’ˆ Barbershop</option>
-            <option value="nails">ðŸ’… Nails</option>
-            <option value="massage">ðŸ’† Massage</option>
-            <option value="physiotherapy">ðŸ©º Physiotherapie</option>
+            <option value="tattoo">🎨 Tattoo</option>
+            <option value="medical_aesthetics">💉 Medical Aesthetics</option>
+            <option value="spa_wellness">🧖 Spa & Wellness</option>
+            <option value="barbershop">💇 Barbershop</option>
+            <option value="nails">💅 Nails</option>
+            <option value="massage">💆 Massage</option>
+            <option value="physiotherapy">🧘 Physiotherapie</option>
           </select>
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Alle Status</option>
             <option value="draft">Entwurf</option>

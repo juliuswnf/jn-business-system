@@ -4,7 +4,7 @@ import SEO from '../../components/SEO';
 
 /**
  * FAQ Page - Häufig gestellte Fragen
- * Erweitert mit echten Fragen von Salons
+ * Erweitert mit echten Fragen von Unternehmen
  */
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -15,7 +15,7 @@ const FAQ = () => {
 
   const faqs = [
     {
-      category: 'Für Salonbesitzer',
+      category: 'Für Geschäftsinhaber',
       questions: [
         {
           question: 'Wie viel kostet JN Business System?',
@@ -27,7 +27,7 @@ const FAQ = () => {
         },
         {
           question: 'Brauche ich eine Website?',
-          answer: 'Nein! Sie erhalten automatisch eine eigene Buchungsseite (z.B. /s/ihr-salon-name), die Sie in Social Media teilen können. Optional können Sie auch unser Booking-Widget auf Ihrer bestehenden Website einbinden.'
+          answer: 'Nein! Sie erhalten automatisch eine eigene Buchungsseite (z.B. /s/ihr-business-name), die Sie in Social Media teilen können. Optional können Sie auch unser Booking-Widget auf Ihrer bestehenden Website einbinden.'
         },
         {
           question: 'Wie werden meine Kunden benachrichtigt?',
@@ -81,7 +81,7 @@ const FAQ = () => {
       questions: [
         {
           question: 'Funktioniert es auf dem Smartphone?',
-          answer: 'Ja! Das gesamte System ist für Mobile optimiert. Sowohl Salonbesitzer als auch Kunden können alles bequem vom Smartphone aus nutzen.'
+          answer: 'Ja! Das gesamte System ist für Mobile optimiert. Sowohl Geschäftsinhaber als auch Kunden können alles bequem vom Smartphone aus nutzen.'
         },
         {
           question: 'Welche Browser werden unterstützt?',
@@ -110,7 +110,7 @@ const FAQ = () => {
         },
         {
           question: 'Gibt es einen Mengenrabatt?',
-          answer: 'Ja, bei mehr als 5 Salons (z.B. Ketten) bieten wir individuelle Enterprise-Konditionen. Kontaktieren Sie uns für ein Angebot.'
+          answer: 'Ja, bei mehr als 5 Standorten (z.B. Ketten) bieten wir individuelle Enterprise-Konditionen. Kontaktieren Sie uns für ein Angebot.'
         },
         {
           question: 'Wie schnell ist der Support?',

@@ -8,8 +8,8 @@ import PropTypes from 'prop-types';
 
 const SEO = ({
   title = 'JN Business System - Terminbuchung für Unternehmen',
-  description = 'Professionelles Online-Buchungssystem für Salons, Studios und Unternehmen. Automatische Erinnerungen, Kalender-Integration und faire Preise.',
-  keywords = 'Terminbuchung, Online Booking, Salon Software, Appointment Booking, Buchungssystem',
+  description = 'Professionelles Online-Buchungssystem für Unternehmen und Dienstleister. Automatische Erinnerungen, Kalender-Integration und faire Preise.',
+  keywords = 'Terminbuchung, Online Booking, Business Software, Appointment Booking, Buchungssystem',
   author = 'JN Business System',
   image = '/og-image.png',
   url = 'https://jn-automation.vercel.app',

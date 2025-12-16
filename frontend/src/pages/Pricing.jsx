@@ -12,7 +12,7 @@ const plans = [
     yearlyMonthlyCost: 57.50,
     features: [
       { name: 'Mitarbeiter', value: '3', description: 'Bis zu 3 Mitarbeiter können das System nutzen' },
-      { name: 'Standorte', value: '1', description: 'Für einen Salon-Standort' },
+      { name: 'Standorte', value: '1', description: 'Für einen Unternehmens-Standort' },
       { name: 'Buchungen/Monat', value: '200', description: 'Bis zu 200 Termine pro Monat verwaltbar' },
       { name: 'Kunden', value: '500', description: 'Bis zu 500 Kundenkontakte speicherbar' },
       { name: 'Online-Buchung', included: true, description: 'Kunden buchen selbständig Termine über Ihre Webseite' },
@@ -130,7 +130,7 @@ export default function Pricing() {
       <SEO
         title="Preise - Faire Preise ohne versteckte Kosten"
         description="Starter ab €69/Monat, Professional €199/Monat, Enterprise €499/Monat. 30 Tage kostenlos testen. Keine Kreditkarte erforderlich."
-        keywords="Preise, Buchungssystem Kosten, Salon Software Preis, Tattoo Studio Software"
+        keywords="Preise, Buchungssystem Kosten, Business Software Preis, Unternehmenssoftware"
         url="/pricing"
       />
     <div className="min-h-screen bg-black text-white">

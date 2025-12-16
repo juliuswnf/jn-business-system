@@ -21,7 +21,7 @@ import {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /**
- * Success Metrics Dashboard for Salon Owners
+ * Success Metrics Dashboard for Business Owners
  * Shows KPIs and value they get from JN Automation
  */
 const SuccessMetrics = () => {

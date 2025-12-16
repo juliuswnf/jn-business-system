@@ -29,7 +29,7 @@ const Login = () => {
             Willkommen bei JN Business System
           </h1>
           <p className="text-gray-200">
-            Wählen Sie Ihre Rolle aus, um fortzufahren
+            Business Management für alle Branchen
           </p>
         </div>
 
@@ -45,7 +45,7 @@ const Login = () => {
             to="/login/business"
             className="block w-full px-6 py-4 border border-zinc-700 text-center font-medium rounded-lg text-white hover:bg-zinc-800 transition"
           >
-            Ich bin Geschäftsinhaber
+            Unternehmens-Login
           </Link>
 
           <Link
