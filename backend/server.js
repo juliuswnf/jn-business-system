@@ -53,7 +53,6 @@ import employeeRoutes from './routes/employeeRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import systemRoutes from './routes/systemRoutes.js'; // ? MEDIUM FIX #13 & #14
 import gdprRoutes from './routes/gdprRoutes.js'; // GDPR Compliance
-import healthRoutes from './routes/healthRoutes.js'; // Health Checks
 
 // Multi-Industry Routes - Phase 2
 import artistPortfolioRoutes from './routes/artistPortfolioRoutes.js';
@@ -252,9 +251,8 @@ app.use('/api/bookings/public', publicBookingRoutes);
 app.use('/api/widget', widgetRoutes); // Embeddable Widget API
 app.use('/api/subscriptions', subscriptionRoutes); // Stripe Subscription Management
 app.use('/api/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected)
-app.use('/api/system', systemRoutes); // ? MEDIUM FIX #13 & #14: Health & Backups
+app.use('/api/system', systemRoutes); // ? MEDIUM FIX #13 & #14: Health & Backups (/health, /health/detailed, /backups/*)
 app.use('/api/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: public + protected)
-app.use('/health', healthRoutes); // Health Check Endpoints
 
 // Protected Routes (Auth Required)
 app.use('/api/salon', authMiddleware.protect, salonRoutes);
