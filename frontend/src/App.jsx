@@ -66,6 +66,9 @@ const Marketing = lazy(() => import('./pages/dashboard/Marketing'));
 const CampaignEditor = lazy(() => import('./pages/dashboard/CampaignEditor'));
 const CampaignAnalytics = lazy(() => import('./pages/dashboard/CampaignAnalytics'));
 
+// NO-SHOW-KILLER System
+const Waitlist = lazy(() => import('./pages/dashboard/Waitlist'));
+
 // Tattoo Studio
 const TattooProjects = lazy(() => import('./pages/dashboard/TattooProjects'));
 const TattooProjectEditor = lazy(() => import('./pages/dashboard/TattooProjectEditor'));
@@ -75,6 +78,7 @@ const TattooProjectDetails = lazy(() => import('./pages/dashboard/TattooProjectD
 const Workflows = lazy(() => import('./pages/dashboard/Workflows'));
 const WorkflowProjects = lazy(() => import('./pages/dashboard/WorkflowProjects'));
 const WorkflowProjectDetail = lazy(() => import('./pages/dashboard/WorkflowProjectDetail'));
+const WorkflowProjectEditor = lazy(() => import('./pages/dashboard/WorkflowProjectEditor'));
 const PackagesMemberships = lazy(() => import('./pages/dashboard/PackagesMemberships'));
 
 // Onboarding
@@ -463,6 +467,18 @@ function App() {
           }
         />
 
+        {/* ==================== NO-SHOW-KILLER SYSTEM ==================== */}
+        <Route
+          path="/dashboard/waitlist"
+          element={
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
+              <DashboardLayout>
+                <LazyPage><Waitlist /></LazyPage>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         {/* ==================== TATTOO STUDIO ==================== */}
         <Route
           path="/dashboard/tattoo/projects"
@@ -522,6 +538,26 @@ function App() {
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
               <DashboardLayout>
                 <LazyPage><WorkflowProjects /></LazyPage>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/workflow-projects/new"
+          element={
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+              <DashboardLayout>
+                <LazyPage><WorkflowProjectEditor /></LazyPage>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/workflow-projects/:id/edit"
+          element={
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+              <DashboardLayout>
+                <LazyPage><WorkflowProjectEditor /></LazyPage>
               </DashboardLayout>
             </ProtectedRoute>
           }

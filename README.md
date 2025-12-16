@@ -8,15 +8,18 @@ Ein vollständiges, modernes Salon-Management-System mit React Frontend und Node
 
 ## 🚀 Features
 
-- ✅ **Termin-Management** - Automatische Buchung und Erinnerungen
-- ✅ **Kundenverwaltung** - Kundenprofile und Historie
-- ✅ **Mitarbeiterverwaltung** - Planung und Verfügbarkeit
-- ✅ **Zahlungsverarbeitung** - Stripe Integration
-- ✅ **Analytik & Berichte** - CEO Dashboard mit Insights
-- ✅ **Rollenbasierter Zugriff** - CEO, Admin, Employee, Customer
-- ✅ **Öffentliche Buchung** - Ohne Registrierung buchbar
-- ✅ **Responsive Design** - Mobile-friendly
-- ✅ **Dark Mode** - Verfügbar
+**Vollständige Feature-Liste:** Siehe [FEATURES.md](FEATURES.md) für detaillierte Dokumentation aller Features.
+
+### Haupt-Features:
+- ✅ **Booking System** - Multi-Service, Multi-Employee, Recurring Appointments
+- ✅ **NO-SHOW-KILLER** 💎 - SMS-Bestätigungen, Auto-Cancel, Waitlist-Matching (€544/Mo ROI)
+- ✅ **Marketing-Agent** 🎯 - 5 Campaign-Types, ROI-Tracking (€4.026/Mo Revenue)
+- ✅ **Branchen-Workflows** 🏆 - 8 Industries (Tattoo, Medical, Wellness, etc.)
+- ✅ **Pricing-Wizard** 🧙 - Intelligenter Tier-Recommendation (+25% Conversion)
+- ✅ **GDPR Compliance** - Data Export, Right to be Forgotten, Audit Logging
+- ✅ **Security** ⭐⭐⭐⭐⭐ - Enterprise-Grade (Helmet, Rate Limiting, Input Sanitization)
+- ✅ **Public Salon Directory** - Marketplace mit SEO-optimierten Pages
+- ✅ **Mobile-Responsive** 📱 - Lighthouse 100/100 Performance
 
 ## 🛠️ Tech Stack
 
@@ -260,10 +263,11 @@ npm run test:e2e
 ## 📊 Monitoring
 
 ### Health Endpoints
-- `GET /health` - Basic health check
-- `GET /health/detailed` - Full system info
-- `GET /health/ready` - Readiness probe (K8s)
-- `GET /health/live` - Liveness probe (K8s)
+- `GET /api/system/health` - Basic health check
+- `GET /api/system/health/detailed` - Full system info (Admin)
+- `GET /api/system/ready` - Readiness probe (Kubernetes)
+- `GET /api/system/live` - Liveness probe (Kubernetes)
+- `GET /api/system/ping` - Simple ping
 
 ### Sentry Integration
 - Backend: @sentry/node

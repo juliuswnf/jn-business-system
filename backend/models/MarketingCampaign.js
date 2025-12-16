@@ -21,7 +21,7 @@ const MarketingCampaignSchema = new mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: ['inactive_customers', 'birthday', 'last_minute', 'upsell', 'loyalty'],
+      enum: ['inactive_customers', 'birthday', 'last_minute', 'upsell', 'loyalty', 'referral'],
       index: true
     },
 

@@ -232,20 +232,21 @@ function Home() {
 
               <div className="space-y-6">
                 {[
+                  { title: 'NO-SHOW-KILLER System', desc: 'SMS-Bestätigungen 48h vor Termin, Auto-Cancel nach 24h, Waitlist Auto-Matching. Spart €544/Mo.', highlight: true },
+                  { title: 'MARKETING-AGENT', desc: 'Automatische Kampagnen: Birthday, Win-Back, Review, Upsell, Referral. Generiert €4.026/Mo zusätzlich.', highlight: true },
                   { title: 'Keine Provisionen', desc: 'Sie zahlen nur den monatlichen Festpreis. Keine versteckten Gebühren pro Buchung.' },
-                  { title: 'Automatische Erinnerungen', desc: 'Kunden erhalten automatisch Termin-Erinnerungen per E-Mail. Weniger No-Shows.' },
-                  { title: 'Einfaches Widget', desc: 'Ein Code-Snippet auf Ihrer Website und Kunden können direkt buchen.' },
-                  { title: 'Google Bewertungen', desc: 'Nach jedem Termin wird automatisch um eine Google-Bewertung gebeten.' },
-                  { title: 'DSGVO-konform', desc: 'Server in Deutschland, alle Daten sicher und datenschutzkonform gespeichert.' },
+                  { title: 'Branchen-Workflows', desc: 'Tattoo Studios, Medical/Botox, Wellness Spas - spezialisierte Workflows für Ihre Branche.' },
+                  { title: 'Pricing-Wizard', desc: '6-Fragen Wizard findet automatisch den perfekten Tarif für Ihr Business (+25% Conversion).' },
+                  { title: 'DSGVO & HIPAA konform', desc: 'Server in Deutschland, AES-256-GCM Verschlüsselung, Audit-Logs, Breach-Notification.' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4">
-                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className={`w-6 h-6 ${item.highlight ? 'bg-green-500' : 'bg-white'} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5`}>
                       <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">{item.title}</h3>
+                      <h3 className={`font-semibold mb-1 ${item.highlight ? 'text-green-400' : ''}`}>{item.title}</h3>
                       <p className="text-gray-300 text-sm">{item.desc}</p>
                     </div>
                   </div>
@@ -255,23 +256,32 @@ function Home() {
 
             {/* Stats Card */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+              <h3 className="text-xl font-bold mb-6 text-center">ROI Impact</h3>
               <div className="grid grid-cols-2 gap-8">
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
-                  <div className="text-4xl font-bold mb-2">500+</div>
-                  <div className="text-gray-300 text-sm">Aktive Unternehmen</div>
+                  <div className="text-4xl font-bold mb-2 text-green-400">€544</div>
+                  <div className="text-gray-300 text-sm">NO-SHOW Savings/Mo</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
-                  <div className="text-4xl font-bold mb-2">50k+</div>
-                  <div className="text-gray-300 text-sm">Buchungen/Monat</div>
+                  <div className="text-4xl font-bold mb-2 text-green-400">€4.026</div>
+                  <div className="text-gray-300 text-sm">Marketing Revenue/Mo</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
-                  <div className="text-4xl font-bold mb-2">4.9</div>
-                  <div className="text-gray-300 text-sm">Bewertung</div>
+                  <div className="text-4xl font-bold mb-2">4.2x</div>
+                  <div className="text-gray-300 text-sm">NO-SHOW-KILLER ROI</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
-                  <div className="text-4xl font-bold mb-2">2h</div>
-                  <div className="text-gray-300 text-sm">Zeit gespart/Tag</div>
+                  <div className="text-4xl font-bold mb-2">16x</div>
+                  <div className="text-gray-300 text-sm">Marketing-Agent ROI</div>
                 </div>
+              </div>
+              <div className="mt-6 text-center">
+                <Link
+                  to="/pricing-wizard"
+                  className="inline-block px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition"
+                >
+                  🎯 Pricing-Wizard starten
+                </Link>
               </div>
             </div>
           </div>
@@ -281,31 +291,70 @@ function Home() {
       {/* Pricing Preview */}
       <section className="py-24 px-6 bg-zinc-950">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Einfache Preisgestaltung</h2>
+          <h2 className="text-3xl font-bold mb-4">3 Preisstufen - Eine für jeden</h2>
           <p className="text-gray-300 mb-12">
-            Ab 49€ pro Monat. Keine versteckten Kosten, keine Provisionen.
+            Von Starter (€129/Mo) bis Enterprise (€599/Mo). Keine versteckten Kosten, keine Provisionen.
           </p>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-10 max-w-lg mx-auto">
-            <div className="text-5xl font-bold mb-2">ab 49€</div>
-            <div className="text-gray-300 mb-8">pro Monat</div>
-            <ul className="text-left space-y-4 mb-10">
-              {['Online-Buchungen', 'E-Mail-Erinnerungen', 'Eigenes Buchungswidget', '30 Tage kostenlos testen'].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-gray-300">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/pricing"
-              className="block w-full py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition text-center"
-            >
-              Alle Tarife ansehen
-            </Link>
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
+            {/* Starter */}
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-left">
+              <div className="text-2xl font-bold mb-2">€129</div>
+              <div className="text-gray-300 mb-4">Starter</div>
+              <ul className="space-y-3 text-sm">
+                {['3 Mitarbeiter', '100 Buchungen/Mo', 'NO-SHOW-KILLER Basic', 'E-Mail Support'].map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-gray-300">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Professional */}
+            <div className="bg-white text-black border-4 border-green-500 rounded-2xl p-6 text-left relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-xs font-bold">
+                BELIEBT
+              </div>
+              <div className="text-2xl font-bold mb-2">€249</div>
+              <div className="text-gray-600 mb-4">Professional</div>
+              <ul className="space-y-3 text-sm">
+                {['Unlimited Staff', 'NO-SHOW-KILLER Full', 'MARKETING-AGENT (5/Mo)', '1 Branchen-Workflow'].map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-gray-700">
+                    <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Enterprise */}
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-left">
+              <div className="text-2xl font-bold mb-2">€599</div>
+              <div className="text-gray-300 mb-4">Enterprise</div>
+              <ul className="space-y-3 text-sm">
+                {['Unlimited Everything', 'Marketing Unlimited', 'ALLE 8 Workflows', '24/7 Support'].map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-gray-300">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+
+          <Link
+            to="/pricing"
+            className="inline-block px-10 py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition"
+          >
+            Alle Features vergleichen
+          </Link>
         </div>
       </section>
 

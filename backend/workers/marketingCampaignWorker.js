@@ -204,6 +204,25 @@ const findTargetCustomers = async (campaign, salonId) => {
       break;
     }
 
+    case 'referral': {
+      // Find active customers who can refer friends
+      // Target: Customers with 3+ bookings (loyal customers who are likely to refer)
+      const minBookings = campaign.rules.minBookings || 3;
+
+      const referralCustomers = await Booking.aggregate([
+        { $match: { salonId } },
+        { $group: { _id: '$customerId', count: { $sum: 1 } } },
+        { $match: { count: { $gte: minBookings } } }
+      ]);
+
+      const referralCustomerIds = referralCustomers.map(b => b._id);
+      query = {
+        _id: { $in: referralCustomerIds },
+        phoneNumber: { $exists: true, $ne: null }
+      };
+      break;
+    }
+
     case 'loyalty': {
       // Find VIP customers
       const loyaltyBookings = campaign.rules.minBookings || 10;
