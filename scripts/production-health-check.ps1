@@ -6,7 +6,7 @@ Write-Host "================================================" -ForegroundColor C
 Write-Host ""
 
 # Variables (UPDATE THESE)
-$RAILWAY_DOMAIN = "your-railway-domain.up.railway.app"
+$RAILWAY_DOMAIN = "jn-automation-production.up.railway.app"
 $VERCEL_DOMAIN = "jn-automation.vercel.app"
 
 # Check if domains are set
