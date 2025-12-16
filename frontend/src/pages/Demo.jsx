@@ -59,16 +59,24 @@ export default function Demo() {
         url="/demo"
       />
     <div className="min-h-screen bg-black text-white">
-      <div className="max-w-5xl mx-auto px-4 py-16">
+      {/* Animated Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
+
+      <div className="relative max-w-6xl mx-auto px-4 py-16">
 
         {/* Header */}
-        <div className="text-center mb-12">
-          <span className="inline-block text-xs font-medium bg-zinc-800 px-3 py-1 rounded-full mb-4">
-            Interaktive Demo
+        <div className="text-center mb-16">
+          <span className="inline-block text-xs font-semibold bg-gradient-to-r from-green-500 to-white text-black px-4 py-1.5 rounded-full mb-6 animate-pulse">
+            ⚡ Live Demo
           </span>
-          <h1 className="text-3xl font-bold mb-3">Testen Sie das Buchungswidget</h1>
-          <p className="text-gray-200 max-w-lg mx-auto">
-            Genau so sehen es Ihre Kunden. Keine Registrierung nötig.
+          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            So einfach buchen Ihre Kunden
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Genau so sieht es aus. Keine Anmeldung nötig zum Testen.
           </p>
         </div>
 
@@ -76,13 +84,13 @@ export default function Demo() {
 
           {/* Widget */}
           <div className="order-2 lg:order-1">
-            <div className="border border-zinc-800 rounded-lg overflow-hidden">
+            <div className="border border-zinc-800 rounded-xl overflow-hidden shadow-2xl shadow-green-500/20 hover:shadow-green-500/30 transition-all duration-500">
 
               {/* Widget Header */}
-              <div className="bg-zinc-900 p-5 border-b border-zinc-800">
+              <div className="bg-gradient-to-r from-zinc-900 to-zinc-950 p-5 border-b border-zinc-800">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-white rounded-full flex items-center justify-center shadow-lg">
+                    <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -94,13 +102,13 @@ export default function Demo() {
               </div>
 
               {/* Progress */}
-              <div className="flex border-b border-zinc-800 text-xs">
+              <div className="flex border-b border-zinc-800 text-xs font-medium">
                 {['Service', 'Termin', 'Daten', 'Fertig'].map((label, i) => (
                   <div
                     key={label}
-                    className={`flex-1 py-2 text-center ${
-                      step > i + 1 ? 'text-gray-300 bg-zinc-900' :
-                      step === i + 1 ? 'text-white bg-zinc-800' :
+                    className={`flex-1 py-3 text-center transition-all duration-300 ${
+                      step > i + 1 ? 'text-green-400 bg-zinc-900' :
+                      step === i + 1 ? 'text-white bg-gradient-to-r from-green-500/20 to-white/10' :
                       'text-gray-600'
                     }`}
                   >
@@ -121,13 +129,13 @@ export default function Demo() {
                         <button
                           key={s.id}
                           onClick={() => { setService(s); setStep(2); }}
-                          className="w-full p-3 border border-zinc-800 rounded text-left hover:border-zinc-600 transition flex justify-between items-center"
+                          className="w-full p-4 border border-zinc-800 rounded-lg text-left hover:border-green-500/50 hover:bg-zinc-900/50 transition-all duration-200 flex justify-between items-center group"
                         >
                           <div>
                             <div className="text-sm">{s.name}</div>
                             <div className="text-xs text-gray-200">{s.duration} Min.</div>
                           </div>
-                          <span className="text-sm font-medium">{s.price}€</span>
+                          <span className="text-sm font-bold text-green-500 group-hover:text-white transition-colors">{s.price}€</span>
                         </button>
                       ))}
                     </div>
@@ -147,7 +155,7 @@ export default function Demo() {
                       <div className="flex flex-wrap gap-2">
                         <button
                           onClick={() => setEmployee(null)}
-                          className={`px-3 py-1 text-xs rounded ${!employee ? 'bg-white text-black' : 'bg-zinc-800 text-gray-300'}`}
+                          className={`px-4 py-2 text-xs rounded-lg font-medium transition-all duration-200 ${!employee ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'}`}
                         >
                           Egal
                         </button>
@@ -155,7 +163,7 @@ export default function Demo() {
                           <button
                             key={e}
                             onClick={() => setEmployee(e)}
-                            className={`px-3 py-1 text-xs rounded ${employee === e ? 'bg-white text-black' : 'bg-zinc-800 text-gray-300'}`}
+                            className={`px-4 py-2 text-xs rounded-lg font-medium transition-all duration-200 ${employee === e ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'}`}
                           >
                             {e}
                           </button>
@@ -171,8 +179,8 @@ export default function Demo() {
                           <button
                             key={i}
                             onClick={() => setDate(d)}
-                            className={`flex-shrink-0 px-3 py-2 rounded text-center ${
-                              date?.toDateString() === d.toDateString() ? 'bg-white text-black' : 'bg-zinc-800'
+                            className={`flex-shrink-0 px-4 py-3 rounded-lg text-center transition-all duration-200 ${
+                              date?.toDateString() === d.toDateString() ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg font-bold' : 'bg-zinc-800 hover:bg-zinc-700'
                             }`}
                           >
                             <div className="text-xs text-gray-200">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</div>
@@ -191,7 +199,7 @@ export default function Demo() {
                             <button
                               key={t}
                               onClick={() => { setTime(t); setStep(3); }}
-                              className={`py-2 text-xs rounded ${time === t ? 'bg-white text-black' : 'bg-zinc-800 hover:bg-zinc-700'}`}
+                              className={`py-3 text-sm font-medium rounded-lg transition-all duration-200 ${time === t ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg' : 'bg-zinc-800 hover:bg-zinc-700 hover:scale-105'}`}
                             >
                               {t}
                             </button>
@@ -291,8 +299,8 @@ export default function Demo() {
           {/* Info */}
           <div className="order-1 lg:order-2 space-y-6">
 
-            <div className="border border-zinc-800 rounded-lg p-5">
-              <h3 className="font-semibold mb-4">So funktioniert es</h3>
+            <div className="border border-zinc-800 rounded-xl p-6 bg-gradient-to-br from-zinc-900 to-zinc-950 shadow-xl">
+              <h3 className="font-bold text-lg mb-6 text-white">So funktioniert es</h3>
               <div className="space-y-4">
                 {[
                   { step: 1, title: 'Widget einbinden', desc: 'Code-Snippet auf Ihre Website kopieren' },
@@ -300,8 +308,8 @@ export default function Demo() {
                   { step: 3, title: 'Kunden buchen', desc: '24/7 ohne Anruf oder Wartezeit' },
                   { step: 4, title: 'Automatische E-Mails', desc: 'Bestätigung und Erinnerung' },
                 ].map((item) => (
-                  <div key={item.step} className="flex gap-3">
-                    <span className="w-6 h-6 bg-zinc-800 rounded text-xs flex items-center justify-center flex-shrink-0">
+                  <div key={item.step} className="flex gap-4">
+                    <span className="w-8 h-8 bg-gradient-to-br from-green-500 to-white text-black rounded-lg text-sm font-bold flex items-center justify-center flex-shrink-0 shadow-md">
                       {item.step}
                     </span>
                     <div>
@@ -319,8 +327,8 @@ export default function Demo() {
                 { title: 'Mehr Google-Bewertungen', desc: 'Automatische Anfrage nach Termin' },
                 { title: 'Keine Provisionen', desc: 'Fixpreis statt Prozente' },
               ].map((b, i) => (
-                <div key={i} className="flex items-center gap-3 border border-zinc-800 rounded-lg p-4">
-                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={i} className="flex items-center gap-3 border border-zinc-800 rounded-xl p-4 hover:border-green-500/50 hover:bg-zinc-900/50 transition-all duration-200 group">
+                  <svg className="w-6 h-6 text-green-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <div>
@@ -331,21 +339,21 @@ export default function Demo() {
               ))}
             </div>
 
-            <div className="border border-zinc-800 rounded-lg p-5 text-center">
-              <h3 className="font-semibold mb-2">Bereit loszulegen?</h3>
-              <p className="text-sm text-gray-200 mb-4">30 Tage kostenlos testen</p>
+            <div className="border border-green-500/50 rounded-xl p-6 text-center bg-gradient-to-br from-zinc-900 to-zinc-950 shadow-xl shadow-green-500/20">
+              <h3 className="font-bold text-xl mb-2">Bereit loszulegen?</h3>
+              <p className="text-base text-gray-300 mb-5">30 Tage kostenlos testen</p>
               <Link
                 to="/register"
-                className="inline-block px-5 py-2 bg-white text-black font-medium rounded text-sm hover:bg-gray-100"
+                className="inline-block px-6 py-3 bg-gradient-to-r from-green-500 to-white text-black font-bold rounded-lg text-base hover:scale-105 transition-transform shadow-lg"
               >
                 Jetzt starten
               </Link>
             </div>
 
-            <div className="border border-zinc-800 rounded-lg p-5">
-              <div className="flex gap-1 mb-3">
+            <div className="border border-zinc-800 rounded-xl p-6 bg-gradient-to-br from-zinc-900 to-zinc-950">
+              <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
