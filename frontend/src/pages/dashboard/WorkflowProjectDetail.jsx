@@ -57,7 +57,7 @@ export default function WorkflowProjectDetail() {
       fetchProjectDetails();
     } catch (error) {
       console.error('Error completing session:', error);
-      toast.error('Fehler beim AbschlieÃŸen');
+      toast.error('Fehler beim Abschließen');
     }
   };
 
@@ -85,12 +85,12 @@ export default function WorkflowProjectDetail() {
 
   const getStatusColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
-      scheduled: 'bg-blue-100 text-blue-800',
-      in_progress: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
-      no_show: 'bg-red-100 text-red-800'
+      draft: 'bg-zinc-800 text-zinc-300',
+      scheduled: 'bg-blue-500/20 text-blue-400',
+      in_progress: 'bg-yellow-500/20 text-yellow-400',
+      completed: 'bg-green-500/20 text-green-400',
+      cancelled: 'bg-red-500/20 text-red-400',
+      no_show: 'bg-red-500/20 text-red-400'
     };
     return colors[status] || colors.draft;
   };
@@ -292,11 +292,11 @@ function SessionCard({ session, index, onComplete }) {
 
   const getStatusColor = (status) => {
     const colors = {
-      scheduled: 'bg-blue-100 text-blue-800',
-      in_progress: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
-      no_show: 'bg-red-100 text-red-800'
+      scheduled: 'bg-blue-500/20 text-blue-400',
+      in_progress: 'bg-yellow-500/20 text-yellow-400',
+      completed: 'bg-green-500/20 text-green-400',
+      cancelled: 'bg-red-500/20 text-red-400',
+      no_show: 'bg-red-500/20 text-red-400'
     };
     return colors[status] || colors.scheduled;
   };
@@ -306,35 +306,35 @@ function SessionCard({ session, index, onComplete }) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="flex items-center p-4 bg-gray-50 rounded-lg"
+      className="flex items-center p-4 bg-zinc-800 rounded-lg border border-zinc-700"
     >
-      <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full text-xl font-bold text-blue-800 mr-4">
+      <div className="flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full text-xl font-bold text-blue-400 mr-4">
         {session.sessionNumber}
       </div>
       <div className="flex-1">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
             <span className="text-2xl mr-2">{getStatusIcon(session.status)}</span>
-            <span className="font-medium text-gray-900">{session.phase || 'Session'}</span>
+            <span className="font-medium text-white">{session.phase || 'Session'}</span>
           </div>
           <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(session.status)}`}>
             {session.status}
           </span>
         </div>
         {session.scheduledDate && (
-          <div className="text-sm text-gray-600 mb-1">
-            ðŸ“… {new Date(session.scheduledDate).toLocaleString('de-DE')}
+          <div className="text-sm text-zinc-400 mb-1">
+            📅 {new Date(session.scheduledDate).toLocaleString('de-DE')}
           </div>
         )}
         {session.notes && (
-          <div className="text-sm text-gray-600">ðŸ’¬ {session.notes}</div>
+          <div className="text-sm text-zinc-400">📝 {session.notes}</div>
         )}
         {session.status === 'scheduled' && (
           <button
             onClick={() => onComplete(session)}
             className="mt-2 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
           >
-            Session abschlieÃŸen
+            Session abschließen
           </button>
         )}
       </div>
@@ -356,14 +356,14 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-md w-full"
+        className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 max-w-md w-full"
       >
-        <h3 className="text-xl font-bold text-gray-900 mb-4">
-          Session {session.sessionNumber} abschlieÃŸen
+        <h3 className="text-xl font-bold text-white mb-4">
+          Session {session.sessionNumber} abschließen
         </h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
               Fortschritt nach dieser Session: {progress}%
             </label>
             <input
@@ -376,14 +376,14 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
               Notizen (optional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Was wurde gemacht? Wie war die Session?"
             />
           </div>
@@ -391,7 +391,7 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300"
+              className="flex-1 bg-zinc-800 text-zinc-300 py-2 px-4 rounded-lg hover:bg-zinc-700 border border-zinc-700"
             >
               Abbrechen
             </button>
@@ -399,7 +399,7 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
               type="submit"
               className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
             >
-              AbschlieÃŸen
+              Abschließen
             </button>
           </div>
         </form>

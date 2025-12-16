@@ -13,14 +13,15 @@ export default function DashboardLayout({ children }) {
     { path: '/dashboard/bookings', label: 'Buchungen', dataTour: 'bookings' },
     { path: '/dashboard/services', label: 'Services', dataTour: 'services' },
     { path: '/dashboard/employees', label: 'Mitarbeiter' },
+    { path: '/dashboard/waitlist', label: '⏳ Warteliste (NO-SHOW-KILLER)' },
+    { path: '/dashboard/marketing', label: '📧 Marketing-Agent' },
     { path: '/dashboard/workflows', label: '🔄 Branchen-Workflows' },
     { path: '/dashboard/workflow-projects', label: '📋 Projekte' },
     { path: '/dashboard/packages-memberships', label: '🎁 Packages & Memberships' },
     { path: '/dashboard/tattoo/projects', label: '🎨 Tattoo Studio' },
-    { path: '/dashboard/marketing', label: 'Marketing' },
-    { path: '/dashboard/success-metrics', label: 'Erfolgsmetriken' },
-    { path: '/dashboard/widget', label: 'Widget', dataTour: 'widget' },
-    { path: '/dashboard/settings', label: 'Einstellungen', dataTour: 'settings' },
+    { path: '/dashboard/success-metrics', label: '📊 Erfolgsmetriken' },
+    { path: '/dashboard/widget', label: '🔗 Widget', dataTour: 'widget' },
+    { path: '/dashboard/settings', label: '⚙️ Einstellungen', dataTour: 'settings' },
   ];
 
   const isActive = (path, exact = false) => {
@@ -78,7 +79,7 @@ export default function DashboardLayout({ children }) {
 
         {/* Mobile Sidebar Overlay */}
         {mobileMenuOpen && (
-          <div 
+          <div
             className="md:hidden fixed inset-0 bg-black/50 z-40"
             onClick={() => setMobileMenuOpen(false)}
           />
@@ -118,8 +119,8 @@ export default function DashboardLayout({ children }) {
               </Link>
             ))}
             <hr className="border-zinc-800 my-2" />
-            <Link 
-              to="/dashboard/help" 
+            <Link
+              to="/dashboard/help"
               onClick={handleNavClick}
               className={`py-2 px-3 rounded flex items-center gap-2 transition ${
                 currentPath === '/dashboard/help' ? 'bg-white text-black font-medium' : 'text-zinc-300 hover:bg-zinc-800'
@@ -143,7 +144,7 @@ export default function DashboardLayout({ children }) {
               >
                 <Menu className="w-5 h-5" />
               </button>
-              
+
               <h2 className="text-lg sm:text-xl font-semibold truncate flex-1">{getPageTitle()}</h2>
               <UserMenu />
             </div>

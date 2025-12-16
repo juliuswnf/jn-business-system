@@ -25,6 +25,43 @@ router.get('/ping', (req, res) => {
 // Comprehensive health check (no auth required)
 router.get('/health', healthCheckService.healthCheckEndpoint);
 
+// Readiness check (Kubernetes readiness probe)
+router.get('/ready', async (req, res) => {
+  try {
+    const mongoose = (await import('mongoose')).default;
+
+    // Check if MongoDB is ready
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        ready: false,
+        reason: 'Database not connected'
+      });
+    }
+
+    // Check if we can perform a simple query
+    await mongoose.connection.db.admin().ping();
+
+    res.json({
+      ready: true,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Readiness check failed:', error);
+    res.status(503).json({
+      ready: false,
+      reason: error.message
+    });
+  }
+});
+
+// Liveness check (Kubernetes liveness probe)
+router.get('/live', (req, res) => {
+  res.json({
+    alive: true,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // ==================== ADMIN ROUTES (AUTH REQUIRED) ====================
 
 // Protect admin routes

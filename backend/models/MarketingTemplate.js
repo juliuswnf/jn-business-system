@@ -13,7 +13,7 @@ const MarketingTemplateSchema = new mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: ['inactive_customers', 'birthday', 'last_minute', 'upsell', 'loyalty'],
+      enum: ['inactive_customers', 'birthday', 'last_minute', 'upsell', 'loyalty', 'referral'],
       unique: true
     },
 
@@ -221,6 +221,31 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
       },
       estimatedROI: 450,
       estimatedConversionRate: 40,
+      popular: true
+    },
+    {
+      name: 'Freunde werben - Belohnung',
+      type: 'referral',
+      tier: 'professional',
+      icon: '👥',
+      description: 'Motivieren Sie treue Kunden, Freunde zu werben. Beide erhalten einen Rabatt!',
+      defaultRules: {
+        minBookings: 3,
+        maxRecipients: 100
+      },
+      defaultMessage: {
+        template: '👥 {{customerName}}, Sie sind ein geschätzter Kunde bei {{salonName}}! Empfehlen Sie uns weiter und Sie UND Ihr Freund erhalten {{discount}} Rabatt. Code: {{discountCode}} - {{bookingLink}}',
+        discountType: 'percentage',
+        discountValue: 15,
+        validDays: 60
+      },
+      defaultSchedule: {
+        type: 'monthly',
+        time: '10:00',
+        dayOfMonth: 1
+      },
+      estimatedROI: 380,
+      estimatedConversionRate: 25,
       popular: true
     }
   ];

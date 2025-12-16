@@ -71,10 +71,10 @@ export default function WorkflowProjects() {
 
   const getStatusColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
-      active: 'bg-blue-100 text-blue-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800'
+      draft: 'bg-zinc-800 text-zinc-300',
+      active: 'bg-blue-500/20 text-blue-400',
+      completed: 'bg-green-500/20 text-green-400',
+      cancelled: 'bg-red-500/20 text-red-400'
     };
     return colors[status] || colors.draft;
   };
@@ -195,8 +195,8 @@ export default function WorkflowProjects() {
 
       {/* Projects Table */}
       {projects.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-          <p className="text-gray-500 mb-4">Noch keine Projekte vorhanden</p>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-12 text-center">
+          <p className="text-zinc-400 mb-4">Noch keine Projekte vorhanden</p>
           <button
             onClick={() => navigate('/dashboard/workflow-projects/new')}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -205,48 +205,48 @@ export default function WorkflowProjects() {
           </button>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+          <table className="min-w-full divide-y divide-zinc-800">
+            <thead className="bg-zinc-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Projekt
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Kunde
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Branche
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Fortschritt
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Sessions
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Aktionen
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-zinc-900 divide-y divide-zinc-800">
               {projects.map((project) => (
                 <motion.tr
                   key={project._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="hover:bg-gray-50"
+                  className="hover:bg-zinc-800"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <span className="text-2xl mr-3">{getIndustryIcon(project.industry)}</span>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{project.name}</div>
+                        <div className="text-sm font-medium text-white">{project.name}</div>
                         {project.description && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
+                          <div className="text-sm text-zinc-400 truncate max-w-xs">
                             {project.description}
                           </div>
                         )}
@@ -254,27 +254,27 @@ export default function WorkflowProjects() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-white">
                       {project.customerId?.firstName} {project.customerId?.lastName}
                     </div>
-                    <div className="text-sm text-gray-500">{project.customerId?.phone}</div>
+                    <div className="text-sm text-zinc-400">{project.customerId?.phone}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-600">{project.industry}</span>
+                    <span className="text-sm text-zinc-300">{project.industry}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                      <div className="w-full bg-zinc-800 rounded-full h-2 mr-2">
                         <div
                           className="bg-blue-600 h-2 rounded-full"
                           style={{ width: `${project.progress}%` }}
                         />
                       </div>
-                      <span className="text-sm text-gray-600">{project.progress}%</span>
+                      <span className="text-sm text-zinc-300">{project.progress}%</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-900">
+                    <span className="text-sm text-white">
                       {project.completedSessions}/{project.totalSessions}
                     </span>
                   </td>
@@ -287,21 +287,21 @@ export default function WorkflowProjects() {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => navigate(`/dashboard/workflow-projects/${project._id}`)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-400 hover:text-blue-300"
                       >
                         Details
                       </button>
                       <button
                         onClick={() => navigate(`/dashboard/workflow-projects/${project._id}/edit`)}
-                        className="text-yellow-600 hover:text-yellow-900"
+                        className="text-yellow-400 hover:text-yellow-300"
                       >
                         Bearbeiten
                       </button>
                       <button
                         onClick={() => handleDeleteProject(project._id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-400 hover:text-red-300"
                       >
-                        LÃ¶schen
+                        Löschen
                       </button>
                     </div>
                   </td>
@@ -320,13 +320,13 @@ function StatCard({ title, value, icon, color }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`border-2 rounded-lg p-4 ${color}`}
+      className={`border-2 rounded-lg p-4 bg-zinc-900 border-zinc-800`}
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-2xl">{icon}</span>
       </div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
-      <div className="text-sm text-gray-600">{title}</div>
+      <div className="text-2xl font-bold text-white">{value}</div>
+      <div className="text-sm text-zinc-400">{title}</div>
     </motion.div>
   );
 }
