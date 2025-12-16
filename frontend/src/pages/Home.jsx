@@ -85,7 +85,7 @@ function Home() {
                             <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">MH</div>
                             <div>
                               <div className="font-medium">Maria H.</div>
-                              <div className="text-sm text-gray-500">Beratung · 10:30 Uhr</div>
+                              <div className="text-sm text-gray-300">Beratung · 10:30 Uhr</div>
                             </div>
                           </div>
                           <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Bestätigt</span>
@@ -95,7 +95,7 @@ function Home() {
                             <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">SK</div>
                             <div>
                               <div className="font-medium">Sophie K.</div>
-                              <div className="text-sm text-gray-500">Behandlung · 14:00 Uhr</div>
+                              <div className="text-sm text-gray-300">Behandlung · 14:00 Uhr</div>
                             </div>
                           </div>
                           <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">Neu</span>
@@ -105,7 +105,7 @@ function Home() {
                             <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">LM</div>
                             <div>
                               <div className="font-medium">Lisa M.</div>
-                              <div className="text-sm text-gray-500">Termin · 16:30 Uhr</div>
+                              <div className="text-sm text-gray-300">Termin · 16:30 Uhr</div>
                             </div>
                           </div>
                           <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Bestätigt</span>
@@ -125,7 +125,7 @@ function Home() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold">Neue Buchung!</div>
-                      <div className="text-xs text-gray-500">vor 2 Min.</div>
+                      <div className="text-xs text-gray-300">vor 2 Min.</div>
                     </div>
                   </div>
                 </div>
@@ -153,7 +153,7 @@ function Home() {
       <section className="py-24 px-6 bg-zinc-950">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">So funktioniert es</h2>
-          <p className="text-gray-500 text-center mb-16 max-w-2xl mx-auto">
+          <p className="text-gray-300 text-center mb-16 max-w-2xl mx-auto">
             In nur 3 Schritten zu Ihrem eigenen Online-Buchungssystem
           </p>
 
@@ -163,7 +163,7 @@ function Home() {
                 1
               </div>
               <h3 className="font-semibold text-lg mb-3">Account erstellen</h3>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 Registrieren Sie sich kostenlos und richten Sie Ihr Studio in wenigen Minuten ein.
               </p>
             </div>
@@ -173,7 +173,7 @@ function Home() {
                 2
               </div>
               <h3 className="font-semibold text-lg mb-3">Services eintragen</h3>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 Fügen Sie Ihre Dienstleistungen mit Preisen und Zeitdauer hinzu.
               </p>
             </div>
@@ -183,7 +183,7 @@ function Home() {
                 3
               </div>
               <h3 className="font-semibold text-lg mb-3">Buchungen empfangen</h3>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 Kunden buchen über Ihre Website, Sie verwalten alles im Dashboard.
               </p>
             </div>
@@ -197,7 +197,7 @@ function Home() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-6">Warum JN Business System?</h2>
-              <p className="text-gray-500 mb-8">
+              <p className="text-gray-300 mb-8">
                 Alles was Sie brauchen, um Ihr Termingeschäft zu digitalisieren.
               </p>
 
@@ -217,7 +217,7 @@ function Home() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">{item.title}</h3>
-                      <p className="text-gray-500 text-sm">{item.desc}</p>
+                      <p className="text-gray-300 text-sm">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -253,13 +253,13 @@ function Home() {
       <section className="py-24 px-6 bg-zinc-950">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Einfache Preisgestaltung</h2>
-          <p className="text-gray-500 mb-12">
+          <p className="text-gray-300 mb-12">
             Ab 49€ pro Monat. Keine versteckten Kosten, keine Provisionen.
           </p>
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-10 max-w-lg mx-auto">
             <div className="text-5xl font-bold mb-2">ab 49€</div>
-            <div className="text-gray-500 mb-8">pro Monat</div>
+            <div className="text-gray-300 mb-8">pro Monat</div>
             <ul className="text-left space-y-4 mb-10">
               {['Online-Buchungen', 'E-Mail-Erinnerungen', 'Eigenes Buchungswidget', '30 Tage kostenlos testen'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-gray-300">
@@ -284,7 +284,7 @@ function Home() {
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Bereit loszulegen?</h2>
-          <p className="text-gray-500 mb-8 text-lg">
+          <p className="text-gray-300 mb-8 text-lg">
             Testen Sie JN Business System 30 Tage kostenlos. Keine Kreditkarte erforderlich.
           </p>
           <Link
