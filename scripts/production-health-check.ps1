@@ -9,13 +9,6 @@ Write-Host ""
 $RAILWAY_DOMAIN = "jn-automation-production.up.railway.app"
 $VERCEL_DOMAIN = "jn-automation.vercel.app"
 
-# Check if domains are set
-if ($RAILWAY_DOMAIN -eq "jn-automation-production.up.railway.app") {
-    Write-Host "Error: Please update RAILWAY_DOMAIN in this script" -ForegroundColor Red
-    Write-Host "   Find your domain: Railway Dashboard -> Service -> Settings -> Domains" -ForegroundColor Yellow
-    exit 1
-}
-
 Write-Host "Testing Backend: https://$RAILWAY_DOMAIN"
 Write-Host "Testing Frontend: https://$VERCEL_DOMAIN"
 Write-Host ""
