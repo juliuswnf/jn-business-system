@@ -92,7 +92,16 @@ const createIndexes = async () => {
     await Payment.collection.createIndex({ salon: 1, createdAt: -1 });
     await Payment.collection.createIndex({ customer: 1, status: 1 });
     await Payment.collection.createIndex({ booking: 1 });
-    await Payment.collection.createIndex({ stripePaymentIntentId: 1 });
+    // stripePaymentIntentId (skip if exists - may have sparse: true from previous version)
+    try {
+      await Payment.collection.createIndex({ stripePaymentIntentId: 1 });
+    } catch (err) {
+      if (err.code === 86) {
+        console.log('   ⚠️  stripePaymentIntentId index already exists (skipped)');
+      } else {
+        throw err;
+      }
+    }
     await Payment.collection.createIndex({ status: 1, createdAt: -1 });
     console.log('   ✅ Payment indexes created');
 

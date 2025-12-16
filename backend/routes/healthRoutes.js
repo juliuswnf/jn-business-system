@@ -8,10 +8,11 @@ const router = express.Router();
 /**
  * Health Check Endpoints
  * For monitoring and uptime checks
+ * Mounted at /health in server.js
  */
 
-// Basic health check
-router.get('/health', async (req, res) => {
+// Basic health check - GET /health
+router.get('/', async (req, res) => {
   const health = {
     uptime: process.uptime(),
     timestamp: Date.now(),
@@ -71,8 +72,8 @@ router.get('/health', async (req, res) => {
   }
 });
 
-// Detailed health check (for internal monitoring)
-router.get('/health/detailed', async (req, res) => {
+// Detailed health check (for internal monitoring) - GET /health/detailed
+router.get('/detailed', async (req, res) => {
   try {
     const memUsage = process.memoryUsage();
     const loadAvg = os.loadavg();
