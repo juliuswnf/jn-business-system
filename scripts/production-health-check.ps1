@@ -16,7 +16,7 @@ Write-Host ""
 # Test 1: Backend Health Check
 Write-Host "1. Testing Backend Health..." -ForegroundColor White
 try {
-    $healthResponse = Invoke-WebRequest -Uri "https://$RAILWAY_DOMAIN/health" -UseBasicParsing -TimeoutSec 10
+    $healthResponse = Invoke-WebRequest -Uri "https://$RAILWAY_DOMAIN/api/system/health" -UseBasicParsing -TimeoutSec 10
     if ($healthResponse.StatusCode -eq 200) {
         Write-Host "   [OK] Backend Health: 200" -ForegroundColor Green
         $healthData = $healthResponse.Content | ConvertFrom-Json
@@ -96,7 +96,7 @@ Write-Host "================================================" -ForegroundColor C
 Write-Host ""
 Write-Host "Backend URL:    https://$RAILWAY_DOMAIN" -ForegroundColor White
 Write-Host "Frontend URL:   https://$VERCEL_DOMAIN" -ForegroundColor White
-Write-Host "Health Check:   https://$RAILWAY_DOMAIN/health" -ForegroundColor White
+Write-Host "Health Check:   https://$RAILWAY_DOMAIN/api/system/health" -ForegroundColor White
 Write-Host "API Base:       https://$RAILWAY_DOMAIN/api" -ForegroundColor White
 Write-Host ""
 Write-Host "Environment:    $($healthData.environment)" -ForegroundColor Cyan
