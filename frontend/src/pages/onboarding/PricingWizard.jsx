@@ -8,12 +8,12 @@ import wizardQuestions from '../../config/wizardQuestions';
 
 /**
  * PricingWizard Page
- * 
+ *
  * Guided wizard to recommend optimal pricing tier
  */
 const PricingWizard = () => {
   const navigate = useNavigate();
-  
+
   // State
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState({
@@ -56,16 +56,16 @@ const PricingWizard = () => {
 
     // Validate current answer
     const currentAnswer = answers[currentQuestion.key];
-    
+
     if (currentQuestion.required) {
       if (currentQuestion.type === 'multiple') {
         if (!currentAnswer || currentAnswer.length === 0) {
-          toast.error('Bitte wÃ¤hle mindestens eine Option');
+          toast.error('Bitte wähle mindestens eine Option');
           return;
         }
       } else {
         if (!currentAnswer && currentAnswer !== 0) {
-          toast.error('Bitte wÃ¤hle eine Option');
+          toast.error('Bitte wähle eine Option');
           return;
         }
       }
@@ -93,7 +93,7 @@ const PricingWizard = () => {
     try {
       const timeToComplete = startTime ? Math.round((Date.now() - startTime) / 1000) : null;
 
-      const response = await fetch('/api/pricing-wizard/recommend', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/pricing-wizard/recommend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ const PricingWizard = () => {
 
     try {
       // Save selection to backend
-      await fetch('/api/pricing-wizard/save', {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/pricing-wizard/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -152,7 +152,7 @@ const PricingWizard = () => {
 
   // Handle skip wizard
   const handleSkip = () => {
-    if (window.confirm('MÃ¶chtest du den Wizard wirklich Ã¼berspringen?')) {
+    if (window.confirm('Möchtest du den Wizard wirklich überspringen?')) {
       navigate('/pricing');
     }
   };
@@ -160,34 +160,34 @@ const PricingWizard = () => {
   // Check if current step can proceed
   const canProceed = () => {
     if (!currentQuestion) return false;
-    
+
     const currentAnswer = answers[currentQuestion.key];
-    
+
     if (currentQuestion.type === 'multiple') {
       return currentAnswer && currentAnswer.length > 0;
     }
-    
+
     return currentAnswer !== null && currentAnswer !== undefined;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-zinc-900 border-b border-zinc-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-blue-600">JN Business System</span>
+              <span className="text-2xl font-bold text-white">JN Business System</span>
             </div>
 
             {/* Skip Button */}
             {currentStep <= totalSteps && (
               <button
                 onClick={handleSkip}
-                className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+                className="text-gray-300 hover:text-white text-sm font-medium"
               >
-                Ãœberspringen â†’
+                Überspringen →
               </button>
             )}
           </div>
@@ -196,22 +196,22 @@ const PricingWizard = () => {
 
       {/* Progress Bar */}
       {currentStep <= totalSteps && (
-        <div className="bg-white shadow-sm">
+        <div className="bg-zinc-900 border-b border-zinc-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-300">
                 Frage {currentStep} von {totalSteps}
               </span>
-              <span className="text-sm font-medium text-blue-600">
+              <span className="text-sm font-medium text-white">
                 {Math.round(progress)}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full bg-zinc-800 rounded-full h-2.5 overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.3 }}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 h-2.5 rounded-full"
+                className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2.5 rounded-full"
               />
             </div>
           </div>
@@ -246,18 +246,18 @@ const PricingWizard = () => {
                 <button
                   onClick={handleBack}
                   disabled={currentStep === 1}
-                  className="px-6 py-3 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  className="px-6 py-3 text-gray-300 font-semibold rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center border border-zinc-800"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  ZurÃ¼ck
+                  Zurück
                 </button>
 
                 <button
                   onClick={handleNext}
                   disabled={!canProceed() || loading}
-                  className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg"
+                  className="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-black font-bold rounded-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-xl"
                 >
                   {loading ? (
                     <>
@@ -265,7 +265,7 @@ const PricingWizard = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      LÃ¤dt...
+                      Lädt...
                     </>
                   ) : currentStep === totalSteps ? (
                     <>
@@ -314,9 +314,9 @@ const PricingWizard = () => {
                       budget: null
                     });
                   }}
-                  className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+                  className="text-gray-300 hover:text-white text-sm font-medium"
                 >
-                  â† Nochmal von vorne starten
+                  ← Nochmal von vorne starten
                 </button>
               </div>
             </motion.div>
@@ -325,18 +325,18 @@ const PricingWizard = () => {
       </div>
 
       {/* Footer */}
-      <div className="bg-white border-t mt-12">
+      <div className="bg-zinc-950 border-t border-zinc-800 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <p>Â© 2024 JN Business System. Alle Rechte vorbehalten.</p>
+          <div className="flex items-center justify-between text-sm text-gray-300">
+            <p>© 2024 JN Business System. Alle Rechte vorbehalten.</p>
             <div className="flex items-center space-x-4">
-              <a href="/pricing" className="hover:text-blue-600">
+              <a href="/pricing" className="hover:text-white">
                 Alle Preise
               </a>
-              <a href="/features" className="hover:text-blue-600">
+              <a href="/features" className="hover:text-white">
                 Features
               </a>
-              <a href="/support" className="hover:text-blue-600">
+              <a href="/support" className="hover:text-white">
                 Support
               </a>
             </div>
