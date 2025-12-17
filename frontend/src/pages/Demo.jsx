@@ -61,7 +61,7 @@ export default function Demo() {
     <div className="min-h-screen bg-black text-white">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
 
@@ -69,7 +69,7 @@ export default function Demo() {
 
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="inline-block text-xs font-semibold bg-gradient-to-r from-green-500 to-white text-black px-4 py-1.5 rounded-full mb-6 animate-pulse">
+          <span className="inline-block text-xs font-semibold bg-gradient-to-r from-blue-500 to-cyan-400 text-black px-4 py-1.5 rounded-full mb-6 animate-pulse">
             ⚡ Live Demo
           </span>
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -89,7 +89,7 @@ export default function Demo() {
               {/* Widget Header */}
               <div className="bg-gradient-to-r from-zinc-900 to-zinc-950 p-5 border-b border-zinc-800">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-white rounded-full flex items-center justify-center shadow-lg">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg">
                     <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -107,8 +107,8 @@ export default function Demo() {
                   <div
                     key={label}
                     className={`flex-1 py-3 text-center transition-all duration-300 ${
-                      step > i + 1 ? 'text-green-400 bg-zinc-900' :
-                      step === i + 1 ? 'text-white bg-gradient-to-r from-green-500/20 to-white/10' :
+                      step > i + 1 ? 'text-blue-400 bg-zinc-900' :
+                      step === i + 1 ? 'text-white bg-gradient-to-r from-blue-500/20 to-cyan-400/10' :
                       'text-gray-600'
                     }`}
                   >
@@ -135,7 +135,7 @@ export default function Demo() {
                             <div className="text-sm">{s.name}</div>
                             <div className="text-xs text-gray-200">{s.duration} Min.</div>
                           </div>
-                          <span className="text-sm font-bold text-green-500 group-hover:text-white transition-colors">{s.price}€</span>
+                          <span className="text-sm font-bold text-blue-500 group-hover:text-white transition-colors">{s.price}€</span>
                         </button>
                       ))}
                     </div>
@@ -155,7 +155,7 @@ export default function Demo() {
                       <div className="flex flex-wrap gap-2">
                         <button
                           onClick={() => setEmployee(null)}
-                          className={`px-4 py-2 text-xs rounded-lg font-medium transition-all duration-200 ${!employee ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'}`}
+                          className={`px-4 py-2 text-xs rounded-lg font-medium transition-all duration-200 ${!employee ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-black shadow-lg' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'}`}
                         >
                           Egal
                         </button>
@@ -163,7 +163,7 @@ export default function Demo() {
                           <button
                             key={e}
                             onClick={() => setEmployee(e)}
-                            className={`px-4 py-2 text-xs rounded-lg font-medium transition-all duration-200 ${employee === e ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'}`}
+                            className={`px-4 py-2 text-xs rounded-lg font-medium transition-all duration-200 ${employee === e ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-black shadow-lg' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'}`}
                           >
                             {e}
                           </button>
@@ -180,7 +180,7 @@ export default function Demo() {
                             key={i}
                             onClick={() => setDate(d)}
                             className={`flex-shrink-0 px-4 py-3 rounded-lg text-center transition-all duration-200 ${
-                              date?.toDateString() === d.toDateString() ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg font-bold' : 'bg-zinc-800 hover:bg-zinc-700'
+                              date?.toDateString() === d.toDateString() ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-black shadow-lg font-bold' : 'bg-zinc-800 hover:bg-zinc-700'
                             }`}
                           >
                             <div className="text-xs text-gray-200">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</div>
@@ -199,7 +199,7 @@ export default function Demo() {
                             <button
                               key={t}
                               onClick={() => { setTime(t); setStep(3); }}
-                              className={`py-3 text-sm font-medium rounded-lg transition-all duration-200 ${time === t ? 'bg-gradient-to-r from-green-500 to-white text-black shadow-lg' : 'bg-zinc-800 hover:bg-zinc-700 hover:scale-105'}`}
+                              className={`py-3 text-sm font-medium rounded-lg transition-all duration-200 ${time === t ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-black shadow-lg' : 'bg-zinc-800 hover:bg-zinc-700 hover:scale-105'}`}
                             >
                               {t}
                             </button>
@@ -309,7 +309,7 @@ export default function Demo() {
                   { step: 4, title: 'Automatische E-Mails', desc: 'Bestätigung und Erinnerung' },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-4">
-                    <span className="w-8 h-8 bg-gradient-to-br from-green-500 to-white text-black rounded-lg text-sm font-bold flex items-center justify-center flex-shrink-0 shadow-md">
+                    <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-400 text-black rounded-lg text-sm font-bold flex items-center justify-center flex-shrink-0 shadow-md">
                       {item.step}
                     </span>
                     <div>
@@ -328,7 +328,7 @@ export default function Demo() {
                 { title: 'Keine Provisionen', desc: 'Fixpreis statt Prozente' },
               ].map((b, i) => (
                 <div key={i} className="flex items-center gap-3 border border-zinc-800 rounded-xl p-4 hover:border-green-500/50 hover:bg-zinc-900/50 transition-all duration-200 group">
-                  <svg className="w-6 h-6 text-green-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <div>
@@ -344,7 +344,7 @@ export default function Demo() {
               <p className="text-base text-gray-300 mb-5">30 Tage kostenlos testen</p>
               <Link
                 to="/register"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-green-500 to-white text-black font-bold rounded-lg text-base hover:scale-105 transition-transform shadow-lg"
+                className="inline-block px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-black font-bold rounded-lg text-base hover:scale-105 transition-transform shadow-lg"
               >
                 Jetzt starten
               </Link>

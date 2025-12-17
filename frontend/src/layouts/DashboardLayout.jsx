@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoSpinning, setLogoSpinning] = useState(false);
 
-  const handleLogoClick = () => {
+  const handleLogoClick = (e) => {
     setLogoSpinning(true);
     setTimeout(() => setLogoSpinning(false), 600);
   };

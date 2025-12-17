@@ -240,13 +240,13 @@ function Home() {
                   { title: 'Datenschutz & Sicherheit', desc: 'Server in Deutschland, alle Daten verschlüsselt und sicher gespeichert.', highlight: false },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4">
-                    <div className={`w-6 h-6 ${item.highlight ? 'bg-green-500' : 'bg-white'} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <div className={`w-6 h-6 ${item.highlight ? 'bg-blue-500' : 'bg-white'} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                       <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className={`font-semibold mb-1 ${item.highlight ? 'text-green-400' : ''}`}>{item.title}</h3>
+                      <h3 className={`font-semibold mb-1 ${item.highlight ? 'text-blue-400' : ''}`}>{item.title}</h3>
                       <p className="text-gray-300 text-sm">{item.desc}</p>
                     </div>
                   </div>
@@ -259,11 +259,11 @@ function Home() {
               <h3 className="text-xl font-bold mb-6 text-center">Was bringt es Ihnen?</h3>
               <div className="grid grid-cols-2 gap-8">
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
-                  <div className="text-4xl font-bold mb-2 text-green-400">€544</div>
+                  <div className="text-4xl font-bold mb-2 text-blue-400">€544</div>
                   <div className="text-gray-300 text-sm">Ersparnis pro Monat</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
-                  <div className="text-4xl font-bold mb-2 text-green-400">€4.026</div>
+                  <div className="text-4xl font-bold mb-2 text-blue-400">€4.026</div>
                   <div className="text-gray-300 text-sm">Zusatz-Umsatz pro Monat</div>
                 </div>
                 <div className="text-center p-6 bg-zinc-800/50 rounded-xl">
@@ -314,16 +314,16 @@ function Home() {
             </div>
 
             {/* Professional */}
-            <div className="bg-white text-black border-4 border-green-500 rounded-2xl p-6 text-left relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-xs font-bold">
+            <div className="bg-zinc-900 border-2 border-blue-500 rounded-2xl p-6 text-left relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold">
                 BELIEBT
               </div>
               <div className="text-2xl font-bold mb-2">€249</div>
-              <div className="text-gray-600 mb-4">Professional</div>
+              <div className="text-gray-300 mb-4">Professional</div>
               <ul className="space-y-3 text-sm">
                 {['Unlimited Staff', 'NO-SHOW-KILLER Full', 'MARKETING-AGENT (5/Mo)', '1 Branchen-Workflow'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-gray-700">
-                    <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={i} className="flex items-center gap-2 text-gray-300">
+                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     {item}
