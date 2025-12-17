@@ -16,7 +16,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import { api } from '../../utils/api';
 
 /**
  * Bookings Page with SMS Confirmation Integration
@@ -91,7 +91,7 @@ export default function Bookings() {
         params.endDate = monthEnd.toISOString();
       }
 
-      const response = await axios.get('/api/bookings', { params });
+      const response = await api.get('/bookings', { params });
 
       if (response.data.success) {
         // Load confirmations for these bookings
@@ -120,7 +120,7 @@ export default function Bookings() {
       // Fetch confirmations in parallel
       const confirmationPromises = bookingIds.map(async (bookingId) => {
         try {
-          const response = await axios.get(`/api/confirmations/${bookingId}`);
+          const response = await api.get(`/confirmations/${bookingId}`);
           return {
             bookingId,
             confirmation: response.data.success ? response.data.confirmation : null
@@ -154,7 +154,7 @@ export default function Bookings() {
     try {
       setSendingConfirmation(prev => ({ ...prev, [booking._id]: true }));
 
-      const response = await axios.post(`/api/confirmations/${booking._id}`);
+      const response = await api.post(`/confirmations/${booking._id}`);
 
       if (response.data.success) {
         toast.success(`✅ SMS-Bestätigung gesendet an ${booking.customerPhone}`);

@@ -2,7 +2,7 @@
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,
   headers: {
@@ -25,12 +25,12 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
+
     // Skip redirect for login/register endpoints - let the component handle the error
-    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') || 
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
                            originalRequest?.url?.includes('/auth/register') ||
                            originalRequest?.url?.includes('/auth/ceo-login');
-    
+
     if (isAuthEndpoint) {
       // Don't redirect for login failures - let the login form show the error
       return Promise.reject(error);
@@ -213,6 +213,8 @@ export const customerAPI = {
 };
 
 export const bookingAPI = {
+  // Convenience alias for tenant-scoped bookings (customer/business/employee via backend tenant middleware)
+  getMine: (params = {}) => api.get('/bookings', { params: { page: 1, limit: 100, ...params } }),
   getAll: (params) => api.get('/bookings', { params }),
   getById: (id) => api.get(`/bookings/${id}`),
   create: (data) => api.post('/bookings', data),
@@ -493,7 +495,7 @@ export const salonAPI = {
   getServices: () => api.get('/salon/services'),
   getBookings: (params) => api.get('/salon/bookings', { params }),
   getStats: () => api.get('/salon/stats'),
-  
+
   // Success Metrics / Analytics
   getSuccessMetrics: (period = '30d') => api.get('/salon/analytics/success-metrics', { params: { period } }),
   getBookingTrends: (period = '30d') => api.get('/salon/analytics/booking-trends', { params: { period } }),
@@ -588,7 +590,7 @@ export const ceoAPI = {
     return api.post('/ceo/data/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
   },
   cleanupOldData: (data) => api.post('/ceo/data/cleanup', data),
-  
+
   // ==================== ANALYTICS ====================
   getAnalyticsOverview: (timeRange) => api.get('/ceo/analytics/overview', { params: { timeRange } }),
   getRevenueChart: (timeRange) => api.get('/ceo/analytics/revenue-chart', { params: { timeRange } }),
@@ -596,7 +598,7 @@ export const ceoAPI = {
   getCohortAnalysis: () => api.get('/ceo/analytics/cohorts'),
   getChurnAnalysis: () => api.get('/ceo/analytics/churn'),
   getAtRiskStudios: () => api.get('/ceo/analytics/at-risk'),
-  
+
   // ==================== EMAIL CAMPAIGNS ====================
   getCampaigns: (params) => api.get('/ceo/email/campaigns', { params }),
   createCampaign: (data) => api.post('/ceo/email/campaigns', data),
@@ -606,7 +608,7 @@ export const ceoAPI = {
   cancelCampaign: (campaignId) => api.post(`/ceo/email/campaigns/${campaignId}/cancel`),
   getEmailTemplates: () => api.get('/ceo/email/templates'),
   getCampaignStats: (params) => api.get('/ceo/email/stats', { params }),
-  
+
   // ==================== PAYMENTS ====================
   getTransactions: (params) => api.get('/ceo/payments/transactions', { params }),
   getPaymentOverview: (dateRange) => api.get('/ceo/payments/overview', { params: { dateRange } }),
@@ -614,7 +616,7 @@ export const ceoAPI = {
   processRefund: (transactionId, data) => api.post(`/ceo/payments/transactions/${transactionId}/refund`, data),
   getPayouts: () => api.get('/ceo/payments/payouts'),
   getRevenueByPlan: () => api.get('/ceo/payments/by-plan'),
-  
+
   // ==================== SUPPORT TICKETS ====================
   getTickets: (params) => api.get('/ceo/support/tickets', { params }),
   createTicket: (data) => api.post('/ceo/support/tickets', data),
@@ -622,14 +624,14 @@ export const ceoAPI = {
   updateTicketStatus: (ticketId, status) => api.patch(`/ceo/support/tickets/${ticketId}`, { status }),
   replyToTicket: (ticketId, data) => api.post(`/ceo/support/tickets/${ticketId}/reply`, data),
   getTicketStats: (params) => api.get('/ceo/support/tickets/stats', { params }),
-  
+
   // ==================== AUDIT LOG ====================
   getAuditLogs: (params) => api.get('/ceo/audit/logs', { params }),
   getAuditLogDetails: (logId) => api.get(`/ceo/audit/logs/${logId}`),
   getAuditStats: (dateRange) => api.get('/ceo/audit/stats', { params: { dateRange } }),
   getSecurityAlerts: () => api.get('/ceo/audit/alerts'),
   exportAuditLogs: (params) => api.get('/ceo/audit/export', { params, responseType: 'blob' }),
-  
+
   // ==================== FEATURE FLAGS ====================
   getFeatureFlags: (params) => api.get('/ceo/feature-flags', { params }),
   createFlag: (data) => api.post('/ceo/feature-flags', data),
@@ -638,7 +640,7 @@ export const ceoAPI = {
   toggleFlag: (flagId) => api.post(`/ceo/feature-flags/${flagId}/toggle`),
   deleteFlag: (flagId) => api.delete(`/ceo/feature-flags/${flagId}`),
   checkFeatureFlag: (flagKey, salonId) => api.get(`/ceo/feature-flags/check/${flagKey}/${salonId}`),
-  
+
   // ==================== BACKUPS ====================
   getAllBackups: (params) => api.get('/ceo/backups', { params }),
   createBackup: (data) => api.post('/ceo/backups', data),
@@ -715,13 +717,13 @@ export const formatError = (error) => {
 export const subscriptionAPI = {
   // Get available plans (public)
   getPlans: () => api.get('/subscriptions/plans'),
-  
+
   // Create Stripe checkout session (planId: starter|professional|enterprise, billing: monthly|yearly)
   createCheckout: (planId, billing = 'monthly') => api.post('/subscriptions/checkout', { planId, billing }),
-  
+
   // Create billing portal session
   createPortal: () => api.post('/subscriptions/portal'),
-  
+
   // Get current subscription status
   getStatus: () => api.get('/subscriptions/status'),
 };

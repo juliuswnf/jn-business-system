@@ -1,4 +1,5 @@
 ﻿import React, { createContext, useState, useCallback, useContext } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
 // Erstelle den NotificationContext
 export const NotificationContext = createContext();
@@ -16,6 +17,10 @@ export const NotificationProvider = ({ children }) => {
     const notification = { id, message, type };
 
     setNotifications((prev) => [...prev, notification]);
+
+    if (type === 'success') toast.success(message, { duration });
+    else if (type === 'error') toast.error(message, { duration });
+    else toast(message, { duration });
 
     // Auto remove after duration
     if (duration > 0) {
@@ -65,6 +70,7 @@ export const NotificationProvider = ({ children }) => {
 
   return (
     <NotificationContext.Provider value={value}>
+      <Toaster position="top-right" />
       {children}
     </NotificationContext.Provider>
   );

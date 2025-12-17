@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, User, ChevronRight } from 'lucide-react';
+import { bookingAPI, formatError } from '../../utils/api';
+import { useNotification } from '../../hooks/useNotification';
 
 const CustomerDashboard = () => {
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -14,13 +17,21 @@ const CustomerDashboard = () => {
       setUser(JSON.parse(storedUser));
     }
 
-    // Simulate loading bookings
-    setTimeout(() => {
-      setBookings([
-        // Example bookings - in production these would come from API
-      ]);
-      setLoading(false);
-    }, 500);
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await bookingAPI.getMine({ limit: 100 });
+        setBookings(res.data?.bookings || []);
+      } catch (e) {
+        if (import.meta.env.DEV) console.error('Error fetching bookings:', e);
+        showNotification(formatError(e) || 'Fehler beim Laden der Termine', 'error');
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
   }, []);
 
   if (loading) {
@@ -53,7 +64,7 @@ const CustomerDashboard = () => {
             <Calendar className="text-gray-300" size={24} />
             <h3 className="font-semibold text-white">Kommende Termine</h3>
           </div>
-          <p className="text-3xl font-bold text-white">{bookings.filter(b => new Date(b.date) > new Date()).length}</p>
+          <p className="text-3xl font-bold text-white">{bookings.filter(b => new Date(b.bookingDate) > new Date()).length}</p>
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
@@ -61,7 +72,7 @@ const CustomerDashboard = () => {
             <Clock className="text-gray-300" size={24} />
             <h3 className="font-semibold text-white">Vergangene Termine</h3>
           </div>
-          <p className="text-3xl font-bold text-white">{bookings.filter(b => new Date(b.date) <= new Date()).length}</p>
+          <p className="text-3xl font-bold text-white">{bookings.filter(b => new Date(b.bookingDate) <= new Date()).length}</p>
         </div>
       </div>
 
@@ -86,7 +97,7 @@ const CustomerDashboard = () => {
           <div className="space-y-4">
             {bookings.map((booking) => (
               <div
-                key={booking.id}
+                key={booking._id}
                 className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
               >
                 <div className="flex items-center gap-4">
@@ -94,13 +105,16 @@ const CustomerDashboard = () => {
                     <Calendar className="text-white" size={24} />
                   </div>
                   <div>
-                    <h4 className="font-medium text-white">{booking.service}</h4>
-                    <p className="text-sm text-gray-300">{booking.date} um {booking.time}</p>
+                    <h4 className="font-medium text-white">{booking.serviceId?.name || 'Service'}</h4>
+                    <p className="text-sm text-gray-300">
+                      {new Date(booking.bookingDate).toLocaleDateString('de-DE')} um{' '}
+                      {new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="text-gray-600" size={16} />
-                  <span className="text-sm text-gray-300">{booking.location}</span>
+                  <span className="text-sm text-gray-300">{booking.status || '-'}</span>
                 </div>
               </div>
             ))}
