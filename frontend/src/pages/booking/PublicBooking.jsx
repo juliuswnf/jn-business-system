@@ -59,7 +59,7 @@ export default function PublicBooking() {
     setLoading(true);
     try {
       // Fetch salon info and services via public widget API
-      const res = await fetch(`${API_URL}/widget/${salonSlug}`);
+      const res = await fetch(`${API_URL}/bookings/public/s/${salonSlug}`);
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -102,7 +102,16 @@ export default function PublicBooking() {
   const fetchAvailableSlots = async () => {
     try {
       const res = await fetch(
-        `${API_URL}/widget/${salonSlug}/available-slots?date=${bookingData.date}&serviceId=${bookingData.serviceId}`
+        `${API_URL}/bookings/public/s/${salonSlug}/available-slots`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: bookingData.date,
+            serviceId: bookingData.serviceId,
+            employeeId: bookingData.employeeId || undefined
+          })
+        }
       );
       if (res.ok) {
         const data = await res.json();
@@ -146,7 +155,7 @@ export default function PublicBooking() {
       const idempotencyKey = `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
-      const res = await fetch(`${API_URL}/widget/${salonSlug}/book`, {
+      const res = await fetch(`${API_URL}/bookings/public/s/${salonSlug}/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
