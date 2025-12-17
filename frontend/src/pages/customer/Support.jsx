@@ -286,11 +286,21 @@ const Support = () => {
                 />
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewTicket(false);
+                    setNewTicket({ subject: '', description: '', category: 'general' });
+                  }}
+                  className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition"
+                >
+                  Abbrechen
+                </button>
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition"
+                  disabled={submitting || !newTicket.subject.trim() || !newTicket.description.trim()}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition"
                 >
                   {submitting ? 'Wird gesendet...' : 'Ticket erstellen'}
                 </button>

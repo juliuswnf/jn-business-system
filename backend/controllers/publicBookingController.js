@@ -1,12 +1,12 @@
 import logger from '../utils/logger.js';
 import timezoneHelpers from '../utils/timezoneHelpers.js';
-import { 
-  escapeRegex, 
-  sanitizePagination, 
-  parseValidDate, 
-  isValidObjectId, 
+import {
+  escapeRegex,
+  sanitizePagination,
+  parseValidDate,
+  isValidObjectId,
   isValidEmail,
-  sanitizeErrorMessage 
+  sanitizeErrorMessage
 } from '../utils/validation.js';
 /**
  * Public Booking Controller
@@ -58,7 +58,7 @@ export const getAllSalons = async (req, res) => {
           isActive: true
         });
         return {
-          ...salon.toObject(),
+          ...salon,
           serviceCount
         };
       })
@@ -161,7 +161,7 @@ export const getSalonsByCity = async (req, res) => {
           isActive: true
         });
         return {
-          ...salon.toObject(),
+          ...salon,
           serviceCount
         };
       })
@@ -392,16 +392,16 @@ export const createPublicBooking = async (req, res) => {
     // ? SRE FIX #30: Idempotency check
     if (idempotencyKey) {
       const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
-      
+
       if (existingBooking) {
         logger.info(`?? Duplicate public booking: ${idempotencyKey}`);
-        
+
         // ? SRE FIX #38: Email status feedback
         const warnings = [];
         if (!existingBooking.emailsSent?.confirmation) {
           warnings.push('Confirmation email is delayed. You will receive it within 15 minutes.');
         }
-        
+
         return res.status(200).json({
           success: true,
           message: 'Booking already exists',
@@ -414,22 +414,22 @@ export const createPublicBooking = async (req, res) => {
 
     // Validate ObjectIds
     if (!isValidObjectId(serviceId)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid service ID format' 
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid service ID format'
       });
     }
     if (employeeId && !isValidObjectId(employeeId)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid employee ID format' 
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid employee ID format'
       });
     }
 
     // Validate and parse date
     // ? AUDIT FIX: Support both legacy ISO string and new { date, time } format
     let parsedBookingDate;
-    
+
     if (typeof bookingDate === 'string') {
       // Legacy format: ISO string
       parsedBookingDate = parseValidDate(bookingDate);
@@ -587,7 +587,7 @@ export const createPublicBooking = async (req, res) => {
       await booking.populate('employeeId');
     }
 
-    // Prepare booking object for email
+    // Prepare booking object for email (use .toObject() because this is NOT .lean())
     const bookingForEmail = {
       ...booking.toObject(),
       service: booking.serviceId,
