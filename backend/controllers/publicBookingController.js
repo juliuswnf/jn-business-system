@@ -594,57 +594,44 @@ export const createPublicBooking = async (req, res) => {
       employee: booking.employeeId
     };
 
-    // Send confirmation email immediately
-    try {
-      const emailData = emailTemplateService.renderConfirmationEmail(
-        salon,
-        bookingForEmail,
-        booking.language
-      );
-
-      await emailService.sendEmail({
-        to: customerEmail,
-        subject: emailData.subject,
-        text: emailData.body,
-        html: emailData.body.replace(/\n/g, '<br>')
+    // Send confirmation email (Fire & Forget)
+    emailTemplateService.renderConfirmationEmail(salon, bookingForEmail, booking.language)
+      .then(emailData => {
+        return emailService.sendEmail({
+          to: customerEmail,
+          subject: emailData.subject,
+          text: emailData.body,
+          html: emailData.body.replace(/\n/g, '<br>')
+        });
+      })
+      .then(() => {
+        return booking.markEmailSent('confirmation');
+      })
+      .then(() => {
+        logger.log(`✉️  Sent confirmation email to ${customerEmail}`);
+      })
+      .catch(emailError => {
+        logger.error('Error sending confirmation email:', emailError);
       });
 
-      // Mark email as sent
-      await booking.markEmailSent('confirmation');
+    // Schedule reminder email (Fire & Forget)
+    emailQueueWorker.scheduleReminderEmail(booking, salon)
+      .catch(error => logger.error('Error scheduling reminder email:', error));
 
-      logger.log(`✉️  Sent confirmation email to ${customerEmail}`);
-    } catch (emailError) {
-      logger.error('Error sending confirmation email:', emailError);
-      // Don't fail the booking if email fails
-    }
+    // Schedule review email (Fire & Forget)
+    emailQueueWorker.scheduleReviewEmail(booking, salon)
+      .catch(error => logger.error('Error scheduling review email:', error));
 
-    // Schedule reminder email
-    try {
-      await emailQueueWorker.scheduleReminderEmail(booking, salon);
-    } catch (error) {
-      logger.error('Error scheduling reminder email:', error);
-    }
-
-    // Schedule review email
-    try {
-      await emailQueueWorker.scheduleReviewEmail(booking, salon);
-    } catch (error) {
-      logger.error('Error scheduling review email:', error);
-    }
-
-    // Notify salon owner
-    try {
-      const salonOwnerEmail = salon.email;
-
-      await emailService.sendEmail({
-        to: salonOwnerEmail,
-        subject: `New Booking: ${customerName}`,
-        text: `New booking received:\n\nCustomer: ${customerName}\nEmail: ${customerEmail}\nService: ${service.name}\nDate: ${new Date(bookingDate).toLocaleString('de-DE')}`,
-        html: `<h2>New Booking</h2><p><strong>Customer:</strong> ${customerName}<br><strong>Email:</strong> ${customerEmail}<br><strong>Service:</strong> ${service.name}<br><strong>Date:</strong> ${new Date(bookingDate).toLocaleString('de-DE')}</p>`
-      });
-    } catch (error) {
+    // Notify salon owner (Fire & Forget)
+    const salonOwnerEmail = salon.email;
+    emailService.sendEmail({
+      to: salonOwnerEmail,
+      subject: `New Booking: ${customerName}`,
+      text: `New booking received:\n\nCustomer: ${customerName}\nEmail: ${customerEmail}\nService: ${service.name}\nDate: ${new Date(bookingDate).toLocaleString('de-DE')}`,
+      html: `<h2>New Booking</h2><p><strong>Customer:</strong> ${customerName}<br><strong>Email:</strong> ${customerEmail}<br><strong>Service:</strong> ${service.name}<br><strong>Date:</strong> ${new Date(bookingDate).toLocaleString('de-DE')}</p>`
+    }).catch(error => {
       logger.error('Error sending salon notification:', error);
-    }
+    });
 
     res.status(201).json({
       success: true,
