@@ -370,7 +370,9 @@ export const getAvailableSlots = async (req, res) => {
  * POST /api/public/s/:slug/book
  */
 export const createPublicBooking = async (req, res) => {
+  let stage = 'start';
   try {
+    stage = 'parse_request';
     const { slug } = req.params;
     const {
       serviceId,
@@ -385,6 +387,7 @@ export const createPublicBooking = async (req, res) => {
     } = req.body;
 
     // Validation
+    stage = 'validate_required_fields';
     if (!serviceId || !bookingDate || !customerName || !customerEmail) {
       return res.status(400).json({
         success: false,
@@ -393,6 +396,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // ? SRE FIX #30: Idempotency check
+    stage = 'idempotency_check';
     if (idempotencyKey) {
       const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
 
@@ -416,6 +420,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Validate ObjectIds
+    stage = 'validate_object_ids';
     if (!isValidObjectId(serviceId)) {
       return res.status(400).json({
         success: false,
@@ -431,6 +436,7 @@ export const createPublicBooking = async (req, res) => {
 
     // Validate and parse date
     // ? AUDIT FIX: Support both legacy ISO string and new { date, time } format
+    stage = 'parse_booking_date';
     let parsedBookingDate;
 
     if (typeof bookingDate === 'string') {
@@ -455,6 +461,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Validate email
+    stage = 'validate_email';
     if (!isValidEmail(customerEmail)) {
       return res.status(400).json({
         success: false,
@@ -474,6 +481,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Get salon
+    stage = 'load_salon';
     const salon = await Salon.findBySlug(slug);
 
     if (!salon) {
@@ -484,6 +492,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // ? AUDIT FIX: Convert bookingDate to UTC using salon timezone
+  stage = 'convert_booking_date_timezone';
     if (!parsedBookingDate && bookingDate.date && bookingDate.time) {
       // Validate booking time (DST check)
       const validation = timezoneHelpers.validateBookingTime(
@@ -508,6 +517,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Check subscription
+    stage = 'check_subscription';
     if (!salon.hasActiveSubscription()) {
       return res.status(403).json({
         success: false,
@@ -542,6 +552,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Get service
+    stage = 'load_service';
     const service = await Service.findById(serviceId).maxTimeMS(5000);
 
     if (!service) {
@@ -552,6 +563,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Check if slot is still available
+    stage = 'check_slot_conflict';
     const existingBooking = await Booking.findOne({
       salonId: salon._id,
       serviceId,
@@ -568,6 +580,7 @@ export const createPublicBooking = async (req, res) => {
     }
 
     // Create booking (no Customer model - data stored directly in Booking)
+    stage = 'create_booking';
     const booking = await Booking.create({
       salonId: salon._id,
       customerName,
@@ -585,6 +598,7 @@ export const createPublicBooking = async (req, res) => {
     });
 
     // Populate for email
+    stage = 'populate_booking';
     await booking.populate('serviceId');
     if (employeeId) {
       await booking.populate('employeeId');
@@ -599,6 +613,7 @@ export const createPublicBooking = async (req, res) => {
 
     // Send confirmation email (Fire & Forget)
     // NOTE: renderConfirmationEmail is synchronous; wrap in Promise chain to avoid `.then is not a function`.
+    stage = 'trigger_emails';
     Promise.resolve()
       .then(() => emailTemplateService.renderConfirmationEmail(salon, bookingForEmail, booking.language))
       .then((emailData) => {
@@ -647,10 +662,19 @@ export const createPublicBooking = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('CreatePublicBooking Error:', error);
+    logger.error('CreatePublicBooking Error:', {
+      requestId: req.id,
+      stage,
+      path: req.originalUrl,
+      errorName: error?.name,
+      errorMessage: error?.message,
+      errorCode: error?.code
+    });
     res.status(500).json({
       success: false,
-      message: sanitizeErrorMessage(error, 'Failed to create booking')
+      message: sanitizeErrorMessage(error, 'Failed to create booking'),
+      requestId: req.id,
+      stage
     });
   }
 };
