@@ -36,14 +36,14 @@ export const getAllTickets = async (req, res) => {
     }
 
     const tickets = await SupportTicket.find(query)
+      .lean()
       .sort({
         priority: -1, // urgent first
         createdAt: -1
       })
-      .skip((page - 1).lean().maxTimeMS(5000) * limit)
+      .skip((page - 1) * limit)
       .limit(parseInt(limit))
-      .populate('salonId', 'name')
-      .populate('assignedTo', 'name email');
+      .maxTimeMS(5000);
 
     const total = await SupportTicket.countDocuments(query);
 

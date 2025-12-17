@@ -58,14 +58,17 @@ export const createTicket = async (req, res) => {
       }]
     });
 
-    // Send confirmation email to customer
-    try {
-      await emailService.sendEmail({
+    logger.info(`Support ticket created: ${ticket.ticketNumber} by user ${userId}`);
+
+    // Send emails asynchronously (don't block response)
+    Promise.all([
+      // Confirmation email to customer
+      emailService.sendEmail({
         to: req.user.email,
         subject: `Support-Ticket erstellt: ${ticket.ticketNumber}`,
         html: `
           <h2>Ihr Support-Ticket wurde erstellt</h2>
-          <p>Vielen Dank fÃ¼r Ihre Anfrage. Wir werden uns schnellstmÃ¶glich bei Ihnen melden.</p>
+          <p>Vielen Dank für Ihre Anfrage. Wir werden uns schnellstmöglich bei Ihnen melden.</p>
           <hr>
           <p><strong>Ticket-Nummer:</strong> ${ticket.ticketNumber}</p>
           <p><strong>Betreff:</strong> ${subject}</p>
@@ -74,17 +77,12 @@ export const createTicket = async (req, res) => {
           <p><strong>Ihre Nachricht:</strong></p>
           <p>${description}</p>
           <hr>
-          <p>Sie kÃ¶nnen auf diese E-Mail antworten, um weitere Informationen hinzuzufÃ¼gen.</p>
-          <p>Mit freundlichen GrÃ¼ÃŸen,<br>Ihr JN Business System Support-Team</p>
+          <p>Sie können auf diese E-Mail antworten, um weitere Informationen hinzuzufügen.</p>
+          <p>Mit freundlichen Grüßen,<br>Ihr JN Business System Support-Team</p>
         `
-      });
-    } catch (emailError) {
-      logger.warn('Failed to send ticket confirmation email:', emailError.message);
-    }
-
-    // Send notification to support team
-    try {
-      await emailService.sendEmail({
+      }),
+      // Notification to support team
+      emailService.sendEmail({
         to: process.env.SUPPORT_EMAIL || 'support@jn-business-system.de',
         subject: `Neues Support-Ticket: ${ticket.ticketNumber} - ${subject}`,
         html: `
@@ -93,19 +91,16 @@ export const createTicket = async (req, res) => {
           <p><strong>Von:</strong> ${req.user.firstName} ${req.user.lastName} (${req.user.email})</p>
           <p><strong>Salon:</strong> ${salon?.businessName || 'Kein Salon'}</p>
           <p><strong>Kategorie:</strong> ${category || 'Sonstige'}</p>
-          <p><strong>PrioritÃ¤t:</strong> ${priority || 'Mittel'}</p>
+          <p><strong>Priorität:</strong> ${priority || 'Mittel'}</p>
           <hr>
           <p><strong>Betreff:</strong> ${subject}</p>
           <p><strong>Beschreibung:</strong></p>
           <p>${description}</p>
         `
-      });
-    } catch (emailError) {
-      logger.warn('Failed to send support notification email:', emailError.message);
-    }
+      })
+    ]).catch(err => logger.warn('Email sending errors:', err.message));
 
-    logger.info(`Support ticket created: ${ticket.ticketNumber} by user ${userId}`);
-
+    // Respond immediately without waiting for emails
     res.status(201).json({
       success: true,
       message: 'Support-Ticket erfolgreich erstellt',
