@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { MapPinIcon, MagnifyingGlassIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { API_URL } from '../../utils/api';
 
 /**
  * /salons Landing Page - SEO-optimierte Dienstleister-Übersicht
@@ -23,7 +24,7 @@ const Salons = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings/public/salons?page=${pagination.page}&limit=20`
+        `${API_URL}/bookings/public/salons?page=${pagination.page}&limit=20`
       );
       const data = await response.json();
 

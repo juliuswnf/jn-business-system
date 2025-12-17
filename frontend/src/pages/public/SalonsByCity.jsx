@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { MapPinIcon, ChevronRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { API_URL } from '../../utils/api';
 
 /**
  * Stadt-spezifische Dienstleister Page - SEO optimiert
@@ -44,7 +45,7 @@ const SalonsByCity = () => {
       setError(null);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings/public/salons/city/${displayCityName}`
+        `${API_URL}/bookings/public/salons/city/${encodeURIComponent(displayCityName)}`
       );
       const data = await response.json();
 
