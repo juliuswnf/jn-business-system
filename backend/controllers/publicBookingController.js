@@ -317,17 +317,10 @@ export const getAvailableSlots = async (req, res) => {
 
     // Generate time slots based on business hours (in salon timezone)
     const slots = [];
-    const openTime = businessHours.open;
-    const closeTime = businessHours.close;
-
-    if (!openTime || !closeTime) {
-      return res.status(200).json({
-        success: true,
-        slots: [],
-        bookedSlots,
-        message: 'Salon opening hours not configured'
-      });
-    }
+    // Some salons may only store { closed: false } without open/close.
+    // Use a safe default window to avoid returning empty slots.
+    const openTime = businessHours.open || '09:00';
+    const closeTime = businessHours.close || '18:00';
 
     const serviceDuration = service.duration || 60;
     const buffer = salon.bookingBuffer || 0;
