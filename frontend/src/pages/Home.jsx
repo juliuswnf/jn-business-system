@@ -182,25 +182,25 @@ function Home() {
       <section className="py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold mb-4">Alles, was Sie brauchen. <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">An einem Ort.</span></h2>
+            <h2 className="text-4xl font-bold mb-4">Unsere <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Top-Features</span></h2>
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-              Professionelle Features, die Ihren Geschäftsalltag vereinfachen
+              Die wichtigsten Funktionen für Ihr Business - professionell und sofort einsatzbereit
             </p>
           </div>
 
           <div className="space-y-32">
-            {/* Feature 1: Calendar & Bookings */}
+            {/* Feature 1: Online Booking Widget */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
-                  Intelligenter Terminkalender
+                  Online Buchungs-Widget
                 </div>
-                <h3 className="text-4xl font-bold mb-6">Behalten Sie den Überblick über alle Termine</h3>
+                <h3 className="text-4xl font-bold mb-6">Kunden buchen 24/7 online</h3>
                 <p className="text-gray-300 text-lg mb-8">
-                  Sehen Sie alle Buchungen auf einen Blick. Drag & Drop zum Verschieben, automatische Kollisionserkennung und intelligente Benachrichtigungen.
+                  Integrieren Sie unser Buchungs-Widget auf Ihrer Website mit nur einem Code-Schnipsel. Ihre Kunden können rund um die Uhr buchen - auch wenn Sie schlafen.
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
@@ -210,8 +210,8 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Echtzeit-Synchronisation</div>
-                      <div className="text-gray-400">Änderungen werden sofort auf allen Geräten angezeigt</div>
+                      <div className="font-semibold mb-1">Einfache Integration</div>
+                      <div className="text-gray-400">Kopieren Sie den Code und fügen Sie ihn auf Ihrer Website ein</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -221,8 +221,8 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Mehrere Mitarbeiter</div>
-                      <div className="text-gray-400">Verwalten Sie Termine für Ihr gesamtes Team</div>
+                      <div className="font-semibold mb-1">Echtzeit-Verfügbarkeit</div>
+                      <div className="text-gray-400">Nur freie Termine werden angezeigt - keine Doppelbuchungen</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -232,111 +232,127 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Automatische Erinnerungen</div>
-                      <div className="text-gray-400">Reduzieren Sie No-Shows um bis zu 80%</div>
+                      <div className="font-semibold mb-1">Vollständig anpassbar</div>
+                      <div className="text-gray-400">Farben, Logo und Design - alles in Ihrem Brand-Look</div>
                     </div>
                   </li>
                 </ul>
               </div>
               <div className="relative">
-                {/* Calendar Preview */}
+                {/* Booking Widget Preview */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
-                  <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-700 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="font-semibold">Kalender</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <button className="px-3 py-1 hover:bg-zinc-700 rounded-lg transition">←</button>
-                      <span className="font-medium">17. Dezember 2025</span>
-                      <button className="px-3 py-1 hover:bg-zinc-700 rounded-lg transition">→</button>
+                  <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-700">
+                    <div className="text-center">
+                      <h3 className="font-bold text-lg">Termin buchen</h3>
+                      <p className="text-sm text-gray-400">Beauty Studio Müller</p>
                     </div>
                   </div>
-                  <div className="p-6">
-                    {/* Timeline */}
-                    <div className="space-y-3">
-                      <div className="flex gap-3">
-                        <div className="w-16 text-sm text-gray-400 flex-shrink-0">09:00</div>
-                        <div className="flex-1 bg-blue-500/20 border-l-4 border-blue-500 rounded-r-xl p-3">
-                          <div className="font-semibold">Anna Müller</div>
-                          <div className="text-sm text-gray-300">Haarschnitt • 60 Min.</div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <div className="w-16 text-sm text-gray-400 flex-shrink-0">10:30</div>
-                        <div className="flex-1 bg-purple-500/20 border-l-4 border-purple-500 rounded-r-xl p-3">
-                          <div className="font-semibold">Lisa Schmidt</div>
-                          <div className="text-sm text-gray-300">Färben • 120 Min.</div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <div className="w-16 text-sm text-gray-400 flex-shrink-0">13:00</div>
-                        <div className="flex-1 bg-cyan-500/20 border-l-4 border-cyan-500 rounded-r-xl p-3">
-                          <div className="font-semibold">Max Weber</div>
-                          <div className="text-sm text-gray-300">Styling • 45 Min.</div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <div className="w-16 text-sm text-gray-400 flex-shrink-0">14:15</div>
-                        <div className="flex-1 bg-green-500/20 border-l-4 border-green-500 rounded-r-xl p-3">
-                          <div className="font-semibold">Sarah Klein</div>
-                          <div className="text-sm text-gray-300">Beratung • 30 Min.</div>
+                  <div className="p-6 space-y-4">
+                    {/* Service Selection */}
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-2">Service wählen</label>
+                      <select className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white">
+                        <option>Haarschnitt - €35 (45 Min.)</option>
+                        <option>Färben - €65 (90 Min.)</option>
+                        <option>Styling - €25 (30 Min.)</option>
+                      </select>
+                    </div>
+                    {/* Date Picker */}
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-2">Datum wählen</label>
+                      <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-3">
+                        <div className="text-center mb-2 text-sm">Dezember 2025</div>
+                        <div className="grid grid-cols-7 gap-1 text-center text-sm">
+                          <div className="p-2 text-gray-500">Mo</div>
+                          <div className="p-2 text-gray-500">Di</div>
+                          <div className="p-2 text-gray-500">Mi</div>
+                          <div className="p-2 text-gray-500">Do</div>
+                          <div className="p-2 text-gray-500">Fr</div>
+                          <div className="p-2 text-gray-500">Sa</div>
+                          <div className="p-2 text-gray-500">So</div>
+                          <div className="p-2 text-gray-600">15</div>
+                          <div className="p-2 text-gray-600">16</div>
+                          <div className="p-2 bg-blue-500 text-white rounded-lg font-semibold">17</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">18</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">19</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">20</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">21</div>
                         </div>
                       </div>
                     </div>
+                    {/* Time Slots */}
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-2">Uhrzeit wählen</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button className="px-4 py-2 bg-zinc-800 hover:bg-blue-500 border border-zinc-700 hover:border-blue-500 rounded-lg text-sm transition">09:00</button>
+                        <button className="px-4 py-2 bg-zinc-800 hover:bg-blue-500 border border-zinc-700 hover:border-blue-500 rounded-lg text-sm transition">10:30</button>
+                        <button className="px-4 py-2 bg-zinc-800 hover:bg-blue-500 border border-zinc-700 hover:border-blue-500 rounded-lg text-sm transition">13:00</button>
+                      </div>
+                    </div>
+                    <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition">
+                      Jetzt buchen
+                    </button>
                   </div>
                 </div>
                 <div className="absolute -z-10 -inset-4 bg-blue-500/30 blur-3xl rounded-full"></div>
               </div>
             </div>
 
-            {/* Feature 2: Analytics */}
+            {/* Feature 2: Automated Reminders & Notifications */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1 relative">
-                {/* Analytics Dashboard */}
+                {/* Email/SMS Notifications */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
                   <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-700 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span className="font-semibold">Analytics</span>
+                      <span className="font-semibold">Benachrichtigungen</span>
                     </div>
-                    <select className="bg-zinc-700 px-3 py-1 rounded-lg text-sm">
-                      <option>Dieser Monat</option>
-                    </select>
+                    <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">Aktiv</span>
                   </div>
-                  <div className="p-6 space-y-6">
-                    {/* Revenue Chart */}
-                    <div>
-                      <div className="text-gray-400 text-sm mb-2">Umsatz</div>
-                      <div className="text-3xl font-bold mb-4">€12.450</div>
-                      <div className="flex items-end gap-1 h-32">
-                        <div className="flex-1 bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t-lg opacity-50" style={{height: '40%'}}></div>
-                        <div className="flex-1 bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t-lg opacity-60" style={{height: '55%'}}></div>
-                        <div className="flex-1 bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t-lg opacity-70" style={{height: '70%'}}></div>
-                        <div className="flex-1 bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t-lg" style={{height: '100%'}}></div>
-                        <div className="flex-1 bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t-lg opacity-80" style={{height: '85%'}}></div>
-                        <div className="flex-1 bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t-lg opacity-60" style={{height: '60%'}}></div>
-                        <div className="flex-1 bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t-lg opacity-50" style={{height: '45%'}}></div>
+                  <div className="p-6 space-y-4">
+                    {/* Email Notification */}
+                    <div className="bg-zinc-800 rounded-xl p-4 border-l-4 border-cyan-400">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <span className="font-semibold text-sm">E-Mail Erinnerung</span>
+                        </div>
+                        <span className="text-xs text-gray-400">24h vorher</span>
                       </div>
+                      <p className="text-sm text-gray-300 mb-2">Hallo Anna, Ihr Termin morgen um 10:00 Uhr wurde bestätigt.</p>
+                      <div className="text-xs text-gray-500">An: anna.mueller@email.de</div>
                     </div>
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-zinc-800 rounded-xl p-4">
-                        <div className="text-2xl font-bold text-green-400">+23%</div>
-                        <div className="text-xs text-gray-400">Buchungen</div>
+                    {/* SMS Notification */}
+                    <div className="bg-zinc-800 rounded-xl p-4 border-l-4 border-green-500">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                          </svg>
+                          <span className="font-semibold text-sm">SMS Erinnerung</span>
+                        </div>
+                        <span className="text-xs text-gray-400">2h vorher</span>
                       </div>
-                      <div className="bg-zinc-800 rounded-xl p-4">
-                        <div className="text-2xl font-bold text-blue-400">156</div>
-                        <div className="text-xs text-gray-400">Neue Kunden</div>
+                      <p className="text-sm text-gray-300 mb-2">Beauty Studio: Ihr Termin heute um 10:00. Bis gleich!</p>
+                      <div className="text-xs text-gray-500">An: +49 151 2345 6789</div>
+                    </div>
+                    {/* Push Notification */}
+                    <div className="bg-zinc-800 rounded-xl p-4 border-l-4 border-purple-500">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                          </svg>
+                          <span className="font-semibold text-sm">Neue Buchung</span>
+                        </div>
+                        <span className="text-xs text-gray-400">Gerade eben</span>
                       </div>
-                      <div className="bg-zinc-800 rounded-xl p-4">
-                        <div className="text-2xl font-bold text-purple-400">4.9</div>
-                        <div className="text-xs text-gray-400">Bewertung</div>
-                      </div>
+                      <p className="text-sm text-gray-300">Lisa Schmidt hat einen Termin für morgen 14:00 Uhr gebucht.</p>
                     </div>
                   </div>
                 </div>
@@ -345,13 +361,13 @@ function Home() {
               <div className="order-1 lg:order-2">
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-cyan-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
-                  Detaillierte Analytics
+                  Automatische Erinnerungen
                 </div>
-                <h3 className="text-4xl font-bold mb-6">Verstehen Sie Ihr Geschäft besser</h3>
+                <h3 className="text-4xl font-bold mb-6">80% weniger No-Shows</h3>
                 <p className="text-gray-300 text-lg mb-8">
-                  Erhalten Sie wertvolle Einblicke in Umsätze, Auslastung und Kundenverhalten. Treffen Sie datenbasierte Entscheidungen.
+                  Das System schickt automatisch E-Mails und SMS an Ihre Kunden. 24h vorher, 2h vorher - Sie konfigurieren es einmal und vergessen es.
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
@@ -361,8 +377,8 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Umsatz-Tracking</div>
-                      <div className="text-gray-400">Sehen Sie Ihre Einnahmen in Echtzeit</div>
+                      <div className="font-semibold mb-1">E-Mail & SMS Erinnerungen</div>
+                      <div className="text-gray-400">Automatisch 24h und 2h vor dem Termin</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -372,8 +388,8 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Beliebte Services</div>
-                      <div className="text-gray-400">Welche Leistungen werden am meisten gebucht?</div>
+                      <div className="font-semibold mb-1">Buchungsbestätigungen</div>
+                      <div className="text-gray-400">Sofortige Bestätigung nach jeder Buchung</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -383,26 +399,27 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Export-Funktionen</div>
-                      <div className="text-gray-400">Exportieren Sie Daten für Ihre Buchhaltung</div>
+                      <div className="font-semibold mb-1">Anpassbare Vorlagen</div>
+                      <div className="text-gray-400">Personalisieren Sie alle Nachrichten nach Ihrem Stil</div>
                     </div>
                   </li>
                 </ul>
               </div>
             </div>
 
-            {/* Feature 3: Customer Management */}
+            {/* Feature 3: Multi-Location Support */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  Kunden-Management
+                  Mehrere Standorte
                 </div>
-                <h3 className="text-4xl font-bold mb-6">Bauen Sie langfristige Kundenbeziehungen auf</h3>
+                <h3 className="text-4xl font-bold mb-6">Perfekt für Filial-Betriebe</h3>
                 <p className="text-gray-300 text-lg mb-8">
-                  Speichern Sie Kundenpräferenzen, Notizen und Buchungshistorie. Personalisieren Sie jeden Besuch.
+                  Verwalten Sie alle Ihre Standorte zentral. Jede Filiale hat eigene Mitarbeiter, Services und Öffnungszeiten - aber Sie sehen alles auf einen Blick.
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
@@ -412,8 +429,8 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Vollständige Kundenprofile</div>
-                      <div className="text-gray-400">Kontaktdaten, Präferenzen und Geschichte an einem Ort</div>
+                      <div className="font-semibold mb-1">Zentrale Verwaltung</div>
+                      <div className="text-gray-400">Ein Dashboard für alle Standorte</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -423,8 +440,8 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Notizen & Tags</div>
-                      <div className="text-gray-400">Merken Sie sich wichtige Details zu jedem Kunden</div>
+                      <div className="font-semibold mb-1">Standort-spezifische Einstellungen</div>
+                      <div className="text-gray-400">Jede Filiale kann eigene Preise und Services haben</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -434,60 +451,97 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Automatische Segmentierung</div>
-                      <div className="text-gray-400">Stammkunden, Neukunden, VIPs - alles automatisch</div>
+                      <div className="font-semibold mb-1">Übergreifende Auswertungen</div>
+                      <div className="text-gray-400">Vergleichen Sie Umsätze und Performance aller Filialen</div>
                     </div>
                   </li>
                 </ul>
               </div>
               <div className="relative">
-                {/* Customer Database Preview */}
+                {/* Multi-Location Dashboard */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
                   <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-700 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
-                      <span className="font-semibold">Kunden</span>
+                      <span className="font-semibold">Standorte</span>
                     </div>
-                    <input type="text" placeholder="Suchen..." className="bg-zinc-700 px-3 py-1 rounded-lg text-sm w-40" />
+                    <button className="px-3 py-1 bg-purple-500 text-white text-sm font-semibold rounded-lg">+ Neuer Standort</button>
                   </div>
                   <div className="p-6 space-y-3">
-                    <div className="bg-zinc-800 rounded-xl p-4 flex items-center justify-between hover:bg-zinc-700 transition cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
-                          AM
+                    {/* Location 1 */}
+                    <div className="bg-zinc-800 rounded-xl p-4 hover:bg-zinc-700 transition cursor-pointer">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold">
+                            M
+                          </div>
+                          <div>
+                            <div className="font-semibold">München Zentrum</div>
+                            <div className="text-sm text-gray-400">Marienplatz 5</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-semibold">Anna Müller</div>
-                          <div className="text-sm text-gray-400">23 Buchungen • Stammkundin</div>
+                        <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">Geöffnet</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-zinc-900 rounded-lg p-2">
+                          <div className="text-lg font-bold text-blue-400">12</div>
+                          <div className="text-xs text-gray-400">Heute</div>
+                        </div>
+                        <div className="bg-zinc-900 rounded-lg p-2">
+                          <div className="text-lg font-bold text-cyan-400">€1.2k</div>
+                          <div className="text-xs text-gray-400">Umsatz</div>
+                        </div>
+                        <div className="bg-zinc-900 rounded-lg p-2">
+                          <div className="text-lg font-bold text-green-400">3</div>
+                          <div className="text-xs text-gray-400">Mitarbeiter</div>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full">VIP</span>
                     </div>
-                    <div className="bg-zinc-800 rounded-xl p-4 flex items-center justify-between hover:bg-zinc-700 transition cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
-                          LS
+                    {/* Location 2 */}
+                    <div className="bg-zinc-800 rounded-xl p-4 hover:bg-zinc-700 transition cursor-pointer">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white font-bold">
+                            S
+                          </div>
+                          <div>
+                            <div className="font-semibold">Stuttgart Süd</div>
+                            <div className="text-sm text-gray-400">Königstraße 42</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-semibold">Lisa Schmidt</div>
-                          <div className="text-sm text-gray-400">8 Buchungen</div>
+                        <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">Geöffnet</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-zinc-900 rounded-lg p-2">
+                          <div className="text-lg font-bold text-blue-400">8</div>
+                          <div className="text-xs text-gray-400">Heute</div>
+                        </div>
+                        <div className="bg-zinc-900 rounded-lg p-2">
+                          <div className="text-lg font-bold text-cyan-400">€950</div>
+                          <div className="text-xs text-gray-400">Umsatz</div>
+                        </div>
+                        <div className="bg-zinc-900 rounded-lg p-2">
+                          <div className="text-lg font-bold text-green-400">2</div>
+                          <div className="text-xs text-gray-400">Mitarbeiter</div>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full">Aktiv</span>
                     </div>
-                    <div className="bg-zinc-800 rounded-xl p-4 flex items-center justify-between hover:bg-zinc-700 transition cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
-                          MW
+                    {/* Location 3 */}
+                    <div className="bg-zinc-800 rounded-xl p-4 hover:bg-zinc-700 transition cursor-pointer opacity-60">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl flex items-center justify-center text-white font-bold">
+                            B
+                          </div>
+                          <div>
+                            <div className="font-semibold">Berlin Mitte</div>
+                            <div className="text-sm text-gray-400">Friedrichstraße 123</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-semibold">Max Weber</div>
-                          <div className="text-sm text-gray-400">1 Buchung • vor 2 Tagen</div>
-                        </div>
+                        <span className="px-3 py-1 bg-gray-500/20 text-gray-400 text-xs font-semibold rounded-full">Geschlossen</span>
                       </div>
-                      <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">Neu</span>
                     </div>
                   </div>
                 </div>
