@@ -90,7 +90,6 @@ const PricingWizard = lazy(() => import('./pages/onboarding/PricingWizard'));
 // Public Booking (no auth required)
 const PublicBooking = lazy(() => import('./pages/booking/PublicBooking'));
 const Salons = lazy(() => import('./pages/public/Salons'));
-const SalonsByCity = lazy(() => import('./pages/public/SalonsByCity'));
 
 // Error Pages
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -213,7 +212,7 @@ function App() {
 
         {/* ==================== PUBLIC SALON PAGES (SEO) ==================== */}
         <Route path="/salons" element={<AppLayout><LazyPage><Salons /></LazyPage></AppLayout>} />
-        <Route path="/salons/:city" element={<AppLayout><LazyPage><SalonsByCity /></LazyPage></AppLayout>} />
+        {/* City-specific salon pages removed (unused) */}
 
         {/* ==================== HIDDEN CEO LOGIN ==================== */}
         {/* SECURITY: Only accessible via Ctrl+Shift+C on home page */}

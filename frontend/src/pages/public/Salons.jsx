@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { MapPinIcon, MagnifyingGlassIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { API_URL } from '../../utils/api';
 
@@ -54,9 +54,6 @@ const Salons = () => {
     }
   }, [searchQuery, salons]);
 
-  // Get unique cities for quick filters
-  const cities = [...new Set(salons.map(s => s.city || s.address?.city).filter(Boolean))];
-
   return (
     <div className="min-h-screen bg-black text-white">
       {/* SEO Header */}
@@ -84,28 +81,6 @@ const Salons = () => {
           </div>
         </div>
       </div>
-
-      {/* City Quick Filters */}
-      {cities.length > 0 && (
-        <div className="bg-zinc-950 border-b border-zinc-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center gap-2 overflow-x-auto">
-              <span className="text-sm text-gray-300 font-medium whitespace-nowrap">
-                Beliebte Städte:
-              </span>
-              {cities.slice(0, 8).map(city => (
-                <Link
-                  key={city}
-                  to={`/salons/${city.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')}`}
-                  className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 hover:text-white rounded-full text-sm font-medium whitespace-nowrap transition-colors"
-                >
-                  {city}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Salons Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

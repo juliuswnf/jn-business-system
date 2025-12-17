@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import { authAPI } from '../../utils/api';
 
 const CustomerLogin = () => {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const notification = useNotification();
+
+  const redirectParam = searchParams.get('redirect') || '';
+  const redirectTo = redirectParam.startsWith('/') ? redirectParam : '';
 
   // No auto-redirect - allow users to log in as different account
 
@@ -36,10 +40,12 @@ const CustomerLogin = () => {
 
         // Auth data saved, redirecting
 
-        // Redirect based on role
+        // Redirect based on role (optional safe redirect back to booking link)
         const role = data.user?.role || 'customer';
 
-        if (role === 'customer') {
+        if (redirectTo) {
+          window.location.replace(redirectTo);
+        } else if (role === 'customer') {
           window.location.replace('/customer/dashboard');
         } else if (role === 'ceo') {
           window.location.replace('/ceo/dashboard');
