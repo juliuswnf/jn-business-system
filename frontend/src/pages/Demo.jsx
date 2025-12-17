@@ -129,7 +129,7 @@ export default function Demo() {
                         <button
                           key={s.id}
                           onClick={() => { setService(s); setStep(2); }}
-                          className="w-full p-4 border border-zinc-800 rounded-lg text-left hover:border-green-500/50 hover:bg-zinc-900/50 transition-all duration-200 flex justify-between items-center group"
+                          className="w-full p-4 border border-zinc-800 rounded-lg text-left hover:border-blue-500/50 hover:bg-zinc-900/50 transition-all duration-200 flex justify-between items-center group"
                         >
                           <div>
                             <div className="text-sm">{s.name}</div>
@@ -327,7 +327,7 @@ export default function Demo() {
                 { title: 'Mehr Google-Bewertungen', desc: 'Automatische Anfrage nach Termin' },
                 { title: 'Keine Provisionen', desc: 'Fixpreis statt Prozente' },
               ].map((b, i) => (
-                <div key={i} className="flex items-center gap-3 border border-zinc-800 rounded-xl p-4 hover:border-green-500/50 hover:bg-zinc-900/50 transition-all duration-200 group">
+                <div key={i} className="flex items-center gap-3 border border-zinc-800 rounded-xl p-4 hover:border-blue-500/50 hover:bg-zinc-900/50 transition-all duration-200 group">
                   <svg className="w-6 h-6 text-blue-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -339,7 +339,7 @@ export default function Demo() {
               ))}
             </div>
 
-            <div className="border border-green-500/50 rounded-xl p-6 text-center bg-gradient-to-br from-zinc-900 to-zinc-950 shadow-xl shadow-green-500/20">
+            <div className="border border-blue-500/50 rounded-xl p-6 text-center bg-gradient-to-br from-zinc-900 to-zinc-950 shadow-xl shadow-blue-500/20">
               <h3 className="font-bold text-xl mb-2">Bereit loszulegen?</h3>
               <p className="text-base text-gray-300 mb-5">30 Tage kostenlos testen</p>
               <Link
