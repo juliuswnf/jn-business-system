@@ -192,7 +192,7 @@ function Home() {
             {/* Feature 1: Booking System - The Foundation */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-400 text-sm font-semibold mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-cyan-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -200,7 +200,7 @@ function Home() {
                 </div>
                 <h3 className="text-4xl font-bold mb-6">Kunden buchen online - Tag und Nacht</h3>
                 <p className="text-gray-300 text-lg mb-8">
-                  Ihre Kunden können jederzeit Termine buchen, auch wenn Sie schlafen. Das System zeigt nur freie Termine an - keine Doppelbuchungen mehr.
+                  Ihre Kunden/Patienten können jederzeit Termine buchen. Das System zeigt nur freie Termine an keine Doppelbuchungen möglich.
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
@@ -210,8 +210,8 @@ function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-semibold mb-1">Einfach auf Ihrer Website einbauen</div>
-                      <div className="text-gray-400">Ein Code-Schnipsel kopieren - fertig. Keine technischen Kenntnisse nötig</div>
+                      <div className="font-semibold mb-1">Einfach auf Ihrer Website einfügen</div>
+                      <div className="text-gray-400">Ihren Code-Abschnitt kopieren und fertig. Keine technischen Kenntnisse nötig</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -233,14 +233,14 @@ function Home() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">Warteliste für volle Tage</div>
-                      <div className="text-gray-400">Kunden werden automatisch informiert wenn ein Termin frei wird</div>
+                      <div className="text-gray-400">Kunden werden automatisch informiert sobald ein Termin frei wird</div>
                     </div>
                   </li>
                 </ul>
               </div>
               <div className="relative">
                 {/* Booking Widget Preview */}
-                <div className="bg-white text-black rounded-3xl shadow-2xl overflow-hidden">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
                   <div className="bg-gradient-to-r from-blue-500 to-cyan-400 px-6 py-4">
                     <div className="text-center">
                       <h3 className="font-bold text-lg text-white">Termin buchen</h3>
@@ -250,21 +250,21 @@ function Home() {
                   <div className="p-6 space-y-4">
                     {/* Service Selection */}
                     <div>
-                      <label className="text-sm text-gray-600 font-semibold block mb-2">Was möchten Sie buchen?</label>
-                      <div className="border-2 border-blue-500 rounded-lg p-3 bg-blue-50">
+                      <label className="text-sm text-gray-400 font-semibold block mb-2">Was möchten Sie buchen?</label>
+                      <div className="border-2 border-cyan-400 rounded-lg p-3 bg-zinc-800">
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="font-semibold">Haarschnitt</div>
-                            <div className="text-sm text-gray-600">45 Minuten</div>
+                            <div className="text-sm text-gray-400">45 Minuten</div>
                           </div>
-                          <div className="text-lg font-bold text-blue-500">€35</div>
+                          <div className="text-lg font-bold text-cyan-400">€35</div>
                         </div>
                       </div>
                     </div>
                     {/* Date Picker */}
                     <div>
-                      <label className="text-sm text-gray-600 font-semibold block mb-2">Wählen Sie einen Tag</label>
-                      <div className="border border-gray-300 rounded-lg p-3">
+                      <label className="text-sm text-gray-400 font-semibold block mb-2">Wählen Sie einen Tag</label>
+                      <div className="border border-zinc-700 rounded-lg p-3 bg-zinc-800">
                         <div className="text-center mb-2 text-sm font-semibold">Dezember 2025</div>
                         <div className="grid grid-cols-7 gap-1 text-center text-sm">
                           <div className="p-2 text-gray-400 text-xs">Mo</div>
@@ -274,31 +274,31 @@ function Home() {
                           <div className="p-2 text-gray-400 text-xs">Fr</div>
                           <div className="p-2 text-gray-400 text-xs">Sa</div>
                           <div className="p-2 text-gray-400 text-xs">So</div>
-                          <div className="p-2 text-gray-400">15</div>
-                          <div className="p-2 text-gray-400">16</div>
-                          <div className="p-2 bg-blue-500 text-white rounded-lg font-semibold">17</div>
-                          <div className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">18</div>
-                          <div className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">19</div>
-                          <div className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">20</div>
-                          <div className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">21</div>
+                          <div className="p-2 text-gray-500">15</div>
+                          <div className="p-2 text-gray-500">16</div>
+                          <div className="p-2 bg-cyan-400 text-black rounded-lg font-semibold">17</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">18</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">19</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">20</div>
+                          <div className="p-2 hover:bg-zinc-700 rounded-lg cursor-pointer">21</div>
                         </div>
                       </div>
                     </div>
                     {/* Time Slots */}
                     <div>
-                      <label className="text-sm text-gray-600 font-semibold block mb-2">Wählen Sie eine Uhrzeit</label>
+                      <label className="text-sm text-gray-400 font-semibold block mb-2">Wählen Sie eine Uhrzeit</label>
                       <div className="grid grid-cols-3 gap-2">
-                        <button className="px-4 py-3 bg-white hover:bg-blue-500 hover:text-white border-2 border-gray-300 hover:border-blue-500 rounded-lg font-semibold transition">09:00</button>
-                        <button className="px-4 py-3 bg-white hover:bg-blue-500 hover:text-white border-2 border-gray-300 hover:border-blue-500 rounded-lg font-semibold transition">10:30</button>
-                        <button className="px-4 py-3 bg-white hover:bg-blue-500 hover:text-white border-2 border-gray-300 hover:border-blue-500 rounded-lg font-semibold transition">13:00</button>
+                        <button className="px-4 py-3 bg-zinc-800 hover:bg-cyan-400 hover:text-black border-2 border-zinc-700 hover:border-cyan-400 rounded-lg font-semibold transition">09:00</button>
+                        <button className="px-4 py-3 bg-zinc-800 hover:bg-cyan-400 hover:text-black border-2 border-zinc-700 hover:border-cyan-400 rounded-lg font-semibold transition">10:30</button>
+                        <button className="px-4 py-3 bg-zinc-800 hover:bg-cyan-400 hover:text-black border-2 border-zinc-700 hover:border-cyan-400 rounded-lg font-semibold transition">13:00</button>
                       </div>
                     </div>
-                    <button className="w-full bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white font-bold py-4 rounded-lg transition shadow-lg">
+                    <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-black font-bold py-4 rounded-lg transition shadow-lg">
                       Jetzt buchen
                     </button>
                   </div>
                 </div>
-                <div className="absolute -z-10 -inset-4 bg-blue-500/30 blur-3xl rounded-full"></div>
+                <div className="absolute -z-10 -inset-4 bg-cyan-400/30 blur-3xl rounded-full"></div>
               </div>
             </div>
 
@@ -423,7 +423,7 @@ function Home() {
             {/* Feature 3: Marketing-Agent */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400 text-sm font-semibold mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-cyan-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                   </svg>
@@ -435,7 +435,7 @@ function Home() {
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-sm">🎂</span>
                     </div>
                     <div>
@@ -444,7 +444,7 @@ function Home() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-sm">🔄</span>
                     </div>
                     <div>
@@ -453,7 +453,7 @@ function Home() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-sm">⭐</span>
                     </div>
                     <div>
@@ -462,7 +462,7 @@ function Home() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-sm">👥</span>
                     </div>
                     <div>
@@ -471,13 +471,13 @@ function Home() {
                     </div>
                   </li>
                 </ul>
-                <div className="mt-8 p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl">
+                <div className="mt-8 p-4 bg-cyan-400/10 border border-cyan-400/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                     <div>
-                      <div className="font-semibold text-purple-400">+€4.026/Monat Zusatz-Umsatz</div>
+                      <div className="font-semibold text-cyan-400">+€4.026/Monat Zusatz-Umsatz</div>
                       <div className="text-sm text-gray-400">Durch automatisierte Kampagnen</div>
                     </div>
                   </div>
@@ -488,7 +488,7 @@ function Home() {
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
                   <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-700">
                     <div className="flex items-center gap-3">
-                      <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span className="font-semibold">Automatische Kampagnen</span>
@@ -496,7 +496,7 @@ function Home() {
                   </div>
                   <div className="p-6 space-y-3">
                     {/* Birthday Campaign */}
-                    <div className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-4">
+                    <div className="bg-cyan-400/10 border border-cyan-400/30 rounded-xl p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="text-3xl">🎂</div>
                         <div>
@@ -507,12 +507,12 @@ function Home() {
                       <div className="bg-white text-black p-3 rounded-lg text-sm">
                         <p className="font-semibold mb-2">🎉 Alles Gute zum Geburtstag, Anna!</p>
                         <p className="mb-2">Wir schenken Ihnen 20% Rabatt auf alle Services im Geburtsmonat.</p>
-                        <button className="bg-pink-500 text-white px-4 py-2 rounded-lg font-semibold w-full">Jetzt Termin buchen</button>
+                        <button className="bg-cyan-400 text-black px-4 py-2 rounded-lg font-semibold w-full">Jetzt Termin buchen</button>
                       </div>
                     </div>
 
                     {/* Win-Back Campaign */}
-                    <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-4">
+                    <div className="bg-cyan-400/10 border border-cyan-400/30 rounded-xl p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="text-3xl">🔄</div>
                         <div>
@@ -523,12 +523,12 @@ function Home() {
                       <div className="bg-white text-black p-3 rounded-lg text-sm">
                         <p className="font-semibold mb-2">Wir vermissen Sie, Lisa!</p>
                         <p className="mb-2">Kommen Sie zurück und erhalten Sie 15% Rabatt auf Ihren nächsten Besuch.</p>
-                        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold w-full">Termin vereinbaren</button>
+                        <button className="bg-cyan-400 text-black px-4 py-2 rounded-lg font-semibold w-full">Termin vereinbaren</button>
                       </div>
                     </div>
 
                     {/* Review Request */}
-                    <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-4">
+                    <div className="bg-cyan-400/10 border border-cyan-400/30 rounded-xl p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="text-3xl">⭐</div>
                         <div>
@@ -539,19 +539,19 @@ function Home() {
                       <div className="bg-white text-black p-3 rounded-lg text-sm">
                         <p className="font-semibold mb-2">Wie war Ihr Besuch?</p>
                         <p className="mb-2">Helfen Sie anderen mit einer Google-Bewertung. Dauert nur 30 Sekunden!</p>
-                        <button className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold w-full">Jetzt bewerten</button>
+                        <button className="bg-cyan-400 text-black px-4 py-2 rounded-lg font-semibold w-full">Jetzt bewerten</button>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="absolute -z-10 -inset-4 bg-purple-500/30 blur-3xl rounded-full"></div>
+                <div className="absolute -z-10 -inset-4 bg-cyan-400/30 blur-3xl rounded-full"></div>
               </div>
             </div>
 
             {/* Feature 4: Industry-Specific Workflows */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/30 rounded-full text-orange-400 text-sm font-semibold mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-cyan-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
@@ -597,7 +597,7 @@ function Home() {
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
                   <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-700">
                     <div className="flex items-center gap-3">
-                      <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span className="font-semibold">Ihre Branche wählen</span>
@@ -605,14 +605,14 @@ function Home() {
                   </div>
                   <div className="p-6 space-y-3">
                     {/* Tattoo Studio Selected */}
-                    <div className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-2 border-pink-500 rounded-xl p-4">
+                    <div className="bg-cyan-400/10 border-2 border-cyan-400 rounded-xl p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="text-3xl">🎨</div>
                         <div className="flex-1">
                           <div className="font-semibold">Tattoo-Studio</div>
                           <div className="text-sm text-gray-400">Multi-Session Projekte</div>
                         </div>
-                        <svg className="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
@@ -676,7 +676,7 @@ function Home() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -z-10 -inset-4 bg-orange-500/30 blur-3xl rounded-full"></div>
+                <div className="absolute -z-10 -inset-4 bg-cyan-400/30 blur-3xl rounded-full"></div>
               </div>
             </div>
 
@@ -685,7 +685,7 @@ function Home() {
               <div className="order-2 lg:order-1 relative">
                 {/* Pricing Wizard Preview */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4">
+                  <div className="bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-4">
                     <div className="flex items-center gap-3 text-white">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -703,7 +703,7 @@ function Home() {
                           <div className="font-semibold">Unter 20 Termine</div>
                           <div className="text-sm text-gray-400">Kleines Studio, wenige Kunden</div>
                         </button>
-                        <button className="w-full bg-blue-500 border-2 border-blue-500 rounded-xl p-4 text-left">
+                        <button className="w-full bg-cyan-400/20 border-2 border-cyan-400 rounded-xl p-4 text-left">
                           <div className="font-semibold">20-50 Termine</div>
                           <div className="text-sm text-white/80">Mittleres Geschäft</div>
                         </button>
@@ -717,7 +717,7 @@ function Home() {
                     {/* Progress Bar */}
                     <div>
                       <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" style={{width: '33%'}}></div>
+                        <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full" style={{width: '33%'}}></div>
                       </div>
                     </div>
 
@@ -745,10 +745,10 @@ function Home() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -z-10 -inset-4 bg-gradient-to-r from-blue-500/30 to-purple-500/30 blur-3xl rounded-full"></div>
+                <div className="absolute -z-10 -inset-4 bg-cyan-400/30 blur-3xl rounded-full"></div>
               </div>
               <div className="order-1 lg:order-2">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-full text-blue-400 text-sm font-semibold mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-cyan-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
@@ -793,13 +793,13 @@ function Home() {
                     </div>
                   </li>
                 </ul>
-                <div className="mt-8 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+                <div className="mt-8 p-4 bg-cyan-400/10 border border-cyan-400/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     <div>
-                      <div className="font-semibold text-blue-400">Keine Fehlentscheidung mehr</div>
+                      <div className="font-semibold text-cyan-400">Keine Fehlentscheidung mehr</div>
                       <div className="text-sm text-gray-400">Wählen Sie von Anfang an den richtigen Plan</div>
                     </div>
                   </div>
@@ -810,7 +810,7 @@ function Home() {
             {/* Feature 6: Multi-Location */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-full text-green-400 text-sm font-semibold mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-cyan-400 text-sm font-semibold mb-6">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -862,16 +862,16 @@ function Home() {
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden">
                   <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-700 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                       <span className="font-semibold">Alle Standorte</span>
                     </div>
-                    <button className="px-3 py-1 bg-green-500 text-white text-sm font-semibold rounded-lg">+ Neue Filiale</button>
+                    <button className="px-3 py-1 bg-cyan-400 text-black text-sm font-semibold rounded-lg">+ Neue Filiale</button>
                   </div>
                   <div className="p-6 space-y-3">
                     {/* Location 1 - Best Performer */}
-                    <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-500 rounded-xl p-4">
+                    <div className="bg-cyan-400/10 border-2 border-cyan-400 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-white font-bold">
@@ -882,19 +882,19 @@ function Home() {
                             <div className="text-sm text-gray-400">Marienplatz 5</div>
                           </div>
                         </div>
-                        <span className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">Top Filiale</span>
+                        <span className="px-3 py-1 bg-cyan-400 text-black text-xs font-semibold rounded-full">Top Filiale</span>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div className="bg-zinc-900 rounded-lg p-2">
-                          <div className="text-lg font-bold text-green-400">47</div>
+                          <div className="text-lg font-bold text-cyan-400">47</div>
                           <div className="text-xs text-gray-400">Termine heute</div>
                         </div>
                         <div className="bg-zinc-900 rounded-lg p-2">
-                          <div className="text-lg font-bold text-green-400">€3.2k</div>
+                          <div className="text-lg font-bold text-cyan-400">€3.2k</div>
                           <div className="text-xs text-gray-400">Umsatz</div>
                         </div>
                         <div className="bg-zinc-900 rounded-lg p-2">
-                          <div className="text-lg font-bold text-green-400">5</div>
+                          <div className="text-lg font-bold text-cyan-400">5</div>
                           <div className="text-xs text-gray-400">Mitarbeiter</div>
                         </div>
                       </div>
@@ -961,7 +961,7 @@ function Home() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -z-10 -inset-4 bg-green-500/30 blur-3xl rounded-full"></div>
+                <div className="absolute -z-10 -inset-4 bg-cyan-400/30 blur-3xl rounded-full"></div>
               </div>
             </div>
           </div>
