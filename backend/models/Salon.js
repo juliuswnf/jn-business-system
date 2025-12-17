@@ -410,6 +410,11 @@ salonSchema.virtual('bookingUrl').get(function() {
 salonSchema.methods.hasActiveSubscription = function() {
   const now = new Date();
 
+  // Treat missing subscription data as inactive
+  if (!this.subscription || !this.subscription.status) {
+    return false;
+  }
+
   // Trial is valid if not expired
   if (this.subscription.status === 'trial') {
     return !this.subscription.trialEndsAt || this.subscription.trialEndsAt > now;
@@ -425,12 +430,12 @@ salonSchema.methods.hasActiveSubscription = function() {
 salonSchema.methods.hasFeature = function(featureName) {
   // Import pricing config
   const { tierHasFeature } = require('../config/pricing.js');
-  
+
   // Check if subscription is active
   if (!this.hasActiveSubscription()) {
     return false;
   }
-  
+
   // Check if tier has feature
   return tierHasFeature(this.subscription.tier || 'starter', featureName);
 };
@@ -438,21 +443,21 @@ salonSchema.methods.hasFeature = function(featureName) {
 // Check if salon can send SMS (Enterprise only)
 salonSchema.methods.canSendSMS = function() {
   const { tierHasFeature, calculateSMSLimit } = require('../config/pricing.js');
-  
+
   // Check if subscription is active
   if (!this.hasActiveSubscription()) {
     return false;
   }
-  
+
   // Check if tier has SMS feature (Enterprise only)
   if (!tierHasFeature(this.subscription.tier || 'starter', 'smsNotifications')) {
     return false;
   }
-  
+
   // Calculate SMS limit based on tier and staff count
   const staffCount = this.staff?.length || 0;
   const smsLimit = calculateSMSLimit(this.subscription.tier, staffCount);
-  
+
   // Check if under limit
   return (this.subscription.smsUsedThisMonth || 0) < smsLimit;
 };
@@ -460,16 +465,16 @@ salonSchema.methods.canSendSMS = function() {
 // Get remaining SMS for this month (Enterprise only)
 salonSchema.methods.getRemainingSMS = function() {
   const { tierHasFeature, calculateSMSLimit } = require('../config/pricing.js');
-  
+
   // If no SMS feature, return 0
   if (!tierHasFeature(this.subscription.tier || 'starter', 'smsNotifications')) {
     return 0;
   }
-  
+
   const staffCount = this.staff?.length || 0;
   const smsLimit = calculateSMSLimit(this.subscription.tier, staffCount);
   const used = this.subscription.smsUsedThisMonth || 0;
-  
+
   return Math.max(0, smsLimit - used);
 };
 
@@ -487,7 +492,7 @@ salonSchema.methods.incrementSMSUsage = async function() {
   if (this.subscription.smsResetDate && now >= this.subscription.smsResetDate) {
     await this.resetMonthlySMS();
   }
-  
+
   // Increment counter
   this.subscription.smsUsedThisMonth = (this.subscription.smsUsedThisMonth || 0) + 1;
   await this.save();
@@ -496,34 +501,34 @@ salonSchema.methods.incrementSMSUsage = async function() {
 // Reset monthly SMS counter (runs on 1st of each month)
 salonSchema.methods.resetMonthlySMS = async function() {
   this.subscription.smsUsedThisMonth = 0;
-  
+
   // Set next reset date to 1st of next month
   const nextMonth = new Date();
   nextMonth.setMonth(nextMonth.getMonth() + 1);
   nextMonth.setDate(1);
   nextMonth.setHours(0, 0, 0, 0);
   this.subscription.smsResetDate = nextMonth;
-  
+
   await this.save();
 };
 
 // Get remaining bookings for this month (for Starter/Professional tiers)
 salonSchema.methods.getRemainingBookings = function() {
   const { PRICING_TIERS } = require('../config/pricing.js');
-  
+
   const tier = this.subscription.tier || 'starter';
   const tierConfig = PRICING_TIERS[tier];
-  
+
   // Enterprise has unlimited bookings
   if (!tierConfig?.limits?.bookingsPerMonth) {
     return Infinity;
   }
-  
+
   // Calculate bookings this month
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-  
+
   // Note: This would need to query Booking model to get actual count
   // For now, return the limit (implement booking tracking separately)
   return tierConfig.limits.bookingsPerMonth;
@@ -712,16 +717,16 @@ salonSchema.pre('save', function(next) {
   if (this.isNew && this.subscription.status === 'trial' && !this.subscription.trialEndsAt) {
     const { TRIAL_CONFIG } = require('../config/pricing.js');
     const trialDays = TRIAL_CONFIG.durationDays || 14;
-    
+
     // Set trial end date
     this.subscription.trialEndsAt = new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000);
-    
+
     // Set trial tier to Enterprise (show full power of platform)
     this.subscription.tier = TRIAL_CONFIG.tier || 'enterprise';
-    
+
     // Initialize SMS counter for trial
     this.subscription.smsUsedThisMonth = 0;
-    
+
     // Set SMS reset date to 1st of next month
     const nextMonth = new Date();
     nextMonth.setMonth(nextMonth.getMonth() + 1);
@@ -734,7 +739,7 @@ salonSchema.pre('save', function(next) {
   const now = new Date();
   if (this.subscription.smsResetDate && now >= this.subscription.smsResetDate && !this.isNew) {
     this.subscription.smsUsedThisMonth = 0;
-    
+
     // Set next reset date
     const nextMonth = new Date();
     nextMonth.setMonth(nextMonth.getMonth() + 1);
@@ -761,7 +766,7 @@ salonSchema.methods.softDeleteWithCascade = async function(userId) {
   // Soft delete all related services
   await Service.updateMany(
     { companyId: this._id },
-    { 
+    {
       deletedAt: new Date(),
       deletedBy: userId,
       isAvailable: false
@@ -771,7 +776,7 @@ salonSchema.methods.softDeleteWithCascade = async function(userId) {
   // Soft delete all related bookings
   await Booking.updateMany(
     { salonId: this._id },
-    { 
+    {
       deletedAt: new Date(),
       deletedBy: userId,
       status: 'cancelled'
@@ -784,7 +789,7 @@ salonSchema.methods.softDeleteWithCascade = async function(userId) {
   // Archive employees (don't break their accounts)
   await User.updateMany(
     { salonId: this._id, role: 'employee' },
-    { 
+    {
       isActive: false,
       salonId: null
     }
@@ -806,7 +811,7 @@ salonSchema.methods.restoreWithCascade = async function() {
   // Restore all related services
   await Service.updateMany(
     { companyId: this._id, deletedAt: { $ne: null } },
-    { 
+    {
       deletedAt: null,
       deletedBy: null,
       isAvailable: true
@@ -816,12 +821,12 @@ salonSchema.methods.restoreWithCascade = async function() {
   // Restore bookings (only future ones)
   const now = new Date();
   await Booking.updateMany(
-    { 
-      salonId: this._id, 
+    {
+      salonId: this._id,
       deletedAt: { $ne: null },
       bookingDate: { $gte: now }
     },
-    { 
+    {
       deletedAt: null,
       deletedBy: null,
       status: 'pending'
