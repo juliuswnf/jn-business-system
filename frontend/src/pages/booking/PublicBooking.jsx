@@ -689,6 +689,12 @@ export default function PublicBooking() {
               >
                 Neuen Termin buchen
               </button>
+              <Link
+                to="/"
+                className="flex-1 px-6 py-3 border border-zinc-600 hover:bg-zinc-800 rounded-full font-semibold transition text-center"
+              >
+                Zur Homepage
+              </Link>
             </div>
           </div>
         )}
