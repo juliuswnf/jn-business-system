@@ -43,8 +43,9 @@ export default function PublicBooking() {
   const [employees, setEmployees] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
+  const [confirmation, setConfirmation] = useState(null);
 
-  // Step 0 = Service, 1 = Zeit, 2 = Daten, 3 = Bestätigung
+  // Step 0 = Service, 1 = Zeit, 2 = Daten, 3 = Übersicht, 4 = Bestätigung (Erfolg)
   const [bookingStep, setBookingStep] = useState(0);
   const [bookingData, setBookingData] = useState({
     customerName: getPrefillFromUser().customerName || '',
@@ -213,20 +214,18 @@ export default function PublicBooking() {
       });
 
       if (res.ok) {
-        showNotification('Termin erfolgreich gebucht! Bestätigung per E-Mail.', 'success');
-        // Reset form
-        setBookingStep(0);
-        setBookingData({
-          customerName: getPrefillFromUser().customerName || '',
-          customerEmail: getPrefillFromUser().customerEmail || '',
-          customerPhone: getPrefillFromUser().customerPhone || '',
-          service: '',
-          serviceId: '',
-          date: '',
-          time: '',
-          employee: '',
-          employeeId: '',
+        // Show a proper confirmation window instead of toast popup
+        setConfirmation({
+          salonName: salonInfo?.name || 'Salon',
+          service: bookingData.service,
+          employee: bookingData.employee || 'Wird zugewiesen',
+          date: bookingData.date,
+          time: bookingData.time,
+          customerName: bookingData.customerName,
+          customerEmail: bookingData.customerEmail,
+          customerPhone: bookingData.customerPhone,
         });
+        setBookingStep(4);
       } else {
         const data = await res.json();
         showNotification(data.message || 'Fehler beim Buchen', 'error');
@@ -618,6 +617,77 @@ export default function PublicBooking() {
                 className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 disabled:opacity-50 transition shadow-md"
               >
                 {submitting ? 'Wird gebucht...' : 'Termin buchen'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Success Confirmation Window */}
+        {bookingStep === 4 && confirmation && (
+          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
+            <h2 className="text-2xl font-bold mb-2">Termin bestätigt</h2>
+            <p className="text-gray-300 mb-6">Du erhältst die Bestätigung per E-Mail.</p>
+
+            <div className="space-y-4 mb-8 p-6 bg-zinc-800 bg-opacity-50 rounded-lg">
+              <div className="flex justify-between">
+                <span className="text-gray-300">Salon:</span>
+                <span className="font-semibold">{confirmation.salonName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Service:</span>
+                <span className="font-semibold">{confirmation.service}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Mitarbeiter:</span>
+                <span className="font-semibold">{confirmation.employee}</span>
+              </div>
+
+              <div className="border-t border-zinc-700 pt-4 mt-4">
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Termin:</span>
+                  <span>
+                    {new Date(confirmation.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })} um {confirmation.time} Uhr
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-t border-zinc-700 pt-4 mt-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-300">Name:</span>
+                  <span className="font-semibold">{confirmation.customerName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-300">E-Mail:</span>
+                  <span className="font-semibold">{confirmation.customerEmail}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-300">Telefon:</span>
+                  <span className="font-semibold">{confirmation.customerPhone}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmation(null);
+                  setBookingStep(0);
+                  setBookingData({
+                    customerName: getPrefillFromUser().customerName || '',
+                    customerEmail: getPrefillFromUser().customerEmail || '',
+                    customerPhone: getPrefillFromUser().customerPhone || '',
+                    service: '',
+                    serviceId: '',
+                    date: '',
+                    time: '',
+                    employee: '',
+                    employeeId: '',
+                  });
+                }}
+                className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 transition shadow-md"
+              >
+                Neuen Termin buchen
               </button>
             </div>
           </div>
