@@ -50,7 +50,7 @@ function Home() {
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <Link
                   to="/register"
-                  className="px-8 py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition text-center"
+                  className="px-8 py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-medium rounded-lg hover:from-cyan-500 hover:to-blue-600 transition text-center"
                 >
                   30 Tage kostenlos testen
                 </Link>
@@ -145,22 +145,22 @@ function Home() {
                 </div>
 
                 {/* Floating Notification - New Booking - slides up and down */}
-                <div className="absolute -top-3 -right-3 bg-white text-black rounded-xl shadow-lg p-3 animate-bounce-slow">
+                <div className="absolute -top-3 -right-3 bg-zinc-900 border border-cyan-400 rounded-xl shadow-lg p-3 animate-bounce-slow">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-8 h-8 rounded-full bg-cyan-400/20 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <div className="text-sm font-semibold">Neue Buchung!</div>
-                      <div className="text-xs text-gray-600">vor 2 Min.</div>
+                      <div className="text-sm font-semibold text-cyan-400">Neue Buchung!</div>
+                      <div className="text-xs text-gray-400">vor 2 Min.</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Floating Review Badge */}
-                <div className="absolute -bottom-3 -left-3 bg-white text-black rounded-xl shadow-lg p-3">
+                <div className="absolute -bottom-3 -left-3 bg-zinc-900 border border-cyan-400 rounded-xl shadow-lg p-3">
                   <div className="flex items-center gap-2">
                     <div className="flex text-yellow-400">
                       {[1,2,3,4,5].map((i) => (
@@ -169,7 +169,7 @@ function Home() {
                         </svg>
                       ))}
                     </div>
-                    <span className="text-sm font-semibold">+12 Bewertungen</span>
+                    <span className="text-sm font-semibold text-white">+12 Bewertungen</span>
                   </div>
                 </div>
               </div>
@@ -204,8 +204,8 @@ function Home() {
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -215,8 +215,8 @@ function Home() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -226,8 +226,8 @@ function Home() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -322,10 +322,10 @@ function Home() {
                         <div className="w-8 h-8 bg-cyan-400 text-black rounded-full flex items-center justify-center font-bold">1</div>
                         <span className="font-semibold">48h vorher: SMS-Erinnerung</span>
                       </div>
-                      <div className="bg-white text-black p-3 rounded-lg text-sm mt-3">
-                        <p className="font-semibold mb-1">Beauty Studio Müller</p>
-                        <p>Hallo Anna! Ihr Termin ist übermorgen um 10:00 Uhr.</p>
-                        <p className="mt-2 font-bold">👉 Antworten Sie mit JA zur Bestätigung</p>
+                      <div className="bg-zinc-800 border border-cyan-400/30 p-3 rounded-lg text-sm mt-3">
+                        <p className="font-semibold mb-1 text-cyan-400">Beauty Studio Müller</p>
+                        <p className="text-gray-300">Hallo Anna! Ihr Termin ist übermorgen um 10:00 Uhr.</p>
+                        <p className="mt-2 font-bold text-cyan-400">👉 Antworten Sie mit JA zur Bestätigung</p>
                       </div>
                     </div>
 
@@ -344,17 +344,17 @@ function Home() {
                         <div className="w-8 h-8 bg-green-400 text-black rounded-full flex items-center justify-center font-bold">3</div>
                         <span className="font-semibold">Warteliste wird sofort informiert</span>
                       </div>
-                      <div className="bg-white text-black p-3 rounded-lg text-sm mt-3">
-                        <p className="font-semibold mb-1">🎉 Gute Nachrichten!</p>
-                        <p>Ein Termin ist frei geworden: Mittwoch 10:00 Uhr</p>
-                        <button className="mt-2 bg-green-500 text-white px-4 py-2 rounded-lg font-semibold w-full">Jetzt buchen</button>
+                      <div className="bg-zinc-800 border border-green-400/30 p-3 rounded-lg text-sm mt-3">
+                        <p className="font-semibold mb-1 text-green-400">🎉 Gute Nachrichten!</p>
+                        <p className="text-gray-300">Ein Termin ist frei geworden: Mittwoch 10:00 Uhr</p>
+                        <button className="mt-2 bg-green-400 text-black px-4 py-2 rounded-lg font-semibold w-full">Jetzt buchen</button>
                       </div>
                     </div>
 
                     {/* Savings Badge */}
                     <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 text-center">
-                      <div className="text-3xl font-bold text-white mb-1">€544</div>
-                      <div className="text-white text-sm">Durchschnittliche Ersparnis pro Monat</div>
+                      <div className="text-3xl font-bold text-black mb-1">€544</div>
+                      <div className="text-black text-sm">Durchschnittliche Ersparnis pro Monat</div>
                     </div>
                   </div>
                 </div>
@@ -380,7 +380,7 @@ function Home() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">SMS-Bestätigung 48h vorher</div>
-                      <div className="text-gray-400">Kunde muss mit "JA" antworten - sonst wird storniert</div>
+                      <div className="text-gray-400">Kunde muss Termin bestätigen sonst wird storniert</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -391,7 +391,7 @@ function Home() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">Automatisch freigegebene Termine</div>
-                      <div className="text-gray-400">Plätze werden nicht verschwendet - andere Kunden können nachrücken</div>
+                      <div className="text-gray-400">Plätze werden nicht verschwendet und andere Kunden können nachrücken</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -429,9 +429,9 @@ function Home() {
                   </svg>
                   Automatisches Marketing
                 </div>
-                <h3 className="text-4xl font-bold mb-6">Marketing läuft automatisch - Sie müssen nichts tun</h3>
+                <h3 className="text-4xl font-bold mb-6">Marketing läuft automatisch</h3>
                 <p className="text-gray-300 text-lg mb-8">
-                  Das System schickt automatisch Geburtstagsrabatte, holt verlorene Kunden zurück und bittet um Bewertungen. Einmal einrichten - für immer profitieren.
+                  Das System schickt automatisch Geburtstagsrabatte, holt verlorene Kunden zurück und bittet um Bewertungen. Einmal einrichten und für immer profitieren.
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
@@ -477,7 +477,7 @@ function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                     <div>
-                      <div className="font-semibold text-cyan-400">+€4.026/Monat Zusatz-Umsatz</div>
+                      <div className="font-semibold text-cyan-400">Durchschnittlich +€4.026/Monat Zusatz-Umsatz</div>
                       <div className="text-sm text-gray-400">Durch automatisierte Kampagnen</div>
                     </div>
                   </div>
@@ -504,9 +504,9 @@ function Home() {
                           <div className="text-sm text-gray-400">Gesendet 7 Tage vorher</div>
                         </div>
                       </div>
-                      <div className="bg-white text-black p-3 rounded-lg text-sm">
-                        <p className="font-semibold mb-2">🎉 Alles Gute zum Geburtstag, Anna!</p>
-                        <p className="mb-2">Wir schenken Ihnen 20% Rabatt auf alle Services im Geburtsmonat.</p>
+                      <div className="bg-zinc-800 border border-cyan-400/30 p-3 rounded-lg text-sm">
+                        <p className="font-semibold mb-2 text-cyan-400">🎉 Alles Gute zum Geburtstag, Anna!</p>
+                        <p className="mb-2 text-gray-300">Wir schenken Ihnen 20% Rabatt auf alle Services zum Geburtstag.</p>
                         <button className="bg-cyan-400 text-black px-4 py-2 rounded-lg font-semibold w-full">Jetzt Termin buchen</button>
                       </div>
                     </div>
@@ -520,9 +520,9 @@ function Home() {
                           <div className="text-sm text-gray-400">Nach 60 Tagen Inaktivität</div>
                         </div>
                       </div>
-                      <div className="bg-white text-black p-3 rounded-lg text-sm">
-                        <p className="font-semibold mb-2">Wir vermissen Sie, Lisa!</p>
-                        <p className="mb-2">Kommen Sie zurück und erhalten Sie 15% Rabatt auf Ihren nächsten Besuch.</p>
+                      <div className="bg-zinc-800 border border-cyan-400/30 p-3 rounded-lg text-sm">
+                        <p className="font-semibold mb-2 text-cyan-400">Wir vermissen Sie, Lisa!</p>
+                        <p className="mb-2 text-gray-300">Kommen Sie zurück und erhalten Sie 15% Rabatt auf Ihren nächsten Besuch.</p>
                         <button className="bg-cyan-400 text-black px-4 py-2 rounded-lg font-semibold w-full">Termin vereinbaren</button>
                       </div>
                     </div>
@@ -536,9 +536,9 @@ function Home() {
                           <div className="text-sm text-gray-400">24h nach Besuch</div>
                         </div>
                       </div>
-                      <div className="bg-white text-black p-3 rounded-lg text-sm">
-                        <p className="font-semibold mb-2">Wie war Ihr Besuch?</p>
-                        <p className="mb-2">Helfen Sie anderen mit einer Google-Bewertung. Dauert nur 30 Sekunden!</p>
+                      <div className="bg-zinc-800 border border-cyan-400/30 p-3 rounded-lg text-sm">
+                        <p className="font-semibold mb-2 text-cyan-400">Wie war Ihr Besuch?</p>
+                        <p className="mb-2 text-gray-300">Helfen Sie anderen mit einer Google-Bewertung. Dauert nur 30 Sekunden!</p>
                         <button className="bg-cyan-400 text-black px-4 py-2 rounded-lg font-semibold w-full">Jetzt bewerten</button>
                       </div>
                     </div>
@@ -566,7 +566,7 @@ function Home() {
                     <div className="text-2xl">🎨</div>
                     <div>
                       <div className="font-semibold mb-1">Tattoo-Studios</div>
-                      <div className="text-gray-400">Große Tattoos über mehrere Sitzungen verfolgen, Fortschritt dokumentieren, Portfolio-Galerie</div>
+                      <div className="text-gray-400">Große Tattoos über mehrere Termine verfolgen, Fortschritt dokumentieren, Portfolio-Galerie</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -754,7 +754,7 @@ function Home() {
                   </svg>
                   Intelligenter Preis-Finder
                 </div>
-                <h3 className="text-4xl font-bold mb-6">Finden Sie den perfekten Plan - in 60 Sekunden</h3>
+                <h3 className="text-4xl font-bold mb-6">Finden Sie den perfekten Plan in nur 60 Sekunden</h3>
                 <p className="text-gray-300 text-lg mb-8">
                   Beantworten Sie 6 einfache Fragen über Ihr Geschäft. Das System empfiehlt automatisch den besten Plan und zeigt Ihnen, wie viel Sie sparen.
                 </p>
@@ -985,7 +985,7 @@ function Home() {
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Account erstellen & einrichten</h3>
                 <p className="text-gray-300 text-lg mb-6">
-                  Registrieren Sie sich kostenlos und richten Sie Ihr Studio in wenigen Minuten ein. Keine technischen Kenntnisse erforderlich.
+                  Registrieren Sie sich kostenlos und richten Sie Ihr Konto in wenigen Minuten ein. Keine technischen Kenntnisse erforderlich.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-3 text-gray-300">
@@ -1327,7 +1327,7 @@ function Home() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Bereit loszulegen?</h2>
           <p className="text-gray-300 mb-8 text-lg">
-            Testen Sie JN Business System 30 Tage kostenlos. Keine Kreditkarte erforderlich.
+            Testen Sie JN Business System 14 Tage kostenlos. Keine Kreditkarte erforderlich.
           </p>
           <Link
             to="/register"
