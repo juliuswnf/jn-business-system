@@ -241,6 +241,10 @@ export default function Booking() {
       } else {
         if (res.status === 409) {
           showNotification('Dieser Termin ist leider schon vergeben. Bitte wähle eine andere Uhrzeit.', 'error');
+          // Move user back to time selection and refresh slots
+          setBookingData(prev => ({ ...prev, time: '' }));
+          setBookingStep(2);
+          fetchAvailableSlots();
         } else {
           showNotification(data?.message || `Fehler beim Buchen (HTTP ${res.status})`, 'error');
         }
