@@ -240,13 +240,13 @@ function Home() {
                   { title: 'Datenschutz & Sicherheit', desc: 'Server in Deutschland, alle Daten verschlüsselt und sicher gespeichert.', highlight: false },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4">
-                    <div className={`w-6 h-6 ${item.highlight ? 'bg-blue-500' : 'bg-white'} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className={item.highlight ? 'w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5' : 'w-6 h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'}>
                       <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className={`font-semibold mb-1 ${item.highlight ? 'text-blue-400' : ''}`}>{item.title}</h3>
+                      <h3 className={item.highlight ? 'font-semibold mb-1 text-blue-400' : 'font-semibold mb-1'}>{item.title}</h3>
                       <p className="text-gray-300 text-sm">{item.desc}</p>
                     </div>
                   </div>
