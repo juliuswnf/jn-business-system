@@ -598,8 +598,10 @@ export const createPublicBooking = async (req, res) => {
     };
 
     // Send confirmation email (Fire & Forget)
-    emailTemplateService.renderConfirmationEmail(salon, bookingForEmail, booking.language)
-      .then(emailData => {
+    // NOTE: renderConfirmationEmail is synchronous; wrap in Promise chain to avoid `.then is not a function`.
+    Promise.resolve()
+      .then(() => emailTemplateService.renderConfirmationEmail(salon, bookingForEmail, booking.language))
+      .then((emailData) => {
         return emailService.sendEmail({
           to: customerEmail,
           subject: emailData.subject,
@@ -607,13 +609,11 @@ export const createPublicBooking = async (req, res) => {
           html: emailData.body.replace(/\n/g, '<br>')
         });
       })
-      .then(() => {
-        return booking.markEmailSent('confirmation');
-      })
+      .then(() => booking.markEmailSent('confirmation'))
       .then(() => {
         logger.log(`✉️  Sent confirmation email to ${customerEmail}`);
       })
-      .catch(emailError => {
+      .catch((emailError) => {
         logger.error('Error sending confirmation email:', emailError);
       });
 
@@ -650,7 +650,7 @@ export const createPublicBooking = async (req, res) => {
     logger.error('CreatePublicBooking Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: sanitizeErrorMessage(error, 'Failed to create booking')
     });
   }
 };
