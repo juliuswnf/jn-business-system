@@ -4,11 +4,11 @@ import mongoose from 'mongoose';
 import timezoneHelpers from '../utils/timezoneHelpers.js';
 import Salon from '../models/Salon.js';
 import BookingConfirmation from '../models/BookingConfirmation.js';
-import { 
-  parseValidDate, 
-  isValidObjectId, 
-  sanitizePagination, 
-  sanitizeErrorMessage 
+import {
+  parseValidDate,
+  isValidObjectId,
+  sanitizePagination,
+  sanitizeErrorMessage
 } from '../utils/validation.js';
 /**
  * Booking Controller - MVP Simplified
@@ -34,7 +34,7 @@ export const createBooking = async (req, res) => {
     // ? SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
     if (idempotencyKey) {
       const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
-      
+
       if (existingBooking) {
         logger.info(`?? Duplicate booking attempt detected: ${idempotencyKey}`);
         return res.status(200).json({
@@ -59,7 +59,7 @@ export const createBooking = async (req, res) => {
 
     // ? AUDIT FIX: Parse and validate date with timezone support
     let parsedDate;
-    
+
     // Support new { date, time } format OR legacy ISO string
     if (typeof bookingDate === 'object' && bookingDate.date && bookingDate.time) {
       // New format: { date: "2025-12-15", time: "14:00" }
@@ -191,7 +191,7 @@ export const createBooking = async (req, res) => {
 
       const [booking] = await Booking.create([bookingData], { session });
       await session.commitTransaction();
-      
+
       await booking.populate('serviceId');
 
       // Invalidate related caches
@@ -222,17 +222,15 @@ export const getBookings = async (req, res) => {
   try {
     const { status, startDate, endDate, salonId } = req.query;
     const { page, limit, skip } = sanitizePagination(
-      req.query.page, 
-      req.query.limit, 
+      req.query.page,
+      req.query.limit,
       100 // Maximum 100 items per page
     );
 
-    let filter = {};
+    let filter = { ...(req.tenantFilter || {}) };
 
-    // Filter by salon if not CEO
-    if (req.user && req.user.role !== 'ceo') {
-      filter.salonId = req.user.salonId || salonId;
-    } else if (salonId) {
+    // Optional salon filter for CEO only
+    if (req.user?.role === 'ceo' && salonId) {
       filter.salonId = salonId;
     }
 
@@ -367,7 +365,7 @@ export const updateBooking = async (req, res) => {
     // Build update data with validation
     if (status) booking.status = status;
     if (notes !== undefined) booking.notes = notes;
-    
+
     if (bookingDate) {
       // ? AUDIT FIX: Parse and validate date with timezone support
       let parsedDate;
@@ -413,7 +411,7 @@ export const updateBooking = async (req, res) => {
           });
         }
       }
-      
+
       booking.bookingDate = parsedDate;
     }
 
@@ -629,11 +627,10 @@ export const deleteBooking = async (req, res) => {
 export const getBookingStats = async (req, res) => {
   try {
     const { salonId } = req.query;
-    let filter = {};
+    let filter = { ...(req.tenantFilter || {}) };
 
-    if (req.user && req.user.role !== 'ceo') {
-      filter.salonId = req.user.salonId || salonId;
-    } else if (salonId) {
+    // Optional salon filter for CEO only
+    if (req.user?.role === 'ceo' && salonId) {
       filter.salonId = salonId;
     }
 
@@ -682,12 +679,12 @@ export const getBookingsByDate = async (req, res) => {
     endDate.setHours(23, 59, 59, 999);
 
     let filter = {
+      ...(req.tenantFilter || {}),
       bookingDate: { $gte: startDate, $lte: endDate }
     };
 
-    if (req.user && req.user.role !== 'ceo') {
-      filter.salonId = req.user.salonId || salonId;
-    } else if (salonId) {
+    // Optional salon filter for CEO only
+    if (req.user?.role === 'ceo' && salonId) {
       filter.salonId = salonId;
     }
 

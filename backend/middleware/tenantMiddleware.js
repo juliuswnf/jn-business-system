@@ -102,6 +102,20 @@ export const enforceTenantFilter = (req, res, next) => {
     return next();
   }
 
+  // Customers should only access their own bookings (by email)
+  if (req.user.role === 'customer') {
+    const email = (req.user.email || '').toLowerCase().trim();
+    if (!email) {
+      logger.warn(`🚫 Customer user ${req.user.id} has no email assigned`);
+      return res.status(403).json({
+        success: false,
+        message: 'No email assigned to your account'
+      });
+    }
+    req.tenantFilter = { customerEmail: email };
+    return next();
+  }
+
   // All other users MUST have a salonId
   if (!req.user.salonId) {
     logger.warn(`🚫 User ${req.user.id} has no salonId assigned`);

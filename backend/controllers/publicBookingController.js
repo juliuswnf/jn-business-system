@@ -290,17 +290,15 @@ export const getAvailableSlots = async (req, res) => {
       });
     }
 
-    // Get existing bookings for this date
-    const startDate = new Date(date);
-    startDate.setHours(0, 0, 0, 0);
+    const timezone = salon.timezone || 'Europe/Berlin';
 
-    const endDate = new Date(date);
-    endDate.setHours(23, 59, 59, 999);
+    // Get existing bookings for this date (timezone-aware, stored in UTC)
+    const { startUTC, endUTC } = timezoneHelpers.getDayRangeUTC(date, timezone);
 
     let bookingFilter = {
       salonId: salon._id,
       serviceId,
-      bookingDate: { $gte: startDate, $lte: endDate },
+      bookingDate: { $gte: startUTC, $lte: endUTC },
       status: { $nin: ['cancelled'] }
     };
 
@@ -308,50 +306,62 @@ export const getAvailableSlots = async (req, res) => {
       bookingFilter.employeeId = employeeId;
     }
 
-    const existingBookings = await Booking.find(bookingFilter).lean().maxTimeMS(5000);
+    const existingBookings = await Booking.find(bookingFilter)
+      .select('bookingDate')
+      .lean()
+      .maxTimeMS(5000);
 
-    // Generate time slots based on business hours
+    const bookedSlots = existingBookings
+      .map(b => timezoneHelpers.fromUTC(b.bookingDate, timezone).time)
+      .filter(Boolean);
+
+    // Generate time slots based on business hours (in salon timezone)
     const slots = [];
-    const [openHour, openMin] = businessHours.open.split(':').map(Number);
-    const [closeHour, closeMin] = businessHours.close.split(':').map(Number);
+    const openTime = businessHours.open;
+    const closeTime = businessHours.close;
 
-    let currentSlot = new Date(startDate);
-    currentSlot.setHours(openHour, openMin, 0, 0);
-
-    const closingTime = new Date(startDate);
-    closingTime.setHours(closeHour, closeMin, 0, 0);
+    if (!openTime || !closeTime) {
+      return res.status(200).json({
+        success: true,
+        slots: [],
+        bookedSlots,
+        message: 'Salon opening hours not configured'
+      });
+    }
 
     const serviceDuration = service.duration || 60;
     const buffer = salon.bookingBuffer || 0;
     const slotInterval = serviceDuration + buffer;
 
-    while (currentSlot < closingTime) {
-      // Check if slot is already booked
-      const isBooked = existingBookings.some(booking => {
-        const bookingTime = new Date(booking.bookingDate).getTime();
-        const slotTime = currentSlot.getTime();
-        return Math.abs(bookingTime - slotTime) < 60000; // Within 1 minute
-      });
+    // Iterate in local time (DST-safe via Luxon inside timezoneHelpers)
+    // Build a list of HH:mm strings so frontend can render directly.
+    let currentMinutes = 0;
+    const [openHour, openMin] = openTime.split(':').map(Number);
+    const [closeHour, closeMin] = closeTime.split(':').map(Number);
+    const openTotal = openHour * 60 + openMin;
+    const closeTotal = closeHour * 60 + closeMin;
 
-      // Check if slot is in the past
-      const isPast = currentSlot < new Date();
+    currentMinutes = openTotal;
+    while (currentMinutes + serviceDuration <= closeTotal) {
+      const h = String(Math.floor(currentMinutes / 60)).padStart(2, '0');
+      const m = String(currentMinutes % 60).padStart(2, '0');
+      const timeStr = `${h}:${m}`;
+
+      const isBooked = bookedSlots.includes(timeStr);
+      const isPast = timezoneHelpers.isInPast(date, timeStr, timezone);
 
       if (!isBooked && !isPast) {
-        slots.push({
-          time: currentSlot.toISOString(),
-          display: currentSlot.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
-          available: true
-        });
+        slots.push(timeStr);
       }
 
-      // Move to next slot
-      currentSlot = new Date(currentSlot.getTime() + slotInterval * 60000);
+      currentMinutes += slotInterval;
     }
 
     res.status(200).json({
       success: true,
-      date: startDate.toISOString().split('T')[0],
-      slots
+      date,
+      slots,
+      bookedSlots
     });
   } catch (error) {
     logger.error('GetAvailableSlots Error:', error);

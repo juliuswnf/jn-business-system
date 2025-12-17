@@ -207,9 +207,14 @@ export default function Booking() {
         })
       });
 
-      const data = await res.json();
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
 
-      if (res.ok && data.success) {
+      if (res.ok && data?.success) {
         // ✅ SRE FIX #38: Show email warnings if any
         if (data.warnings && data.warnings.length > 0) {
           showNotification('Termin gebucht! ' + data.warnings[0], 'warning');
@@ -234,7 +239,11 @@ export default function Booking() {
         setServices([]);
         setEmployees([]);
       } else {
-        showNotification(data.message || 'Fehler beim Buchen', 'error');
+        if (res.status === 409) {
+          showNotification('Dieser Termin ist leider schon vergeben. Bitte wähle eine andere Uhrzeit.', 'error');
+        } else {
+          showNotification(data?.message || `Fehler beim Buchen (HTTP ${res.status})`, 'error');
+        }
       }
     } catch (error) {
       console.error('Booking error:', error);
