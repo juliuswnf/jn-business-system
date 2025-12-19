@@ -257,7 +257,7 @@ export const sendBookingReminder = async (booking) => {
 
     return { success: true };
   } catch (error) {
-    logger.error('� SendBookingReminder Error:', error);
+    logger.error('❌ SendBookingReminder Error:', error);
     throw error;
   }
 };

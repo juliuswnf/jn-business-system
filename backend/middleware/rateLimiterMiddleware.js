@@ -61,7 +61,7 @@ class MemoryStoreAdapter {
 
     for (const [key, value] of this.hits.entries()) {
       // Delete if expired OR if single request older than 2x windowMs (cleanup old one-offs)
-      if (now - value.timestamp > this.windowMs || 
+      if (now - value.timestamp > this.windowMs ||
           (value.count === 1 && now - value.timestamp > this.windowMs * 2)) {
         this.hits.delete(key);
         deleted++;
@@ -247,7 +247,7 @@ const bookingCreationLimiter = rateLimit({
   keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   skip: (req) => req.user && req.user.role === 'ceo', // CEO bypass
   handler: (req, res) => {
-    logger.warn(`?? Booking creation rate limit exceeded: ${req.user?.id || req.ip}`);
+    logger.warn(`⚠️ Booking creation rate limit exceeded: ${req.user?.id || req.ip}`);
     res.status(429).json({
       success: false,
       message: 'Zu viele Buchungsanfragen. Bitte warten Sie einen Moment.',
@@ -260,17 +260,17 @@ const bookingCreationLimiter = rateLimit({
 const mutationLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: parseInt(process.env.RATE_LIMIT_MUTATIONS || '30'), // 30 mutations per minute
-  message: { success: false, message: 'Zu viele �nderungen in kurzer Zeit' },
+  message: { success: false, message: 'Zu viele Änderungen in kurzer Zeit' },
   standardHeaders: true,
   legacyHeaders: false,
   store: memoryStoreAdapter,
   keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   skip: (req) => req.user && req.user.role === 'ceo', // CEO bypass
   handler: (req, res) => {
-    logger.warn(`?? Mutation rate limit exceeded: ${req.user?.id || req.ip}`);
+    logger.warn(`⚠️ Mutation rate limit exceeded: ${req.user?.id || req.ip}`);
     res.status(429).json({
       success: false,
-      message: 'Zu viele �nderungen. Bitte verlangsamen Sie Ihre Anfragen.',
+      message: 'Zu viele Änderungen. Bitte verlangsamen Sie Ihre Anfragen.',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
     });
   }
