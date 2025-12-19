@@ -147,10 +147,10 @@ export const createBooking = async (req, res) => {
 
       if (concurrentBookings >= maxConcurrentBookings) {
         await session.abortTransaction();
-        logger.warn(`?? Capacity exceeded: ${concurrentBookings}/${maxConcurrentBookings} for salon ${salonId}`);
+        logger.warn(`⚠️ Capacity exceeded: ${concurrentBookings}/${maxConcurrentBookings} for salon ${salonId}`);
         return res.status(409).json({
           success: false,
-          message: `Kapazit�t erreicht. Maximal ${maxConcurrentBookings} gleichzeitige Buchungen m�glich.`,
+          message: `Kapazität erreicht. Maximal ${maxConcurrentBookings} gleichzeitige Buchungen möglich.`,
           capacity: {
             current: concurrentBookings,
             max: maxConcurrentBookings

@@ -14,9 +14,9 @@ const router = express.Router();
 
 /**
  * Widget Routes - Embeddable Booking Widget API
- * Public endpoints f�r externe Salon-Websites
+ * Public endpoints für externe Salon-Websites
  * Kein Auth erforderlich - Slug-basiert
- * Rate-Limited f�r Spam-Schutz
+ * Rate-Limited für Spam-Schutz
  */
 
 // ? HIGH FIX #12: Apply CORS middleware (allowedDomains whitelist)

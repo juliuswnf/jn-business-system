@@ -4,7 +4,7 @@ import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 /**
  * Package Model
  * For Personal Trainers / Fitness Studios
- * Package deals (e.g., "10 Sessions for �300")
+ * Package deals (e.g., "10 Sessions for €300")
  */
 const packageSchema = new mongoose.Schema(
   {

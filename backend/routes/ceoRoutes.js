@@ -87,7 +87,7 @@ router.get('/settings', ceoMiddleware.verifyCEOAuth, ceoController.getSystemSett
 router.put('/settings', securityMiddleware.validateContentType, ceoController.updateSystemSettings);
 
 // ==================== CEO HIDDEN LOGIN ROUTE ====================
-// Nur �ber spezielle URL erreichbar
+// Nur über spezielle URL erreichbar
 router.get('/hidden-login', (req, res) => {
   return res.json({
     success: true,
@@ -97,7 +97,7 @@ router.get('/hidden-login', (req, res) => {
 });
 
 // ==================== CEO STATUS ROUTE ====================
-// F�r System-�berwachung
+// Für System-Überwachung
 router.get('/status', ceoMiddleware.verifyCEOAuth, (req, res) => {
   return res.json({
     success: true,

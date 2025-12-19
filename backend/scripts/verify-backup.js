@@ -23,23 +23,23 @@ config();
 let hasErrors = false;
 
 function logSuccess(message) {
-  console.log(`? ${message}`);
+  console.log(`✅ ${message}`);
 }
 
 function logError(message) {
-  console.error(`? ${message}`);
+  console.error(`❌ ${message}`);
   hasErrors = true;
 }
 
 function logWarning(message) {
-  logger.warn(`? ${message}`);
+  logger.warn(`⚠️ ${message}`);
 }
 
 async function verifyBackup() {
   try {
     console.log('');
     console.log('+----------------------------------------------------------+');
-    console.log('�       Database Backup Integrity Verification            �');
+    console.log('        Database Backup Integrity Verification             ');
     console.log('+----------------------------------------------------------+');
     console.log('');
 
@@ -50,7 +50,7 @@ async function verifyBackup() {
     console.log('');
 
     // 1. Verify Record Counts
-    console.log('?? Verifying record counts...');
+    console.log('🔎 Verifying record counts...');
     const salonCount = await Salon.countDocuments();
     const bookingCount = await Booking.countDocuments();
     const userCount = await User.countDocuments();
@@ -68,7 +68,7 @@ async function verifyBackup() {
     }
 
     // 2. Verify Salon References in Bookings
-    console.log('?? Verifying salon references...');
+    console.log('🔎 Verifying salon references...');
     const salonIds = await Salon.find().distinct('_id');
     const bookingsWithInvalidSalon = await Booking.countDocuments({
       salon: { $nin: salonIds, $ne: null }

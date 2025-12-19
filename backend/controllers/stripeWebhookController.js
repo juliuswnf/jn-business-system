@@ -65,7 +65,7 @@ export const handleStripeWebhook = async (req, res) => {
     // ? IDEMPOTENCY CHECK - prevent duplicate processing
     const alreadyProcessed = await StripeEvent.hasBeenProcessed(event.id);
     if (alreadyProcessed) {
-      logger.log(`� � Event ${event.id} already processed, skipping...`);
+      logger.log(`⏭️ Event ${event.id} already processed, skipping...`);
       return res.status(200).json({ received: true, duplicate: true });
     }
 
@@ -138,7 +138,7 @@ export const handleStripeWebhook = async (req, res) => {
       break;
 
     default:
-      logger.log(`� � Unhandled webhook event type: ${event.type}`);
+      logger.log(`ℹ️ Unhandled webhook event type: ${event.type}`);
     }
 
       // ? Mark event as successfully processed
@@ -151,7 +151,7 @@ export const handleStripeWebhook = async (req, res) => {
       throw processingError; // Re-throw to outer catch block
     }
   } catch (error) {
-    logger.error('� Stripe Webhook Error:', error);
+    logger.error('❌ Stripe Webhook Error:', error);
     res.status(400).json({
       success: false,
       message: 'Webhook processing error',
