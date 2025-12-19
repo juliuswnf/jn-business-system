@@ -69,7 +69,7 @@ const smsLogSchema = new mongoose.Schema({
   cost: {
     type: Number,
     min: 0,
-    comment: 'Cost in EUR cents (e.g., 7 = Ã¢â€šÂ¬0.07)'
+    comment: 'Cost in EUR cents (e.g., 7 = €0.07)'
   },
 
   // Error Handling

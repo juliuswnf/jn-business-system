@@ -101,7 +101,7 @@ router.post('/accept/:id', async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'ðŸŽ‰ Booking confirmed! Slot successfully reserved from waitlist.',
+      message: '🎉 Booking confirmed! Slot successfully reserved from waitlist.',
       booking: {
         id: booking._id,
         customer: booking.customer,

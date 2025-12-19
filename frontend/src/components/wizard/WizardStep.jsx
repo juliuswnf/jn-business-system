@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 /**
  * WizardStep Component
- * 
+ *
  * Displays a single wizard question with different input types
  */
 const WizardStep = ({
@@ -24,7 +24,7 @@ const WizardStep = ({
 
   const handleMultipleSelect = (value) => {
     const currentValues = Array.isArray(selectedValue) ? selectedValue : [];
-    
+
     if (currentValues.includes(value)) {
       // Remove if already selected
       onSelect(currentValues.filter(v => v !== value));
@@ -61,11 +61,11 @@ const WizardStep = ({
             {icon}
           </motion.div>
         )}
-        
+
         <h2 className="text-3xl font-bold text-gray-900 mb-2">
           {questionText}
         </h2>
-        
+
         {subtitle && (
           <p className="text-gray-600 text-lg">
             {subtitle}
@@ -87,8 +87,8 @@ const WizardStep = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            onClick={() => type === 'multiple' 
-              ? handleMultipleSelect(option.value) 
+            onClick={() => type === 'multiple'
+              ? handleMultipleSelect(option.value)
               : handleSingleSelect(option.value)
             }
             className={`
@@ -137,11 +137,11 @@ const WizardStep = ({
                   {option.icon && <span className="text-xl">{option.icon}</span>}
                   <span className="font-semibold text-gray-900">{option.label}</span>
                 </div>
-                
+
                 {option.subtitle && (
                   <p className="text-sm text-gray-600 mb-1">{option.subtitle}</p>
                 )}
-                
+
                 {option.description && (
                   <p className="text-xs text-gray-500">{option.description}</p>
                 )}
@@ -149,7 +149,7 @@ const WizardStep = ({
                 {option.tier && (
                   <span className={`
                     inline-block mt-2 px-2 py-1 text-xs rounded-full
-                    ${option.tier === 'enterprise' 
+                    ${option.tier === 'enterprise'
                       ? 'bg-purple-100 text-purple-700'
                       : 'bg-blue-100 text-blue-700'
                     }
@@ -180,7 +180,7 @@ const WizardStep = ({
       {type === 'multiple' && (
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
-            {Array.isArray(selectedValue) ? selectedValue.length : 0} von {options.length} ausgewÃ¤hlt
+            {Array.isArray(selectedValue) ? selectedValue.length : 0} von {options.length} ausgewählt
           </p>
         </div>
       )}

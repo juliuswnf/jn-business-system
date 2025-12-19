@@ -72,7 +72,7 @@ const TattooProjectDetails = () => {
 
   if (loading) {
     return <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-      <div className="text-gray-600">LÃ¤dt Projekt...</div>
+      <div className="text-gray-600">Lädt Projekt...</div>
     </div>;
   }
 
@@ -90,7 +90,7 @@ const TattooProjectDetails = () => {
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-gray-600 mt-1">{project.bodyPart} â€¢ {project.style}</p>
+              <p className="text-gray-600 mt-1">{project.bodyPart} • {project.style}</p>
               <div className="flex items-center gap-4 mt-4">
                 <div>
                   <span className="text-sm text-gray-500">Kunde:</span>
@@ -147,12 +147,12 @@ const TattooProjectDetails = () => {
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">GeschÃ¤tzt</p>
-              <p className="text-2xl font-bold text-gray-900">â‚¬{(project.estimatedPrice / 100).toFixed(2)}</p>
+              <p className="text-sm text-gray-500">Geschätzt</p>
+              <p className="text-2xl font-bold text-gray-900">€{(project.estimatedPrice / 100).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">TatsÃ¤chlich</p>
-              <p className="text-2xl font-bold text-green-600">â‚¬{(project.actualPrice / 100).toFixed(2)}</p>
+              <p className="text-sm text-gray-500">Tatsächlich</p>
+              <p className="text-2xl font-bold text-green-600">€{(project.actualPrice / 100).toFixed(2)}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Status</p>
@@ -163,8 +163,8 @@ const TattooProjectDetails = () => {
 
         {/* Sessions Timeline */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">ðŸ“… Sessions Timeline</h2>
-          
+          <h2 className="text-xl font-bold text-gray-900 mb-4">📅 Sessions Timeline</h2>
+
           {sessions.length === 0 ? (
             <p className="text-gray-500">Keine Sessions geplant. Erstelle die erste Session!</p>
           ) : (
@@ -190,13 +190,13 @@ const TattooProjectDetails = () => {
 
         {/* Photo Gallery */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">ðŸ“¸ Photo Gallery</h2>
-          
+          <h2 className="text-xl font-bold text-gray-900 mb-4">📸 Photo Gallery</h2>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {sessions.flatMap(session => session.photos || []).length === 0 ? (
               <p className="text-gray-500 col-span-4">Keine Fotos hochgeladen</p>
             ) : (
-              sessions.flatMap(session => 
+              sessions.flatMap(session =>
                 (session.photos || []).map((photo, idx) => (
                   <div key={`${session._id}-${idx}`} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
                     <img
@@ -216,8 +216,8 @@ const TattooProjectDetails = () => {
 
         {/* Consents */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">ðŸ“ EinverstÃ¤ndniserklÃ¤rungen</h2>
-          
+          <h2 className="text-xl font-bold text-gray-900 mb-4">📝 Einverständniserklärungen</h2>
+
           {consents.length === 0 ? (
             <p className="text-gray-500">Keine Consents vorhanden</p>
           ) : (
@@ -307,7 +307,7 @@ const SessionCard = ({ session, isLast, onComplete }) => {
             onClick={onComplete}
             className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
           >
-            Session abschlieÃŸen â†’
+            Session abschließen →
           </button>
         )}
       </div>
@@ -327,7 +327,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
       >
-        <h3 className="text-xl font-bold mb-4">Session {session.sessionNumber} abschlieÃŸen</h3>
+        <h3 className="text-xl font-bold mb-4">Session {session.sessionNumber} abschließen</h3>
 
         <div className="space-y-4">
           <div>
@@ -369,7 +369,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
             onClick={() => onComplete(session._id, progress, notes)}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
           >
-            AbschlieÃŸen
+            Abschließen
           </button>
         </div>
       </motion.div>

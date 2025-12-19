@@ -100,7 +100,7 @@ export function calculateTierRecommendation(answers) {
 function calculateCustomerCountScore(customerCount) {
   switch (customerCount) {
     case '0-50':
-      return { score: 10, reason: 'Kleine Kundenbasis - perfekt fÃƒÆ’Ã‚Â¼r den Start' };
+      return { score: 10, reason: 'Kleine Kundenbasis - perfekt für den Start' };
     case '51-200':
       return { score: 20, reason: '150 Kunden - brauchst erweiterte Features' };
     case '201-500':
@@ -141,7 +141,7 @@ function calculateLocationsScore(locations) {
   } else if (count === 2 || count === 3) {
     return { score: 15, reason: 'Multi-Location - zentrale Verwaltung wichtig' };
   } else if (count >= 4) {
-    return { score: 25, reason: `${count} Standorte - Enterprise-Features nÃƒÆ’Ã‚Â¶tig` };
+    return { score: 25, reason: `${count} Standorte - Enterprise-Features nötig` };
   }
 
   return { score: 5, reason: null };
@@ -162,10 +162,10 @@ function calculateFeaturesScore(features) {
     reason = 'Wenige Features - Starter reicht';
   } else if (count >= 3 && count <= 5) {
     score = 15;
-    reason = `${count} Features gewÃƒÆ’Ã‚Â¼nscht - Professional empfohlen`;
+    reason = `${count} Features gewünscht - Professional empfohlen`;
   } else if (count >= 6) {
     score = 20;
-    reason = `${count}+ Features - Enterprise fÃƒÆ’Ã‚Â¼r volle Power`;
+    reason = `${count}+ Features - Enterprise für volle Power`;
   }
 
   // Bonus for specific high-value features
@@ -174,7 +174,7 @@ function calculateFeaturesScore(features) {
 
   if (hasEnterpriseFeature) {
     score += 10;
-    reason = 'Premium-Features benÃƒÆ’Ã‚Â¶tigt - Enterprise ideal';
+    reason = 'Premium-Features benötigt - Enterprise ideal';
   }
 
   return { score, reason };
@@ -190,7 +190,7 @@ function calculateEmployeesScore(employees) {
     case '2-5':
       return { score: 15, reason: '2-5 Mitarbeiter - Team-Features wichtig' };
     case '6-10':
-      return { score: 20, reason: '6-10 Mitarbeiter - erweiterte Rechte nÃƒÆ’Ã‚Â¶tig' };
+      return { score: 20, reason: '6-10 Mitarbeiter - erweiterte Rechte nötig' };
     case '10+':
       return { score: 25, reason: '10+ Mitarbeiter - Enterprise-Organisation essentiell' };
     default:
@@ -206,11 +206,11 @@ function calculateBudgetScore(budget) {
     case 'under-100':
       return { score: 5, reason: null };
     case '100-200':
-      return { score: 10, reason: 'ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬150 Budget - Professional in Reichweite' };
+      return { score: 10, reason: '€150 Budget - Professional in Reichweite' };
     case '200-500':
-      return { score: 12, reason: 'ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬350 Budget - Professional optimal' };
+      return { score: 12, reason: '€350 Budget - Professional optimal' };
     case '500+':
-      return { score: 15, reason: 'ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬500+ Budget - Enterprise fÃƒÆ’Ã‚Â¼r maximale Leistung' };
+      return { score: 15, reason: '€500+ Budget - Enterprise für maximale Leistung' };
     default:
       return { score: 5, reason: null };
   }
@@ -228,7 +228,7 @@ function calculateIndustryBonus(industry, features) {
     reason = 'Tattoo + Multi-Session - Professional ideal';
   } else if (industry === 'medical_aesthetics' && features.includes('consents')) {
     score = 15;
-    reason = 'Medical + Consents - Professional/Enterprise fÃƒÆ’Ã‚Â¼r Compliance';
+    reason = 'Medical + Consents - Professional/Enterprise für Compliance';
   } else if (industry === 'spa_wellness' && features.includes('memberships')) {
     score = 10;
     reason = 'Spa + Memberships - Recurring Revenue Features wichtig';
@@ -269,7 +269,7 @@ function calculateAlternatives(score, recommendedTier, _answers) {
     let reason = '';
 
     if (tier === 'starter' && recommendedTier !== 'starter') {
-      reason = match < 30 ? 'Zu wenig Features fÃƒÆ’Ã‚Â¼r deine Anforderungen' : 'KÃƒÆ’Ã‚Â¶nnte knapp reichen, aber eng';
+      reason = match < 30 ? 'Zu wenig Features für deine Anforderungen' : 'Könnte knapp reichen, aber eng';
     } else if (tier === 'professional') {
       if (recommendedTier === 'starter') {
         reason = 'Mehr Features als du aktuell brauchst';
@@ -277,7 +277,7 @@ function calculateAlternatives(score, recommendedTier, _answers) {
         reason = 'Fast perfekt, aber Enterprise bietet mehr';
       }
     } else if (tier === 'enterprise' && recommendedTier !== 'enterprise') {
-      reason = match < 40 ? 'Overkill fÃƒÆ’Ã‚Â¼r deine GrÃƒÆ’Ã‚Â¶ÃƒÆ’Ã…Â¸e' : 'Nice-to-have, aber nicht nÃƒÆ’Ã‚Â¶tig';
+      reason = match < 40 ? 'Overkill für deine Größe' : 'Nice-to-have, aber nicht nötig';
     }
 
     alternatives[tier] = { match, reason, price: TIER_PRICING[tier] };
@@ -299,11 +299,11 @@ function calculateROI(tier, answers) {
   const bookingsPerWeek = getBookingsPerWeekNumber(answers.bookingsPerWeek);
   const timePerBooking = 5; // minutes
   const totalMinutesPerWeek = bookingsPerWeek * timePerBooking;
-  const hourlyRate = 25; // ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬/hour
+  const hourlyRate = 25; // €/hour
   const timeCostPerMonth = (totalMinutesPerWeek / 60) * hourlyRate * 4;
   estimatedCosts += timeCostPerMonth;
 
-  // No-show costs (average 15% no-show rate, ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬50 average booking value)
+  // No-show costs (average 15% no-show rate, €50 average booking value)
   const avgBookingValue = 50;
   const noShowRate = 0.15;
   const noShowCostPerMonth = bookingsPerWeek * 4 * noShowRate * avgBookingValue;
@@ -368,8 +368,8 @@ export function getTierDetails(tier) {
     starter: {
       name: 'Starter',
       price: 49,
-      icon: 'ÃƒÂ°Ã…Â¸Ã‚Â¥Ã¢â‚¬Â°',
-      tagline: 'Perfekt fÃƒÆ’Ã‚Â¼r den Start',
+      icon: '🥉',
+      tagline: 'Perfekt für den Start',
       features: [
         'Unbegrenzte Buchungen',
         'Kunden-Datenbank',
@@ -387,8 +387,8 @@ export function getTierDetails(tier) {
     professional: {
       name: 'Professional',
       price: 199,
-      icon: 'ÃƒÂ°Ã…Â¸Ã‚Â¥Ã‹â€ ',
-      tagline: 'FÃƒÆ’Ã‚Â¼r etablierte Businesses',
+      icon: '🥈',
+      tagline: 'Für etablierte Businesses',
       features: [
         'Alles aus Starter',
         '1.000 SMS/Monat',
@@ -409,8 +409,8 @@ export function getTierDetails(tier) {
     enterprise: {
       name: 'Enterprise',
       price: 499,
-      icon: 'ÃƒÂ°Ã…Â¸Ã‚Â¥Ã¢â‚¬Â¡',
-      tagline: 'Maximale Power fÃƒÆ’Ã‚Â¼r Profis',
+      icon: '🥇',
+      tagline: 'Maximale Power für Profis',
       features: [
         'Alles aus Professional',
         '5.000 SMS/Monat',

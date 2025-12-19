@@ -71,16 +71,16 @@ export default function WorkflowProjectDetail() {
 
   const getIndustryIcon = (industry) => {
     const icons = {
-      tattoo: 'ðŸŽ¨',
-      medical_aesthetics: 'ðŸ’‰',
-      spa_wellness: 'ðŸ§–',
-      barbershop: 'ðŸ’ˆ',
-      nails: 'ðŸ’…',
-      massage: 'ðŸ’†',
-      physiotherapy: 'ðŸ©º',
-      generic: 'ðŸ“‹'
+      tattoo: '🎨',
+      medical_aesthetics: '💉',
+      spa_wellness: '🧖',
+      barbershop: '💇',
+      nails: '💅',
+      massage: '💆',
+      physiotherapy: '🧘',
+      generic: '📋'
     };
-    return icons[industry] || 'ðŸ“‹';
+    return icons[industry] || '📋';
   };
 
   const getStatusColor = (status) => {
@@ -103,7 +103,7 @@ export default function WorkflowProjectDetail() {
           onClick={() => navigate('/dashboard/workflow-projects')}
           className="text-blue-600 hover:text-blue-800 mb-4 flex items-center"
         >
-          â† ZurÃ¼ck zu Projekten
+          ← Zurück zu Projekten
         </button>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -140,13 +140,13 @@ export default function WorkflowProjectDetail() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">
-                  {project.totalPrice.toLocaleString()}â‚¬
+                  {project.totalPrice.toLocaleString()}€
                 </div>
                 <div className="text-sm text-gray-600">Gesamtpreis</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-600">
-                  {project.paidAmount.toLocaleString()}â‚¬
+                  {project.paidAmount.toLocaleString()}€
                 </div>
                 <div className="text-sm text-gray-600">Bezahlt</div>
               </div>
@@ -281,13 +281,13 @@ export default function WorkflowProjectDetail() {
 function SessionCard({ session, index, onComplete }) {
   const getStatusIcon = (status) => {
     const icons = {
-      scheduled: 'ðŸ“…',
-      in_progress: 'ðŸ”„',
-      completed: 'âœ…',
-      cancelled: 'âŒ',
-      no_show: 'âš ï¸'
+      scheduled: '📅',
+      in_progress: '🔄',
+      completed: '✅',
+      cancelled: '❌',
+      no_show: '⚠️'
     };
-    return icons[status] || 'ðŸ“‹';
+    return icons[status] || '📋';
   };
 
   const getStatusColor = (status) => {

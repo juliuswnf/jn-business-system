@@ -5,7 +5,7 @@ import confetti from 'canvas-confetti';
 
 /**
  * TierRecommendation Component
- * 
+ *
  * Displays tier recommendation with reasoning and alternatives
  */
 const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
@@ -27,10 +27,10 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
 
   const getTierIcon = (tier) => {
     switch (tier) {
-      case 'starter': return 'ðŸ¥‰';
-      case 'professional': return 'ðŸ¥ˆ';
-      case 'enterprise': return 'ðŸ¥‡';
-      default: return 'ðŸ’Ž';
+      case 'starter': return '🥉';
+      case 'professional': return '🥈';
+      case 'enterprise': return '🥇';
+      default: return '💎';
     }
   };
 
@@ -66,15 +66,15 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           transition={{ delay: 0.2, type: 'spring' }}
           className="text-7xl mb-4"
         >
-          ðŸŽ‰
+          🎉
         </motion.div>
-        
+
         <h2 className="text-4xl font-bold text-gray-900 mb-2">
           Deine perfekte Empfehlung!
         </h2>
-        
+
         <p className="text-gray-600 text-lg">
-          Basierend auf deinen Angaben haben wir das optimale Paket fÃ¼r dich gefunden
+          Basierend auf deinen Angaben haben wir das optimale Paket für dich gefunden
         </p>
       </div>
 
@@ -147,7 +147,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">GeschÃ¤tzte Ersparnis pro Monat</p>
+                <p className="text-sm text-gray-600 mb-1">Geschätzte Ersparnis pro Monat</p>
                 <p className="text-2xl font-bold text-green-700">
                   ~{formatPrice(recommendation.estimatedMonthlySavings)}
                 </p>
@@ -173,7 +173,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           disabled={loading}
           className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Wird geladen...' : `${recommendation.tierDetails.name.toUpperCase()} WÃ„HLEN`}
+          {loading ? 'Wird geladen...' : `${recommendation.tierDetails.name.toUpperCase()} WÄHLEN`}
         </motion.button>
       </motion.div>
 
@@ -182,12 +182,12 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
         <h4 className="text-xl font-semibold text-gray-900 mb-4 text-center">
           Andere Optionen
         </h4>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.entries(recommendation.allTiers).map(([tier, details], index) => {
             const isRecommended = tier === recommendation.recommendedTier;
             const alternative = recommendation.alternatives[tier];
-            
+
             if (isRecommended) {
               return (
                 <motion.div
@@ -232,14 +232,14 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
                   {formatPrice(details.price)}
                   <span className="text-sm text-gray-600">/Mo</span>
                 </p>
-                
+
                 {alternative && (
                   <>
                     <div className="flex items-center mb-2">
                       <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full" 
-                          style={{ width: `${alternative.match}%` }} 
+                        <div
+                          className="bg-blue-600 h-2 rounded-full"
+                          style={{ width: `${alternative.match}%` }}
                         />
                       </div>
                       <span className="text-sm font-semibold text-gray-700">
@@ -257,7 +257,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
                   disabled={loading}
                   className="w-full py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  WÃ¤hlen
+                  Wählen
                 </button>
               </motion.div>
             );
@@ -271,7 +271,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           href="/pricing"
           className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
         >
-          Alle Features im Detail vergleichen â†’
+          Alle Features im Detail vergleichen →
         </a>
       </div>
     </motion.div>

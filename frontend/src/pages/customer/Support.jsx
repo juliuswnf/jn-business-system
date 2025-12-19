@@ -182,7 +182,7 @@ const Support = () => {
     const statusMap = {
       open: { label: 'Offen', color: 'text-yellow-600 bg-yellow-100' },
       'in-progress': { label: 'In Bearbeitung', color: 'text-blue-600 bg-blue-100' },
-      resolved: { label: 'GelÃ¶st', color: 'text-green-600 bg-green-100' },
+      resolved: { label: 'Gelöst', color: 'text-green-600 bg-green-100' },
       closed: { label: 'Geschlossen', color: 'text-gray-600 bg-gray-100' }
     };
     return statusMap[status] || { label: status, color: 'text-gray-600 bg-gray-100' };
@@ -279,7 +279,7 @@ const Support = () => {
                 <textarea
                   value={newTicket.description}
                   onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
-                  placeholder="Beschreiben Sie Ihr Anliegen so detailliert wie mÃ¶glich..."
+                  placeholder="Beschreiben Sie Ihr Anliegen so detailliert wie möglich..."
                   required
                   rows={5}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -322,7 +322,7 @@ const Support = () => {
                 </div>
                 <h2 className="text-xl font-semibold text-white">{selectedTicket.subject}</h2>
                 <p className="text-sm text-gray-300 mt-1">
-                  {getCategoryDisplay(selectedTicket.category)} â€¢ Erstellt am {formatDate(selectedTicket.createdAt)}
+                  {getCategoryDisplay(selectedTicket.category)} • Erstellt am {formatDate(selectedTicket.createdAt)}
                 </p>
               </div>
               <button
@@ -377,7 +377,7 @@ const Support = () => {
                     onClick={handleCloseTicket}
                     className="text-gray-300 hover:text-white text-sm"
                   >
-                    Ticket schlieÃŸen
+                    Ticket schließen
                   </button>
                   <button
                     type="submit"
@@ -402,7 +402,7 @@ const Support = () => {
             </div>
           ) : tickets.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-5xl mb-4">ðŸ“©</div>
+              <div className="text-5xl mb-4">📩</div>
               <p className="text-gray-300 mb-4">Keine Support-Tickets vorhanden</p>
               <button
                 onClick={() => setShowNewTicket(true)}
@@ -429,7 +429,7 @@ const Support = () => {
                       </div>
                       <h3 className="text-white font-medium">{ticket.subject}</h3>
                       <p className="text-sm text-gray-300 mt-1">
-                        {getCategoryDisplay(ticket.category)} â€¢ {formatDate(ticket.createdAt)}
+                        {getCategoryDisplay(ticket.category)} • {formatDate(ticket.createdAt)}
                       </p>
                     </div>
                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,7 +445,7 @@ const Support = () => {
         {/* Back to Dashboard */}
         <div className="mt-8 text-center">
           <Link to="/customer/dashboard" className="text-gray-300 hover:text-white" aria-label="Zurück zum Kunden-Dashboard">
-            â† ZurÃ¼ck zum Dashboard
+            ← Zurück zum Dashboard
           </Link>
         </div>
       </div>

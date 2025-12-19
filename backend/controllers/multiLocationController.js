@@ -37,7 +37,7 @@ export const getLocations = async (req, res) => {
     if (tier !== 'enterprise') {
       return res.status(403).json({
         success: false,
-        error: 'Multi-Location ist nur im Enterprise-Tarif verfÃ¼gbar.',
+        error: 'Multi-Location ist nur im Enterprise-Tarif verfügbar.',
         upgradeRequired: true
       });
     }
@@ -237,7 +237,7 @@ export const addLocation = async (req, res) => {
     if (tier !== 'enterprise') {
       return res.status(403).json({
         success: false,
-        error: 'Multi-Location ist nur im Enterprise-Tarif verfÃ¼gbar.'
+        error: 'Multi-Location ist nur im Enterprise-Tarif verfügbar.'
       });
     }
 
@@ -280,7 +280,7 @@ export const addLocation = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Neuer Standort erfolgreich hinzugefÃ¼gt',
+      message: 'Neuer Standort erfolgreich hinzugefügt',
       location: {
         id: newSalon._id,
         name: newSalon.name,
@@ -291,7 +291,7 @@ export const addLocation = async (req, res) => {
     logger.error('MultiLocation addLocation Error:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim HinzufÃ¼gen des Standorts'
+      error: 'Fehler beim Hinzufügen des Standorts'
     });
   }
 };

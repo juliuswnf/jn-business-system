@@ -135,16 +135,16 @@ export default function BrandingSettings() {
 
       if (res.ok) {
         setBranding(prev => ({ ...prev, logo: null }));
-        showNotification('Logo gelÃ¶scht', 'success');
+        showNotification('Logo gelöscht', 'success');
       }
     } catch (error) {
-      showNotification('Fehler beim LÃ¶schen', 'error');
+      showNotification('Fehler beim Löschen', 'error');
     }
   };
 
   // Reset to defaults
   const handleReset = async () => {
-    if (!confirm('MÃ¶chten Sie das Branding wirklich auf Standard zurÃ¼cksetzen?')) return;
+    if (!confirm('Möchten Sie das Branding wirklich auf Standard zurücksetzen?')) return;
 
     try {
       const token = getToken();
@@ -159,10 +159,10 @@ export default function BrandingSettings() {
 
       if (res.ok && data.success) {
         setBranding(data.branding);
-        showNotification('Branding zurÃ¼ckgesetzt', 'success');
+        showNotification('Branding zurückgesetzt', 'success');
       }
     } catch (error) {
-      showNotification('Fehler beim ZurÃ¼cksetzen', 'error');
+      showNotification('Fehler beim Zurücksetzen', 'error');
     }
   };
 
@@ -206,9 +206,9 @@ export default function BrandingSettings() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <div>
-              <h3 className="text-yellow-400 font-medium">Custom Branding nicht verfÃ¼gbar</h3>
+              <h3 className="text-yellow-400 font-medium">Custom Branding nicht verfügbar</h3>
               <p className="text-yellow-300/70 text-sm mt-1">
-                Custom Branding ist ab dem Professional-Tarif verfÃ¼gbar.
+                Custom Branding ist ab dem Professional-Tarif verfügbar.
                 <a href="/pricing" className="text-yellow-400 hover:text-yellow-300 ml-1 underline">Jetzt upgraden</a>
               </p>
             </div>
@@ -263,7 +263,7 @@ export default function BrandingSettings() {
           <h2 className="text-lg font-semibold text-white mb-4">Farben</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm text-gray-300 mb-2">PrimÃ¤rfarbe</label>
+              <label className="block text-sm text-gray-300 mb-2">Primärfarbe</label>
               <div className="flex items-center gap-3">
                 <input
                   type="color"
@@ -280,7 +280,7 @@ export default function BrandingSettings() {
               </div>
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">SekundÃ¤rfarbe</label>
+              <label className="block text-sm text-gray-300 mb-2">Sekundärfarbe</label>
               <div className="flex items-center gap-3">
                 <input
                   type="color"
@@ -389,7 +389,7 @@ export default function BrandingSettings() {
               )}
               <span className="text-white font-semibold">Ihr Unternehmen</span>
             </div>
-            <p className="text-gray-300 mb-4">WÃ¤hlen Sie einen Service fÃ¼r Ihre Buchung.</p>
+            <p className="text-gray-300 mb-4">Wählen Sie einen Service für Ihre Buchung.</p>
             <button
               className={`px-6 py-2 text-white font-medium transition ${
                 branding.buttonStyle === 'pill' ? 'rounded-full' :
@@ -420,14 +420,14 @@ export default function BrandingSettings() {
             onClick={handleReset}
             className="text-gray-300 hover:text-white text-sm"
           >
-            Auf Standard zurÃ¼cksetzen
+            Auf Standard zurücksetzen
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
             className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-8 py-3 rounded-lg font-medium transition"
           >
-            {saving ? 'Wird gespeichert...' : 'Ã„nderungen speichern'}
+            {saving ? 'Wird gespeichert...' : 'Änderungen speichern'}
           </button>
         </div>
       </div>

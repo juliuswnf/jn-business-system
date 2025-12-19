@@ -5,7 +5,7 @@ import ISMSProvider from './ISMSProvider.js';
  * Twilio SMS Provider Implementation
  *
  * Docs: https://www.twilio.com/docs/sms
- * Pricing: ~Ã¢â€šÂ¬0.077 per SMS (Germany)
+ * Pricing: ~€0.077 per SMS (Germany)
  */
 
 export default class TwilioProvider extends ISMSProvider {

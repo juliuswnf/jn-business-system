@@ -103,17 +103,17 @@ const MarketingTemplateSchema = new mongoose.Schema(
 MarketingTemplateSchema.statics.seedTemplates = async function() {
   const templates = [
     {
-      name: 'Inaktive Kunden zurÃ¼ckgewinnen',
+      name: 'Inaktive Kunden zurückgewinnen',
       type: 'inactive_customers',
       tier: 'starter',
-      icon: 'ðŸ”„',
-      description: 'Gewinnen Sie Kunden zurÃ¼ck, die 6+ Monate nicht mehr da waren. Perfekt fÃ¼r Starter-Tier!',
+      icon: '🔄',
+      description: 'Gewinnen Sie Kunden zurück, die 6+ Monate nicht mehr da waren. Perfekt für Starter-Tier!',
       defaultRules: {
         inactiveDays: 180,
         maxRecipients: 50
       },
       defaultMessage: {
-        template: 'Hallo {{customerName}}! Wir vermissen Sie bei {{salonName}}! ðŸ˜Š Kommen Sie zurÃ¼ck und erhalten Sie {{discount}} Rabatt. Buchen: {{bookingLink}} (GÃ¼ltig {{validDays}} Tage)',
+        template: 'Hallo {{customerName}}! Wir vermissen Sie bei {{salonName}}! 😊 Kommen Sie zurück und erhalten Sie {{discount}} Rabatt. Buchen: {{bookingLink}} (Gültig {{validDays}} Tage)',
         discountType: 'percentage',
         discountValue: 20,
         validDays: 30
@@ -128,17 +128,17 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
       popular: true
     },
     {
-      name: 'Geburtstags-Ãœberraschung',
+      name: 'Geburtstags-Überraschung',
       type: 'birthday',
       tier: 'professional',
-      icon: 'ðŸŽ‚',
-      description: 'Automatische Geburtstagsgutscheine 7 Tage vor dem Geburtstag. ErhÃ¶ht Kundenbindung um 40%!',
+      icon: '🎂',
+      description: 'Automatische Geburtstagsgutscheine 7 Tage vor dem Geburtstag. Erhöht Kundenbindung um 40%!',
       defaultRules: {
         birthdayDaysBefore: 7,
         maxRecipients: 100
       },
       defaultMessage: {
-        template: 'ðŸŽ‰ Alles Gute zum Geburtstag, {{customerName}}! Feiern Sie mit uns - {{discount}} Geschenk wartet auf Sie bei {{salonName}}! Code: {{discountCode}} - Buchen: {{bookingLink}}',
+        template: '🎉 Alles Gute zum Geburtstag, {{customerName}}! Feiern Sie mit uns - {{discount}} Geschenk wartet auf Sie bei {{salonName}}! Code: {{discountCode}} - Buchen: {{bookingLink}}',
         discountType: 'fixed_amount',
         discountValue: 25,
         validDays: 14
@@ -152,17 +152,17 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
       popular: true
     },
     {
-      name: 'Last-Minute Slots fÃ¼llen',
+      name: 'Last-Minute Slots füllen',
       type: 'last_minute',
       tier: 'professional',
-      icon: 'âš¡',
-      description: 'FÃ¼llen Sie freie Termine kurzfristig mit Stammkunden. Reduziert Leerlauf um 60%!',
+      icon: '⚡',
+      description: 'Füllen Sie freie Termine kurzfristig mit Stammkunden. Reduziert Leerlauf um 60%!',
       defaultRules: {
         targetSegment: 'regular',
         maxRecipients: 30
       },
       defaultMessage: {
-        template: 'âš¡ LAST-MINUTE bei {{salonName}}! Freier Termin HEUTE/MORGEN mit {{discount}} Rabatt nur fÃ¼r Sie, {{customerName}}! Schnell buchen: {{bookingLink}} Code: {{discountCode}}',
+        template: '⚡ LAST-MINUTE bei {{salonName}}! Freier Termin HEUTE/MORGEN mit {{discount}} Rabatt nur für Sie, {{customerName}}! Schnell buchen: {{bookingLink}} Code: {{discountCode}}',
         discountType: 'percentage',
         discountValue: 15,
         validDays: 2
@@ -178,14 +178,14 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
       name: 'Neue Services bewerben',
       type: 'upsell',
       tier: 'professional',
-      icon: 'âœ¨',
-      description: 'Informieren Sie Bestandskunden Ã¼ber neue Dienstleistungen mit EinfÃ¼hrungsrabatt.',
+      icon: '✨',
+      description: 'Informieren Sie Bestandskunden über neue Dienstleistungen mit Einführungsrabatt.',
       defaultRules: {
         minBookings: 3,
         maxRecipients: 200
       },
       defaultMessage: {
-        template: 'âœ¨ NEU bei {{salonName}}: [Service-Name]! Als treuer Kunde erhalten Sie {{discount}} EinfÃ¼hrungsrabatt, {{customerName}}. Jetzt testen: {{bookingLink}} Code: {{discountCode}}',
+        template: '✨ NEU bei {{salonName}}: [Service-Name]! Als treuer Kunde erhalten Sie {{discount}} Einführungsrabatt, {{customerName}}. Jetzt testen: {{bookingLink}} Code: {{discountCode}}',
         discountType: 'percentage',
         discountValue: 30,
         validDays: 30
@@ -201,7 +201,7 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
       name: 'VIP Treue-Bonus',
       type: 'loyalty',
       tier: 'professional',
-      icon: 'ðŸ‘‘',
+      icon: '🥂',
       description: 'Belohnen Sie Ihre besten Kunden (10+ Buchungen) automatisch mit exklusiven Rabatten.',
       defaultRules: {
         minBookings: 10,
@@ -209,7 +209,7 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
         maxRecipients: 50
       },
       defaultMessage: {
-        template: 'ðŸ‘‘ VIP-DANKESCHÃ–N! Sie sind ein geschÃ¤tzter Stammgast bei {{salonName}}, {{customerName}}! Hier ist Ihr exklusiver {{discount}} Treue-Rabatt: {{discountCode}} - {{bookingLink}}',
+        template: '🥂 VIP-DANKESCHÖN! Sie sind ein geschätzter Stammgast bei {{salonName}}, {{customerName}}! Hier ist Ihr exklusiver {{discount}} Treue-Rabatt: {{discountCode}} - {{bookingLink}}',
         discountType: 'percentage',
         discountValue: 25,
         validDays: 60
@@ -259,7 +259,7 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
     );
   }
 
-  console.log('âœ… Marketing templates seeded successfully');
+  console.log('✅ Marketing templates seeded successfully');
   return templates.length;
 };
 

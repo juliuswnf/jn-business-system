@@ -396,13 +396,13 @@ export const addCustomerNote = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Notiz hinzugefÃ¼gt'
+      message: 'Notiz hinzugefügt'
     });
   } catch (error) {
     logger.error('CRM addCustomerNote Error:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim HinzufÃ¼gen der Notiz'
+      error: 'Fehler beim Hinzufügen der Notiz'
     });
   }
 };

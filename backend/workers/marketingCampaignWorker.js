@@ -403,7 +403,7 @@ const formatDiscount = (messageConfig) => {
   if (messageConfig.discountType === 'percentage') {
     return `${messageConfig.discountValue}%`;
   } else if (messageConfig.discountType === 'fixed_amount') {
-    return `${messageConfig.discountValue}Ã¢â€šÂ¬`;
+    return `${messageConfig.discountValue}€`;
   }
   return '';
 };

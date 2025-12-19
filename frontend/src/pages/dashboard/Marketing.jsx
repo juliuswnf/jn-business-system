@@ -107,7 +107,7 @@ const Marketing = () => {
   };
 
   const deleteCampaign = async (campaignId) => {
-    if (!confirm('Campaign wirklich lÃ¶schen?')) return;
+    if (!confirm('Campaign wirklich löschen?')) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -116,10 +116,10 @@ const Marketing = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success('Campaign gelÃ¶scht');
+      toast.success('Campaign gelöscht');
       loadData();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Fehler beim LÃ¶schen');
+      toast.error(error.response?.data?.message || 'Fehler beim Löschen');
     }
   };
 
@@ -135,8 +135,8 @@ const Marketing = () => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">ðŸ“§ Marketing Automation</h1>
-        <p className="text-gray-600">Automatische SMS-Kampagnen fÃ¼r mehr Umsatz</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">📧 Marketing Automation</h1>
+        <p className="text-gray-600">Automatische SMS-Kampagnen für mehr Umsatz</p>
       </div>
 
       {/* Stats Cards */}
@@ -157,14 +157,14 @@ const Marketing = () => {
         <StatCard
           icon={<DollarSign className="w-6 h-6" />}
           label="Umsatz"
-          value={`${stats?.totalRevenue?.toFixed(0) || 0}â‚¬`}
+          value={`${stats?.totalRevenue?.toFixed(0) || 0}€`}
           color="purple"
         />
         <StatCard
           icon={<TrendingUp className="w-6 h-6" />}
           label="ROI"
           value={`${stats?.roi || 0}%`}
-          subtext={`${stats?.totalCost || 0}â‚¬ Kosten`}
+          subtext={`${stats?.totalCost || 0}€ Kosten`}
           color="orange"
         />
       </div>
@@ -182,13 +182,13 @@ const Marketing = () => {
                 {limits.tier.charAt(0).toUpperCase() + limits.tier.slice(1)} Tier
               </h3>
               <p className="text-sm text-blue-700">
-                {limits.activeCampaigns} / {limits.maxActiveCampaigns} aktive Kampagnen Â·
+                {limits.activeCampaigns} / {limits.maxActiveCampaigns} aktive Kampagnen ·
                 {' '}{limits.smsUsed} / {limits.smsLimit} SMS diesen Monat
               </p>
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-blue-900">{limits.smsRemaining}</div>
-              <div className="text-sm text-blue-700">SMS Ã¼brig</div>
+              <div className="text-sm text-blue-700">SMS übrig</div>
             </div>
           </div>
         </motion.div>
@@ -205,7 +205,7 @@ const Marketing = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            ðŸ“‹ Templates
+            📋 Templates
           </button>
           <button
             onClick={() => setActiveTab('campaigns')}
@@ -215,7 +215,7 @@ const Marketing = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            ðŸš€ Meine Kampagnen ({campaigns.length})
+            🚀 Meine Kampagnen ({campaigns.length})
           </button>
         </nav>
       </div>
@@ -321,7 +321,7 @@ const TemplateCard = ({ template, onActivate, canActivate }) => {
         <div className="text-4xl">{template.icon}</div>
         {template.popular && (
           <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-            â­ Beliebt
+            ⭐ Beliebt
           </span>
         )}
       </div>
@@ -396,7 +396,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
           {campaign.roi}%
         </div>
         <div className="text-xs text-gray-600">
-          {campaign.stats?.totalRevenue?.toFixed(0) || 0}â‚¬
+          {campaign.stats?.totalRevenue?.toFixed(0) || 0}€
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -412,7 +412,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
             onClick={() => onRun(campaign)}
             disabled={campaign.status !== 'active'}
             className="text-blue-600 hover:text-blue-900 disabled:text-gray-300"
-            title="Manuell ausfÃ¼hren"
+            title="Manuell ausführen"
           >
             <Activity className="w-4 h-4" />
           </button>
@@ -433,7 +433,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
           <button
             onClick={() => onDelete(campaign._id)}
             className="text-red-600 hover:text-red-900"
-            title="LÃ¶schen"
+            title="Löschen"
           >
             <Trash2 className="w-4 h-4" />
           </button>

@@ -78,19 +78,19 @@ const noShowAnalyticsSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0,
-    comment: 'Total Ã¢â€šÂ¬ value of unconfirmed bookings'
+    comment: 'Total € value of unconfirmed bookings'
   },
   revenueSaved: {
     type: Number,
     default: 0,
     min: 0,
-    comment: 'Ã¢â€šÂ¬ recovered by filling cancelled slots via waitlist'
+    comment: '€ recovered by filling cancelled slots via waitlist'
   },
   revenueLost: {
     type: Number,
     default: 0,
     min: 0,
-    comment: 'Ã¢â€šÂ¬ lost due to no-shows and unfilled slots'
+    comment: '€ lost due to no-shows and unfilled slots'
   },
   totalRevenue: {
     type: Number,
@@ -162,7 +162,7 @@ const noShowAnalyticsSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0,
-    comment: 'Ã¢â€šÂ¬ generated from waitlist bookings'
+    comment: '€ generated from waitlist bookings'
   },
   avgWaitlistFillTimeHours: {
     type: Number,
@@ -197,7 +197,7 @@ const noShowAnalyticsSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0,
-    comment: 'Ã¢â€šÂ¬ spent on SMS this period'
+    comment: '€ spent on SMS this period'
   },
 
   // Customer Reliability Tracking
@@ -275,7 +275,7 @@ const noShowAnalyticsSchema = new mongoose.Schema({
   // Comparison to Previous Period
   comparisonToPrevious: {
     noShowRateChange: Number,    // % change
-    revenueChange: Number,        // Ã¢â€šÂ¬ change
+    revenueChange: Number,        // € change
     confirmationRateChange: Number,
     waitlistFillRateChange: Number
   }

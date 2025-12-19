@@ -105,7 +105,7 @@ export const updateBranding = async (req, res) => {
     if (tier === 'starter') {
       return res.status(403).json({
         success: false,
-        error: 'Custom Branding ist ab dem Professional-Tarif verfÃ¼gbar. Bitte upgraden Sie Ihr Abonnement.'
+        error: 'Custom Branding ist ab dem Professional-Tarif verfügbar. Bitte upgraden Sie Ihr Abonnement.'
       });
     }
 
@@ -113,7 +113,7 @@ export const updateBranding = async (req, res) => {
     if (showPoweredBy === false && tier !== 'enterprise') {
       return res.status(403).json({
         success: false,
-        error: 'White-Label (ohne "Powered by JN Business System") ist nur im Enterprise-Tarif verfÃ¼gbar.'
+        error: 'White-Label (ohne "Powered by JN Business System") ist nur im Enterprise-Tarif verfügbar.'
       });
     }
 
@@ -122,19 +122,19 @@ export const updateBranding = async (req, res) => {
     if (primaryColor && !colorRegex.test(primaryColor)) {
       return res.status(400).json({
         success: false,
-        error: 'UngÃ¼ltiges Farbformat fÃ¼r PrimÃ¤rfarbe. Verwenden Sie #RRGGBB.'
+        error: 'Ungültiges Farbformat für Primärfarbe. Verwenden Sie #RRGGBB.'
       });
     }
     if (secondaryColor && !colorRegex.test(secondaryColor)) {
       return res.status(400).json({
         success: false,
-        error: 'UngÃ¼ltiges Farbformat fÃ¼r SekundÃ¤rfarbe. Verwenden Sie #RRGGBB.'
+        error: 'Ungültiges Farbformat für Sekundärfarbe. Verwenden Sie #RRGGBB.'
       });
     }
     if (accentColor && !colorRegex.test(accentColor)) {
       return res.status(400).json({
         success: false,
-        error: 'UngÃ¼ltiges Farbformat fÃ¼r Akzentfarbe. Verwenden Sie #RRGGBB.'
+        error: 'Ungültiges Farbformat für Akzentfarbe. Verwenden Sie #RRGGBB.'
       });
     }
 
@@ -197,7 +197,7 @@ export const uploadLogo = async (req, res) => {
     if (tier === 'starter') {
       return res.status(403).json({
         success: false,
-        error: 'Logo-Upload ist ab dem Professional-Tarif verfÃ¼gbar.'
+        error: 'Logo-Upload ist ab dem Professional-Tarif verfügbar.'
       });
     }
 
@@ -247,13 +247,13 @@ export const deleteLogo = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Logo wurde gelÃ¶scht'
+      message: 'Logo wurde gelöscht'
     });
   } catch (error) {
     logger.error('Branding deleteLogo Error:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim LÃ¶schen des Logos'
+      error: 'Fehler beim Löschen des Logos'
     });
   }
 };
@@ -292,14 +292,14 @@ export const resetBranding = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Branding wurde auf Standard zurÃ¼ckgesetzt',
+      message: 'Branding wurde auf Standard zurückgesetzt',
       branding: defaultBranding
     });
   } catch (error) {
     logger.error('Branding resetBranding Error:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim ZurÃ¼cksetzen des Brandings'
+      error: 'Fehler beim Zurücksetzen des Brandings'
     });
   }
 };

@@ -42,7 +42,7 @@ router.post(
   '/',
   [
     body('name').trim().notEmpty().withMessage('Name ist erforderlich'),
-    body('email').isEmail().withMessage('GÃ¼ltige E-Mail erforderlich')
+    body('email').isEmail().withMessage('Gültige E-Mail erforderlich')
   ],
   validateBody,
   addLocation

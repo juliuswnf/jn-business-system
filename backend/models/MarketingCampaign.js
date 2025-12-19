@@ -180,7 +180,7 @@ MarketingCampaignSchema.virtual('roi').get(function() {
   if (!this.stats.totalSent || this.stats.totalSent === 0) {
     return 0;
   }
-  const cost = this.stats.totalSent * 0.077; // Ã¢â€šÂ¬0.077 per SMS (Twilio cost)
+  const cost = this.stats.totalSent * 0.077; // €0.077 per SMS (Twilio cost)
   if (cost === 0) return 0;
   return ((this.stats.totalRevenue - cost) / cost * 100).toFixed(2);
 });
