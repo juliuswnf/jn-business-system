@@ -81,16 +81,16 @@ export default function WorkflowProjects() {
 
   const getIndustryIcon = (industry) => {
     const icons = {
-      tattoo: 'ðŸŽ¨',
-      medical_aesthetics: 'ðŸ’‰',
-      spa_wellness: 'ðŸ§–',
-      barbershop: 'ðŸ’ˆ',
-      nails: 'ðŸ’…',
-      massage: 'ðŸ’†',
-      physiotherapy: 'ðŸ©º',
-      generic: 'ðŸª'
+      tattoo: '🎨',
+      medical_aesthetics: '💉',
+      spa_wellness: '🧖',
+      barbershop: '💇',
+      nails: '💅',
+      massage: '💆',
+      physiotherapy: '🧘',
+      generic: '🏪'
     };
-    return icons[industry] || 'ðŸ“‹';
+    return icons[industry] || '📋';
   };
 
   if (loading) {
@@ -125,19 +125,19 @@ export default function WorkflowProjects() {
           <StatCard
             title="Gesamt"
             value={stats.total}
-            icon="ðŸ“Š"
+            icon="📊"
             color="bg-blue-50 border-blue-200"
           />
           <StatCard
             title="Aktiv"
             value={stats.active}
-            icon="ðŸ”„"
+            icon="🔄"
             color="bg-blue-50 border-blue-200"
           />
           <StatCard
             title="Abgeschlossen"
             value={stats.completed}
-            icon="âœ…"
+            icon="✅"
             color="bg-green-50 border-green-200"
           />
           <StatCard

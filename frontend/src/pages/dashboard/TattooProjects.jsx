@@ -140,25 +140,25 @@ const TattooProjects = () => {
             <StatCard
               label="Gesamt"
               value={stats.total}
-              icon="ðŸ“Š"
+              icon="📊"
               color="bg-gray-100"
             />
             <StatCard
               label="In Arbeit"
               value={stats.inProgress}
-              icon="ðŸš§"
+              icon="🚧"
               color="bg-blue-100"
             />
             <StatCard
               label="Fertig"
               value={stats.completed}
-              icon="âœ…"
+              icon="✅"
               color="bg-green-100"
             />
             <StatCard
               label="Durchschnitt"
               value={`${stats.averageProgress}%`}
-              icon="ðŸ“ˆ"
+              icon="📈"
               color="bg-purple-100"
             />
             <StatCard
@@ -175,7 +175,7 @@ const TattooProjects = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
-              placeholder="ðŸ” Suche nach Name, Style..."
+              placeholder="🔍 Suche nach Name, Style..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500"

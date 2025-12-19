@@ -17,15 +17,15 @@ function LoginSelection() {
             <h2 className="text-2xl font-semibold mb-2">Kunde</h2>
             <p className="text-gray-300 mb-6">Termine ansehen und verwalten</p>
             <div className="mt-6">
-              <div className="btn-primary text-sm">Kundenlogin</div>
+              <div className="btn-primary text-sm">Login</div>
             </div>
           </Link>
 
           <Link to={`/login/business${redirectQuery}`} className="card hover:card-hover p-8 transition" aria-label="Business-Login für Saloninhaber - Dashboard und Buchungen verwalten">
-            <h2 className="text-2xl font-semibold mb-2">Saloninhaber</h2>
+            <h2 className="text-2xl font-semibold mb-2">Business Inhaber</h2>
             <p className="text-gray-300 mb-6">Dashboard, Mitarbeiter & Buchungen verwalten</p>
             <div className="mt-6">
-              <div className="btn-outline text-sm">Business-Login</div>
+              <div className="btn-outline text-sm">Login</div>
             </div>
           </Link>
         </div>

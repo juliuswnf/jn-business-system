@@ -28,16 +28,16 @@ if (process.env.REDIS_URL) {
   });
 
   redisClient.on('connect', () => {
-    console.log('âœ… Redis connected for SMS rate limiting');
+    console.log('✅ Redis connected for SMS rate limiting');
     redisAvailable = true;
   });
 
   redisClient.connect().catch(_err => {
-    console.warn('âš ï¸ Redis not available, using in-memory rate limiting (not production-safe)');
+    console.warn('⚠️ Redis not available, using in-memory rate limiting (not production-safe)');
     redisAvailable = false;
   });
 } else {
-  console.warn('âš ï¸ REDIS_URL not configured, using in-memory rate limiting (not production-safe)');
+  console.warn('⚠️ REDIS_URL not configured, using in-memory rate limiting (not production-safe)');
 }
 
 // Rate Limiting Queue
@@ -88,7 +88,7 @@ async function checkRateLimit(salonId) {
       }
 
       if (count > RATE_LIMIT * 60) { // 10 SMS/sec * 60 sec = 600/min
-        console.warn(`âš ï¸ Rate limit exceeded for salon ${salonId}: ${count} SMS/min`);
+        console.warn(`⚠️ Rate limit exceeded for salon ${salonId}: ${count} SMS/min`);
         return false;
       }
 
@@ -116,7 +116,7 @@ async function checkRateLimit(salonId) {
   limit.count++;
 
   if (limit.count > RATE_LIMIT * 60) {
-    console.warn(`âš ï¸ Rate limit exceeded for salon ${salonId} (in-memory): ${limit.count} SMS/min`);
+    console.warn(`⚠️ Rate limit exceeded for salon ${salonId} (in-memory): ${limit.count} SMS/min`);
     return false;
   }
 
@@ -212,7 +212,7 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
     // Mark as sent with actual cost from provider
     await smsLog.markAsSent(result.messageId, result.cost);
 
-    console.log(`âœ… SMS sent successfully via ${result.provider}:`, {
+    console.log(`✅ SMS sent successfully via ${result.provider}:`, {
       messageId: result.messageId,
       phoneNumber,
       template,
@@ -228,7 +228,7 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
     };
 
   } catch (error) {
-    console.error(`âŒ SMS failed:`, {
+    console.error(`❌ SMS failed:`, {
       phoneNumber,
       template,
       error: error.message,
@@ -241,7 +241,7 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
     // Retry logic (max 3 attempts with exponential backoff)
     if (retryCount < 3) {
       const backoffDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-      console.log(`ðŸ”„ Retrying SMS in ${backoffDelay}ms (attempt ${retryCount + 1}/3)`);
+      console.log(`🔄 Retrying SMS in ${backoffDelay}ms (attempt ${retryCount + 1}/3)`);
 
       await new Promise(resolve => setTimeout(resolve, backoffDelay));
 
@@ -288,16 +288,16 @@ export async function sendBookingConfirmation(booking, confirmationToken) {
   const confirmUrl = `${process.env.FRONTEND_URL}/confirm/${confirmationToken}`;
 
   // Message template
-  const message = `Hallo ${customer.firstName}! ðŸ‘‹
+  const message = `Hallo ${customer.firstName}! 👋
 
 Ihr Termin bei ${salon.businessName}:
-ðŸ“… ${date} um ${time}
-âœ‚ï¸ ${service.name}
+📅 ${date} um ${time}
+✂️ ${service.name}
 
-âš ï¸ WICHTIG: Bitte bestÃ¤tigen Sie Ihren Termin innerhalb von 48h:
+⚠️ WICHTIG: Bitte bestätigen Sie Ihren Termin innerhalb von 48h:
 ${confirmUrl}
 
-Ohne BestÃ¤tigung wird der Termin automatisch storniert.
+Ohne Bestätigung wird der Termin automatisch storniert.
 
 Bei Fragen: ${salon.phone || salon.email}
 
@@ -335,16 +335,16 @@ export async function sendWaitlistOffer(waitlistEntry, slotSuggestion) {
   const acceptUrl = `${process.env.FRONTEND_URL}/waitlist/accept/${slotSuggestion._id}`;
 
   // Message template
-  const message = `Gute Nachricht, ${customer.firstName}! ðŸŽ‰
+  const message = `Gute Nachricht, ${customer.firstName}! 🎉
 
 Ein Termin ist frei geworden bei ${salon.businessName}:
-ðŸ“… ${date} um ${time}
-âœ‚ï¸ ${preferredService.name}
+📅 ${date} um ${time}
+✂️ ${preferredService.name}
 
-â° Schnell sein lohnt sich! Jetzt buchen:
+⏰ Schnell sein lohnt sich! Jetzt buchen:
 ${acceptUrl}
 
-Angebot gÃ¼ltig fÃ¼r 2 Stunden.
+Angebot gültig für 2 Stunden.
 
 Abmelden: Antworten Sie mit STOP`;
 
@@ -376,17 +376,17 @@ export async function sendReminderSMS(booking) {
   });
 
   // Message template
-  const message = `Erinnerung: Ihr Termin ist morgen! â°
+  const message = `Erinnerung: Ihr Termin ist morgen! ⏰
 
 ${salon.businessName}
-ðŸ“… ${date} um ${time}
-âœ‚ï¸ ${service.name}
+📅 ${date} um ${time}
+✂️ ${service.name}
 
-Adresse: ${salon.address || 'siehe BuchungsbestÃ¤tigung'}
+Adresse: ${salon.address || 'siehe Buchungsbestätigung'}
 
-Wir freuen uns auf Sie! ðŸ˜Š
+Wir freuen uns auf Sie! 😊
 
-Bei Ã„nderungen: ${salon.phone || salon.email}
+Bei Änderungen: ${salon.phone || salon.email}
 
 Abmelden: Antworten Sie mit STOP`;
 
@@ -409,9 +409,9 @@ export async function sendNoShowFollowup(booking) {
   // Message template
   const message = `Hallo ${customer.firstName},
 
-Wir haben Sie heute vermisst bei ${salon.businessName}. ðŸ˜”
+Wir haben Sie heute vermisst bei ${salon.businessName}. 😔
 
-Falls etwas dazwischen kam - kein Problem! Bitte sagen Sie beim nÃ¤chsten Mal rechtzeitig ab, damit andere Kunden den Termin nutzen kÃ¶nnen.
+Falls etwas dazwischen kam - kein Problem! Bitte sagen Sie beim nächsten Mal rechtzeitig ab, damit andere Kunden den Termin nutzen können.
 
 Neuen Termin buchen:
 ${process.env.FRONTEND_URL}/booking/${salon._id}
@@ -441,7 +441,7 @@ export async function handleStopReply(phoneNumber, salonId) {
 
   if (consent) {
     await consent.handleStopReply();
-    console.log(`ðŸ“µ Customer opted out: ${phoneNumber}`);
+    console.log(`📵 Customer opted out: ${phoneNumber}`);
   }
 }
 

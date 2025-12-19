@@ -24,19 +24,19 @@ const EmailQueue = mongoose.model('EmailQueue', emailQueueSchema);
 const checkStatus = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('\nðŸ“Š EMAIL QUEUE STATUS\n');
+    console.log('\n📊 EMAIL QUEUE STATUS\n');
     console.log('='.repeat(50));
 
     const allEmails = await EmailQueue.find({}).sort({ createdAt: -1 }).limit(10);
 
-    console.log(`\nðŸ“§ Last 10 emails in queue:\n`);
+    console.log(`\n📧 Last 10 emails in queue:\n`);
 
     for (const email of allEmails) {
       const statusEmoji =
-        email.status === 'sent' ? 'âœ…' :
-        email.status === 'pending' ? 'â³' :
-        email.status === 'failed' ? 'âŒ' :
-        email.status === 'sending' ? 'ðŸ“¤' : 'â“';
+        email.status === 'sent' ? '✅' :
+        email.status === 'pending' ? '⏳' :
+        email.status === 'failed' ? '❌' :
+        email.status === 'sending' ? '📤' : '❓';
 
       console.log(`${statusEmoji} ${email.status.toUpperCase().padEnd(10)} | ${email.type.padEnd(12)} | ${email.to}`);
       console.log(`   Subject: ${email.subject}`);
@@ -57,14 +57,14 @@ const checkStatus = async () => {
       }
     ]);
 
-    console.log('\nðŸ“ˆ SUMMARY:');
+    console.log('\n📈 SUMMARY:');
     summary.forEach(s => {
       console.log(`   ${s._id}: ${s.count}`);
     });
 
     await mongoose.disconnect();
   } catch (error) {
-    console.error('âŒ Error:', error);
+    console.error('❌ Error:', error);
     process.exit(1);
   }
 };

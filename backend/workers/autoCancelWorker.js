@@ -55,7 +55,7 @@ async function processAutoCancellations() {
         // Mark confirmation as auto-cancelled
         await confirmation.markAutoCancelled();
 
-        console.log(`[AutoCancel] âœ… Auto-cancelled booking ${booking._id} (no confirmation)`);
+        console.log(`[AutoCancel] ✅ Auto-cancelled booking ${booking._id} (no confirmation)`);
         cancelled++;
 
         // Try to fill slot from waitlist
@@ -99,7 +99,7 @@ async function processAutoCancellations() {
             // Send SMS offer
             try {
               await sendWaitlistOffer(topCandidate, suggestion);
-              console.log(`[AutoCancel] ðŸ“± Sent waitlist offer to customer ${topCandidate.customerId._id}`);
+              console.log(`[AutoCancel] 📱 Sent waitlist offer to customer ${topCandidate.customerId._id}`);
               waitlistOffered++;
             } catch (smsError) {
               console.error(`[AutoCancel] Failed to send waitlist SMS:`, smsError.message);
@@ -139,7 +139,7 @@ export function startAutoCancelWorker() {
     processAutoCancellations();
   });
 
-  console.log('[AutoCancel] Worker scheduled âœ…');
+  console.log('[AutoCancel] Worker scheduled ✅');
 }
 
 export default startAutoCancelWorker;

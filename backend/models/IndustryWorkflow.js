@@ -99,57 +99,57 @@ industryWorkflowSchema.statics.getAvailableIndustries = function() {
     {
       id: 'tattoo',
       name: 'Tattoo Studio',
-      icon: 'Ã°Å¸Å½Â¨',
+      icon: '🎨',
       description: 'Multi-Session-Projekte mit Progress-Tracking, Portfolio-Galerie',
       defaultFeatures: ['multi_session', 'progress_tracking', 'consents', 'photo_gallery', 'portfolio', 'body_mapping']
     },
     {
       id: 'medical_aesthetics',
       name: 'Medical Aesthetics',
-      icon: 'Ã°Å¸â€™â€°',
+      icon: '💉',
       description: 'Botox, Filler, Treatment-Plans mit Follow-ups',
       defaultFeatures: ['treatment_plans', 'consents', 'photo_gallery', 'follow_ups', 'medication_tracking', 'hipaa_compliance']
     },
     {
       id: 'spa_wellness',
       name: 'Spa & Wellness',
-      icon: 'Ã°Å¸Â§â€“',
+      icon: '🧖',
       description: 'Packages, Memberships, Credit-System',
       defaultFeatures: ['packages', 'memberships', 'credit_system', 'gift_cards', 'upsells', 'recurring_billing']
     },
     {
       id: 'barbershop',
       name: 'Barbershop',
-      icon: 'Ã°Å¸â€™Ë†',
+      icon: '💈',
       description: 'Memberships, Upsells, Loyalty-System',
       defaultFeatures: ['memberships', 'upsells', 'packages']
     },
     {
       id: 'nails',
       name: 'Nail Studio',
-      icon: 'Ã°Å¸â€™â€¦',
+      icon: '💅',
       description: 'Packages, Photo-Gallery, Upsells',
       defaultFeatures: ['packages', 'photo_gallery', 'portfolio', 'upsells']
     },
     {
       id: 'massage',
       name: 'Massage Therapy',
-      icon: 'Ã°Å¸â€™â€ ',
+      icon: '💆',
       description: 'Treatment-Plans, Packages, Follow-ups',
       defaultFeatures: ['treatment_plans', 'packages', 'follow_ups']
     },
     {
       id: 'physiotherapy',
       name: 'Physiotherapie',
-      icon: 'Ã°Å¸Â©Âº',
+      icon: '🩺',
       description: 'Treatment-Plans, Progress-Tracking, Follow-ups',
       defaultFeatures: ['treatment_plans', 'progress_tracking', 'follow_ups', 'consents']
     },
     {
       id: 'generic',
       name: 'Andere Branche',
-      icon: 'Ã°Å¸ÂÂª',
-      description: 'Flexible Workflows fÃƒÂ¼r alle Branchen',
+      icon: '🏪',
+      description: 'Flexible Workflows für alle Branchen',
       defaultFeatures: ['packages', 'upsells']
     }
   ];

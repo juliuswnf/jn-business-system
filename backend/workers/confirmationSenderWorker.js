@@ -76,10 +76,10 @@ async function processConfirmations() {
           confirmation.lastReminderSent = new Date();
           await confirmation.save();
 
-          console.log(`[ConfirmationSender] âœ… Sent confirmation for booking ${booking._id}`);
+          console.log(`[ConfirmationSender] ✅ Sent confirmation for booking ${booking._id}`);
           created++;
         } catch (smsError) {
-          console.error(`[ConfirmationSender] âŒ Failed to send SMS for booking ${booking._id}:`, smsError.message);
+          console.error(`[ConfirmationSender] ❌ Failed to send SMS for booking ${booking._id}:`, smsError.message);
           // Keep confirmation but mark as failed SMS attempt
           errors++;
         }
@@ -113,7 +113,7 @@ export function startConfirmationSender() {
     processConfirmations();
   });
 
-  console.log('[ConfirmationSender] Worker scheduled âœ…');
+  console.log('[ConfirmationSender] Worker scheduled ✅');
 }
 
 export default startConfirmationSender;

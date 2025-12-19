@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Save, 
-  Eye, 
+import {
+  Save,
+  Eye,
   ArrowLeft,
   Clock,
   Calendar,
@@ -23,7 +23,7 @@ const CampaignEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(null);
-  
+
   const [campaign, setCampaign] = useState({
     name: '',
     type: 'inactive_customers',
@@ -76,7 +76,7 @@ const CampaignEditor = () => {
     try {
       setSaving(true);
       const token = localStorage.getItem('token');
-      
+
       if (id) {
         await axios.put(
           `${API_BASE_URL}/marketing/campaigns/${id}`,
@@ -108,7 +108,7 @@ const CampaignEditor = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPreview(response.data.data);
-      toast.success(`${response.data.data.totalRecipients} EmpfÃ¤nger gefunden`);
+      toast.success(`${response.data.data.totalRecipients} Empfänger gefunden`);
     } catch (error) {
       toast.error('Fehler beim Laden der Vorschau');
     }
@@ -190,12 +190,12 @@ const CampaignEditor = () => {
         {/* Main Form */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Info */}
-          <Section title="ðŸ“‹ Grundeinstellungen">
+          <Section title="📋 Grundeinstellungen">
             <Input
               label="Campaign Name"
               value={campaign.name}
               onChange={(e) => updateField('name', e.target.value)}
-              placeholder="z.B. Inaktive Kunden zurÃ¼ckgewinnen"
+              placeholder="z.B. Inaktive Kunden zurückgewinnen"
             />
 
             <Select
@@ -224,7 +224,7 @@ const CampaignEditor = () => {
           </Section>
 
           {/* Targeting Rules */}
-          <Section title="ðŸŽ¯ Zielgruppen-Regeln">
+          <Section title="🎯 Zielgruppen-Regeln">
             {campaign.type === 'inactive_customers' && (
               <Slider
                 label="Inaktive Tage"
@@ -276,7 +276,7 @@ const CampaignEditor = () => {
             )}
 
             <Slider
-              label="Max. EmpfÃ¤nger"
+              label="Max. Empfänger"
               value={campaign.rules.maxRecipients}
               onChange={(value) => updateRules('maxRecipients', value)}
               min={10}
@@ -287,7 +287,7 @@ const CampaignEditor = () => {
           </Section>
 
           {/* Message Editor */}
-          <Section title="âœ‰ï¸ Nachricht & Rabatt">
+          <Section title="✉️ Nachricht & Rabatt">
             <Textarea
               label="SMS Template"
               value={campaign.message.template}
@@ -307,7 +307,7 @@ const CampaignEditor = () => {
                 onChange={(e) => updateMessage('discountType', e.target.value)}
                 options={[
                   { value: 'percentage', label: 'Prozent (%)' },
-                  { value: 'fixed_amount', label: 'Fixer Betrag (â‚¬)' },
+                  { value: 'fixed_amount', label: 'Fixer Betrag (€)' },
                   { value: 'none', label: 'Kein Rabatt' }
                 ]}
               />
@@ -326,7 +326,7 @@ const CampaignEditor = () => {
 
             {campaign.message.discountType !== 'none' && (
               <Slider
-                label="GÃ¼ltigkeit"
+                label="Gültigkeit"
                 value={campaign.message.validDays}
                 onChange={(value) => updateMessage('validDays', value)}
                 min={1}
@@ -338,15 +338,15 @@ const CampaignEditor = () => {
           </Section>
 
           {/* Schedule */}
-          <Section title="ðŸ“… Zeitplan">
+          <Section title="📅 Zeitplan">
             <Select
-              label="AusfÃ¼hrung"
+              label="Ausführung"
               value={campaign.schedule.type}
               onChange={(e) => updateSchedule('type', e.target.value)}
               options={[
                 { value: 'manual', label: 'Manuell (nur auf Knopfdruck)' },
-                { value: 'daily', label: 'TÃ¤glich' },
-                { value: 'weekly', label: 'WÃ¶chentlich' }
+                { value: 'daily', label: 'Täglich' },
+                { value: 'weekly', label: 'Wöchentlich' }
               ]}
             />
 
@@ -388,18 +388,18 @@ const CampaignEditor = () => {
               animate={{ opacity: 1, x: 0 }}
               className="bg-white rounded-lg shadow-lg p-6 sticky top-6"
             >
-              <h3 className="text-lg font-semibold mb-4">ðŸ“Š Vorschau</h3>
-              
+              <h3 className="text-lg font-semibold mb-4">📊 Vorschau</h3>
+
               <div className="space-y-4">
                 <PreviewStat
                   icon={<Users className="w-5 h-5" />}
-                  label="EmpfÃ¤nger"
+                  label="Empfänger"
                   value={preview.totalRecipients}
                 />
                 <PreviewStat
                   icon={<Euro className="w-5 h-5" />}
-                  label="GeschÃ¤tzte Kosten"
-                  value={`${preview.estimatedCost}â‚¬`}
+                  label="Geschätzte Kosten"
+                  value={`${preview.estimatedCost}€`}
                 />
               </div>
 
@@ -418,7 +418,7 @@ const CampaignEditor = () => {
               {preview.recipients && preview.recipients.length > 0 && (
                 <div className="mt-6">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    Erste {preview.recipients.length} EmpfÃ¤nger:
+                    Erste {preview.recipients.length} Empfänger:
                   </h4>
                   <div className="space-y-2">
                     {preview.recipients.map((r, i) => (

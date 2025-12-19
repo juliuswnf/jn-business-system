@@ -11,7 +11,7 @@ export const wizardQuestions = [
     title: 'Wie viele Kunden hast du aktuell?',
     subtitle: 'Hilft uns, die richtige Größe für dein Business zu finden',
     type: 'single',
-    icon: 'ðŸ‘¥',
+    icon: '👥',
     required: true,
     options: [
       {
@@ -46,7 +46,7 @@ export const wizardQuestions = [
     title: 'Wie viele Termine hast du pro Woche?',
     subtitle: 'Zeigt uns, wie viel Automatisierung du brauchst',
     type: 'single',
-    icon: 'ðŸ“…',
+    icon: '📅',
     required: true,
     options: [
       {
@@ -81,7 +81,7 @@ export const wizardQuestions = [
     title: 'Wie viele Standorte hast du?',
     subtitle: 'Multi-Location Features ab Professional',
     type: 'single',
-    icon: 'ðŸ“',
+    icon: '📍',
     required: true,
     options: [
       {
@@ -110,7 +110,7 @@ export const wizardQuestions = [
     title: 'Welche Features brauchst du?',
     subtitle: 'Wähle alles, was für dich wichtig ist (mehrere möglich)',
     type: 'multiple',
-    icon: 'âœ¨',
+    icon: '✨',
     required: true,
     minSelections: 1,
     options: [
@@ -118,7 +118,7 @@ export const wizardQuestions = [
         value: 'sms_reminders',
         label: 'SMS-Erinnerungen',
         subtitle: 'Reduziere No-Shows um 70%',
-        icon: 'ðŸ“±',
+        icon: '📱',
         tier: 'professional',
         description: 'Automatische SMS 24h und 2h vor Termin'
       },
@@ -126,7 +126,7 @@ export const wizardQuestions = [
         value: 'marketing',
         label: 'Marketing-Kampagnen',
         subtitle: 'Email & SMS Automation',
-        icon: 'ðŸ“§',
+        icon: '📧',
         tier: 'professional',
         description: 'Gezielte Kampagnen für mehr Umsatz'
       },
@@ -134,7 +134,7 @@ export const wizardQuestions = [
         value: 'multi_session',
         label: 'Multi-Session-Projekte',
         subtitle: 'Für Tattoo, Medical',
-        icon: 'ðŸŽ¨',
+        icon: '🎨',
         tier: 'professional',
         description: 'Projekte über mehrere Termine hinweg'
       },
@@ -142,7 +142,7 @@ export const wizardQuestions = [
         value: 'memberships',
         label: 'Packages & Memberships',
         subtitle: 'Recurring Revenue',
-        icon: 'ðŸ’Ž',
+        icon: '💎',
         tier: 'professional',
         description: 'Monatliche Mitgliedschaften verwalten'
       },
@@ -150,7 +150,7 @@ export const wizardQuestions = [
         value: 'waitlist',
         label: 'Waitlist-Management',
         subtitle: 'Fülle freie Slots automatisch',
-        icon: 'â°',
+        icon: '⏰',
         tier: 'professional',
         description: 'Wartelisten-Automation bei Absagen'
       },
@@ -158,7 +158,7 @@ export const wizardQuestions = [
         value: 'analytics',
         label: 'Analytics & Reports',
         subtitle: 'Datenbasierte Entscheidungen',
-        icon: 'ðŸ“Š',
+        icon: '📊',
         tier: 'professional',
         description: 'Detaillierte Business-Insights'
       },
@@ -166,7 +166,7 @@ export const wizardQuestions = [
         value: 'white_label',
         label: 'White-Label Branding',
         subtitle: 'Deine eigene Brand',
-        icon: 'ðŸ·ï¸',
+        icon: '🏷️',
         tier: 'enterprise',
         description: 'Komplett gebrandete Lösung'
       }
@@ -178,7 +178,7 @@ export const wizardQuestions = [
     title: 'Wie viele Mitarbeiter hast du?',
     subtitle: 'Team-Features und User-Limits variieren',
     type: 'single',
-    icon: 'ðŸ‘”',
+    icon: '👔',
     required: true,
     options: [
       {
@@ -213,18 +213,18 @@ export const wizardQuestions = [
     title: 'Was ist dein monatliches Budget für Software?',
     subtitle: 'Ehrlich sein hilft uns, das beste Preis-Leistungs-Verhältnis zu finden',
     type: 'single',
-    icon: 'ðŸ’°',
+    icon: '💰',
     required: true,
     options: [
       {
         value: 'under-100',
-        label: 'Unter â‚¬100/Monat',
+        label: 'Unter €100/Monat',
         subtitle: 'Budget-bewusst',
         description: 'Kosteneffizienz steht im Vordergrund'
       },
       {
         value: '100-200',
-        label: 'â‚¬100-200/Monat',
+        label: '€100-200/Monat',
         subtitle: 'Standard-Budget',
         description: 'Gutes Preis-Leistungs-Verhältnis wichtig'
       },

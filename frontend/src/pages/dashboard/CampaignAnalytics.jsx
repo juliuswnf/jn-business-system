@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   Edit,
   TrendingUp,
@@ -49,7 +49,7 @@ const CampaignAnalytics = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      
+
       const [campaignRes, recipientsRes] = await Promise.all([
         axios.get(
           `${API_BASE_URL}/marketing/campaigns/${id}`,
@@ -81,7 +81,7 @@ const CampaignAnalytics = () => {
       r.sentAt ? new Date(r.sentAt).toLocaleString('de-DE') : 'N/A',
       r.clickedAt ? new Date(r.clickedAt).toLocaleString('de-DE') : 'N/A',
       r.bookedAt ? new Date(r.bookedAt).toLocaleString('de-DE') : 'N/A',
-      r.revenue ? `${r.revenue}â‚¬` : '0â‚¬'
+      r.revenue ? `${r.revenue}€` : '0€'
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -134,12 +134,12 @@ const CampaignAnalytics = () => {
 
     const grouped = recipients.reduce((acc, r) => {
       if (!r.sentAt) return acc;
-      
+
       const date = new Date(r.sentAt).toLocaleDateString('de-DE');
       if (!acc[date]) {
         acc[date] = { date, sent: 0, delivered: 0, clicked: 0, booked: 0 };
       }
-      
+
       acc[date].sent++;
       if (r.status === 'delivered' || r.status === 'clicked' || r.status === 'booked') {
         acc[date].delivered++;
@@ -150,11 +150,11 @@ const CampaignAnalytics = () => {
       if (r.status === 'booked') {
         acc[date].booked++;
       }
-      
+
       return acc;
     }, {});
 
-    return Object.values(grouped).sort((a, b) => 
+    return Object.values(grouped).sort((a, b) =>
       new Date(a.date.split('.').reverse().join('-')) - new Date(b.date.split('.').reverse().join('-'))
     );
   };
@@ -172,7 +172,7 @@ const CampaignAnalytics = () => {
       .slice(0, 10);
   };
 
-  const filteredRecipients = recipients.filter(r => 
+  const filteredRecipients = recipients.filter(r =>
     statusFilter === 'all' || r.status === statusFilter
   );
 
@@ -193,7 +193,7 @@ const CampaignAnalytics = () => {
 
   if (!campaign) return null;
 
-  const roi = campaign.stats?.totalRevenue > 0 
+  const roi = campaign.stats?.totalRevenue > 0
     ? (((campaign.stats.totalRevenue - (campaign.stats.totalSent * 0.1)) / (campaign.stats.totalSent * 0.1)) * 100).toFixed(0)
     : 0;
 
@@ -272,7 +272,7 @@ const CampaignAnalytics = () => {
         <StatCard
           icon={<Euro className="w-6 h-6" />}
           label="Umsatz"
-          value={`${campaign.stats?.totalRevenue || 0}â‚¬`}
+          value={`${campaign.stats?.totalRevenue || 0}€`}
           subtext={`${roi}% ROI`}
           color="emerald"
         />
@@ -284,7 +284,7 @@ const CampaignAnalytics = () => {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-lg shadow p-6 mb-8"
       >
-        <h2 className="text-xl font-semibold mb-4">ðŸ“ˆ Verlauf Ã¼ber Zeit</h2>
+        <h2 className="text-xl font-semibold mb-4">📈 Verlauf über Zeit</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={prepareTimelineData()}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -307,14 +307,14 @@ const CampaignAnalytics = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-lg shadow p-6 mb-8"
         >
-          <h2 className="text-xl font-semibold mb-4">ðŸ’° Top 10 Umsatz-Bringer</h2>
+          <h2 className="text-xl font-semibold mb-4">💰 Top 10 Umsatz-Bringer</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={prepareRevenueData()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="revenue" fill="#059669" name="Umsatz (â‚¬)" />
+              <Bar dataKey="revenue" fill="#059669" name="Umsatz (€)" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -328,7 +328,7 @@ const CampaignAnalytics = () => {
       >
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">ðŸ‘¥ EmpfÃ¤nger ({filteredRecipients.length})</h2>
+            <h2 className="text-xl font-semibold">👥 Empfänger ({filteredRecipients.length})</h2>
             <select
               value={statusFilter}
               onChange={(e) => {
@@ -406,7 +406,7 @@ const CampaignAnalytics = () => {
                     }) : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {recipient.revenue ? `${recipient.revenue}â‚¬` : '-'}
+                    {recipient.revenue ? `${recipient.revenue}€` : '-'}
                   </td>
                 </tr>
               ))}
@@ -426,7 +426,7 @@ const CampaignAnalytics = () => {
                 disabled={currentPage === 1}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                ZurÃ¼ck
+                Zurück
               </button>
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}

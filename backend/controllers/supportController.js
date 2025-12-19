@@ -263,7 +263,7 @@ export const addMessage = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Nachricht hinzugefÃ¼gt',
+      message: 'Nachricht hinzugefügt',
       ticket: {
         id: ticket._id,
         ticketNumber: ticket.ticketNumber,
@@ -275,7 +275,7 @@ export const addMessage = async (req, res) => {
     logger.error('Error adding message to ticket:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim HinzufÃ¼gen der Nachricht'
+      error: 'Fehler beim Hinzufügen der Nachricht'
     });
   }
 };
@@ -319,7 +319,7 @@ export const closeTicket = async (req, res) => {
     logger.error('Error closing ticket:', error);
     res.status(500).json({
       success: false,
-      error: 'Fehler beim SchlieÃŸen des Tickets'
+      error: 'Fehler beim Schließen des Tickets'
     });
   }
 };

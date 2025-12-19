@@ -1,6 +1,6 @@
 /**
- * Smoke Test fÃ¼r Email Queue Worker
- * Erstellt Test-Emails und prÃ¼ft ob Worker sie verarbeitet
+ * Smoke Test für Email Queue Worker
+ * Erstellt Test-Emails und prüft ob Worker sie verarbeitet
  */
 
 const mongoose = require('mongoose');
@@ -25,15 +25,15 @@ const EmailQueue = mongoose.model('EmailQueue', emailQueueSchema);
 
 const runSmokeTest = async () => {
   try {
-    console.log('\nðŸ§ª EMAIL QUEUE WORKER SMOKE TEST\n');
+    console.log('\n🧪 EMAIL QUEUE WORKER SMOKE TEST\n');
     console.log('=' .repeat(50));
 
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('âœ… MongoDB Connected\n');
+    console.log('✅ MongoDB Connected\n');
 
     // Test 1: Create test email that should be sent immediately
-    console.log('ðŸ“§ TEST 1: Creating immediate test email...');
+    console.log('📧 TEST 1: Creating immediate test email...');
     const testEmail1 = await EmailQueue.create({
       to: 'test@example.com',
       subject: 'Smoke Test Email - Immediate',
@@ -43,10 +43,10 @@ const runSmokeTest = async () => {
       scheduledFor: new Date(), // Send now
       status: 'pending'
     });
-    console.log(`âœ… Created test email: ${testEmail1._id}`);
+    console.log(`✅ Created test email: ${testEmail1._id}`);
 
     // Test 2: Create email scheduled for future
-    console.log('\nðŸ“§ TEST 2: Creating future scheduled email...');
+    console.log('\n📧 TEST 2: Creating future scheduled email...');
     const futureDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
     const testEmail2 = await EmailQueue.create({
       to: 'future@example.com',
@@ -57,10 +57,10 @@ const runSmokeTest = async () => {
       scheduledFor: futureDate,
       status: 'pending'
     });
-    console.log(`âœ… Created scheduled email: ${testEmail2._id} (scheduled for ${futureDate.toISOString()})`);
+    console.log(`✅ Created scheduled email: ${testEmail2._id} (scheduled for ${futureDate.toISOString()})`);
 
     // Check pending emails
-    console.log('\nðŸ“Š QUEUE STATUS:');
+    console.log('\n📊 QUEUE STATUS:');
     const pendingCount = await EmailQueue.countDocuments({ status: 'pending' });
     const sentCount = await EmailQueue.countDocuments({ status: 'sent' });
     const failedCount = await EmailQueue.countDocuments({ status: 'failed' });
@@ -69,26 +69,26 @@ const runSmokeTest = async () => {
     console.log(`   Sent: ${sentCount}`);
     console.log(`   Failed: ${failedCount}`);
 
-    console.log('\nâœ… Smoke test emails created successfully!');
-    console.log('\nâ³ Wait 60 seconds for worker to process...\n');
+    console.log('\n✅ Smoke test emails created successfully!');
+    console.log('\n⏳ Wait 60 seconds for worker to process...\n');
     console.log('Expected behavior:');
     console.log('  1. Email worker picks up testEmail1 (scheduled for now)');
-    console.log('  2. Processes it (status â†’ sending â†’ sent or failed)');
+    console.log('  2. Processes it (status → sending → sent or failed)');
     console.log('  3. Logs success/failure with details');
     console.log('  4. testEmail2 should stay pending (future scheduled)');
-    console.log('\nðŸ’¡ Check backend logs for:');
-    console.log('  - "ðŸ“§ Processing X pending emails..."');
-    console.log('  - "âœ… Email sent successfully" or "âŒ Email send failed"');
+    console.log('\n💡 Check backend logs for:');
+    console.log('  - "📧 Processing X pending emails..."');
+    console.log('  - "✅ Email sent successfully" or "❌ Email send failed"');
     console.log('  - Error details if SMTP fails');
 
-    console.log('\nðŸ” To verify results after 60s:');
+    console.log('\n🔍 To verify results after 60s:');
     console.log('  Run: node backend/test-email-queue-status.cjs\n');
 
     await mongoose.disconnect();
-    console.log('âœ… Disconnected from MongoDB');
+    console.log('✅ Disconnected from MongoDB');
 
   } catch (error) {
-    console.error('âŒ Smoke test failed:', error);
+    console.error('❌ Smoke test failed:', error);
     process.exit(1);
   }
 };

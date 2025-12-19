@@ -13,7 +13,7 @@ async function handleProviderWebhook(providerName, req, res) {
     const provider = SMSProviderFactory.getProviderByName(providerName);
 
     if (!provider) {
-      console.error(`Ã¢ÂÅ’ Unknown SMS provider: ${providerName}`);
+      console.error(`❌ Unknown SMS provider: ${providerName}`);
       return res.status(404).json({
         success: false,
         message: `Provider ${providerName} not found`
@@ -24,7 +24,7 @@ async function handleProviderWebhook(providerName, req, res) {
     const isValid = provider.validateWebhook(req);
 
     if (!isValid) {
-      console.error(`Ã¢ÂÅ’ Invalid ${providerName} webhook signature`);
+      console.error(`❌ Invalid ${providerName} webhook signature`);
       return res.status(401).json({
         success: false,
         message: 'Invalid signature'
@@ -47,7 +47,7 @@ async function handleProviderWebhook(providerName, req, res) {
     const smsLog = await SMSLog.findOne({ messageId });
 
     if (!smsLog) {
-      console.warn(`Ã¢Å¡Â Ã¯Â¸Â SMS log not found for ${providerName} message ${messageId}`);
+      console.warn(`⚠️ SMS log not found for ${providerName} message ${messageId}`);
       // Still return 200 to acknowledge webhook
       return res.status(200).json({
         success: true,
@@ -63,28 +63,28 @@ async function handleProviderWebhook(providerName, req, res) {
           smsLog.sentAt = new Date(timestamp);
           await smsLog.save();
         }
-        console.log(`Ã°Å¸â€œÂ¤ SMS ${messageId} confirmed sent (${providerName})`);
+        console.log(`📤 SMS ${messageId} confirmed sent (${providerName})`);
         break;
 
       case 'delivered':
         await smsLog.markAsDelivered();
-        console.log(`Ã¢Å“â€¦ SMS ${messageId} delivered successfully (${providerName})`);
+        console.log(`✅ SMS ${messageId} delivered successfully (${providerName})`);
         break;
 
       case 'failed':
         await smsLog.markAsFailed(errorMessage || 'Delivery failed', errorCode || status);
-        console.error(`Ã¢ÂÅ’ SMS ${messageId} failed (${providerName}): ${errorMessage}`);
+        console.error(`❌ SMS ${messageId} failed (${providerName}): ${errorMessage}`);
         break;
 
       case 'pending':
         // Update status but don't change sentAt
         smsLog.status = 'pending';
         await smsLog.save();
-        console.log(`Ã¢ÂÂ³ SMS ${messageId} pending (${providerName})`);
+        console.log(`⏳ SMS ${messageId} pending (${providerName})`);
         break;
 
       default:
-        console.log(`Ã¢â€žÂ¹Ã¯Â¸Â SMS ${messageId} status update (${providerName}): ${status}`);
+        console.log(`ℹ️ SMS ${messageId} status update (${providerName}): ${status}`);
     }
 
     // Always return 200 OK (providers expect this)
