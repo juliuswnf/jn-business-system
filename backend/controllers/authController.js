@@ -130,7 +130,7 @@ export const register = async (req, res) => {
       user.salonId = salon._id;
       await user.save();
 
-      logger.log(`? Salon created for new owner: ${salon.name} (${salon.slug})`);
+      logger.info(`Salon created for new owner: ${salon.name} (${salon.slug})`);
 
       // Queue welcome email
       try {
@@ -143,7 +143,7 @@ export const register = async (req, res) => {
       // Schedule lifecycle emails for trial nurturing
       try {
         await LifecycleEmail.scheduleForNewSalon(salon, user);
-        logger.log(`? Lifecycle emails scheduled for: ${salon.name}`);
+        logger.info(`Lifecycle emails scheduled for: ${salon.name}`);
       } catch (lifecycleError) {
         logger.warn('Lifecycle email scheduling failed:', lifecycleError.message);
       }
@@ -152,7 +152,7 @@ export const register = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    logger.log(`? User registered: ${user.email} (${user.role})`);
+    logger.info(`User registered: ${user.email} (${user.role})`);
 
     res.status(201).json({
       success: true,
@@ -166,7 +166,7 @@ export const register = async (req, res) => {
       } : null
     });
   } catch (error) {
-    logger.error('? Register Error:', error);
+    logger.error('Register Error:', error.message, { stack: error.stack });
     res.status(500).json({
       success: false,
       message: 'Registration failed',
@@ -226,7 +226,7 @@ export const login = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    logger.log(`? User logged in: ${user.email} (${user.role})`);
+    logger.info(`? User logged in: ${user.email} (${user.role})`);
 
     res.status(200).json({
       success: true,
@@ -394,13 +394,13 @@ export const ceoLogin = async (req, res) => {
     // ==================== 2FA MANDATORY FOR CEO ====================
     // CEO MUST have 2FA enabled - no exceptions
 
-    logger.log(`[CEO-SECURITY] 2FA Check - twoFactorEnabled: ${user.twoFactorEnabled}, twoFactorSecret: ${user.twoFactorSecret ? 'exists' : 'null'}, twoFactorCode provided: ${twoFactorCode ? 'yes' : 'no'}`);
+    logger.info(`[CEO-SECURITY] 2FA Check - twoFactorEnabled: ${user.twoFactorEnabled}, twoFactorSecret: ${user.twoFactorSecret ? 'exists' : 'null'}, twoFactorCode provided: ${twoFactorCode ? 'yes' : 'no'}`);
 
     // If 2FA is not enabled yet
     if (!user.twoFactorEnabled) {
       // Check if user is trying to verify a setup code
       if (twoFactorCode && user.twoFactorSecret) {
-        logger.log(`[CEO-SECURITY] Attempting 2FA setup verification with code: ${twoFactorCode}`);
+        logger.info(`[CEO-SECURITY] Attempting 2FA setup verification with code: ${twoFactorCode}`);
         // User has a secret and is sending a code - verify it to complete setup
         const isValidToken = authenticator.verify({
           token: twoFactorCode.toString().replace(/\s/g, ''),
@@ -417,7 +417,7 @@ export const ceoLogin = async (req, res) => {
           await user.resetLoginAttempts();
           const token = generateToken(user._id, '30d');
 
-          logger.log(`[CEO-SECURITY] ? 2FA setup completed and CEO logged in: ${user.email}, IP: ${clientIP}`);
+          logger.info(`[CEO-SECURITY] ? 2FA setup completed and CEO logged in: ${user.email}, IP: ${clientIP}`);
 
           return res.status(200).json({
             success: true,
@@ -461,7 +461,7 @@ export const ceoLogin = async (req, res) => {
 
     // 2FA is enabled - verify code
     if (!twoFactorCode) {
-      logger.log(`[CEO-SECURITY] 2FA code required for: ${email}, IP: ${clientIP}`);
+      logger.info(`[CEO-SECURITY] 2FA code required for: ${email}, IP: ${clientIP}`);
       return res.status(200).json({
         success: false,
         requiresTwoFactor: true,
@@ -497,7 +497,7 @@ export const ceoLogin = async (req, res) => {
     if (!user.twoFactorEnabled) {
       user.twoFactorEnabled = true;
       await user.save();
-      logger.log(`[CEO-SECURITY] 2FA activated for CEO: ${user.email}`);
+      logger.info(`[CEO-SECURITY] 2FA activated for CEO: ${user.email}`);
     }
 
     // Reset all counters
@@ -507,7 +507,7 @@ export const ceoLogin = async (req, res) => {
     // Generate token (CEO gets longer session)
     const token = generateToken(user._id, '30d');
 
-    logger.log(`[CEO-SECURITY] ? SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
+    logger.info(`[CEO-SECURITY] ? SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
 
     res.status(200).json({
       success: true,
@@ -593,7 +593,7 @@ export const employeeLogin = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    logger.log(`? Employee logged in: ${user.email} (${user.role})`);
+    logger.info(`? Employee logged in: ${user.email} (${user.role})`);
 
     res.status(200).json({
       success: true,
@@ -679,7 +679,7 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    logger.log(`? Profile updated for user: ${user.email}`);
+    logger.info(`? Profile updated for user: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -749,7 +749,7 @@ export const changePassword = async (req, res) => {
     user.password = newPassword;
     await user.save();
 
-    logger.log(`? Password changed for user: ${user.email}`);
+    logger.info(`? Password changed for user: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -768,7 +768,7 @@ export const changePassword = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    logger.log(`? User logged out: ${req.user.id}`);
+    logger.info(`? User logged out: ${req.user.id}`);
 
     res.status(200).json({
       success: true,
@@ -822,7 +822,7 @@ export const forgotPassword = async (req, res) => {
         body: `Hallo ${user.name},\n\nSie haben eine Passwort-Zurücksetzung angefordert.\n\nKlicken Sie auf den folgenden Link, um Ihr Passwort zurückzusetzen:\n${resetUrl}\n\nDer Link ist 10 Minuten gültig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
         type: 'password_reset'
       });
-      logger.log(`?? Password reset email sent to: ${user.email}`);
+      logger.info(`?? Password reset email sent to: ${user.email}`);
     } catch (emailError) {
       logger.error('? Failed to send password reset email:', emailError.message);
       // Don't fail the request if email fails in development
@@ -897,7 +897,7 @@ export const resetPassword = async (req, res) => {
     user.passwordResetExpire = undefined;
     await user.save();
 
-    logger.log(`? Password reset for user: ${user.email}`);
+    logger.info(`? Password reset for user: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -957,7 +957,7 @@ export const sendVerificationEmail = async (req, res) => {
         body: `Hallo ${user.name},\n\nBitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie auf den folgenden Link klicken:\n${verificationUrl}\n\nDer Link ist 24 Stunden gültig.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
         type: 'email_verification'
       });
-      logger.log(`?? Verification email sent to: ${user.email}`);
+      logger.info(`?? Verification email sent to: ${user.email}`);
     } catch (emailError) {
       logger.error('? Failed to send verification email:', emailError.message);
       if (process.env.NODE_ENV === 'production') {
@@ -1000,7 +1000,7 @@ export const verifyEmail = async (req, res) => {
     // Verify email
     await user.verifyEmail();
 
-    logger.log(`? Email verified for: ${user.email}`);
+    logger.info(`? Email verified for: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -1090,7 +1090,7 @@ export const refreshToken = async (req, res) => {
     const newAccessToken = generateToken(user._id, '15m'); // Short-lived access token
     const newRefreshToken = generateToken(user._id, '7d'); // Longer-lived refresh token
 
-    logger.log(`?? Token refreshed for: ${user.email}`);
+    logger.info(`?? Token refreshed for: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -1146,7 +1146,7 @@ export const enable2FA = async (req, res) => {
     const otpAuthUrl = authenticator.keyuri(user.email, 'JN Business', secret);
     const qrCodeDataUrl = await QRCode.toDataURL(otpAuthUrl);
 
-    logger.log(`?? 2FA setup initiated for: ${user.email}`);
+    logger.info(`?? 2FA setup initiated for: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -1204,7 +1204,7 @@ export const verify2FA = async (req, res) => {
       if (backupCode) {
         backupCode.used = true;
         await user.save();
-        logger.log(`?? Backup code used for: ${user.email}`);
+        logger.info(`?? Backup code used for: ${user.email}`);
         return res.status(200).json({
           success: true,
           message: '2FA verified with backup code',
@@ -1222,7 +1222,7 @@ export const verify2FA = async (req, res) => {
     if (!user.twoFactorEnabled) {
       user.twoFactorEnabled = true;
       await user.save();
-      logger.log(`?? 2FA enabled for: ${user.email}`);
+      logger.info(`?? 2FA enabled for: ${user.email}`);
     }
 
     res.status(200).json({
@@ -1287,7 +1287,7 @@ export const disable2FA = async (req, res) => {
     user.twoFactorBackupCodes = [];
     await user.save();
 
-    logger.log(`?? 2FA disabled for: ${user.email}`);
+    logger.info(`?? 2FA disabled for: ${user.email}`);
 
     res.status(200).json({
       success: true,
@@ -1378,7 +1378,7 @@ export const regenerateBackupCodes = async (req, res) => {
     }));
     await user.save();
 
-    logger.log(`?? Backup codes regenerated for: ${user.email}`);
+    logger.info(`?? Backup codes regenerated for: ${user.email}`);
 
     res.status(200).json({
       success: true,
