@@ -146,9 +146,24 @@ app.post('/api/rate-limit/reset', resetRateLimiter);
 initSentry(app);
 
 // 2️⃣ SECURITY FIRST
-app.use(helmet());
-app.use(mongoSanitize()); // ? Prevent MongoDB injection
-app.use(xss()); // ? FREE OPTIMIZATION: XSS protection
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://plausible.io"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", process.env.FRONTEND_URL || "http://localhost:5173"],
+      frameSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
+    }
+  },
+  crossOriginEmbedderPolicy: false // Required for external widgets
+}));
+app.use(mongoSanitize()); // Prevent MongoDB injection
+app.use(xss()); // FREE OPTIMIZATION: XSS protection
 app.use(sanitizeInput); // ? XSS sanitization for all inputs
 app.use(hpp());
 // Compression should be applied after security middleware
