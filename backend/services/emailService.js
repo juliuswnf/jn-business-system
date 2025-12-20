@@ -11,17 +11,8 @@ import logger from '../utils/logger.js';
 // ==================== EMAIL TRANSPORTER ====================
 
 const createTransporter = () => {
-  // Use SMTP or development mode
-  if (process.env.NODE_ENV === 'development') {
-    // Development: Log emails to console
-    return nodemailer.createTransport({
-      streamTransport: true,
-      newline: 'unix',
-      buffer: true
-    });
-  }
-
-  // Production: Use SMTP
+  // Always use real SMTP (even in development)
+  // This ensures emails are actually sent for testing
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.EMAIL_PORT || process.env.SMTP_PORT || '587'),
@@ -29,7 +20,10 @@ const createTransporter = () => {
     auth: {
       user: process.env.EMAIL_USER || process.env.SMTP_USER,
       pass: process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD || process.env.SMTP_PASS
-    }
+    },
+    // Enable logging for debugging
+    logger: process.env.NODE_ENV === 'development',
+    debug: process.env.NODE_ENV === 'development'
   });
 };
 
@@ -119,14 +113,17 @@ export const sendBookingConfirmation = async (booking) => {
     }
 
     // Get email template
-    const template = salon.getEmailTemplate('confirmation', bookingSnapshot.language);
-    if (!template) {
-      throw new Error('Confirmation email template not found');
-    }
-
+    const template = salon.getEmailTemplate?.('confirmation', bookingSnapshot.language);
+    const firstName = bookingSnapshot.customerName?.split(' ')[0] || bookingSnapshot.customerName || 'dort';
+    
     // Format date and time
     const bookingDate = new Date(bookingSnapshot.bookingDate);
-    const dateStr = bookingDate.toLocaleDateString(bookingSnapshot.language === 'de' ? 'de-DE' : 'en-US');
+    const dateStr = bookingDate.toLocaleDateString(bookingSnapshot.language === 'de' ? 'de-DE' : 'en-US', { 
+      weekday: 'long',
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
     const timeStr = bookingDate.toLocaleTimeString(bookingSnapshot.language === 'de' ? 'de-DE' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit'
@@ -134,37 +131,143 @@ export const sendBookingConfirmation = async (booking) => {
 
     // Format address
     const addressStr = salon.address
-      ? `${salon.address.street || ''}\n${salon.address.postalCode || ''} ${salon.address.city || ''}`.trim()
+      ? `${salon.address.street || ''}, ${salon.address.postalCode || ''} ${salon.address.city || ''}`.trim()
       : '';
 
-    // Replace placeholders
-    const subject = replacePlaceholders(template.subject, {
-      salon_name: salon.name,
-      customer_name: booking.customerName
-    });
+    // Default subject and body if template not found
+    const subject = template 
+      ? replacePlaceholders(template.subject, { salon_name: salon.name, customer_name: bookingSnapshot.customerName })
+      : `✅ Buchungsbestätigung - ${salon.name}`;
 
-    const body = replacePlaceholders(template.body, {
-      salon_name: salon.name,
-      customer_name: booking.customerName,
-      service_name: service.name,
-      booking_date: dateStr,
-      booking_time: timeStr,
-      employee_name: 'Team', // TODO: Add employee support
-      salon_address: addressStr,
-      salon_email: salon.email,
-      salon_phone: salon.phone || ''
-    });
+    const body = template 
+      ? replacePlaceholders(template.body, {
+          salon_name: salon.name,
+          customer_name: bookingSnapshot.customerName,
+          service_name: service.name,
+          booking_date: dateStr,
+          booking_time: timeStr,
+          employee_name: 'Team',
+          salon_address: addressStr,
+          salon_email: salon.email,
+          salon_phone: salon.phone || ''
+        })
+      : `Hallo ${firstName},\n\nIhre Buchung wurde bestätigt.\n\nService: ${service.name}\nDatum: ${dateStr}\nUhrzeit: ${timeStr}\n\nWir freuen uns auf Sie!\n\n${salon.name}`;
+
+    // Create HTML email template
+    const dashboardUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f8fafc;">
+
+  <!-- Header -->
+  <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center;">
+    <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+    <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 700;">Buchung bestätigt!</h1>
+  </div>
+
+  <!-- Content -->
+  <div style="background: white; padding: 40px 30px;">
+
+    <p style="font-size: 16px; color: #1f2937; margin: 0 0 20px 0;">
+      Hallo ${firstName},
+    </p>
+
+    <p style="color: #4b5563; margin: 0 0 30px 0;">
+      Ihre Buchung bei <strong>${salon.name}</strong> wurde erfolgreich bestätigt.
+    </p>
+
+    <!-- Booking Details Card -->
+    <div style="background: #f0fdf4; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 2px solid #10b981;">
+      <h2 style="color: #166534; margin: 0 0 20px 0; font-size: 18px; text-align: center;">
+        📅 Ihre Buchungsdetails
+      </h2>
+
+      <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #d1fae5;">
+        <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Service</div>
+        <div style="color: #1f2937; font-size: 16px; font-weight: 600;">${service.name}</div>
+      </div>
+
+      <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #d1fae5;">
+        <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Datum & Uhrzeit</div>
+        <div style="color: #1f2937; font-size: 16px; font-weight: 600;">${dateStr}</div>
+        <div style="color: #10b981; font-size: 18px; font-weight: 700; margin-top: 4px;">🕐 ${timeStr} Uhr</div>
+      </div>
+
+      ${addressStr ? `
+      <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #d1fae5;">
+        <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Adresse</div>
+        <div style="color: #1f2937; font-size: 14px;">${addressStr}</div>
+      </div>
+      ` : ''}
+
+      ${salon.phone ? `
+      <div style="margin-bottom: 0;">
+        <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Kontakt</div>
+        <div style="color: #1f2937; font-size: 14px;">
+          📞 ${salon.phone}
+          ${salon.email ? `<br>📧 ${salon.email}` : ''}
+        </div>
+      </div>
+      ` : ''}
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      ${dashboardUrl ? `
+      <a href="${dashboardUrl}/customer/bookings" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 15px; margin: 0 5px;">
+        Zum Kundenbereich →
+      </a>
+      ` : ''}
+    </div>
+
+    <!-- Reminder Box -->
+    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; margin-bottom: 30px; border-radius: 4px;">
+      <p style="color: #92400e; margin: 0; font-size: 14px;">
+        <strong>📲 Erinnerung:</strong> Sie erhalten 24 Stunden vor Ihrem Termin eine Erinnerung per E-Mail.
+      </p>
+    </div>
+
+    <!-- Info Box -->
+    <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
+      <p style="color: #6b7280; margin: 0; font-size: 13px;">
+        Termin absagen oder verschieben?<br>
+        Kontaktieren Sie uns: <a href="mailto:${salon.email || 'info@salon.de'}" style="color: #10b981; text-decoration: none;">${salon.email || salon.phone}</a>
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div style="background: #1f2937; padding: 30px; text-align: center;">
+    <p style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;">
+      Wir freuen uns auf Ihren Besuch! 🎉
+    </p>
+    <p style="color: #6b7280; margin: 0; font-size: 12px;">
+      ${salon.name}<br>
+      Powered by JN Business System
+    </p>
+  </div>
+
+</body>
+</html>
+    `;
 
     // Queue email with audit trail
     await EmailQueue.create({
       to: bookingSnapshot.customerEmail,
       subject,
       body,
+      html, // Include HTML version
       type: 'booking_confirmation',
       bookingId: bookingSnapshot._id,
       priority: 'high',
       language: bookingSnapshot.language,
-      // ? Audit metadata for GDPR compliance
+      // Audit metadata for GDPR compliance
       metadata: {
         customerName: bookingSnapshot.customerName,
         salonId: salon._id.toString(),
