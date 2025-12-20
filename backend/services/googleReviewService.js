@@ -97,7 +97,7 @@ const replacePlaceholders = (text, data) => {
   let result = text;
 
   Object.keys(data).forEach(key => {
-    const regex = new RegExp(`{{${key}}}`, 'g');
+    const regex = new RegExp(`{{${escapeRegExp(key)}}}`, 'g');
     result = result.replace(regex, data[key] || '');
   });
 

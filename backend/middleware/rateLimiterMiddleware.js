@@ -24,12 +24,16 @@ class MemoryStoreAdapter {
         this.cleanup();
       }
 
-      const current = (this.hits.get(key) || 0) + 1;
-      this.hits.set(key, { count: current, timestamp: Date.now() });
+      const timestamp = Date.now();
+      const existing = this.hits.get(key);
+      const current = (existing?.count || 0) + 1;
+      this.hits.set(key, { count: current, timestamp });
 
-      cb(null, current);
+      // Return totalHits and resetTime as Date object
+      const resetTime = new Date(timestamp + this.windowMs);
+      cb(null, current, resetTime);
     } catch (err) {
-      logger.error('❌ MemoryStore incr error:', err);
+      logger.error('MemoryStore incr error:', err);
       cb(err);
     }
   }
@@ -38,10 +42,10 @@ class MemoryStoreAdapter {
     try {
       const current = Math.max(0, (this.hits.get(key)?.count || 1) - 1);
       this.hits.set(key, { count: current, timestamp: Date.now() });
-      cb(null, current);
+      if (cb) cb(null, current);
     } catch (err) {
-      logger.error('❌ MemoryStore decrement error:', err);
-      cb(err);
+      logger.error('MemoryStore decrement error:', err);
+      if (cb) cb(err);
     }
   }
 

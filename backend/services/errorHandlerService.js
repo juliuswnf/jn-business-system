@@ -76,7 +76,7 @@ class ErrorHandlerService {
   static async logError(error, req = null, severity = 'high') {
     try {
       const errorData = {
-        errorId: `ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        errorId: `ERR-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`,
         errorType: error.constructor.name,
         message: error.message,
         stack: error.stack,

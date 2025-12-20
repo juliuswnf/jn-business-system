@@ -94,6 +94,7 @@ export const sanitizeHTML = (req, res, next) => {
           // Remove dangerous tags (script, iframe, object, embed, etc.)
           const dangerousTags = ['script', 'iframe', 'object', 'embed', 'link', 'style', 'meta', 'base'];
           dangerousTags.forEach(tag => {
+            // Tags are hardcoded strings, safe to use in RegExp
             const regex = new RegExp(`<${tag}[^>]*>.*?</${tag}>`, 'gis');
             cleaned = cleaned.replace(regex, '');
             cleaned = cleaned.replace(new RegExp(`<${tag}[^>]*>`, 'gi'), '');

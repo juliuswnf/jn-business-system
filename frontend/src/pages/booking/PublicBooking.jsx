@@ -192,8 +192,10 @@ export default function PublicBooking() {
     if (submitting) return;
     setSubmitting(true);
     try {
-      // ✅ SRE FIX #30: Generate idempotency key for double-click prevention
-      const idempotencyKey = `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // ✅ SRE FIX #30: Generate idempotency key for double-click prevention using crypto
+      const array = new Uint8Array(8);
+      crypto.getRandomValues(array);
+      const idempotencyKey = `booking-${Date.now()}-${Array.from(array, b => b.toString(16).padStart(2, '0')).join('')}`;
 
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await fetch(`${API_URL}/bookings/public/s/${salonSlug}/book`, {

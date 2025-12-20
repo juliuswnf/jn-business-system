@@ -6,6 +6,7 @@ import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';
 import { sendSMS } from '../services/smsService.js';
 import logger from '../utils/logger.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 /**
  * @desc    Get all marketing templates
@@ -378,9 +379,12 @@ export const trackClick = async (req, res) => {
     // Mark as clicked
     await recipient.markAsClicked();
 
-    // Redirect to booking page
+    // Redirect to booking page - URL is constructed from DB, not user input, safe
     const salon = await Salon.findById(recipient.campaignId.salonId);
-    const redirectUrl = `${process.env.FRONTEND_URL}/booking/${salon.slug}?code=${recipient.discountCode}`;
+    if (!salon || !salon.slug) {
+      return res.redirect(`${process.env.FRONTEND_URL}/404`);
+    }
+    const redirectUrl = `${process.env.FRONTEND_URL}/booking/${encodeURIComponent(salon.slug)}?code=${encodeURIComponent(recipient.discountCode)}`;
 
     res.redirect(redirectUrl);
   } catch (error) {
@@ -695,7 +699,7 @@ async function executeCampaign(campaign, targetCustomers, salon) {
 function renderMessage(template, vars) {
   let message = template;
   Object.keys(vars).forEach(key => {
-    const regex = new RegExp(`{{${key}}}`, 'g');
+    const regex = new RegExp(`{{${escapeRegExp(key)}}}`, 'g');
     message = message.replace(regex, vars[key]);
   });
   return message;

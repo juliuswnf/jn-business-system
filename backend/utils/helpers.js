@@ -50,11 +50,8 @@ export const stringHelpers = {
   },
 
   generateUUID: () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = (Math.random() * 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
+    // Use crypto.randomUUID() for secure UUID generation
+    return crypto.randomUUID();
   }
 };
 
@@ -262,7 +259,12 @@ export const numberHelpers = {
   },
 
   randomNumber: (min = 0, max = 100) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    // Use crypto for secure random numbers
+    const range = max - min + 1;
+    const bytesNeeded = Math.ceil(Math.log2(range) / 8);
+    const randomBytes = crypto.randomBytes(bytesNeeded);
+    const randomNumber = randomBytes.readUIntBE(0, bytesNeeded);
+    return min + (randomNumber % range);
   },
 
   isPrime: (num) => {

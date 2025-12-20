@@ -93,6 +93,14 @@ router.get('/:salonId', authMiddleware.protect, async (req, res) => {
   try {
     const { salonId } = req.params;
 
+    // Validate salonId
+    if (!salonId || salonId === 'null' || salonId === 'undefined') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid salon ID'
+      });
+    }
+
     // TODO: Add authorization check (user must own salon)
 
     const waitlist = await Waitlist.find({ salonId, status: 'active' })

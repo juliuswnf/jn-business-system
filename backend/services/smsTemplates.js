@@ -333,7 +333,7 @@ export function renderTemplate(templateKey, variables = {}) {
 
   // Replace all variables
   Object.entries(variables).forEach(([key, value]) => {
-    const regex = new RegExp(`{{${key}}}`, 'g');
+    const regex = new RegExp(`{{${escapeRegExp(key)}}}`, 'g');
     message = message.replace(regex, value || '');
   });
 

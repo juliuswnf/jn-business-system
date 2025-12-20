@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../utils/api';
 import SubscriptionUpgrade from '../components/subscription/SubscriptionUpgrade';
 import DowngradeWarningModal from '../components/subscription/DowngradeWarningModal';
 
@@ -34,13 +34,7 @@ const SubscriptionManagement = () => {
 
   const fetchSubscriptionStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/subscriptions/manage/status`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await api.get('/subscriptions/manage/status');
 
       if (response.data.success) {
         setSubscription(response.data.subscription);
@@ -81,14 +75,7 @@ const SubscriptionManagement = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/subscriptions/manage/cancel`,
-        { immediately: false },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await api.post('/subscriptions/manage/cancel', { immediately: false });
 
       if (response.data.success) {
         alert('? Abonnement gekündigt. Du behältst Zugriff bis zum Ende der Abrechnungsperiode.');

@@ -105,7 +105,9 @@ export const createCEO = async () => {
       }
 
       const confirmPassword = await question('Confirm Password: ');
-      if (password !== confirmPassword) {
+      // Timing-safe comparison for password confirmation
+      if (password.length !== confirmPassword.length || 
+          !crypto.timingSafeEqual(Buffer.from(password), Buffer.from(confirmPassword))) {
         logger.log('❌ Passwords do not match\n');
         continue;
       }

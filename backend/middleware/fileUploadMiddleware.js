@@ -1,6 +1,7 @@
 ﻿import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import logger from '../utils/logger.js';
 
 /**
@@ -38,7 +39,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     // Generate unique filename
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
     const ext = path.extname(file.originalname);
     cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
   }

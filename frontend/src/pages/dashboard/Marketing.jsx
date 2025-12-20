@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import toast from 'react-hot-toast';
 import {
   TrendingUp,
@@ -16,8 +16,6 @@ import {
   Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 const Marketing = () => {
   const navigate = useNavigate();
@@ -35,14 +33,12 @@ const Marketing = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const [statsRes, templatesRes, campaignsRes, limitsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/marketing/stats`, config),
-        axios.get(`${API_BASE_URL}/marketing/templates`, config),
-        axios.get(`${API_BASE_URL}/marketing/campaigns`, config),
-        axios.get(`${API_BASE_URL}/marketing/limits`, config)
+        api.get('/marketing/stats'),
+        api.get('/marketing/templates'),
+        api.get('/marketing/campaigns'),
+        api.get('/marketing/limits')
       ]);
 
       setStats(statsRes.data.data);

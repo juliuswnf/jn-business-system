@@ -520,7 +520,8 @@ paymentSchema.methods.refundPayment = async function(amount = null, reason = 'Cu
 paymentSchema.methods.generateInvoiceNumber = function() {
   try {
     const date = new Date();
-    const random = Math.floor(Math.random() * 10000);
+    const randomBytes = crypto.randomBytes(2);
+    const random = randomBytes.readUInt16BE(0) % 10000;
     this.invoiceNumber = `INV-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}-${String(random).padStart(5, '0')}`;
     return this.invoiceNumber;
   } catch (err) {

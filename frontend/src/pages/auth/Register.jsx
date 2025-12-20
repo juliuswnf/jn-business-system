@@ -108,16 +108,24 @@ export default function Register() {
 
       if (response.data.success) {
         const { token, user } = response.data;
+        
+        // Set all localStorage keys synchronously BEFORE any async operations
+        localStorage.setItem('jnAuthToken', token);
+        localStorage.setItem('jnUser', JSON.stringify(user));
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
+        
+        // Set default auth header for all future requests
+        const { api } = await import('../../utils/api');
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         // Clear session storage
         sessionStorage.removeItem('selectedPlan');
 
         success('Registrierung erfolgreich! Weiterleitung...');
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
+        
+        // Navigate immediately - no timeout needed since token is already set
+        navigate('/dashboard', { replace: true });
       }
     } catch (error) {
       const errorMsg = formatError(error);

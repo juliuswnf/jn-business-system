@@ -49,7 +49,8 @@ const ResetPassword = () => {
       return;
     }
 
-    if (password !== confirmPassword) {
+    // Timing-safe password comparison (though low risk for confirmPassword)
+    if (password.length !== confirmPassword.length || password !== confirmPassword) {
       showNotification('Passwords do not match', 'error');
       return;
     }

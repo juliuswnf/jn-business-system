@@ -390,7 +390,7 @@ const checkTierLimits = async (salonId, tier = 'starter') => {
 const renderMessage = (template, vars) => {
   let message = template;
   Object.keys(vars).forEach(key => {
-    const regex = new RegExp(`{{${key}}}`, 'g');
+    const regex = new RegExp(`{{${escapeRegExp(key)}}}`, 'g');
     message = message.replace(regex, vars[key]);
   });
   return message;

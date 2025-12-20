@@ -62,8 +62,8 @@ export const register = async (req, res) => {
     const allowedRoles = ['customer', 'admin', 'employee', 'salon_owner', 'ceo'];
     const userRole = allowedRoles.includes(role) ? role : 'customer';
 
-    // Check if user exists
-    const existingUser = await User.findOne({ email }).maxTimeMS(5000);
+    // Check if user exists - ensure email is string to prevent NoSQL injection
+    const existingUser = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -166,7 +166,7 @@ export const register = async (req, res) => {
       } : null
     });
   } catch (error) {
-    logger.error('Register Error:', error.message, { stack: error.stack });
+    logger.error('Register Error:', error);
     res.status(500).json({
       success: false,
       message: 'Registration failed',
@@ -189,11 +189,11 @@ export const login = async (req, res) => {
       });
     }
 
-    // Find user with password field
-    const user = await User.findOne({ email }).maxTimeMS(5000).select('+password');
+    // Find user with password field - ensure email is string to prevent NoSQL injection
+    const user = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000).select('+password');
 
     if (!user) {
-      logger.warn(`?? Login attempt with non-existent email: ${email}`);
+      logger.warn(`🚨 Login attempt with non-existent email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
@@ -329,8 +329,8 @@ export const ceoLogin = async (req, res) => {
       });
     }
 
-    // Find user with password field AND 2FA fields (twoFactorSecret has select: false)
-    const user = await User.findOne({ email }).maxTimeMS(5000).select('+password +twoFactorSecret');
+    // Find user with password field AND 2FA fields (twoFactorSecret has select: false) - ensure email is string
+    const user = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000).select('+password +twoFactorSecret');
 
     if (!user) {
       ipAttempts.count++;

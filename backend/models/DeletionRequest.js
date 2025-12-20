@@ -9,7 +9,7 @@ const deletionRequestSchema = new mongoose.Schema({
   requestId: {
     type: String,
     unique: true,
-    default: () => `DEL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    default: () => `DEL-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`
   },
 
   // Customer

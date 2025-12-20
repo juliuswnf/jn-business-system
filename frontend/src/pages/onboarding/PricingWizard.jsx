@@ -27,7 +27,11 @@ const PricingWizard = () => {
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [startTime, setStartTime] = useState(null);
-  const [sessionId] = useState(() => `wizard_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const [sessionId] = useState(() => {
+    const array = new Uint8Array(8);
+    crypto.getRandomValues(array);
+    return `wizard_${Date.now()}_${Array.from(array, b => b.toString(16).padStart(2, '0')).join('')}`;
+  });
 
   useEffect(() => {
     // Track start time

@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/progress/');
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
     cb(null, 'progress-' + uniqueSuffix + path.extname(file.originalname));
   }
 });

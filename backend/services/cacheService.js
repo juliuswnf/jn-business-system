@@ -76,7 +76,9 @@ class CacheService {
    * @param {string} pattern - Pattern to match (e.g., 'booking:*')
    */
   deletePattern(pattern) {
-    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    // Escape special regex chars except *, then replace * with .*
+    const escapedPattern = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+    const regex = new RegExp('^' + escapedPattern + '$');
     let deleted = 0;
 
     for (const key of this.cache.keys()) {

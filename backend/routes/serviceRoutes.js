@@ -15,7 +15,7 @@ router.use(enforceTenantFilter);
 // Get all services for salon (filtered by tenant)
 router.get('/', async (req, res) => {
   try {
-    const { Service } = await import('../models/index.js').then(m => m.default);
+    const Service = (await import('../models/Service.js')).default;
 
     // Use tenantFilter from middleware (CEO can see all if no filter)
     const filter = req.tenantFilter.salonId
@@ -32,6 +32,7 @@ router.get('/', async (req, res) => {
       count: services.length
     });
   } catch (error) {
+    logger.error('Get Services Error:', error);
     return res.status(500).json({ success: false, message: error.message });
   }
 });

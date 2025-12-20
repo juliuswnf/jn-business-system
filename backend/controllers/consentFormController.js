@@ -237,17 +237,33 @@ export const downloadConsentPDF = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
 
-    // If PDF already exists, redirect to it
+    // If PDF already exists, validate and redirect to it
     if (consent.pdfUrl) {
-      return res.redirect(consent.pdfUrl);
+      try {
+        // Validate URL is from trusted domain (Cloudinary or our domain)
+        const allowedDomains = ['res.cloudinary.com', process.env.FRONTEND_URL?.replace(/^https?:\/\//, '')];
+        validateUrl(consent.pdfUrl, allowedDomains.filter(Boolean));
+        return res.redirect(consent.pdfUrl);
+      } catch (error) {
+        logger.error('Invalid PDF URL:', error);
+        return res.status(400).json({ success: false, message: 'Invalid PDF URL' });
+      }
     }
 
     // Generate PDF on-demand
     if (process.env.PDF_GENERATION_ENABLED === 'true') {
       const pdfUrl = await generateConsentPDF(consent);
-      consent.pdfUrl = pdfUrl;
-      await consent.save();
-      return res.redirect(pdfUrl);
+      try {
+        // Validate generated URL
+        const allowedDomains = ['res.cloudinary.com', process.env.FRONTEND_URL?.replace(/^https?:\/\//, '')];
+        validateUrl(pdfUrl, allowedDomains.filter(Boolean));
+        consent.pdfUrl = pdfUrl;
+        await consent.save();
+        return res.redirect(pdfUrl);
+      } catch (error) {
+        logger.error('Invalid generated PDF URL:', error);
+        return res.status(500).json({ success: false, message: 'PDF generation failed' });
+      }
     }
 
     // Fallback: return JSON

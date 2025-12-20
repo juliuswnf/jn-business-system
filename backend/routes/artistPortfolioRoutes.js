@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/portfolios/');
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
     cb(null, 'portfolio-' + uniqueSuffix + path.extname(file.originalname));
   }
 });

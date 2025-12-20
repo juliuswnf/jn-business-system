@@ -169,7 +169,7 @@ export const xssProtection = (req, res, next) => {
 };
 
 export const csrfProtection = (req, res, next) => {
-  res.locals.csrfToken = Math.random().toString(36).substring(2, 15);
+  res.locals.csrfToken = crypto.randomBytes(16).toString('hex');
   next();
 };
 

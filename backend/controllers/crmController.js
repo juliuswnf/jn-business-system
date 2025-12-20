@@ -154,7 +154,7 @@ export const getCustomerDetails = async (req, res) => {
     // Get all bookings for this customer
     const bookings = await Booking.find({
       salonId,
-      customerEmail: { $regex: new RegExp(`^${email}$`, 'i') }
+      customerEmail: { $regex: new RegExp(`^${escapeRegExp(email)}$`, 'i') }
     })
       .populate('serviceId', 'name price duration')
       .populate('employeeId', 'name')

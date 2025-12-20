@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, '../uploads/logos'));
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
     cb(null, `logo-${req.user.salonId}-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });

@@ -9,7 +9,7 @@ const breachIncidentSchema = new mongoose.Schema({
   incidentId: {
     type: String,
     unique: true,
-    default: () => `BREACH-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    default: () => `BREACH-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`
   },
 
   // Breach details

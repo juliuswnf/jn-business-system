@@ -60,7 +60,8 @@ const widgetCorsMiddleware = async (req, res, next) => {
       }
 
       // Subdomain match (e.g., *.example.com)
-      const domainPattern = domain.replace(/\./g, '\\.').replace(/\*/g, '.*');
+      // Escape dots and replace * wildcards safely
+      const domainPattern = domain.replace(/\./g, '\\.').replace(/\*/g, '[^.]*');
       const regex = new RegExp(`^https?://${domainPattern}$`, 'i');
       return regex.test(origin);
     });

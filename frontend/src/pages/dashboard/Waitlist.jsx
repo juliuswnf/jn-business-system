@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { Clock, Users, Star, AlertCircle, CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function Waitlist() {
   const [waitlist, setWaitlist] = useState([]);
@@ -21,11 +19,18 @@ export default function Waitlist() {
   const fetchWaitlist = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const salonId = localStorage.getItem('salonId'); // Assuming salon context is stored
+      // Try both keys for user data (jnUser is standard, user is fallback)
+      const userStr = localStorage.getItem('jnUser') || localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : {};
+      const salonId = user.salonId;
 
-      const response = await axios.get(`${API_BASE}/waitlist/${salonId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      if (!salonId) {
+        toast.error('Kein Salon zugeordnet');
+        setLoading(false);
+        return;
+      }
+
+      const response = await api.get(`/waitlist/${salonId}`, {
         params: { status: filter }
       });
 
@@ -55,10 +60,7 @@ export default function Waitlist() {
     if (!confirm('Möchten Sie diesen Eintrag wirklich löschen?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE}/waitlist/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/waitlist/${id}`);
 
       toast.success('Eintrag gelöscht');
       fetchWaitlist();

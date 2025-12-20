@@ -12,7 +12,7 @@ import logger from '../utils/logger.js';
 const generateTicketNumber = () => {
   const prefix = 'TKT';
   const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const random = crypto.randomBytes(3).toString('hex').toUpperCase();
   return `${prefix}-${timestamp}-${random}`;
 };
 
@@ -65,17 +65,17 @@ export const createTicket = async (req, res) => {
       // Confirmation email to customer
       emailService.sendEmail({
         to: req.user.email,
-        subject: `Support-Ticket erstellt: ${ticket.ticketNumber}`,
+        subject: `Support-Ticket erstellt: ${escapeHtml(ticket.ticketNumber)}`,
         html: `
           <h2>Ihr Support-Ticket wurde erstellt</h2>
           <p>Vielen Dank für Ihre Anfrage. Wir werden uns schnellstmöglich bei Ihnen melden.</p>
           <hr>
-          <p><strong>Ticket-Nummer:</strong> ${ticket.ticketNumber}</p>
-          <p><strong>Betreff:</strong> ${subject}</p>
-          <p><strong>Kategorie:</strong> ${category || 'Sonstige'}</p>
+          <p><strong>Ticket-Nummer:</strong> ${escapeHtml(ticket.ticketNumber)}</p>
+          <p><strong>Betreff:</strong> ${escapeHtml(subject)}</p>
+          <p><strong>Kategorie:</strong> ${escapeHtml(category || 'Sonstige')}</p>
           <hr>
           <p><strong>Ihre Nachricht:</strong></p>
-          <p>${description}</p>
+          <p>${escapeHtml(description)}</p>
           <hr>
           <p>Sie können auf diese E-Mail antworten, um weitere Informationen hinzuzufügen.</p>
           <p>Mit freundlichen Grüßen,<br>Ihr JN Business System Support-Team</p>
@@ -84,18 +84,18 @@ export const createTicket = async (req, res) => {
       // Notification to support team
       emailService.sendEmail({
         to: process.env.SUPPORT_EMAIL || 'support@jn-business-system.de',
-        subject: `Neues Support-Ticket: ${ticket.ticketNumber} - ${subject}`,
+        subject: `Neues Support-Ticket: ${escapeHtml(ticket.ticketNumber)} - ${escapeHtml(subject)}`,
         html: `
           <h2>Neues Support-Ticket</h2>
-          <p><strong>Ticket-Nummer:</strong> ${ticket.ticketNumber}</p>
-          <p><strong>Von:</strong> ${req.user.firstName} ${req.user.lastName} (${req.user.email})</p>
-          <p><strong>Salon:</strong> ${salon?.businessName || 'Kein Salon'}</p>
-          <p><strong>Kategorie:</strong> ${category || 'Sonstige'}</p>
-          <p><strong>Priorität:</strong> ${priority || 'Mittel'}</p>
+          <p><strong>Ticket-Nummer:</strong> ${escapeHtml(ticket.ticketNumber)}</p>
+          <p><strong>Von:</strong> ${escapeHtml(req.user.firstName)} ${escapeHtml(req.user.lastName)} (${escapeHtml(req.user.email)})</p>
+          <p><strong>Salon:</strong> ${escapeHtml(salon?.businessName || 'Kein Salon')}</p>
+          <p><strong>Kategorie:</strong> ${escapeHtml(category || 'Sonstige')}</p>
+          <p><strong>Priorität:</strong> ${escapeHtml(priority || 'Mittel')}</p>
           <hr>
-          <p><strong>Betreff:</strong> ${subject}</p>
+          <p><strong>Betreff:</strong> ${escapeHtml(subject)}</p>
           <p><strong>Beschreibung:</strong></p>
-          <p>${description}</p>
+          <p>${escapeHtml(description)}</p>
         `
       })
     ]).catch(err => logger.warn('Email sending errors:', err.message));
