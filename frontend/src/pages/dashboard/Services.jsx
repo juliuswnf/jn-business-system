@@ -123,35 +123,45 @@ export default function Services() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-zinc-200 transition"
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-black rounded-lg font-semibold transition"
         >
           <Plus className="w-5 h-5" />
           Service hinzufügen
         </button>
       </div>
 
-      {/* Services Grid */}
-      {services.length === 0 ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-          <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Plus className="w-8 h-8 text-zinc-500" />
+      {/* Services Container */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="font-semibold text-white">Services verwalten</span>
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2">Keine Services vorhanden</h3>
-          <p className="text-zinc-400 mb-6">Füge deinen ersten Service hinzu, um Buchungen zu ermöglichen.</p>
-          <button
-            onClick={handleOpenAdd}
-            className="px-6 py-2 bg-white text-black rounded-lg font-medium hover:bg-zinc-200 transition"
-          >
-            Ersten Service erstellen
-          </button>
         </div>
-      ) : (
-        <div className="grid gap-4">
-          {services.map((service) => (
-            <div
-              key={service._id}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition"
-            >
+        <div className="p-6">
+          {services.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-zinc-800 border border-zinc-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Plus className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Keine Services vorhanden</h3>
+              <p className="text-gray-400 mb-6">Füge deinen ersten Service hinzu, um Buchungen zu ermöglichen.</p>
+              <button
+                onClick={handleOpenAdd}
+                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-black rounded-lg font-semibold transition"
+              >
+                Ersten Service erstellen
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {services.map((service) => (
+                <div
+                  key={service._id}
+                  className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 hover:border-cyan-500/30 transition"
+                >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -193,44 +203,48 @@ export default function Services() {
               </div>
             </div>
           ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Add/Edit Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-zinc-800">
-              <h2 className="text-lg font-semibold text-white">
-                {editingService ? 'Service bearbeiten' : 'Neuer Service'}
-              </h2>
-              <button
-                onClick={handleClose}
-                className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-white">
+                  {editingService ? 'Service bearbeiten' : 'Neuer Service'}
+                </h2>
+                <button
+                  onClick={handleClose}
+                  className="p-1 rounded hover:bg-zinc-700 text-gray-400 hover:text-white transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-5 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm text-zinc-400 mb-2">Name *</label>
+                <label className="block text-sm text-white mb-2">Name *</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:border-zinc-500 focus:outline-none"
+                  className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
                   placeholder="z.B. Beratung Standard"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-zinc-400 mb-2">Beschreibung</label>
+                <label className="block text-sm text-white mb-2">Beschreibung</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:border-zinc-500 focus:outline-none"
+                  className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
                   placeholder="Kurze Beschreibung des Services..."
                   rows={2}
                 />
@@ -238,23 +252,23 @@ export default function Services() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Dauer (Min)</label>
+                  <label className="block text-sm text-white mb-2">Dauer (Min)</label>
                   <input
                     type="number"
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:border-zinc-500 focus:outline-none"
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
                     min="5"
                     step="5"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Preis (€)</label>
+                  <label className="block text-sm text-white mb-2">Preis (€)</label>
                   <input
                     type="number"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:border-zinc-500 focus:outline-none"
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
                     min="0"
                     step="0.5"
                   />
@@ -267,9 +281,9 @@ export default function Services() {
                     type="checkbox"
                     checked={formData.active}
                     onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-700 text-white focus:ring-0"
+                    className="w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-cyan-500 focus:ring-cyan-500/50"
                   />
-                  <span className="text-sm text-zinc-300">Service ist aktiv</span>
+                  <span className="text-sm text-gray-300">Service ist aktiv</span>
                 </label>
               </div>
 
@@ -277,13 +291,13 @@ export default function Services() {
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 px-4 py-2 border border-zinc-700 rounded-lg text-zinc-300 hover:bg-zinc-800 transition"
+                  className="flex-1 px-4 py-3 border border-zinc-800 rounded-lg text-gray-300 hover:bg-zinc-800 transition"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-zinc-200 transition flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-cyan-500 hover:bg-cyan-600 text-black rounded-lg font-semibold transition flex items-center justify-center gap-2"
                 >
                   <Check className="w-4 h-4" />
                   {editingService ? 'Speichern' : 'Erstellen'}

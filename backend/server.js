@@ -134,6 +134,24 @@ let lifecycleWorkerIntervalId = null;
 
 // ==================== GLOBAL MIDDLEWARE ====================
 
+// 0️⃣ CORS FIRST (must be before other middleware for preflight requests)
+app.use(cors({
+  origin: function (origin, callback) {
+    const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'];
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
+  exposedHeaders: ['X-Request-ID']
+}));
+
 app.use(generalLimiter);
 
 // ==================== HEALTH CHECK ROUTES ====================
@@ -160,7 +178,8 @@ app.use(helmet({
       upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
     }
   },
-  crossOriginEmbedderPolicy: false // Required for external widgets
+  crossOriginEmbedderPolicy: false, // Required for external widgets
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow cross-origin resources
 }));
 app.use(mongoSanitize()); // Prevent MongoDB injection
 app.use(xss()); // FREE OPTIMIZATION: XSS protection
@@ -173,13 +192,7 @@ app.use(compression());
 app.post('/api/webhooks/stripe', webhookMiddleware, stripeWebhookController.handleStripeWebhook);
 app.use('/api/webhooks', webhookRoutes); // MessageBird webhooks
 
-// 4️⃣ CORS & BODY PARSING
-app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:5173'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// 4️⃣ BODY PARSING
 app.use(express.json({ limit: '50mb' }));
 
 // 4?? LOGGING & MONITORING

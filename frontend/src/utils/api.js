@@ -26,6 +26,14 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Silently handle 404 errors for confirmations endpoint
+    // (not all bookings have confirmations, so 404 is expected)
+    if (error.response?.status === 404 && originalRequest?.url?.includes('/confirmations/')) {
+      // Suppress console errors for expected 404s on confirmations
+      // The component will handle this gracefully
+      return Promise.reject(error);
+    }
+
     // Skip redirect for login/register endpoints - let the component handle the error
     const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
                            originalRequest?.url?.includes('/auth/register') ||
@@ -280,7 +288,48 @@ export const bookingAPI = {
 };
 
 export const serviceAPI = {
-  getAll: (params) => api.get('/services', { params }),
+  getAll: async (params, forceRefresh = false) => {
+    // Return cached data if available and not expired
+    if (!forceRefresh && !params && servicesCache && servicesCacheTime) {
+      const now = Date.now();
+      if (now - servicesCacheTime < SERVICES_CACHE_TTL) {
+        return servicesCache;
+      }
+    }
+    
+    // If there's already an ongoing request, wait for it instead of making a new one
+    if (!params && servicesCachePromise && !forceRefresh) {
+      return servicesCachePromise;
+    }
+    
+    // Fetch fresh data
+    const fetchPromise = (async () => {
+      try {
+        const response = await api.get('/services', { params });
+        
+        // Cache the response if no params (default list)
+        if (!params) {
+          servicesCache = response;
+          servicesCacheTime = Date.now();
+          servicesCachePromise = null; // Clear promise after completion
+        }
+        
+        return response;
+      } catch (error) {
+        if (!params) {
+          servicesCachePromise = null; // Clear promise on error
+        }
+        throw error;
+      }
+    })();
+    
+    // Store promise for concurrent requests
+    if (!params) {
+      servicesCachePromise = fetchPromise;
+    }
+    
+    return fetchPromise;
+  },
   getById: (id) => api.get(`/services/${id}`),
   create: (data) => api.post('/services', data),
   update: (id, data) => api.put(`/services/${id}`, data),
@@ -488,10 +537,68 @@ export const appointmentAPI = {
   getCancelled: (params) => api.get('/appointments/cancelled', { params })
 };
 
+// Simple cache for salon info to prevent duplicate requests
+let salonInfoCache = null;
+let salonInfoCacheTime = null;
+let salonInfoCachePromise = null; // Track ongoing requests
+const SALON_INFO_CACHE_TTL = 30000; // 30 seconds
+
+// Simple cache for services to prevent duplicate requests
+let servicesCache = null;
+let servicesCacheTime = null;
+let servicesCachePromise = null; // Track ongoing requests
+const SERVICES_CACHE_TTL = 30000; // 30 seconds
+
+// Simple cache for widget config to prevent duplicate requests
+let widgetConfigCache = null;
+let widgetConfigCacheTime = null;
+let widgetConfigCachePromise = null; // Track ongoing requests
+const WIDGET_CONFIG_CACHE_TTL = 30000; // 30 seconds
+
 export const salonAPI = {
   getDashboard: () => api.get('/salon/dashboard'),
-  getInfo: () => api.get('/salon/info'),
-  update: (data) => api.put('/salon/update', data),
+  getInfo: async (forceRefresh = false) => {
+    // Return cached data if available and not expired
+    if (!forceRefresh && salonInfoCache && salonInfoCacheTime) {
+      const now = Date.now();
+      if (now - salonInfoCacheTime < SALON_INFO_CACHE_TTL) {
+        return salonInfoCache;
+      }
+    }
+    
+    // If there's already an ongoing request, wait for it instead of making a new one
+    if (salonInfoCachePromise && !forceRefresh) {
+      return salonInfoCachePromise;
+    }
+    
+    // Fetch new data
+    salonInfoCachePromise = (async () => {
+      try {
+        const response = await api.get('/salon/info');
+        salonInfoCache = response;
+        salonInfoCacheTime = Date.now();
+        salonInfoCachePromise = null; // Clear promise after completion
+        return response;
+      } catch (error) {
+        salonInfoCachePromise = null; // Clear promise on error
+        // If error, return cached data if available
+        if (salonInfoCache) {
+          return salonInfoCache;
+        }
+        throw error;
+      }
+    })();
+    
+    return salonInfoCachePromise;
+  },
+  clearInfoCache: () => {
+    salonInfoCache = null;
+    salonInfoCacheTime = null;
+  },
+  update: (data) => {
+    salonAPI.clearInfoCache(); // Clear cache on update
+    return api.put('/salon/update', data);
+  },
   getServices: () => api.get('/salon/services'),
   getBookings: (params) => api.get('/salon/bookings', { params }),
   getStats: () => api.get('/salon/stats'),
@@ -505,8 +612,47 @@ export const salonAPI = {
 };
 
 export const widgetAPI = {
-  getConfig: () => api.get('/widget/config'),
-  updateConfig: (data) => api.put('/widget/config', data),
+  getConfig: async (forceRefresh = false) => {
+    // Return cached data if available and not expired
+    if (!forceRefresh && widgetConfigCache && widgetConfigCacheTime) {
+      const now = Date.now();
+      if (now - widgetConfigCacheTime < WIDGET_CONFIG_CACHE_TTL) {
+        return widgetConfigCache;
+      }
+    }
+    
+    // If there's already an ongoing request, wait for it instead of making a new one
+    if (widgetConfigCachePromise && !forceRefresh) {
+      return widgetConfigCachePromise;
+    }
+    
+    // Fetch new data
+    widgetConfigCachePromise = (async () => {
+      try {
+        const response = await api.get('/widget/config');
+        widgetConfigCache = response;
+        widgetConfigCacheTime = Date.now();
+        widgetConfigCachePromise = null; // Clear promise after completion
+        return response;
+      } catch (error) {
+        widgetConfigCachePromise = null; // Clear promise on error
+        // If error, return cached data if available
+        if (widgetConfigCache) {
+          return widgetConfigCache;
+        }
+        throw error;
+      }
+    })();
+    
+    return widgetConfigCachePromise;
+  },
+  updateConfig: (data) => {
+    // Clear cache on update
+    widgetConfigCache = null;
+    widgetConfigCacheTime = null;
+    widgetConfigCachePromise = null;
+    return api.put('/widget/config', data);
+  },
   getPublicConfig: (studioId) => api.get(`/widget/public/${studioId}`),
   getEmbedCode: () => api.get('/widget/embed-code')
 };

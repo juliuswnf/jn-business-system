@@ -27,7 +27,7 @@ export const register = async (req, res) => {
   try {
     const {
       email, password, firstName, lastName, name, role, phone,
-      companyName, companyAddress, companyCity, companyZip, plan
+      companyName, companyAddress, companyCity, companyZip, plan, businessType
     } = req.body;
 
     // Combine firstName + lastName OR use name
@@ -106,12 +106,24 @@ export const register = async (req, res) => {
         slug = `${slug}-${Date.now().toString(36)}`;
       }
 
+      // Validate businessType
+      const validBusinessTypes = [
+        'hair-salon', 'beauty-salon', 'spa-wellness', 'tattoo-piercing',
+        'medical-aesthetics', 'personal-training', 'physiotherapy',
+        'barbershop', 'nail-salon', 'massage-therapy', 'yoga-studio',
+        'pilates-studio', 'other'
+      ];
+      const selectedBusinessType = businessType && validBusinessTypes.includes(businessType) 
+        ? businessType 
+        : 'hair-salon'; // Default fallback
+
       salon = await Salon.create({
         name: companyName,
         slug,
         owner: user._id,
         email: email,
         phone: phone || '',
+        businessType: selectedBusinessType,
         address: {
           street: companyAddress || '',
           city: companyCity || '',
@@ -121,7 +133,7 @@ export const register = async (req, res) => {
         isActive: true,
         subscription: {
           status: 'trial',
-          plan: plan || 'starter',
+          tier: plan || 'starter',
           trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days trial
         }
       });

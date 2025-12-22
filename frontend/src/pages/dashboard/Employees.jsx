@@ -96,33 +96,45 @@ export default function Employees() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-zinc-200 transition"
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-black rounded-lg font-semibold transition"
         >
           <Plus size={20} />
           Mitarbeiter hinzufügen
         </button>
       </div>
 
-      {/* Employees List */}
-      {employees.length === 0 ? (
-        <div className="text-center py-12 bg-zinc-900 rounded-xl border border-zinc-800">
-          <Users className="w-12 h-12 mx-auto text-gray-600 mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">Keine Mitarbeiter</h3>
-          <p className="text-gray-300 mb-4">Fügen Sie Ihren ersten Mitarbeiter hinzu</p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-zinc-200 transition"
-          >
-            Mitarbeiter hinzufügen
-          </button>
+      {/* Employees Container */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <span className="font-semibold text-white">Mitarbeiter verwalten</span>
+          </div>
         </div>
-      ) : (
-        <div className="grid gap-4">
-          {employees.map((employee) => (
-            <div
-              key={employee._id}
-              className="flex items-center justify-between p-4 bg-zinc-900 rounded-xl border border-zinc-800"
-            >
+        <div className="p-6">
+          {employees.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-zinc-800 border border-zinc-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Keine Mitarbeiter</h3>
+              <p className="text-gray-400 mb-6">Fügen Sie Ihren ersten Mitarbeiter hinzu</p>
+              <button
+                onClick={() => setShowModal(true)}
+                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-black rounded-lg font-semibold transition"
+              >
+                Mitarbeiter hinzufügen
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {employees.map((employee) => (
+                <div
+                  key={employee._id}
+                  className="flex items-center justify-between p-4 bg-zinc-950 border border-zinc-800 rounded-lg hover:border-cyan-500/30 transition"
+                >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-white font-semibold">
                   {employee.name?.charAt(0)?.toUpperCase() || 'M'}
@@ -156,55 +168,59 @@ export default function Employees() {
               </div>
             </div>
           ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Add Employee Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-900 rounded-xl p-6 w-full max-w-md border border-zinc-800">
-            <h2 className="text-xl font-bold text-white mb-4">Neuer Mitarbeiter</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+              <h2 className="text-lg font-semibold text-white">Neuer Mitarbeiter</h2>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm text-gray-300 mb-1">Name</label>
+                <label className="block text-sm text-white mb-2">Name</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white"
+                  className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-300 mb-1">E-Mail</label>
+                <label className="block text-sm text-white mb-2">E-Mail</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white"
+                  className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-300 mb-1">Telefon</label>
+                <label className="block text-sm text-white mb-2">Telefon</label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white"
+                  className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
                 />
               </div>
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition"
+                  className="flex-1 px-4 py-3 border border-zinc-800 rounded-lg text-gray-300 hover:bg-zinc-800 transition"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-zinc-200 transition"
+                  className="flex-1 px-4 py-3 bg-cyan-500 hover:bg-cyan-600 text-black rounded-lg font-semibold transition"
                 >
                   Hinzufügen
                 </button>

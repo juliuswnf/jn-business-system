@@ -224,7 +224,7 @@ userSchema.methods.comparePassword = async function(enteredPassword) {
 userSchema.methods.getPasswordResetToken = function() {
   const resetToken = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  this.passwordResetExpire = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+  this.passwordResetExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
   return resetToken;
 };
 

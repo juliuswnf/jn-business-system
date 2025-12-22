@@ -38,7 +38,7 @@ const ForgotPassword = () => {
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">E-Mail gesendet</h2>
             <p className="text-gray-400 mb-6">
-              Wir haben einen Link zum Zurücksetzen an <strong className="text-white">{email}</strong> gesendet. Der Link ist 1 Stunde gültig.
+              Wir haben einen Link zum Zurücksetzen an <strong className="text-white">{email}</strong> gesendet. Der Link ist 10 Minuten gültig.
             </p>
             <p className="text-sm text-gray-500 mb-8">
               Keine E-Mail erhalten? Prüfen Sie Ihren Spam-Ordner.

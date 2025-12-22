@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { BarChart3, RefreshCw, CheckCircle, TrendingUp, DollarSign } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -125,71 +126,81 @@ export default function WorkflowProjects() {
           <StatCard
             title="Gesamt"
             value={stats.total}
-            icon="📊"
-            color="bg-blue-50 border-blue-200"
+            icon={<BarChart3 className="w-6 h-6 text-cyan-400" />}
+            color="bg-zinc-900 border-zinc-800"
           />
           <StatCard
             title="Aktiv"
             value={stats.active}
-            icon="🔄"
-            color="bg-blue-50 border-blue-200"
+            icon={<RefreshCw className="w-6 h-6 text-cyan-400" />}
+            color="bg-zinc-900 border-zinc-800"
           />
           <StatCard
             title="Abgeschlossen"
             value={stats.completed}
-            icon="✅"
-            color="bg-green-50 border-green-200"
+            icon={<CheckCircle className="w-6 h-6 text-green-400" />}
+            color="bg-zinc-900 border-zinc-800"
           />
           <StatCard
             title="Ø Fortschritt"
             value={`${stats.averageProgress}%`}
-            icon="📊"
-            color="bg-purple-50 border-purple-200"
+            icon={<TrendingUp className="w-6 h-6 text-cyan-400" />}
+            color="bg-zinc-900 border-zinc-800"
           />
           <StatCard
             title="Umsatz"
             value={`€${stats.totalRevenue.toLocaleString()}`}
-            icon="💰"
-            color="bg-green-50 border-green-200"
+            icon={<DollarSign className="w-6 h-6 text-green-400" />}
+            color="bg-zinc-900 border-zinc-800"
           />
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            type="text"
-            placeholder="Suche nach Name, Kunde..."
-            value={filters.search}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <select
-            value={filters.industry}
-            onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Alle Branchen</option>
-            <option value="tattoo">🎨 Tattoo</option>
-            <option value="medical_aesthetics">💉 Medical Aesthetics</option>
-            <option value="spa_wellness">🧖 Spa & Wellness</option>
-            <option value="barbershop">💇 Barbershop</option>
-            <option value="nails">💅 Nails</option>
-            <option value="massage">💆 Massage</option>
-            <option value="physiotherapy">🧘 Physiotherapie</option>
-          </select>
-          <select
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Alle Status</option>
-            <option value="draft">Entwurf</option>
-            <option value="active">Aktiv</option>
-            <option value="completed">Abgeschlossen</option>
-            <option value="cancelled">Abgebrochen</option>
-          </select>
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden mb-6">
+        <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <span className="font-semibold text-white">Filter</span>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input
+              type="text"
+              placeholder="Suche nach Name, Kunde..."
+              value={filters.search}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            />
+            <select
+              value={filters.industry}
+              onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
+              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            >
+              <option value="">Alle Branchen</option>
+              <option value="tattoo">🎨 Tattoo</option>
+              <option value="medical_aesthetics">💉 Medical Aesthetics</option>
+              <option value="spa_wellness">🧖 Spa & Wellness</option>
+              <option value="barbershop">💇 Barbershop</option>
+              <option value="nails">💅 Nails</option>
+              <option value="massage">💆 Massage</option>
+              <option value="physiotherapy">🧘 Physiotherapie</option>
+            </select>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            >
+              <option value="">Alle Status</option>
+              <option value="draft">Entwurf</option>
+              <option value="active">Aktiv</option>
+              <option value="completed">Abgeschlossen</option>
+              <option value="cancelled">Abgebrochen</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -233,7 +244,7 @@ export default function WorkflowProjects() {
               </tr>
             </thead>
             <tbody className="bg-zinc-900 divide-y divide-zinc-800">
-              {projects.map((project) => (
+              {(projects || []).map((project) => (
                 <motion.tr
                   key={project._id}
                   initial={{ opacity: 0 }}
@@ -320,10 +331,10 @@ function StatCard({ title, value, icon, color }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`border-2 rounded-lg p-4 ${color || 'bg-zinc-900 border-zinc-800'}`}
+      className={`border rounded-lg p-4 ${color || 'bg-zinc-900 border-zinc-800'}`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-2xl">{icon}</span>
+        {icon}
       </div>
       <div className="text-2xl font-bold text-white">{value}</div>
       <div className="text-sm text-zinc-400">{title}</div>

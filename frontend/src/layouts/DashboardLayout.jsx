@@ -1,34 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import UserMenu from '../components/common/UserMenu';
 import { Menu, X } from 'lucide-react';
+import { salonAPI } from '../utils/api';
+import { getAvailableNavItems } from '../utils/featureAccess';
+
+// Default navigation groups (fallback)
+const getDefaultNavGroups = () => [
+  {
+    title: 'Hauptbereich',
+    items: [
+      { path: '/dashboard', label: 'Übersicht', exact: true, dataTour: 'dashboard' },
+      { path: '/dashboard/bookings', label: 'Buchungen', dataTour: 'bookings' },
+    ]
+  },
+  {
+    title: 'Verwaltung',
+    items: [
+      { path: '/dashboard/services', label: 'Services', dataTour: 'services' },
+      { path: '/dashboard/employees', label: 'Mitarbeiter' },
+    ]
+  },
+  {
+    title: 'Einstellungen',
+    items: [
+      { path: '/dashboard/settings', label: 'Einstellungen', dataTour: 'settings' },
+      { path: '/dashboard/widget', label: 'Widget', dataTour: 'widget' },
+    ]
+  },
+];
 
 export default function DashboardLayout({ children }) {
   const location = useLocation();
   const currentPath = location.pathname;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoSpinning, setLogoSpinning] = useState(false);
+  const [navGroups, setNavGroups] = useState(getDefaultNavGroups());
+  const [loading, setLoading] = useState(true);
 
   const handleLogoClick = (e) => {
     setLogoSpinning(true);
     setTimeout(() => setLogoSpinning(false), 600);
   };
 
-  const navItems = [
-    { path: '/dashboard', label: 'Übersicht', exact: true, dataTour: 'dashboard' },
-    { path: '/dashboard/bookings', label: 'Buchungen', dataTour: 'bookings' },
-    { path: '/dashboard/services', label: 'Services', dataTour: 'services' },
-    { path: '/dashboard/employees', label: 'Mitarbeiter' },
-    { path: '/dashboard/waitlist', label: '⏳ Warteliste (NO-SHOW-KILLER)' },
-    { path: '/dashboard/marketing', label: '📧 Marketing-Agent' },
-    { path: '/dashboard/workflows', label: '🔄 Branchen-Workflows' },
-    { path: '/dashboard/workflow-projects', label: '📋 Projekte' },
-    { path: '/dashboard/packages-memberships', label: '🎁 Packages & Memberships' },
-    { path: '/dashboard/tattoo/projects', label: '🎨 Tattoo Studio' },
-    { path: '/dashboard/success-metrics', label: '📊 Erfolgsmetriken' },
-    { path: '/dashboard/widget', label: '🔗 Widget', dataTour: 'widget' },
-    { path: '/dashboard/settings', label: '⚙️ Einstellungen', dataTour: 'settings' },
-  ];
+  // Load salon info and filter navigation
+  useEffect(() => {
+    const loadSalonInfo = async () => {
+      try {
+        const response = await salonAPI.getInfo();
+        if (response.data?.success && response.data.salon) {
+          const salon = response.data.salon;
+          const businessType = salon.businessType || 'hair-salon';
+          const tier = salon.subscription?.tier || 'starter';
+          
+          // Get filtered navigation items
+          const filteredNav = getAvailableNavItems(businessType, tier);
+          
+          // Convert to navGroups format
+          const groups = Object.entries(filteredNav).map(([title, items]) => ({
+            title,
+            items: items.map(item => ({
+              path: item.path,
+              label: item.label,
+              exact: item.exact || false,
+              dataTour: item.dataTour || null
+            }))
+          }));
+          
+          setNavGroups(groups);
+        } else {
+          // Fallback to default navigation
+          setNavGroups(getDefaultNavGroups());
+        }
+      } catch (error) {
+        console.error('Error loading salon info:', error);
+        // Fallback to default navigation
+        setNavGroups(getDefaultNavGroups());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSalonInfo();
+  }, []);
+
+  // Flache Liste für Mobile (ohne Gruppierung)
+  const navItems = navGroups.flatMap(group => group.items || []);
 
   const isActive = (path, exact = false) => {
     if (exact) return currentPath === path;
@@ -56,20 +113,27 @@ export default function DashboardLayout({ children }) {
             </Link>
           </div>
 
-          <nav className="flex flex-col gap-1 text-sm">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                data-tour={item.dataTour}
-                className={`py-2 px-3 rounded transition ${
-                  isActive(item.path, item.exact)
-                    ? 'bg-white text-black font-medium'
-                    : 'text-zinc-300 hover:bg-zinc-800'
-                }`}
-              >
-                {item.label}
-              </Link>
+          <nav className="flex flex-col gap-4 text-sm">
+            {navGroups.map((group, groupIdx) => (
+              <div key={groupIdx}>
+                <div className="px-3 py-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">
+                  {group.title}
+                </div>
+                {group.items.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    data-tour={item.dataTour}
+                    className={`block py-2 px-3 rounded transition ${
+                      isActive(item.path, item.exact)
+                        ? 'bg-white text-black font-medium'
+                        : 'text-zinc-300 hover:bg-zinc-800'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             ))}
             <hr className="border-zinc-800 my-2" />
             <Link to="/dashboard/help" data-tour="help" className={`py-2 px-3 rounded flex items-center gap-2 transition ${

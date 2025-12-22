@@ -129,105 +129,98 @@ export default function BusinessTypeSelector({ onSelect, selectedType }) {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          What type of business do you run?
+        <h1 className="text-4xl font-bold text-white mb-4">
+          Welche Branche betreiben Sie?
         </h1>
-        <p className="text-xl text-gray-600">
-          Choose your business type to customize your experience
+        <p className="text-xl text-gray-400">
+          Wählen Sie Ihre Branche, um Ihr Erlebnis anzupassen
         </p>
       </div>
 
-      {/* Business Type Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {BUSINESS_TYPES.map((type) => {
-          const Icon = type.icon;
-          const isSelected = selectedType === type.id;
-          const isHovered = hoveredType === type.id;
-
-          return (
-            <button
-              key={type.id}
-              onClick={() => onSelect(type)}
-              onMouseEnter={() => setHoveredType(type.id)}
-              onMouseLeave={() => setHoveredType(null)}
-              className={`
-                relative p-6 rounded-2xl border-2 transition-all duration-300
-                hover:scale-105 hover:shadow-2xl
-                ${isSelected 
-                  ? 'border-blue-500 bg-blue-50 shadow-xl' 
-                  : 'border-gray-200 bg-white hover:border-gray-300'
-                }
-              `}
-            >
-              {/* Gradient Background */}
-              <div className={`
-                absolute inset-0 bg-gradient-to-br ${type.color} 
-                opacity-0 hover:opacity-10 rounded-2xl transition-opacity duration-300
-              `} />
-
-              {/* Content */}
-              <div className="relative z-10">
-                {/* Icon */}
-                <div className={`
-                  w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center
-                  bg-gradient-to-br ${type.color} shadow-lg
-                  ${isHovered ? 'scale-110' : 'scale-100'}
-                  transition-transform duration-300
-                `}>
-                  <Icon className="w-8 h-8 text-white" />
-                </div>
-
-                {/* Name */}
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {type.name}
-                </h3>
-
-                {/* Features */}
-                <ul className="space-y-2 text-sm text-gray-600 text-left">
-                  {type.features.slice(0, 4).map((feature, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <CircleDot className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-green-500" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Selected Badge */}
-                {isSelected && (
-                  <div className="absolute top-4 right-4">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Feature Preview (if type selected) */}
-      {selectedType && (
-        <div className="mt-12 p-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            ✨ Your Features
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {BUSINESS_TYPES.find(t => t.id === selectedType)?.features.map((feature, idx) => (
-              <div key={idx} className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-gray-700 font-medium">{feature}</span>
-              </div>
-            ))}
+      {/* Business Type Container - Like Preview */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <span className="font-semibold text-white">Ihre Branche wählen</span>
           </div>
         </div>
-      )}
+
+        <div className="p-6">
+          {/* Business Type Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {BUSINESS_TYPES.map((type) => {
+              const Icon = type.icon;
+              const isSelected = selectedType === type.id;
+
+              return (
+                <button
+                  key={type.id}
+                  onClick={() => onSelect(type)}
+                  onMouseEnter={() => setHoveredType(type.id)}
+                  onMouseLeave={() => setHoveredType(null)}
+                  className={`
+                    bg-zinc-950 border rounded-lg p-4 transition cursor-pointer text-left
+                    ${isSelected 
+                      ? 'border-cyan-500/50 hover:border-cyan-500/70' 
+                      : 'border-zinc-800 hover:bg-zinc-900 hover:border-cyan-500/30'
+                    }
+                  `}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`
+                      w-10 h-10 rounded flex items-center justify-center flex-shrink-0
+                      ${isSelected
+                        ? 'bg-cyan-500/10 border border-cyan-500/30'
+                        : 'bg-zinc-900 border border-zinc-800'
+                      }
+                    `}>
+                      <Icon className={`w-5 h-5 ${isSelected ? 'text-cyan-500' : 'text-gray-400'}`} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-white">{type.name}</div>
+                      <div className="text-sm text-gray-400 mt-1">
+                        {type.features.slice(0, 2).join(', ')}
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <svg className="w-5 h-5 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Feature Preview (if type selected) */}
+          {selectedType && (
+            <div className="mt-6 bg-zinc-950 border border-cyan-500/30 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <svg className="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="text-lg font-semibold text-white">
+                  Features für {BUSINESS_TYPES.find(t => t.id === selectedType)?.name}
+                </h3>
+              </div>
+              <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+                {BUSINESS_TYPES.find(t => t.id === selectedType)?.features.map((feature, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-gray-300 text-sm">
+                    <svg className="w-4 h-4 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

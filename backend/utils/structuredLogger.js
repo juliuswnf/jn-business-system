@@ -1,4 +1,5 @@
 ﻿import winston from 'winston';
+import crypto from 'crypto';
 
 /**
  * ? AUDIT FIX: Structured JSON logger with Winston
