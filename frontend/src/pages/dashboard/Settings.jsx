@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Clock, Star, Mail, CreditCard, Bell, Save, ExternalLink } from 'lucide-react';
+import { Building2, Clock, Star, Mail, CreditCard, Bell, Save, ExternalLink, Palette, MapPin } from 'lucide-react';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
 import { salonAPI } from '../../utils/api';
+import { Link } from 'react-router-dom';
 
 const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 
@@ -144,7 +145,8 @@ export default function Settings() {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="p-4 md:p-6">
 
         {/* Studio Info Tab */}
         {activeTab === 'studio' && (
@@ -425,6 +427,42 @@ export default function Settings() {
             </div>
           </div>
         )}
+        </div>
+      </div>
+
+      {/* Additional Settings Links */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link
+          to="/dashboard/branding"
+          className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-cyan-500/30 transition group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition">
+              <Palette className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold text-white">Branding</div>
+              <div className="text-sm text-gray-400">Buchungsseite anpassen</div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition" />
+          </div>
+        </Link>
+
+        <Link
+          to="/dashboard/locations"
+          className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-cyan-500/30 transition group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition">
+              <MapPin className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold text-white">Multi-Standort</div>
+              <div className="text-sm text-gray-400">Mehrere Standorte verwalten</div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition" />
+          </div>
+        </Link>
       </div>
 
       {/* Save Button */}

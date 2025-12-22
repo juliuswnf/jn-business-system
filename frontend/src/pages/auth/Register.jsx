@@ -34,6 +34,7 @@ export default function Register() {
     companyAddress: '',
     companyCity: '',
     companyZip: '',
+    businessType: '',
     password: '',
     confirmPassword: '',
     userType: 'salon_owner',
@@ -70,6 +71,7 @@ export default function Register() {
     }
     if (!formData.phone.trim()) newErrors.phone = 'Telefon erforderlich';
     if (!formData.companyName.trim()) newErrors.companyName = 'Firmenname erforderlich';
+    if (!formData.businessType) newErrors.businessType = 'Bitte wählen Sie Ihre Branche';
     if (formData.password.length < 8) {
       newErrors.password = 'Mind. 8 Zeichen';
     }
@@ -101,6 +103,7 @@ export default function Register() {
         email: formData.email,
         phone: formData.phone,
         companyName: formData.companyName,
+        businessType: formData.businessType,
         password: formData.password,
         role: 'salon_owner',
         plan: planInfo.planId,
@@ -247,6 +250,33 @@ export default function Register() {
                   className={`input-field ${errors.companyName ? 'input-error' : ''}`}
                 />
                 {errors.companyName && <p className="text-red-400 text-xs mt-1">{errors.companyName}</p>}
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-200 mb-2">Ihre Branche <span className="text-red-400">*</span></label>
+                <select
+                  name="businessType"
+                  value={formData.businessType}
+                  onChange={handleChange}
+                  className={`input-field ${errors.businessType ? 'input-error' : ''}`}
+                >
+                  <option value="">Bitte wählen...</option>
+                  <option value="hair-salon">Friseursalon</option>
+                  <option value="beauty-salon">Beauty-Salon</option>
+                  <option value="spa-wellness">Wellness & Spa</option>
+                  <option value="tattoo-piercing">Tattoo-Studio & Piercing</option>
+                  <option value="medical-aesthetics">Medizinische Praxis / Ästhetik</option>
+                  <option value="personal-training">Personal Training / Fitness</option>
+                  <option value="physiotherapy">Physiotherapie</option>
+                  <option value="barbershop">Barbershop</option>
+                  <option value="nail-salon">Nagelstudio</option>
+                  <option value="massage-therapy">Massagepraxis</option>
+                  <option value="yoga-studio">Yoga-Studio</option>
+                  <option value="pilates-studio">Pilates-Studio</option>
+                  <option value="other">Andere</option>
+                </select>
+                {errors.businessType && <p className="text-red-400 text-xs mt-1">{errors.businessType}</p>}
+                <p className="text-xs text-gray-400 mt-1">Die Auswahl bestimmt, welche branchenspezifischen Funktionen Ihnen zur Verfügung stehen.</p>
               </div>
             </div>
 

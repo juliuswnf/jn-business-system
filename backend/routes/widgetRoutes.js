@@ -3,27 +3,189 @@ import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import Booking from '../models/Booking.js';
 import User from '../models/User.js';
+import Widget from '../models/Widget.js';
 import { validateBooking } from '../middleware/validationMiddleware.js';
 import { widgetLimiter, publicBookingLimiter } from '../middleware/rateLimiterMiddleware.js';
 import widgetCorsMiddleware from '../middleware/widgetCorsMiddleware.js';
 import emailService from '../services/emailService.js';
 import logger from '../utils/logger.js';
 import { generateSecurePassword, isValidObjectId } from '../utils/validation.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 /**
  * Widget Routes - Embeddable Booking Widget API
- * Public endpoints für externe Salon-Websites
- * Kein Auth erforderlich - Slug-basiert
- * Rate-Limited für Spam-Schutz
+ * Mixed: Public endpoints (slug-based) + Protected endpoints (auth required)
  */
 
-// ? HIGH FIX #12: Apply CORS middleware (allowedDomains whitelist)
-router.use(widgetCorsMiddleware);
+// ==================== PROTECTED ROUTES (Auth Required) ====================
+// Get widget config for authenticated user's salon
+router.get('/config', authMiddleware.protect, async (req, res) => {
+  try {
+    let salonId = req.user.salonId;
+    
+    // If salonId not in user, try to find salon by owner
+    if (!salonId && req.user.role === 'salon_owner') {
+      const salon = await Salon.findOne({ owner: req.user._id });
+      if (salon) {
+        salonId = salon._id;
+        // Update user with salonId for future requests
+        req.user.salonId = salonId;
+        await req.user.save();
+      }
+    }
+    
+    if (!salonId) {
+      return res.status(404).json({
+        success: false,
+        message: 'No salon associated with this account'
+      });
+    }
 
-// Apply widget rate limiter to all routes
-router.use(widgetLimiter);
+    // Get or create widget
+    let widget = await Widget.findOne({ salonId });
+    
+    if (!widget) {
+      // Create default widget if it doesn't exist
+      try {
+        widget = await Widget.createForSalon(salonId, {});
+      } catch (error) {
+        // If widget was created by another request, fetch it
+        if (error.message === 'Widget already exists for this salon') {
+          widget = await Widget.findOne({ salonId });
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Get salon info for widget config
+    const salon = await Salon.findById(salonId)
+      .select('name slug logo branding businessType');
+
+    return res.status(200).json({
+      success: true,
+      config: {
+        primaryColor: widget.theme?.primaryColor || salon?.branding?.primaryColor || '#ffffff',
+        backgroundColor: widget.theme?.secondaryColor || salon?.branding?.secondaryColor || '#000000',
+        accentColor: widget.theme?.primaryColor || salon?.branding?.accentColor || '#3b82f6',
+        borderRadius: widget.theme?.borderRadius?.replace('px', '') || '12',
+        fontFamily: widget.theme?.fontFamily?.split(',')[0] || 'Inter',
+        buttonText: widget.settings?.buttonText || 'Termin buchen',
+        headerText: widget.settings?.headerText || 'Online Terminbuchung',
+        showLogo: widget.settings?.showLogo !== false,
+        selectedServices: widget.settings?.selectedServices || [],
+        embedCode: widget.embedCode,
+        apiKey: widget.apiKey
+      }
+    });
+  } catch (error) {
+    logger.error('Widget Config Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error loading widget configuration'
+    });
+  }
+});
+
+// Update widget config for authenticated user's salon
+router.put('/config', authMiddleware.protect, async (req, res) => {
+  try {
+    let salonId = req.user.salonId;
+    
+    // If salonId not in user, try to find salon by owner
+    if (!salonId && req.user.role === 'salon_owner') {
+      const salon = await Salon.findOne({ owner: req.user._id });
+      if (salon) {
+        salonId = salon._id;
+        // Update user with salonId for future requests
+        req.user.salonId = salonId;
+        await req.user.save();
+      }
+    }
+    
+    if (!salonId) {
+      return res.status(404).json({
+        success: false,
+        message: 'No salon associated with this account'
+      });
+    }
+
+    // Get or create widget
+    let widget = await Widget.findOne({ salonId });
+    
+    if (!widget) {
+      try {
+        widget = await Widget.createForSalon(salonId, {});
+      } catch (error) {
+        // If widget was created by another request, fetch it
+        if (error.message === 'Widget already exists for this salon') {
+          widget = await Widget.findOne({ salonId });
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Update widget configuration
+    const { primaryColor, backgroundColor, accentColor, borderRadius, fontFamily, buttonText, headerText, showLogo, selectedServices } = req.body;
+
+    if (primaryColor || backgroundColor || accentColor || borderRadius || fontFamily) {
+      widget.theme = {
+        ...widget.theme.toObject(),
+        primaryColor: accentColor || primaryColor || widget.theme?.primaryColor,
+        secondaryColor: backgroundColor || widget.theme?.secondaryColor,
+        borderRadius: borderRadius ? `${borderRadius}px` : widget.theme?.borderRadius,
+        fontFamily: fontFamily || widget.theme?.fontFamily
+      };
+    }
+
+    if (buttonText || headerText || showLogo !== undefined || selectedServices) {
+      widget.settings = {
+        ...widget.settings,
+        buttonText: buttonText || widget.settings?.buttonText,
+        headerText: headerText || widget.settings?.headerText,
+        showLogo: showLogo !== undefined ? showLogo : widget.settings?.showLogo,
+        selectedServices: selectedServices || widget.settings?.selectedServices
+      };
+    }
+
+    await widget.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Widget configuration updated successfully',
+      config: {
+        primaryColor: widget.theme?.primaryColor,
+        backgroundColor: widget.theme?.backgroundColor,
+        accentColor: widget.theme?.accentColor,
+        borderRadius: widget.theme?.borderRadius,
+        fontFamily: widget.theme?.fontFamily,
+        buttonText: widget.settings?.buttonText,
+        headerText: widget.settings?.headerText,
+        showLogo: widget.settings?.showLogo,
+        selectedServices: widget.settings?.selectedServices
+      }
+    });
+  } catch (error) {
+    logger.error('Widget Update Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error updating widget configuration'
+    });
+  }
+});
+
+// ==================== PUBLIC ROUTES (No Auth Required) ====================
+// Create a separate router for public routes to apply middleware correctly
+const publicRouter = express.Router();
+
+// ? HIGH FIX #12: Apply CORS middleware (allowedDomains whitelist)
+publicRouter.use(widgetCorsMiddleware);
+
+// Apply widget rate limiter to public routes
+publicRouter.use(widgetLimiter);
 
 // ? HIGH FIX #12: Validate slug format (prevent injection)
 const isValidSlug = (slug) => {
@@ -40,8 +202,8 @@ const sanitizeInput = (input) => {
     .substring(0, 500); // Limit length
 };
 
-// ==================== GET WIDGET CONFIG ====================
-router.get('/config/:slug', async (req, res) => {
+// ==================== GET PUBLIC WIDGET CONFIG (by slug) ====================
+publicRouter.get('/config/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
 
@@ -85,8 +247,8 @@ router.get('/config/:slug', async (req, res) => {
   }
 });
 
-// ==================== GET AVAILABLE SERVICES ====================
-router.get('/services/:slug', async (req, res) => {
+// ==================== GET PUBLIC AVAILABLE SERVICES ====================
+publicRouter.get('/services/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
 
@@ -124,8 +286,8 @@ router.get('/services/:slug', async (req, res) => {
   }
 });
 
-// ==================== GET AVAILABLE TIME SLOTS ====================
-router.get('/timeslots/:slug', async (req, res) => {
+// ==================== GET PUBLIC AVAILABLE TIME SLOTS ====================
+publicRouter.get('/timeslots/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
     const { date, serviceId } = req.query;
@@ -242,9 +404,9 @@ router.get('/timeslots/:slug', async (req, res) => {
   }
 });
 
-// ==================== CREATE BOOKING (NO AUTH) ====================
+// ==================== CREATE PUBLIC BOOKING (NO AUTH) ====================
 // Extra strict rate limiting for booking creation
-router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, res) => {
+publicRouter.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, res) => {
   try {
     const { slug } = req.params;
     const { customerName, customerEmail, customerPhone, serviceId, date, time, notes } = req.body;
@@ -355,5 +517,8 @@ router.post('/book/:slug', publicBookingLimiter, validateBooking, async (req, re
     });
   }
 });
+
+// Mount public router under /public path
+router.use('/public', publicRouter);
 
 export default router;

@@ -108,7 +108,22 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
         message: 'Conflict - Service was modified by another user. Please refresh and try again.'
       });
     }
-    return res.status(400).json({ success: false, message: error.message });
+    
+    // Log the full error for debugging
+    logger.error('Service Update Error:', {
+      error: error.message,
+      stack: error.stack,
+      updateData: Object.keys(updateData),
+      serviceId: req.params.id
+    });
+    
+    // Return more detailed error message
+    const errorMessage = error.message || 'Failed to update service';
+    return res.status(400).json({ 
+      success: false, 
+      message: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 

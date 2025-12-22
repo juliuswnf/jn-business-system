@@ -295,7 +295,7 @@ export default function Pricing() {
                         )}
                         {feature.highlight && (
                           <span className="ml-2 text-xs text-blue-500 font-bold">
-                            ⚡ PREMIUM
+                            PREMIUM
                           </span>
                         )}
                       </div>

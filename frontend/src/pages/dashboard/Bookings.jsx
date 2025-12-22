@@ -94,10 +94,9 @@ export default function Bookings() {
       const response = await api.get('/bookings', { params });
 
       if (response.data.success) {
-        // Load confirmations for these bookings
-        const bookingsWithConfirmations = await loadConfirmationsForBookings(response.data.bookings);
-
-        setBookings(bookingsWithConfirmations);
+        // Bookings API already includes confirmation data (see bookingController.js)
+        // No need to make separate confirmation requests
+        setBookings(response.data.bookings || []);
         setTotalPages(response.data.totalPages || 1);
         setTotal(response.data.total || 0);
       }
@@ -109,43 +108,6 @@ export default function Bookings() {
     }
   };
 
-  /**
-   * Load confirmation status for bookings
-   */
-  const loadConfirmationsForBookings = async (bookings) => {
-    try {
-      // Get confirmation status for each booking
-      const bookingIds = bookings.map(b => b._id);
-
-      // Fetch confirmations in parallel
-      const confirmationPromises = bookingIds.map(async (bookingId) => {
-        try {
-          const response = await api.get(`/confirmations/${bookingId}`);
-          return {
-            bookingId,
-            confirmation: response.data.success ? response.data.confirmation : null
-          };
-        } catch (error) {
-          // No confirmation exists (404 is expected)
-          return { bookingId, confirmation: null };
-        }
-      });
-
-      const confirmations = await Promise.all(confirmationPromises);
-
-      // Merge confirmations into bookings
-      return bookings.map(booking => {
-        const confirmationData = confirmations.find(c => c.bookingId === booking._id);
-        return {
-          ...booking,
-          confirmation: confirmationData?.confirmation || null
-        };
-      });
-    } catch (error) {
-      console.error('Error loading confirmations:', error);
-      return bookings; // Return bookings without confirmation data
-    }
-  };
 
   /**
    * Send SMS confirmation for a booking
@@ -157,7 +119,7 @@ export default function Bookings() {
       const response = await api.post(`/confirmations/${booking._id}`);
 
       if (response.data.success) {
-        toast.success(`✅ SMS-Bestätigung gesendet an ${booking.customerPhone}`);
+        toast.success(`SMS-Bestätigung gesendet an ${booking.customerPhone}`);
 
         // Update booking in state
         setBookings(prev => prev.map(b =>
@@ -176,7 +138,7 @@ export default function Bookings() {
     } catch (error) {
       console.error('Error sending SMS confirmation:', error);
       const errorMessage = error.response?.data?.message || 'Fehler beim Senden der SMS';
-      toast.error(`❌ ${errorMessage}`);
+      toast.error(errorMessage);
     } finally {
       setSendingConfirmation(prev => ({ ...prev, [booking._id]: false }));
     }
@@ -325,7 +287,7 @@ export default function Bookings() {
         <button
           onClick={loadBookings}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-black rounded-lg font-semibold transition disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           <span className="hidden sm:inline">Aktualisieren</span>
@@ -333,75 +295,92 @@ export default function Bookings() {
       </div>
 
       {/* Filters */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 sm:p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {/* Search */}
-          <div className="relative sm:col-span-2 md:col-span-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input
-              type="text"
-              placeholder="Suchen..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-            />
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+          <div className="flex items-center gap-3">
+            <Filter className="w-6 h-6 text-gray-400" />
+            <span className="font-semibold text-white">Filter</span>
           </div>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="relative sm:col-span-2 md:col-span-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Suchen..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 text-sm sm:text-base"
+              />
+            </div>
 
-          {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Alle Status</option>
-            <option value="pending">Ausstehend</option>
-            <option value="confirmed">Bestätigt</option>
-            <option value="completed">Abgeschlossen</option>
-            <option value="cancelled">Storniert</option>
-            <option value="no_show">Nicht erschienen</option>
-          </select>
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            >
+              <option value="all">Alle Status</option>
+              <option value="pending">Ausstehend</option>
+              <option value="confirmed">Bestätigt</option>
+              <option value="completed">Abgeschlossen</option>
+              <option value="cancelled">Storniert</option>
+              <option value="no_show">Nicht erschienen</option>
+            </select>
 
-          {/* Date Filter */}
-          <select
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Alle Termine</option>
-            <option value="today">Heute</option>
-            <option value="week">Diese Woche</option>
-            <option value="month">Dieser Monat</option>
-          </select>
+            {/* Date Filter */}
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            >
+              <option value="all">Alle Termine</option>
+              <option value="today">Heute</option>
+              <option value="week">Diese Woche</option>
+              <option value="month">Dieser Monat</option>
+            </select>
 
-          {/* Reset Filters */}
-          <button
-            onClick={() => {
-              setStatusFilter('all');
-              setDateFilter('all');
-              setSearchQuery('');
-            }}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition"
-          >
-            Filter zurücksetzen
-          </button>
+            {/* Reset Filters */}
+            <button
+              onClick={() => {
+                setStatusFilter('all');
+                setDateFilter('all');
+                setSearchQuery('');
+              }}
+              className="px-4 py-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 hover:border-cyan-500/30 text-white rounded-lg transition"
+            >
+              Filter zurücksetzen
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-6 h-6 text-gray-400" />
+            <span className="font-semibold text-white">Buchungen</span>
           </div>
-        ) : filteredBookings.length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-            <p className="text-zinc-400">Keine Buchungen gefunden</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <table className="w-full min-w-[800px]">
-              <thead className="bg-zinc-800/50">
+        </div>
+        <div className="p-6">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <RefreshCw className="w-8 h-8 text-cyan-500 animate-spin" />
+            </div>
+          ) : filteredBookings.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-zinc-800 border border-zinc-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-400">Keine Buchungen gefunden</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full min-w-[800px]">
+                <thead className="bg-zinc-800/50">
                 <tr>
                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
                     Kunde
@@ -525,10 +504,11 @@ export default function Bookings() {
                     </motion.tr>
                   ))}
                 </AnimatePresence>
-              </tbody>
-            </table>
-          </div>
-        )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Pagination */}

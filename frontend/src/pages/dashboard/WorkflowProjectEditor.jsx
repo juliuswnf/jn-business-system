@@ -198,22 +198,24 @@ export default function WorkflowProjectEditor() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Branche *
                 </label>
-                <select
-                  required
-                  value={formData.industry}
-                  onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Branche wählen...</option>
-                  {industries.map((industry) => (
-                    <option key={industry.id} value={industry.id}>
-                      {industry.icon} {industry.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+                  <select
+                    required
+                    value={formData.industry}
+                    onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                    className="w-full px-4 py-3 bg-zinc-950 border-0 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 rounded-lg"
+                  >
+                    <option value="">Branche wählen...</option>
+                    {industries.map((industry) => (
+                      <option key={industry.id} value={industry.id}>
+                        {industry.icon} {industry.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 

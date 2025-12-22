@@ -80,93 +80,110 @@ export default function Workflows() {
       {/* Active Workflows */}
       {activeWorkflows.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Aktive Workflows ({activeWorkflows.length})
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeWorkflows.map((workflow) => (
-              <motion.div
-                key={workflow._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-zinc-900 border-2 border-green-500 rounded-lg p-6"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-3xl">{workflow.icon}</span>
-                  <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                    Aktiv
-                  </span>
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  {workflow.displayName}
-                </h3>
-                <p className="text-sm text-zinc-400 mb-3">
-                  {workflow.description}
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {workflow.features.map((feature) => (
-                    <span
-                      key={feature}
-                      className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded"
-                    >
-                      {feature}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+              <div className="flex items-center gap-3">
+                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-semibold text-white">Aktive Workflows ({activeWorkflows.length})</span>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {activeWorkflows.map((workflow) => (
+                  <motion.div
+                    key={workflow._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-zinc-950 border-2 border-green-500/50 rounded-lg p-4"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-2xl">{workflow.icon}</span>
+                      <span className="bg-green-500/10 border border-green-500/30 text-green-500 text-xs px-3 py-1 rounded-full font-medium">
+                        Aktiv
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      {workflow.displayName}
+                    </h3>
+                    <p className="text-sm text-gray-400 mb-3">
+                      {workflow.description}
+                    </p>
+                    <div className="bg-zinc-900 rounded-lg p-3 space-y-1">
+                      {workflow.features.slice(0, 3).map((feature) => (
+                        <div key={feature} className="flex items-center gap-2 text-gray-300 text-xs">
+                          <svg className="w-3 h-3 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Available Workflows */}
       <div>
-        <h2 className="text-xl font-semibold text-white mb-4">
-          Verfügbare Workflows
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {industries
-            .filter(industry => !isWorkflowActive(industry.id))
-            .map((industry) => (
-              <motion.div
-                key={industry.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ scale: 1.02 }}
-                className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-zinc-700 transition-shadow"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-4xl">{industry.icon}</span>
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  {industry.name}
-                </h3>
-                <p className="text-sm text-zinc-400 mb-4">
-                  {industry.description}
-                </p>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span className="font-semibold text-white">Verfügbare Workflows</span>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {industries
+                .filter(industry => !isWorkflowActive(industry.id))
+                .map((industry) => (
+                  <motion.div
+                    key={industry.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 hover:border-cyan-500/30 transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-zinc-900 border border-zinc-800 rounded flex items-center justify-center">
+                        <span className="text-2xl">{industry.icon}</span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-white">{industry.name}</h3>
+                        <p className="text-sm text-gray-400">{industry.description}</p>
+                      </div>
+                    </div>
 
-                <div className="mb-4">
-                  <p className="text-xs text-zinc-500 mb-2 font-medium">Features:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {industry.defaultFeatures.map((feature) => (
-                      <span
-                        key={feature}
-                        className="bg-zinc-800 text-zinc-300 text-xs px-2 py-1 rounded"
-                      >
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                    <div className="mb-4">
+                      <div className="bg-zinc-900 rounded-lg p-3 space-y-1">
+                        {industry.defaultFeatures.slice(0, 3).map((feature) => (
+                          <div key={feature} className="flex items-center gap-2 text-gray-300 text-xs">
+                            <svg className="w-3 h-3 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
 
-                <button
-                  onClick={() => handleEnableWorkflow(industry.id, industry.defaultFeatures)}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Aktivieren
-                </button>
-              </motion.div>
-            ))}
+                    <button
+                      onClick={() => handleEnableWorkflow(industry.id, industry.defaultFeatures)}
+                      className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-semibold py-2 px-4 rounded-lg transition"
+                    >
+                      Aktivieren
+                    </button>
+                  </motion.div>
+                ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

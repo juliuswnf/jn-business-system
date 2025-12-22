@@ -94,9 +94,18 @@ const memoryStoreAdapter = new MemoryStoreAdapter(15 * 60 * 1000, 10000);
 
 // ==================== RATE LIMITERS ====================
 
+// Determine rate limit based on environment and user authentication
+const getGeneralRateLimit = () => {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  // Much higher limits in development to prevent 429 errors during development
+  // React Strict Mode causes double renders, so we need very high limits
+  const baseLimit = parseInt(process.env.RATE_LIMIT_GENERAL || (isDevelopment ? '10000' : '100'));
+  return baseLimit;
+};
+
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_GENERAL || '100'),
+  max: getGeneralRateLimit(),
   message: {
     success: false,
     message: 'Zu viele Anfragen von dieser IP, bitte später versuchen'
@@ -104,10 +113,27 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: memoryStoreAdapter,
-  keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
-  skip: (req) => req.user && (req.user.role === 'admin' || req.user.role === 'ceo'),
+  keyGenerator: (req) => {
+    // Use user ID if authenticated, otherwise use IP
+    // This allows authenticated users to have higher limits
+    if (req.user?.id) {
+      return `user:${req.user.id}`;
+    }
+    return `ip:${req.ip || 'unknown'}`;
+  },
+  skip: (req) => {
+    // Skip for admin/CEO
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'ceo')) {
+      return true;
+    }
+    // In development, skip rate limiting for authenticated users to prevent issues with React Strict Mode
+    if (process.env.NODE_ENV === 'development' && req.user?.id) {
+      return true; // Skip rate limiting in development for authenticated users
+    }
+    return false;
+  },
   handler: (req, res) => {
-    logger.warn(`⚠️ Rate limit exceeded for ${req.ip}`);
+    logger.warn(`⚠️ Rate limit exceeded for ${req.user?.id || req.ip}`);
     res.status(429).json({
       success: false,
       message: 'Zu viele Anfragen, bitte später versuchen',
@@ -154,11 +180,21 @@ const strictLimiter = rateLimit({
 
 const apiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_API || '1000'),
+  max: parseInt(process.env.RATE_LIMIT_API || (process.env.NODE_ENV === 'development' ? '10000' : '1000')),
   message: { success: false, message: 'API Rate Limit überschritten' },
   store: memoryStoreAdapter,
   keyGenerator: (req) => req.user?.id || req.ip,
-  skip: (req) => req.user?.role === 'ceo'
+  skip: (req) => {
+    // Skip for CEO
+    if (req.user?.role === 'ceo') {
+      return true;
+    }
+    // Skip in development for authenticated users
+    if (process.env.NODE_ENV === 'development' && req.user?.id) {
+      return true;
+    }
+    return false;
+  }
 });
 
 const paymentLimiter = rateLimit({
