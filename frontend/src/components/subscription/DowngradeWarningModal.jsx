@@ -20,7 +20,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
       professional: [
         'SMS-Benachrichtigungen (500/Monat)',
         'Multi-Standort Support (5 Standorte → 1)',
-        'Unbegrenzte Mitarbeiter → 10',
+        'Unbegrenzte Mitarbeiter → 30',
         'Unbegrenzte Buchungen → 1.000/Monat',
         'White-Label Optionen',
         'REST API-Zugang',
@@ -32,7 +32,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
       starter: [
         'SMS-Benachrichtigungen (500/Monat)',
         'Multi-Standort Support (5 Standorte → 1)',
-        'Unbegrenzte Mitarbeiter → 3',
+        'Unbegrenzte Mitarbeiter → 5',
         'Unbegrenzte Buchungen → 200/Monat',
         'White-Label Optionen',
         'REST API-Zugang',
@@ -50,7 +50,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
     },
     professional: {
       starter: [
-        'Zusätzliche Mitarbeiter (10 → 3)',
+        'Zusätzliche Mitarbeiter (30 → 5)',
         'Mehr Buchungen (1.000 → 200/Monat)',
         'Mehr Kunden (2.500 → 500)',
         'Marketing-Automation',

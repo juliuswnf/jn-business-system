@@ -4,7 +4,7 @@ import {
   BuildingOfficeIcon, 
   BriefcaseIcon,
   ArrowRightIcon,
-  SparklesIcon
+  StarIcon
 } from '@heroicons/react/24/outline';
 
 function LoginSelection() {
@@ -62,7 +62,7 @@ function LoginSelection() {
           {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 mb-6">
-              <SparklesIcon className="w-8 h-8 text-white" />
+              <StarIcon className="w-8 h-8 text-white" />
               <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
                 Willkommen zurück
               </h1>
@@ -86,7 +86,7 @@ function LoginSelection() {
                   {option.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
                       <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-400 text-black text-xs font-bold rounded-full shadow-lg">
-                        <SparklesIcon className="w-3 h-3" />
+                        <StarIcon className="w-3 h-3" />
                         BELIEBT
                       </span>
                     </div>
