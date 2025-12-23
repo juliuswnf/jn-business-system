@@ -39,12 +39,11 @@ const CEOLogin = () => {
 
       // CEO Login response received
 
-      // SUCCESS - Login complete with token
-      if (data.success && data.token) {
-        localStorage.setItem('jnAuthToken', data.token);
-        localStorage.setItem('jnUser', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        // SUCCESS - Login complete with token
+        // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+        if (data.success && data.token) {
+          // Only store access token temporarily (short-lived, 15 minutes)
+          localStorage.setItem('token', data.token);
 
         notification.success(data.message || 'Zugang autorisiert');
 

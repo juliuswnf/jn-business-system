@@ -1,5 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { Shield, CheckCircle, AlertTriangle, XCircle, Upload, Download, Calendar, Users, FileText, Lock } from 'lucide-react';
+import { captureError } from '../../utils/errorTracking';
+import { api } from '../../utils/api';
 
 /**
  * BAA Management Dashboard
@@ -19,17 +21,12 @@ export default function BAAManagement() {
 
   const fetchBaas = async () => {
     try {
-      const response = await fetch('/api/compliance/baas', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setBaas(data.baas);
+      const response = await api.get('/compliance/baas');
+      if (response.data.success) {
+        setBaas(response.data.baas);
       }
     } catch (error) {
-      console.error('Failed to fetch BAAs:', error);
+      captureError(error, { context: 'fetchBAAs' });
     } finally {
       setLoading(false);
     }
@@ -37,17 +34,12 @@ export default function BAAManagement() {
 
   const fetchComplianceStatus = async () => {
     try {
-      const response = await fetch('/api/compliance/status', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setComplianceStatus(data.status);
+      const response = await api.get('/compliance/status');
+      if (response.data.success) {
+        setComplianceStatus(response.data.status);
       }
     } catch (error) {
-      console.error('Failed to fetch compliance status:', error);
+      captureError(error, { context: 'fetchComplianceStatus' });
     }
   };
 
@@ -75,42 +67,32 @@ export default function BAAManagement() {
     const formData = new FormData(e.target);
 
     try {
-      const response = await fetch('/api/compliance/baas', {
-        method: 'POST',
+      const response = await api.post('/compliance/baas', formData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         setShowUploadModal(false);
         fetchBaas();
         fetchComplianceStatus();
       }
     } catch (error) {
-      console.error('Failed to upload BAA:', error);
+      captureError(error, { context: 'uploadBAA' });
     }
   };
 
   const handleRenewBaa = async (baaId) => {
     try {
-      const response = await fetch(`/api/compliance/baas/${baaId}/renew`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.post(`/compliance/baas/${baaId}/renew`);
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         fetchBaas();
         fetchComplianceStatus();
       }
     } catch (error) {
-      console.error('Failed to renew BAA:', error);
+      captureError(error, { context: 'renewBAA' });
     }
   };
 

@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import logger from '../utils/logger.js';
 
 /**
@@ -7,14 +8,20 @@ import logger from '../utils/logger.js';
  */
 
 export const initSentry = (app) => {
-  if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+  // Enable Sentry in production OR if explicitly enabled in development
+  const sentryEnabled = (process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true') && process.env.SENTRY_DSN;
+  
+  if (sentryEnabled) {
     try {
       Sentry.init({
         dsn: process.env.SENTRY_DSN,
-        environment: process.env.NODE_ENV,
+        environment: process.env.NODE_ENV || 'development',
 
         // Performance Monitoring
-        tracesSampleRate: 0.1, // 10% of transactions
+        tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 100% in dev, 10% in prod
+
+        // Profiling
+        profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 100% in dev, 10% in prod
 
         // Session Tracking
         autoSessionTracking: true,
@@ -25,7 +32,8 @@ export const initSentry = (app) => {
           new Sentry.Integrations.Express({ app }),
           new Sentry.Integrations.Mongo({
             useMongoose: true
-          })
+          }),
+          nodeProfilingIntegration()
         ],
 
         // Don't send sensitive data
@@ -81,7 +89,8 @@ export const sentryErrorHandler = () => {
 
 // Manual error reporting
 export const captureException = (error, context = {}) => {
-  if (process.env.NODE_ENV === 'production') {
+  const sentryEnabled = (process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true') && process.env.SENTRY_DSN;
+  if (sentryEnabled) {
     Sentry.captureException(error, {
       extra: context
     });
@@ -89,4 +98,16 @@ export const captureException = (error, context = {}) => {
   logger.error('Exception captured:', error, context);
 };
 
-export default { initSentry, sentryErrorHandler, captureException };
+// Manual message reporting
+export const captureMessage = (message, level = 'info', context = {}) => {
+  const sentryEnabled = (process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true') && process.env.SENTRY_DSN;
+  if (sentryEnabled) {
+    Sentry.captureMessage(message, {
+      level,
+      extra: context
+    });
+  }
+  logger.info(`Sentry message [${level}]:`, message, context);
+};
+
+export default { initSentry, sentryErrorHandler, captureException, captureMessage };

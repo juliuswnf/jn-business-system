@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { authAPI, bookingAPI, employeeAPI } from '../../utils/api';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { authAPI, bookingAPI, employeeAPI, api } from '../../utils/api';
+import { getAccessToken } from '../../utils/tokenHelper';
+import { captureError } from '../../utils/errorTracking';
 
 export default function Dashboard() {
   const [employee, setEmployee] = useState(null);
@@ -15,10 +14,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   useEffect(() => {
     fetchData();
@@ -27,39 +24,25 @@ export default function Dashboard() {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    const token = getToken();
-
-    if (!token) {
-      setError('Nicht angemeldet');
-      setLoading(false);
-      return;
-    }
-
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+    // ? SECURITY FIX: Use central api instance
 
     try {
       // Fetch employee profile
-      const profileRes = await fetch(`${API_URL}/auth/profile`, { headers });
-      if (profileRes.ok) {
-        const profileData = await profileRes.json();
-        if (profileData.success) {
-          setEmployee({
-            name: profileData.user?.name || 'Mitarbeiter',
-            role: profileData.user?.role || 'employee',
-            email: profileData.user?.email || ''
-          });
-        }
+      const profileRes = await api.get('/auth/profile');
+      if (profileRes.data.success) {
+        const profileData = profileRes.data;
+        setEmployee({
+          name: profileData.user?.name || 'Mitarbeiter',
+          role: profileData.user?.role || 'employee',
+          email: profileData.user?.email || ''
+        });
       }
 
       // Fetch today's bookings for this employee
       const today = new Date().toISOString().split('T')[0];
-      const bookingsRes = await fetch(`${API_URL}/bookings?date=${today}&limit=20`, { headers });
-      if (bookingsRes.ok) {
-        const bookingsData = await bookingsRes.json();
-        if (bookingsData.success && bookingsData.bookings) {
+      const bookingsRes = await api.get(`/bookings?date=${today}&limit=20`);
+      if (bookingsRes.data.success && bookingsRes.data.bookings) {
+        const bookingsData = bookingsRes.data;
           const formattedBookings = bookingsData.bookings.map(b => ({
             id: b._id,
             customer: b.customerName || b.customerEmail || 'Kunde',
@@ -75,9 +58,10 @@ export default function Dashboard() {
 
       // Try to fetch employee stats if available
       try {
-        const statsRes = await fetch(`${API_URL}/employees/my-stats`, { headers });
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
+        // ? SECURITY FIX: Use central api instance
+        const statsRes = await api.get('/employees/my-stats');
+        if (statsRes.data) {
+          const statsData = statsRes.data;
           if (statsData.success) {
             setStats(prev => ({
               ...prev,
@@ -88,11 +72,11 @@ export default function Dashboard() {
         }
       } catch {
         // Stats endpoint may not exist yet - that's okay
-        console.log('Employee stats not available');
+        // Employee stats not available - not an error
       }
 
     } catch (err) {
-      console.error('Error fetching employee data:', err);
+      captureError(err, { context: 'fetchEmployeeData' });
       setError('Fehler beim Laden der Daten');
     } finally {
       setLoading(false);

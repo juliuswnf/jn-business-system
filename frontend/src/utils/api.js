@@ -7,11 +7,15 @@ export const api = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: true // ? SECURITY FIX: Send cookies with all requests
 });
 
 api.interceptors.request.use(
   (config) => {
+    // ? SECURITY FIX: Tokens are now in HTTP-only cookies, but we still need to send access token in header
+    // Access token is short-lived and sent in response body, we'll get it from there
+    // For now, try to get from localStorage as fallback (will be removed after full migration)
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -47,27 +51,21 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('jnAuthToken');
-          localStorage.removeItem('jnUser');
-          window.location.href = '/login';
-          return Promise.reject(error);
-        }
-
-        const response = await axios.post(`${API_URL}/auth/refresh-token`, {
-          refreshToken
+        // ? SECURITY FIX: Refresh token is now in HTTP-only cookie, no need to get from localStorage
+        const response = await axios.post(`${API_URL}/auth/refresh-token`, {}, {
+          withCredentials: true // Send cookies
         });
 
         if (response.data.success) {
-          const newToken = response.data.data.token;
+          const newToken = response.data.token;
+          // Store access token temporarily (short-lived, 15 minutes)
+          // This will be removed once we fully migrate to cookies
           localStorage.setItem('token', newToken);
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
+        // Clear all tokens on refresh failure
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('jnAuthToken');
@@ -89,7 +87,7 @@ export const authAPI = {
   employeeLogin: (email, password) => api.post('/auth/employee-login', { email, password }),
   logout: () => api.post('/auth/logout'),
   logoutFromAllDevices: () => api.post('/auth/logout-all'),
-  refreshToken: () => api.post('/auth/refresh-token', { refreshToken: localStorage.getItem('refreshToken') }),
+  refreshToken: () => api.post('/auth/refresh-token', {}, { withCredentials: true }), // ? SECURITY FIX: Token is in HTTP-only cookie
   validateToken: (token) => api.post('/auth/validate-token', { token }),
   getTokenInfo: () => api.get('/auth/token-info'),
   getProfile: () => api.get('/auth/profile'),
@@ -101,7 +99,7 @@ export const authAPI = {
   },
   deleteAvatar: () => api.delete('/auth/profile/avatar'),
   changePassword: (data) => api.post('/auth/change-password', data),
-  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  forgotPassword: (email, role) => api.post('/auth/forgot-password', { email, role }),
   resetPassword: (data) => api.post('/auth/reset-password', data),
   verifyPasswordResetToken: (token) => api.post('/auth/verify-reset-token', { token }),
   sendVerificationEmail: () => api.post('/auth/send-verification-email'),

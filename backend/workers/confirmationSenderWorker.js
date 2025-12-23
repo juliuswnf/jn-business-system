@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import Booking from '../models/Booking.js';
 import BookingConfirmation from '../models/BookingConfirmation.js';
 import { sendBookingConfirmation } from '../services/smsService.js';
+import logger from '../utils/logger.js';
 
 /**
  * Confirmation Sender Worker
@@ -15,12 +16,12 @@ let isRunning = false;
 
 async function processConfirmations() {
   if (isRunning) {
-    console.log('[ConfirmationSender] Already running, skipping...');
+    logger.info('[ConfirmationSender] Already running, skipping...');
     return;
   }
 
   isRunning = true;
-  console.log('[ConfirmationSender] Starting confirmation sender worker...');
+  logger.info('[ConfirmationSender] Starting confirmation sender worker...');
 
   try {
     // Find bookings 48-72h away (optimal time to send confirmation)
@@ -39,7 +40,7 @@ async function processConfirmations() {
       .populate('salon', 'businessName phone email')
       .populate('service', 'name duration price');
 
-    console.log(`[ConfirmationSender] Found ${bookings.length} bookings needing confirmation`);
+    logger.info(`[ConfirmationSender] Found ${bookings.length} bookings needing confirmation`);
 
     let created = 0;
     let skipped = 0;
@@ -76,24 +77,24 @@ async function processConfirmations() {
           confirmation.lastReminderSent = new Date();
           await confirmation.save();
 
-          console.log(`[ConfirmationSender] ✅ Sent confirmation for booking ${booking._id}`);
+          logger.info(`[ConfirmationSender] ✅ Sent confirmation for booking ${booking._id}`);
           created++;
         } catch (smsError) {
-          console.error(`[ConfirmationSender] ❌ Failed to send SMS for booking ${booking._id}:`, smsError.message);
+          logger.error(`[ConfirmationSender] ❌ Failed to send SMS for booking ${booking._id}:`, smsError.message);
           // Keep confirmation but mark as failed SMS attempt
           errors++;
         }
 
       } catch (error) {
-        console.error(`[ConfirmationSender] Error processing booking ${booking._id}:`, error);
+        logger.error(`[ConfirmationSender] Error processing booking ${booking._id}:`, error);
         errors++;
       }
     }
 
-    console.log(`[ConfirmationSender] Finished: ${created} sent, ${skipped} skipped, ${errors} errors`);
+    logger.info(`[ConfirmationSender] Finished: ${created} sent, ${skipped} skipped, ${errors} errors`);
 
   } catch (error) {
-    console.error('[ConfirmationSender] Fatal error:', error);
+    logger.error('[ConfirmationSender] Fatal error:', error);
   } finally {
     isRunning = false;
   }
@@ -103,7 +104,7 @@ async function processConfirmations() {
  * Start the confirmation sender worker
  */
 export function startConfirmationSender() {
-  console.log('[ConfirmationSender] Initializing confirmation sender worker (runs every 5 minutes)...');
+  logger.info('[ConfirmationSender] Initializing confirmation sender worker (runs every 5 minutes)...');
 
   // Run immediately on startup
   processConfirmations();
@@ -113,7 +114,7 @@ export function startConfirmationSender() {
     processConfirmations();
   });
 
-  console.log('[ConfirmationSender] Worker scheduled ✅');
+  logger.info('[ConfirmationSender] Worker scheduled ✅');
 }
 
 export default startConfirmationSender;

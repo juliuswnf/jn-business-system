@@ -46,8 +46,8 @@ export default function WorkflowProjectEditor() {
 
   const fetchCustomers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_URL}/api/customers`, {
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get('/customers', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) setCustomers(res.data.customers || res.data.data || []);
@@ -58,8 +58,8 @@ export default function WorkflowProjectEditor() {
 
   const fetchEmployees = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_URL}/api/employees`, {
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get('/employees', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) setEmployees(res.data.employees || res.data.data || []);
@@ -70,7 +70,8 @@ export default function WorkflowProjectEditor() {
 
   const fetchIndustries = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/workflows/industries`);
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get('/workflows/industries');
       if (res.data.success) setIndustries(res.data.data || []);
     } catch (error) {
       console.error('Error fetching industries:', error);
@@ -79,10 +80,8 @@ export default function WorkflowProjectEditor() {
 
   const fetchProject = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_URL}/api/workflows/projects/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get(`/workflows/projects/${id}`);
       if (res.data.success) {
         const project = res.data.data;
         setFormData({
@@ -109,24 +108,16 @@ export default function WorkflowProjectEditor() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const url = isEdit
-        ? `${API_URL}/api/workflows/projects/${id}`
-        : `${API_URL}/api/workflows/projects`;
-      const method = isEdit ? 'put' : 'post';
-
+      // ? SECURITY FIX: Use central api instance
       const payload = {
         ...formData,
         totalPrice: Math.round(formData.totalPrice * 100),
         metadata: formData.metadata
       };
 
-      const res = await axios[method](url, payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const res = isEdit
+        ? await api.put(`/workflows/projects/${id}`, payload)
+        : await api.post('/workflows/projects', payload);
 
       if (res.data.success) {
         toast.success(isEdit ? 'Projekt aktualisiert' : 'Projekt erstellt');

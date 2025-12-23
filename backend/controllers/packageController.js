@@ -2,6 +2,7 @@
 import CustomerPackage from '../models/CustomerPackage.js';
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
+import logger from '../utils/logger.js';
 
 /**
  * Package Controller
@@ -59,7 +60,7 @@ export const createPackage = async (req, res) => {
       package: pkg
     });
   } catch (error) {
-    console.error('Error creating package:', error);
+    logger.error('Error creating package:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -102,7 +103,7 @@ export const getAvailablePackages = async (req, res) => {
       packages: packagesWithCalculations
     });
   } catch (error) {
-    console.error('Error getting packages:', error);
+    logger.error('Error getting packages:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -157,7 +158,7 @@ export const purchasePackage = async (req, res) => {
       customerPackage
     });
   } catch (error) {
-    console.error('Error purchasing package:', error);
+    logger.error('Error purchasing package:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -186,7 +187,7 @@ export const getCustomerPackages = async (req, res) => {
       customerPackages
     });
   } catch (error) {
-    console.error('Error getting customer packages:', error);
+    logger.error('Error getting customer packages:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -220,7 +221,7 @@ export const usePackageSession = async (req, res) => {
       status: customerPackage.status
     });
   } catch (error) {
-    console.error('Error using package session:', error);
+    logger.error('Error using package session:', error);
     return res.status(400).json({
       success: false,
       message: error.message || 'Failed to use package session'
@@ -257,7 +258,7 @@ export const cancelPackage = async (req, res) => {
       status: customerPackage.status
     });
   } catch (error) {
-    console.error('Error cancelling package:', error);
+    logger.error('Error cancelling package:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -293,7 +294,7 @@ export const updatePackage = async (req, res) => {
       package: pkg
     });
   } catch (error) {
-    console.error('Error updating package:', error);
+    logger.error('Error updating package:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -325,7 +326,7 @@ export const deletePackage = async (req, res) => {
       message: 'Package deleted'
     });
   } catch (error) {
-    console.error('Error deleting package:', error);
+    logger.error('Error deleting package:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -381,7 +382,7 @@ export const getPackageStatistics = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting package statistics:', error);
+    logger.error('Error getting package statistics:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

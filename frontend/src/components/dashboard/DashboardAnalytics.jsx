@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { dashboardAPI, formatError } from '../../utils/api';
 import { LoadingSpinner } from '../common';
 import { StatsCard } from './index';
+import { captureError } from '../../utils/errorTracking';
 import './DashboardAnalytics.css';
 
 export default function DashboardAnalytics() {
@@ -32,7 +33,7 @@ export default function DashboardAnalytics() {
       setGrowthForecast(growthRes.data);
     } catch (err) {
       setError(formatError(err));
-      console.error('Error fetching analytics:', err);
+      captureError(err, { context: 'fetchAnalytics' });
     } finally {
       setLoading(false);
     }

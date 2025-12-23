@@ -28,19 +28,36 @@ const storage = multer.diskStorage({
   }
 });
 
+// Security: Strict file validation
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  limits: { 
+    fileSize: MAX_FILE_SIZE,
+    files: 1 // Only one file per request
+  },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed (jpeg, jpg, png, webp)'));
+    // Validate MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      return cb(new Error(`Invalid file type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`), false);
     }
+
+    // Validate file extension
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      return cb(new Error(`Invalid file extension. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`), false);
+    }
+
+    // Validate filename (prevent path traversal)
+    const filename = path.basename(file.originalname);
+    if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      return cb(new Error('Invalid filename'), false);
+    }
+
+    cb(null, true);
   }
 });
 

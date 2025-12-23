@@ -2,6 +2,7 @@ import { createClient } from 'redis';
 import SMSLog from '../models/SMSLog.js';
 import SMSConsent from '../models/SMSConsent.js';
 import SMSProviderFactory from './smsProviders/SMSProviderFactory.js';
+import logger from '../utils/logger.js';
 
 // Get SMS Provider lazily (only when needed)
 let smsProvider = null;
@@ -23,21 +24,21 @@ if (process.env.REDIS_URL) {
   redisClient = createClient({ url: process.env.REDIS_URL });
 
   redisClient.on('error', (err) => {
-    console.error('Redis connection error:', err);
+    logger.error('Redis connection error:', err);
     redisAvailable = false;
   });
 
   redisClient.on('connect', () => {
-    console.log('✅ Redis connected for SMS rate limiting');
+    logger.info('✅ Redis connected for SMS rate limiting');
     redisAvailable = true;
   });
 
   redisClient.connect().catch(_err => {
-    console.warn('⚠️ Redis not available, using in-memory rate limiting (not production-safe)');
+    logger.warn('⚠️ Redis not available, using in-memory rate limiting (not production-safe)');
     redisAvailable = false;
   });
 } else {
-  console.warn('⚠️ REDIS_URL not configured, using in-memory rate limiting (not production-safe)');
+  logger.warn('⚠️ REDIS_URL not configured, using in-memory rate limiting (not production-safe)');
 }
 
 // Rate Limiting Queue
@@ -88,13 +89,13 @@ async function checkRateLimit(salonId) {
       }
 
       if (count > RATE_LIMIT * 60) { // 10 SMS/sec * 60 sec = 600/min
-        console.warn(`⚠️ Rate limit exceeded for salon ${salonId}: ${count} SMS/min`);
+        logger.warn(`⚠️ Rate limit exceeded for salon ${salonId}: ${count} SMS/min`);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Redis rate limit check failed, falling back to in-memory:', error);
+      logger.error('Redis rate limit check failed, falling back to in-memory:', error);
       // Fall through to in-memory fallback
     }
   }
@@ -116,7 +117,7 @@ async function checkRateLimit(salonId) {
   limit.count++;
 
   if (limit.count > RATE_LIMIT * 60) {
-    console.warn(`⚠️ Rate limit exceeded for salon ${salonId} (in-memory): ${limit.count} SMS/min`);
+    logger.warn(`⚠️ Rate limit exceeded for salon ${salonId} (in-memory): ${limit.count} SMS/min`);
     return false;
   }
 
@@ -212,7 +213,7 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
     // Mark as sent with actual cost from provider
     await smsLog.markAsSent(result.messageId, result.cost);
 
-    console.log(`✅ SMS sent successfully via ${result.provider}:`, {
+    logger.info(`✅ SMS sent successfully via ${result.provider}:`, {
       messageId: result.messageId,
       phoneNumber,
       template,
@@ -228,7 +229,7 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
     };
 
   } catch (error) {
-    console.error(`❌ SMS failed:`, {
+    logger.error(`❌ SMS failed:`, {
       phoneNumber,
       template,
       error: error.message,
@@ -241,7 +242,7 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
     // Retry logic (max 3 attempts with exponential backoff)
     if (retryCount < 3) {
       const backoffDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-      console.log(`🔄 Retrying SMS in ${backoffDelay}ms (attempt ${retryCount + 1}/3)`);
+      logger.info(`🔄 Retrying SMS in ${backoffDelay}ms (attempt ${retryCount + 1}/3)`);
 
       await new Promise(resolve => setTimeout(resolve, backoffDelay));
 
@@ -441,7 +442,7 @@ export async function handleStopReply(phoneNumber, salonId) {
 
   if (consent) {
     await consent.handleStopReply();
-    console.log(`📵 Customer opted out: ${phoneNumber}`);
+    logger.info(`📵 Customer opted out: ${phoneNumber}`);
   }
 }
 

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../components/common/UserMenu';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../utils/api';
+import { getAccessToken } from '../utils/tokenHelper';
+import { captureError } from '../utils/errorTracking';
 
 // Icons als SVG Components
 const DashboardIcon = () => (
@@ -85,9 +85,9 @@ const CEODashboard = () => {
   // Subscriptions State
   const [subscriptions, setSubscriptions] = useState([]);
 
-  // Get auth token
+  // Get auth token (using token helper)
   const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
+    return getAccessToken();
   };
 
   // Fetch all data
@@ -103,50 +103,34 @@ const CEODashboard = () => {
         return;
       }
 
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-
+      // ? SECURITY FIX: Use central api instance
       try {
         // Fetch stats
-        const statsRes = await fetch(`${API_URL}/ceo/stats`, { headers });
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          if (statsData.success) {
-            setStats(statsData.stats);
-          }
+        const statsRes = await api.get('/ceo/stats');
+        if (statsRes.data.success) {
+          setStats(statsRes.data.stats);
         }
 
         // Fetch errors
-        const errorsRes = await fetch(`${API_URL}/ceo/errors?limit=50`, { headers });
-        if (errorsRes.ok) {
-          const errorsData = await errorsRes.json();
-          if (errorsData.success) {
-            setErrors(errorsData.errors || []);
-          }
+        const errorsRes = await api.get('/ceo/errors?limit=50');
+        if (errorsRes.data.success) {
+          setErrors(errorsRes.data.errors || []);
         }
 
         // Fetch customers
-        const customersRes = await fetch(`${API_URL}/ceo/customers?limit=100`, { headers });
-        if (customersRes.ok) {
-          const customersData = await customersRes.json();
-          if (customersData.success) {
-            setCustomers(customersData.customers || []);
-          }
+        const customersRes = await api.get('/ceo/customers?limit=100');
+        if (customersRes.data.success) {
+          setCustomers(customersRes.data.customers || []);
         }
 
         // Fetch subscriptions
-        const subsRes = await fetch(`${API_URL}/ceo/ceo-subscriptions?limit=100`, { headers });
-        if (subsRes.ok) {
-          const subsData = await subsRes.json();
-          if (subsData.success) {
-            setSubscriptions(subsData.subscriptions || []);
-          }
+        const subsRes = await api.get('/ceo/ceo-subscriptions?limit=100');
+        if (subsRes.data.success) {
+          setSubscriptions(subsRes.data.subscriptions || []);
         }
 
       } catch (err) {
-        console.error('Error fetching CEO data:', err);
+        captureError(err, { context: 'fetchCEODashboard' });
         setError('Fehler beim Laden der Daten');
       } finally {
         setLoading(false);
@@ -158,24 +142,15 @@ const CEODashboard = () => {
 
   // Mark error as resolved
   const markErrorAsResolved = async (errorId) => {
-    const token = getToken();
-    if (!token) return;
-
+    // ? SECURITY FIX: Use central api instance
     try {
-      const response = await fetch(`${API_URL}/ceo/errors/${errorId}/resolve`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ notes: 'Vom CEO Dashboard als gelöst markiert' })
-      });
+      const response = await api.patch(`/ceo/errors/${errorId}/resolve`, { notes: 'Vom CEO Dashboard als gelöst markiert' });
 
-      if (response.ok) {
+      if (response.data.success) {
         setErrors(errors.map(e => e.id === errorId ? { ...e, resolved: true, resolvedAt: new Date().toISOString() } : e));
       }
     } catch (err) {
-      console.error('Error resolving error:', err);
+      captureError(err, { context: 'resolveError' });
     }
   };
 
@@ -1448,29 +1423,25 @@ const SystemControlTab = () => {
   const [allStarting, setAllStarting] = useState(false);
   const [allStopping, setAllStopping] = useState(false);
 
-  // Get auth token
+  // Get auth token (using token helper)
   const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
+    return getAccessToken();
   };
 
   // Check service status
   const checkServiceStatus = async (serviceId) => {
-    const token = getToken();
-    if (!token) return;
-
+    // ? SECURITY FIX: Use central api instance
     try {
-      const response = await fetch(`${API_URL}/ceo/system/status/${serviceId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await api.get(`/ceo/system/status/${serviceId}`);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.data) {
+        const data = response.data;
         setServices(prev => prev.map(s =>
           s.id === serviceId ? { ...s, status: data.status } : s
         ));
       }
     } catch (err) {
-      console.error(`Error checking ${serviceId} status:`, err);
+      captureError(err, { context: 'checkServiceStatus', serviceId });
     }
   };
 
@@ -1505,17 +1476,11 @@ const SystemControlTab = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ceo/system/start/${serviceId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.post(`/ceo/system/start/${serviceId}`);
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         addLog(`[OK] ${serviceId} erfolgreich gestartet`, 'success');
         setServices(prev => prev.map(s =>
           s.id === serviceId ? { ...s, status: 'running' } : s
@@ -1543,17 +1508,11 @@ const SystemControlTab = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ceo/system/stop/${serviceId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.post(`/ceo/system/stop/${serviceId}`);
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         addLog(`[OK] ${serviceId} gestoppt`, 'success');
         setServices(prev => prev.map(s =>
           s.id === serviceId ? { ...s, status: 'stopped' } : s
@@ -1581,17 +1540,11 @@ const SystemControlTab = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ceo/system/start-all`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.post('/ceo/system/start-all');
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         addLog('[OK] Alle Services werden gestartet...', 'success');
         // Update all service statuses
         data.results?.forEach(result => {
@@ -1629,17 +1582,11 @@ const SystemControlTab = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ceo/system/stop-all`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.post('/ceo/system/stop-all');
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         addLog('[OK] Alle Services werden gestoppt...', 'success');
         setServices(prev => prev.map(s => ({ ...s, status: 'stopped' })));
       } else {

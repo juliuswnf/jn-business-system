@@ -95,16 +95,44 @@ const getErrorMessage = (errorCode) => {
 // ==================== ERROR RESPONSE FORMATTER ====================
 
 const formatErrorResponse = (error, statusCode = 500) => {
-  return {
+  // Sanitize error message to prevent information leakage
+  let safeMessage = 'Ein Fehler ist aufgetreten';
+  
+  // Only expose specific error messages in development
+  if (process.env.NODE_ENV === 'development') {
+    safeMessage = error.message || safeMessage;
+  } else {
+    // In production, only expose safe error messages
+    if (error.message && !error.message.includes('password') && 
+        !error.message.includes('token') && 
+        !error.message.includes('secret') &&
+        !error.message.includes('key') &&
+        !error.message.includes('api') &&
+        error.message.length < 200) {
+      safeMessage = error.message;
+    }
+  }
+
+  const response = {
     success: false,
     statusCode,
-    message: error.message || 'Ein Fehler ist aufgetreten',
-    timestamp: new Date().toISOString(),
-    ...(process.env.NODE_ENV === 'development' && {
-      stack: error.stack,
-      details: error
-    })
+    message: safeMessage,
+    timestamp: new Date().toISOString()
   };
+
+  // Only include stack trace in development
+  if (process.env.NODE_ENV === 'development') {
+    response.stack = error.stack;
+    // Remove sensitive data from error details
+    const safeDetails = { ...error };
+    delete safeDetails.password;
+    delete safeDetails.token;
+    delete safeDetails.secret;
+    delete safeDetails.apiKey;
+    response.details = safeDetails;
+  }
+
+  return response;
 };
 
 // ==================== SEND ERROR RESPONSE ====================

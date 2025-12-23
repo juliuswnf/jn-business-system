@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import { Package, Gem, Clock } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 export default function PackagesMemberships() {
   const [activeTab, setActiveTab] = useState('packages'); // 'packages' | 'memberships'
@@ -18,22 +16,23 @@ export default function PackagesMemberships() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const salonId = JSON.parse(atob(token.split('.')[1])).salonId;
-      const headers = { Authorization: `Bearer ${token}` };
+      // ? SECURITY FIX: Use central api instance (already imported)
+      // Get salonId from user profile instead of decoding token
+      const profileRes = await api.get('/auth/profile');
+      const salonId = profileRes.data.user?.salonId;
+      
+      if (!salonId) {
+        toast.error('Kein Salon zugeordnet');
+        setLoading(false);
+        return;
+      }
 
       // Fetch packages
-      const packagesRes = await axios.get(
-        `${API_URL}/api/workflows/packages/${salonId}`,
-        { headers }
-      );
+      const packagesRes = await api.get(`/workflows/packages/${salonId}`);
       setPackages(packagesRes.data.data);
 
       // Fetch memberships
-      const membershipsRes = await axios.get(
-        `${API_URL}/api/workflows/memberships/${salonId}`,
-        { headers }
-      );
+      const membershipsRes = await api.get(`/workflows/memberships/${salonId}`);
       setMemberships(membershipsRes.data.data);
 
       setLoading(false);
@@ -48,12 +47,8 @@ export default function PackagesMemberships() {
     if (!confirm('Membership wirklich kündigen?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        `${API_URL}/api/workflows/memberships/${id}/cancel`,
-        { reason },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      // ? SECURITY FIX: Use central api instance (already imported)
+      await api.put(`/workflows/memberships/${id}/cancel`, { reason });
       toast.success('Membership gekündigt');
       fetchData();
     } catch (error) {

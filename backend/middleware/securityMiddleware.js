@@ -168,10 +168,85 @@ export const xssProtection = (req, res, next) => {
   next();
 };
 
-export const csrfProtection = (req, res, next) => {
-  res.locals.csrfToken = crypto.randomBytes(16).toString('hex');
+import crypto from 'crypto';
+
+// CSRF Token storage (in production, use Redis or database)
+const csrfTokens = new Map();
+const CSRF_TOKEN_EXPIRY = 60 * 60 * 1000; // 1 hour
+
+// Cleanup expired tokens
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, expiry] of csrfTokens.entries()) {
+    if (now > expiry) {
+      csrfTokens.delete(token);
+    }
+  }
+}, 5 * 60 * 1000); // Cleanup every 5 minutes
+
+export const generateCSRFToken = (req, res, next) => {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiry = Date.now() + CSRF_TOKEN_EXPIRY;
+  csrfTokens.set(token, expiry);
+  res.locals.csrfToken = token;
+  res.cookie('XSRF-TOKEN', token, {
+    httpOnly: false, // Must be readable by JavaScript
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: CSRF_TOKEN_EXPIRY
+  });
   next();
 };
+
+export const validateCSRFToken = (req, res, next) => {
+  // Skip CSRF validation for GET, HEAD, OPTIONS requests
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return next();
+  }
+
+  // Skip for webhook endpoints (they use signature validation)
+  if (req.path.includes('/webhooks/')) {
+    return next();
+  }
+
+  // Get token from header or cookie
+  const token = req.headers['x-csrf-token'] || req.headers['x-xsrf-token'] || req.body._csrf;
+  const cookieToken = req.cookies?.['XSRF-TOKEN'];
+
+  if (!token || !cookieToken) {
+    return res.status(403).json({
+      success: false,
+      message: 'CSRF token missing'
+    });
+  }
+
+  // Validate tokens match
+  if (token !== cookieToken) {
+    return res.status(403).json({
+      success: false,
+      message: 'Invalid CSRF token'
+    });
+  }
+
+  // Check if token exists and is not expired
+  if (!csrfTokens.has(token) || csrfTokens.get(token) < Date.now()) {
+    return res.status(403).json({
+      success: false,
+      message: 'CSRF token expired'
+    });
+  }
+
+  // Remove token after use (one-time use for sensitive operations)
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method) && 
+      (req.path.includes('/auth/') || req.path.includes('/payment/'))) {
+    csrfTokens.delete(token);
+  }
+
+  next();
+};
+
+// Legacy export for backwards compatibility
+export const csrfProtection = generateCSRFToken;
 
 export const sqlInjectionPrevention = (req, res, next) => {
   // Wird durch MongoDB handled (nicht SQL)

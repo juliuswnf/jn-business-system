@@ -4,6 +4,22 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  
+  // Support CommonJS modules
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@context': path.resolve(__dirname, './src/context'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@assets': path.resolve(__dirname, './src/assets'),
+      '@styles': path.resolve(__dirname, './src/styles'),
+    },
+    // Support both ESM and CommonJS
+    extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
+  },
 
   server: {
     port: 5173,
@@ -76,22 +92,22 @@ export default defineConfig({
 
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'axios'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'axios',
+      'hoist-non-react-statics',
+    ],
     exclude: ['@sentry/react'], // Lazy loaded
-  },
-
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@pages': path.resolve(__dirname, './src/pages'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@context': path.resolve(__dirname, './src/context'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@assets': path.resolve(__dirname, './src/assets'),
-      '@styles': path.resolve(__dirname, './src/styles'),
+    esbuildOptions: {
+      // Support CommonJS modules
+      define: {
+        global: 'globalThis',
+      },
     },
   },
+
 
   css: {
     postcss: './postcss.config.js',
@@ -99,5 +115,7 @@ export default defineConfig({
 
   define: {
     __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
+    'process.env': {},
+    global: 'globalThis',
   },
 });

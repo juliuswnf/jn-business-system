@@ -4,6 +4,7 @@ import Booking from '../models/Booking.js';
 import SlotSuggestion from '../models/SlotSuggestion.js';
 import Waitlist from '../models/Waitlist.js';
 import { sendWaitlistOffer } from '../services/smsService.js';
+import logger from '../utils/logger.js';
 
 /**
  * Auto-Cancel Worker
@@ -17,18 +18,18 @@ let isRunning = false;
 
 async function processAutoCancellations() {
   if (isRunning) {
-    console.log('[AutoCancel] Already running, skipping...');
+    logger.info('[AutoCancel] Already running, skipping...');
     return;
   }
 
   isRunning = true;
-  console.log('[AutoCancel] Starting auto-cancel worker...');
+  logger.info('[AutoCancel] Starting auto-cancel worker...');
 
   try {
     // Find confirmations ready for auto-cancel
     const confirmations = await BookingConfirmation.findReadyForAutoCancel();
 
-    console.log(`[AutoCancel] Found ${confirmations.length} bookings to auto-cancel`);
+    logger.info(`[AutoCancel] Found ${confirmations.length} bookings to auto-cancel`);
 
     let cancelled = 0;
     let waitlistOffered = 0;
@@ -42,7 +43,7 @@ async function processAutoCancellations() {
           .populate('service', 'name duration price');
 
         if (!booking) {
-          console.warn(`[AutoCancel] Booking ${confirmation.bookingId} not found`);
+          logger.warn(`[AutoCancel] Booking ${confirmation.bookingId} not found`);
           continue;
         }
 
@@ -55,7 +56,7 @@ async function processAutoCancellations() {
         // Mark confirmation as auto-cancelled
         await confirmation.markAutoCancelled();
 
-        console.log(`[AutoCancel] ✅ Auto-cancelled booking ${booking._id} (no confirmation)`);
+        logger.info(`[AutoCancel] ✅ Auto-cancelled booking ${booking._id} (no confirmation)`);
         cancelled++;
 
         // Try to fill slot from waitlist
@@ -71,7 +72,7 @@ async function processAutoCancellations() {
             .limit(5); // Top 5 candidates
 
           if (waitlist.length > 0) {
-            console.log(`[AutoCancel] Found ${waitlist.length} waitlist candidates for freed slot`);
+            logger.info(`[AutoCancel] Found ${waitlist.length} waitlist candidates for freed slot`);
 
             // Offer slot to highest priority customer
             const topCandidate = waitlist[0];
@@ -99,27 +100,27 @@ async function processAutoCancellations() {
             // Send SMS offer
             try {
               await sendWaitlistOffer(topCandidate, suggestion);
-              console.log(`[AutoCancel] 📱 Sent waitlist offer to customer ${topCandidate.customerId._id}`);
+              logger.info(`[AutoCancel] 📱 Sent waitlist offer to customer ${topCandidate.customerId._id}`);
               waitlistOffered++;
             } catch (smsError) {
-              console.error(`[AutoCancel] Failed to send waitlist SMS:`, smsError.message);
+              logger.error(`[AutoCancel] Failed to send waitlist SMS:`, smsError.message);
             }
           }
 
         } catch (waitlistError) {
-          console.error(`[AutoCancel] Error processing waitlist for cancelled booking:`, waitlistError);
+          logger.error(`[AutoCancel] Error processing waitlist for cancelled booking:`, waitlistError);
         }
 
       } catch (error) {
-        console.error(`[AutoCancel] Error processing confirmation ${confirmation._id}:`, error);
+        logger.error(`[AutoCancel] Error processing confirmation ${confirmation._id}:`, error);
         errors++;
       }
     }
 
-    console.log(`[AutoCancel] Finished: ${cancelled} cancelled, ${waitlistOffered} waitlist offers sent, ${errors} errors`);
+    logger.info(`[AutoCancel] Finished: ${cancelled} cancelled, ${waitlistOffered} waitlist offers sent, ${errors} errors`);
 
   } catch (error) {
-    console.error('[AutoCancel] Fatal error:', error);
+    logger.error('[AutoCancel] Fatal error:', error);
   } finally {
     isRunning = false;
   }
@@ -129,7 +130,7 @@ async function processAutoCancellations() {
  * Start the auto-cancel worker
  */
 export function startAutoCancelWorker() {
-  console.log('[AutoCancel] Initializing auto-cancel worker (runs every 15 minutes)...');
+  logger.info('[AutoCancel] Initializing auto-cancel worker (runs every 15 minutes)...');
 
   // Run immediately on startup
   processAutoCancellations();
@@ -139,7 +140,7 @@ export function startAutoCancelWorker() {
     processAutoCancellations();
   });
 
-  console.log('[AutoCancel] Worker scheduled ✅');
+  logger.info('[AutoCancel] Worker scheduled ✅');
 }
 
 export default startAutoCancelWorker;

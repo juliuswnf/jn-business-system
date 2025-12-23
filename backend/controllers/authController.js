@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import RefreshToken from '../models/RefreshToken.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import logger from '../utils/logger.js';
@@ -19,6 +20,33 @@ const generateToken = (id, expiresIn = process.env.JWT_EXPIRE || '7d') => {
     throw new Error('JWT_SECRET not configured');
   }
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
+};
+
+/**
+ * Generate secure refresh token
+ */
+const generateRefreshToken = () => {
+  return crypto.randomBytes(64).toString('hex');
+};
+
+/**
+ * Create refresh token in database
+ */
+const createRefreshToken = async (userId, deviceInfo = {}) => {
+  const token = generateRefreshToken();
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  const refreshToken = await RefreshToken.create({
+    userId,
+    token,
+    expiresAt,
+    deviceInfo: {
+      userAgent: deviceInfo.userAgent || 'unknown',
+      ipAddress: deviceInfo.ipAddress || 'unknown'
+    }
+  });
+
+  return token;
 };
 
 // ==================== REGISTER ====================
@@ -161,14 +189,31 @@ export const register = async (req, res) => {
       }
     }
 
-    // Generate token
-    const token = generateToken(user._id);
+    // Generate access token (short-lived: 15 minutes)
+    const accessToken = generateToken(user._id, '15m');
+    
+    // Generate and store refresh token
+    const refreshToken = await createRefreshToken(user._id, {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection.remoteAddress
+    });
 
-    logger.info(`User registered: ${user.email} (${user.role})`);
+    logger.info(`✅ User registered: ${user.email} (${user.role})`);
+
+    // Set secure HTTP-only cookie for refresh token
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/api/auth'
+    });
 
     res.status(201).json({
       success: true,
-      token,
+      token: accessToken,
+      refreshToken, // Also send in response for mobile apps
+      expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON(),
       salon: salon ? {
         id: salon._id,
@@ -235,14 +280,31 @@ export const login = async (req, res) => {
     // Reset login attempts and update last login
     await user.resetLoginAttempts();
 
-    // Generate token
-    const token = generateToken(user._id);
+    // Generate access token (short-lived: 15 minutes)
+    const accessToken = generateToken(user._id, '15m');
+    
+    // Generate and store refresh token
+    const refreshToken = await createRefreshToken(user._id, {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection.remoteAddress
+    });
 
     logger.info(`? User logged in: ${user.email} (${user.role})`);
 
+    // Set secure HTTP-only cookie for refresh token
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/api/auth'
+    });
+
     res.status(200).json({
       success: true,
-      token,
+      token: accessToken,
+      refreshToken, // Also send in response for mobile apps
+      expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });
   } catch (error) {
@@ -516,14 +578,31 @@ export const ceoLogin = async (req, res) => {
     ceoLoginAttempts.delete(clientIP);
     await user.resetLoginAttempts();
 
-    // Generate token (CEO gets longer session)
-    const token = generateToken(user._id, '30d');
+    // Generate access token (CEO gets longer session: 1 day)
+    const accessToken = generateToken(user._id, '1d');
+    
+    // Generate and store refresh token
+    const refreshToken = await createRefreshToken(user._id, {
+      userAgent: req.headers['user-agent'],
+      ipAddress: clientIP
+    });
 
-    logger.info(`[CEO-SECURITY] ? SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
+    logger.info(`[CEO-SECURITY] ✅ SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
+
+    // Set secure HTTP-only cookie for refresh token
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/api/auth'
+    });
 
     res.status(200).json({
       success: true,
-      token,
+      token: accessToken,
+      refreshToken, // Also send in response for mobile apps
+      expiresIn: 24 * 60 * 60, // 1 day in seconds
       user: user.toJSON(),
       message: 'Willkommen im CEO Bereich'
     });
@@ -550,8 +629,8 @@ export const employeeLogin = async (req, res) => {
       });
     }
 
-    // Find user with password field
-    const user = await User.findOne({ email }).maxTimeMS(5000).select('+password');
+    // Find user with password field - ensure email is string to prevent NoSQL injection
+    const user = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000).select('+password');
 
     if (!user) {
       logger.warn(`?? Employee login attempt with non-existent email: ${email}`);
@@ -602,14 +681,31 @@ export const employeeLogin = async (req, res) => {
     // Reset login attempts and update last login
     await user.resetLoginAttempts();
 
-    // Generate token
-    const token = generateToken(user._id);
+    // Generate access token (short-lived: 15 minutes)
+    const accessToken = generateToken(user._id, '15m');
+    
+    // Generate and store refresh token
+    const refreshToken = await createRefreshToken(user._id, {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection.remoteAddress
+    });
 
-    logger.info(`? Employee logged in: ${user.email} (${user.role})`);
+    logger.info(`✅ Employee logged in: ${user.email} (${user.role})`);
+
+    // Set secure HTTP-only cookie for refresh token
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/api/auth'
+    });
 
     res.status(200).json({
       success: true,
-      token,
+      token: accessToken,
+      refreshToken, // Also send in response for mobile apps
+      expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });
   } catch (error) {
@@ -721,8 +817,12 @@ export const changePassword = async (req, res) => {
       });
     }
 
-    // Validate passwords match
-    if (newPassword !== confirmPassword) {
+    // Validate passwords match (timing-safe comparison)
+    const { timingSafeEqual } = await import('../utils/securityHelpers.js');
+    const passwordMatch = Buffer.from(newPassword).length === Buffer.from(confirmPassword).length &&
+      timingSafeEqual(newPassword, confirmPassword);
+    
+    if (!passwordMatch) {
       return res.status(400).json({
         success: false,
         message: 'Passwords do not match'
@@ -780,58 +880,216 @@ export const changePassword = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    logger.info(`? User logged out: ${req.user.id}`);
+    const userId = req.user?.id;
+    
+    // Revoke refresh token from cookie
+    const refreshTokenValue = req.cookies?.refreshToken;
+    if (refreshTokenValue) {
+      const storedToken = await RefreshToken.findByToken(refreshTokenValue).maxTimeMS(5000);
+      if (storedToken) {
+        await storedToken.revoke();
+        logger.info(`🔒 Refresh token revoked for logout: ${userId}`);
+      }
+    }
+
+    // Also revoke token from body if provided
+    const tokenFromBody = req.body?.refreshToken;
+    if (tokenFromBody) {
+      const storedToken = await RefreshToken.findByToken(tokenFromBody).maxTimeMS(5000);
+      if (storedToken) {
+        await storedToken.revoke();
+      }
+    }
+
+    // Clear refresh token cookie
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/api/auth'
+    });
+
+    logger.info(`🚪 User logged out: ${userId}`);
 
     res.status(200).json({
       success: true,
-      message: 'Successfully logged out'
+      message: 'Erfolgreich abgemeldet'
     });
   } catch (error) {
-    logger.error('? Logout Error:', error);
+    logger.error('❌ Logout Error:', error);
+    // Still clear cookie even on error
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/api/auth'
+    });
     res.status(500).json({
       success: false,
-      message: 'Error logging out'
+      message: 'Logout fehlgeschlagen'
     });
   }
 };
 
 // ==================== FORGOT PASSWORD ====================
 
+// Known spam/temp email domains (add more as needed)
+const BLOCKED_EMAIL_DOMAINS = [
+  '10minutemail.com', 'guerrillamail.com', 'mailinator.com', 'tempmail.com',
+  'throwaway.email', 'temp-mail.org', 'getnada.com', 'mohmal.com'
+];
+
 export const forgotPassword = async (req, res) => {
+  const startTime = Date.now(); // For timing attack protection
   try {
-    const { email } = req.body;
+    const { email, role } = req.body;
+    const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
 
     // Validate input
     if (!email) {
+      // Constant delay for timing attack protection
+      const delay = Math.max(0, 500 - (Date.now() - startTime));
+      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
       return res.status(400).json({
         success: false,
         message: 'Email required'
       });
     }
 
-    // Find user
-    const user = await User.findOne({ email }).maxTimeMS(5000);
-    if (!user) {
-      // Don't reveal if email exists (security best practice)
-      logger.warn(`?? Password reset requested for non-existent email: ${email}`);
+    // Find user - normalize email (schema already has lowercase: true, but be safe)
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // Validate email format before database query
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      logger.warn(`?? Invalid email format provided: ${email} from IP: ${clientIp}`);
+      // Constant delay
+      const delay = Math.max(0, 500 - (Date.now() - startTime));
+      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
       return res.status(200).json({
         success: true,
         message: 'If this email is registered, a reset link will be sent'
       });
     }
 
-    // Generate reset token
-    const resetToken = user.getPasswordResetToken();
+    // Check for blocked email domains
+    const emailDomain = normalizedEmail.split('@')[1];
+    if (BLOCKED_EMAIL_DOMAINS.includes(emailDomain)) {
+      logger.warn(`🚫 Blocked email domain attempted: ${emailDomain} from IP: ${clientIp}`);
+      // Constant delay
+      const delay = Math.max(0, 500 - (Date.now() - startTime));
+      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+      return res.status(200).json({
+        success: true,
+        message: 'If this email is registered, a reset link will be sent'
+      });
+    }
+    
+    // Find user - schema already enforces lowercase, so direct match should work
+    const user = await User.findOne({ 
+      email: normalizedEmail,
+      isActive: true 
+    }).maxTimeMS(5000);
+    
+    // Constant delay regardless of whether user exists (timing attack protection)
+    const processingTime = Date.now() - startTime;
+    const delay = Math.max(0, 500 - processingTime);
+    if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+    
+    if (!user) {
+      // Don't reveal if email exists (security best practice)
+      logger.warn(`?? Password reset requested for non-existent or inactive email: ${normalizedEmail} from IP: ${clientIp}`);
+      return res.status(200).json({
+        success: true,
+        message: 'If this email is registered, a reset link will be sent'
+      });
+    }
+
+    // Check if account is locked due to too many reset attempts
+    if (user.passwordResetLockUntil && user.passwordResetLockUntil > Date.now()) {
+      const minutesLeft = Math.ceil((user.passwordResetLockUntil - Date.now()) / (1000 * 60));
+      logger.warn(`🔒 Password reset blocked - account locked: ${normalizedEmail} from IP: ${clientIp}. Lock expires in ${minutesLeft} minutes.`);
+      return res.status(200).json({
+        success: true,
+        message: 'If this email is registered, a reset link will be sent'
+      });
+    }
+
+    // Validate role match if role is provided
+    if (role) {
+      const expectedRoles = role === 'business' 
+        ? ['salon_owner', 'employee', 'ceo'] 
+        : role === 'customer' 
+        ? ['customer'] 
+        : null;
+
+      if (expectedRoles && !expectedRoles.includes(user.role)) {
+        // Don't reveal if email exists (security best practice)
+        logger.warn(`?? Password reset requested for email ${normalizedEmail} with wrong role. Expected: ${role}, Found: ${user.role}`);
+        return res.status(200).json({
+          success: true,
+          message: 'If this email is registered, a reset link will be sent'
+        });
+      }
+    }
+
+    // Double-check: Only proceed if user exists and is valid
+    if (!user || !user._id) {
+      logger.error(`?? Critical: User object invalid after validation for email: ${normalizedEmail}`);
+      return res.status(200).json({
+        success: true,
+        message: 'If this email is registered, a reset link will be sent'
+      });
+    }
+
+    // Generate reset token (this will check for lock and throw if locked)
+    let resetToken;
+    try {
+      resetToken = user.getPasswordResetToken();
     await user.save();
+      
+      // Reset attempts on successful token generation
+      await user.resetPasswordResetAttempts();
+    } catch (tokenError) {
+      // Handle account lock error
+      if (tokenError.message.includes('locked')) {
+        const minutesLeft = Math.ceil((user.passwordResetLockUntil - Date.now()) / (1000 * 60));
+        logger.warn(`🔒 ${tokenError.message} for email: ${normalizedEmail} from IP: ${clientIp}`);
+        return res.status(200).json({
+          success: true,
+          message: 'If this email is registered, a reset link will be sent'
+        });
+      }
+      throw tokenError;
+    }
+
+    // Final validation: Ensure user still exists and is valid before sending email
+    const verifiedUser = await User.findById(user._id).maxTimeMS(5000);
+    if (!verifiedUser || !verifiedUser.isActive) {
+      logger.error(`?? Critical: User ${user._id} not found or inactive before sending reset email`);
+      return res.status(200).json({
+        success: true,
+        message: 'If this email is registered, a reset link will be sent'
+      });
+    }
 
     // Send email with reset link
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    const firstName = user.name?.split(' ')[0] || user.name || 'dort';
+    const firstName = verifiedUser.name?.split(' ')[0] || verifiedUser.name || 'dort';
+    
+    // Validate email format before sending (emailRegex already declared above)
+    if (!emailRegex.test(verifiedUser.email)) {
+      logger.error(`?? Invalid email format for user ${verifiedUser._id}: ${verifiedUser.email}`);
+      return res.status(200).json({
+        success: true,
+        message: 'If this email is registered, a reset link will be sent'
+      });
+    }
     
     try {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
-        to: user.email,
+        to: verifiedUser.email,
         subject: '🔒 Passwort zurücksetzen - JN Business System',
         body: `Hallo ${firstName},\n\nSie haben eine Passwort-Zurücksetzung angefordert.\n\nKlicken Sie auf den folgenden Link:\n${resetUrl}\n\nDer Link ist 10 Minuten gültig.\n\nBei Fragen: support@jn-business-system.de`,
         html: `
@@ -909,9 +1167,11 @@ export const forgotPassword = async (req, res) => {
         `,
         type: 'password_reset'
       });
-      logger.info(`✅ Password reset email sent to: ${user.email}`);
+      logger.info(`✅ Password reset email sent to: ${verifiedUser.email} (User ID: ${verifiedUser._id}) from IP: ${clientIp}`);
     } catch (emailError) {
-      logger.error('❌ Failed to send password reset email:', emailError.message);
+      logger.error(`❌ Failed to send password reset email to ${verifiedUser.email}:`, emailError.message);
+      // Increment attempts on email failure
+      await verifiedUser.incPasswordResetAttempts();
       // Don't fail the request if email fails in development
       if (process.env.NODE_ENV === 'production') {
         throw emailError;
@@ -935,30 +1195,37 @@ export const forgotPassword = async (req, res) => {
 // ==================== RESET PASSWORD ====================
 
 export const resetPassword = async (req, res) => {
+  const startTime = Date.now(); // For timing attack protection
   try {
-    const { token, newPassword, confirmPassword } = req.body;
+    const { token, password } = req.body;
+    const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
 
     // Validate input
-    if (!token || !newPassword || !confirmPassword) {
+    if (!token || !password) {
+      const delay = Math.max(0, 300 - (Date.now() - startTime));
+      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
       return res.status(400).json({
         success: false,
-        message: 'Token, password and confirmation required'
+        message: 'Token and password required'
       });
     }
 
-    // Validate passwords match
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Passwords do not match'
-      });
-    }
-
-    // Validate password length
-    if (newPassword.length < 8) {
+    // Validate password length and complexity
+    if (password.length < 8) {
       return res.status(400).json({
         success: false,
         message: 'Password must be at least 8 characters'
+      });
+    }
+
+    // Validate token format
+    if (typeof token !== 'string' || token.length < 32) {
+      logger.warn(`⚠️ Invalid token format in reset attempt from IP: ${clientIp}`);
+      const delay = Math.max(0, 300 - (Date.now() - startTime));
+      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
       });
     }
 
@@ -968,23 +1235,41 @@ export const resetPassword = async (req, res) => {
     // Find user with valid token
     const user = await User.findOne({
       passwordResetToken: hashedToken,
-      passwordResetExpire: { $gt: Date.now().maxTimeMS(5000) }
-    });
+      passwordResetExpire: { $gt: Date.now() }
+    }).maxTimeMS(5000);
+
+    // Constant delay for timing attack protection
+    const processingTime = Date.now() - startTime;
+    const delay = Math.max(0, 300 - processingTime);
+    if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
 
     if (!user) {
+      logger.warn(`⚠️ Invalid password reset token used from IP: ${clientIp}`);
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired reset token'
       });
     }
 
-    // Update password
-    user.password = newPassword;
+    // Check if account is locked
+    if (user.passwordResetLockUntil && user.passwordResetLockUntil > Date.now()) {
+      logger.warn(`🔒 Password reset blocked - account locked: ${user.email} from IP: ${clientIp}`);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    // Update password and invalidate token immediately (prevent reuse)
+    user.password = password;
     user.passwordResetToken = undefined;
     user.passwordResetExpire = undefined;
+    user.passwordResetAttempts = 0;
+    user.passwordResetLockUntil = null;
+    user.passwordChangedAt = new Date();
     await user.save();
 
-    logger.info(`? Password reset for user: ${user.email}`);
+    logger.info(`✅ Password successfully reset for user: ${user.email} from IP: ${clientIp}`);
 
     res.status(200).json({
       success: true,
@@ -1013,6 +1298,68 @@ export const verifyToken = (req, res) => {
     res.status(401).json({
       success: false,
       message: 'Invalid token'
+    });
+  }
+};
+
+// ==================== VERIFY PASSWORD RESET TOKEN ====================
+
+export const verifyPasswordResetToken = async (req, res) => {
+  const startTime = Date.now(); // For timing attack protection
+  try {
+    const { token } = req.body;
+    const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
+
+    if (!token || typeof token !== 'string' || token.length < 32) {
+      // Constant delay for timing attack protection
+      const delay = Math.max(0, 300 - (Date.now() - startTime));
+      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    // Hash token
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid token
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpire: { $gt: Date.now() }
+    }).maxTimeMS(5000);
+
+    // Constant delay regardless of token validity (timing attack protection)
+    const processingTime = Date.now() - startTime;
+    const delay = Math.max(0, 300 - processingTime);
+    if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+
+    if (!user) {
+      logger.warn(`⚠️ Invalid password reset token verification attempt from IP: ${clientIp}`);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    // Check if account is locked
+    if (user.passwordResetLockUntil && user.passwordResetLockUntil > Date.now()) {
+      logger.warn(`🔒 Token verification blocked - account locked: ${user.email} from IP: ${clientIp}`);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Token is valid'
+    });
+  } catch (error) {
+    logger.error('? VerifyPasswordResetToken Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error verifying reset token'
     });
   }
 };
@@ -1077,8 +1424,8 @@ export const verifyEmail = async (req, res) => {
     // Find user with valid token
     const user = await User.findOne({
       emailVerificationToken: hashedToken,
-      emailVerificationExpire: { $gt: Date.now().maxTimeMS(5000) }
-    });
+      emailVerificationExpire: { $gt: Date.now() }
+    }).maxTimeMS(5000);
 
     if (!user) {
       return res.status(400).json({ success: false, message: 'Invalid or expired token' });
@@ -1122,10 +1469,11 @@ export const healthCheck = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    const { refreshToken: token } = req.body;
-    // Also accept token from Authorization header
+    // ? SECURITY FIX: Accept refresh token from cookie (preferred), body, or header
+    const cookieToken = req.cookies?.refreshToken;
+    const bodyToken = req.body?.refreshToken;
     const headerToken = req.headers.authorization?.replace('Bearer ', '');
-    const tokenToVerify = token || headerToken;
+    const tokenToVerify = cookieToken || bodyToken || headerToken;
 
     if (!tokenToVerify) {
       return res.status(401).json({
@@ -1134,30 +1482,19 @@ export const refreshToken = async (req, res) => {
       });
     }
 
-    // Verify the token
-    let decoded;
-    try {
-      decoded = jwt.verify(tokenToVerify, process.env.JWT_SECRET);
-    } catch (err) {
-      // If token is expired, try to decode it anyway to get user ID
-      if (err.name === 'TokenExpiredError') {
-        decoded = jwt.decode(tokenToVerify);
-        if (!decoded || !decoded.id) {
-          return res.status(401).json({
-            success: false,
-            message: 'Invalid token'
-          });
-        }
-      } else {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid token'
-        });
-      }
+    // ? SECURITY FIX: Use RefreshToken model to verify token
+    // RefreshToken is already imported at the top
+    const storedToken = await RefreshToken.findByToken(tokenToVerify);
+    
+    if (!storedToken || !storedToken.isValid()) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired refresh token'
+      });
     }
 
     // Find user
-    const user = await User.findById(decoded.id).maxTimeMS(5000);
+    const user = await User.findById(storedToken.userId).maxTimeMS(5000);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -1173,16 +1510,37 @@ export const refreshToken = async (req, res) => {
       });
     }
 
-    // Generate new access token
+    // Revoke old refresh token (token rotation)
+    await storedToken.revoke();
+
+    // Generate new tokens
     const newAccessToken = generateToken(user._id, '15m'); // Short-lived access token
-    const newRefreshToken = generateToken(user._id, '7d'); // Longer-lived refresh token
+    const newRefreshToken = await createRefreshToken(user._id, {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection.remoteAddress
+    });
+
+    // Update last used
+    storedToken.lastUsedAt = new Date();
+    storedToken.rotationCount = (storedToken.rotationCount || 0) + 1;
+    await storedToken.save();
 
     logger.info(`?? Token refreshed for: ${user.email}`);
+
+    // Set secure HTTP-only cookie for new refresh token
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/api/auth'
+    });
 
     res.status(200).json({
       success: true,
       token: newAccessToken,
-      refreshToken: newRefreshToken,
+      refreshToken: newRefreshToken, // Also send in response for mobile apps
+      expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });
   } catch (error) {
@@ -1493,6 +1851,7 @@ export default {
   logout,
   forgotPassword,
   resetPassword,
+  verifyPasswordResetToken,
   verifyToken,
   sendVerificationEmail,
   verifyEmail,

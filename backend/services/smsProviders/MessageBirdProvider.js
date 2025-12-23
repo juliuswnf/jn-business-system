@@ -1,6 +1,7 @@
 import { createRequire } from 'module';
 import crypto from 'crypto';
 import ISMSProvider from './ISMSProvider.js';
+import logger from '../../utils/logger.js';
 
 // Use require for CommonJS module
 const require = createRequire(import.meta.url);
@@ -56,7 +57,7 @@ export default class MessageBirdProvider extends ISMSProvider {
         provider: 'messagebird'
       };
     } catch (error) {
-      console.error('MessageBird SMS send error:', error);
+      logger.error('MessageBird SMS send error:', error);
       throw new Error(`MessageBird: ${error.message || error}`);
     }
   }
@@ -86,7 +87,7 @@ export default class MessageBirdProvider extends ISMSProvider {
         } : null
       };
     } catch (error) {
-      console.error('MessageBird status check error:', error);
+      logger.error('MessageBird status check error:', error);
       throw new Error(`MessageBird: ${error.message}`);
     }
   }
@@ -124,7 +125,7 @@ export default class MessageBirdProvider extends ISMSProvider {
         Buffer.from(expectedSignature)
       );
     } catch (error) {
-      console.error('MessageBird webhook validation error:', error);
+      logger.error('MessageBird webhook validation error:', error);
       return false;
     }
   }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { subscriptionAPI } from '../utils/api';
+import { getAccessToken } from '../utils/tokenHelper';
 
 const plans = {
   starter: {
@@ -61,7 +62,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const isYearly = searchParams.get('billing') === 'yearly';
-  const isLoggedIn = !!localStorage.getItem('token');
+  const isLoggedIn = !!getAccessToken();
 
   const plan = plans[planId];
 

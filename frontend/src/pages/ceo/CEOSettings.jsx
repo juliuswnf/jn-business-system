@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { useNotification } from '../../context/NotificationContext';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../../utils/api';
+import { getAccessToken } from '../../utils/tokenHelper';
 
 const CEOSettings = () => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -45,10 +45,8 @@ const CEOSettings = () => {
     sessionTimeout: 30
   });
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   // Get user from localStorage
   useEffect(() => {
@@ -72,19 +70,11 @@ const CEOSettings = () => {
   const handleSaveProfile = async () => {
     setSaving(true);
     try {
-      const token = getToken();
-      const response = await fetch(`${API_URL}/auth/profile`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(profile)
-      });
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.put('/auth/profile', profile);
       
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('jnUser', JSON.stringify(data.user));
+      if (response.data.success) {
+        // Note: User data is now managed by backend, no need to store in localStorage
         notification.success('Profil gespeichert');
       } else {
         notification.error('Fehler beim Speichern');
@@ -110,20 +100,13 @@ const CEOSettings = () => {
     
     setSaving(true);
     try {
-      const token = getToken();
-      const response = await fetch(`${API_URL}/auth/change-password`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          currentPassword: security.currentPassword,
-          newPassword: security.newPassword
-        })
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.post('/auth/change-password', {
+        currentPassword: security.currentPassword,
+        newPassword: security.newPassword
       });
       
-      if (response.ok) {
+      if (response.data.success) {
         notification.success('Passwort geändert');
         setSecurity(prev => ({
           ...prev,
@@ -132,8 +115,7 @@ const CEOSettings = () => {
           confirmPassword: ''
         }));
       } else {
-        const data = await response.json();
-        notification.error(data.message || 'Fehler beim Ändern');
+        notification.error(response.data.message || 'Fehler beim Ändern');
       }
     } catch (err) {
       notification.error('Verbindungsfehler');

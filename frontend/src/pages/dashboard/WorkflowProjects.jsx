@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import { BarChart3, RefreshCw, CheckCircle, TrendingUp, DollarSign } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 export default function WorkflowProjects() {
   const navigate = useNavigate();
@@ -24,26 +22,18 @@ export default function WorkflowProjects() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
+      // ? SECURITY FIX: Use central api instance (already imported)
       // Fetch projects
       const params = new URLSearchParams();
       if (filters.industry) params.append('industry', filters.industry);
       if (filters.status) params.append('status', filters.status);
       if (filters.search) params.append('search', filters.search);
 
-      const projectsRes = await axios.get(
-        `${API_URL}/api/workflows/projects?${params}`,
-        { headers }
-      );
+      const projectsRes = await api.get(`/workflows/projects?${params}`);
       setProjects(projectsRes.data.data);
 
       // Fetch stats
-      const statsRes = await axios.get(
-        `${API_URL}/api/workflows/projects/stats`,
-        { headers }
-      );
+      const statsRes = await api.get('/workflows/projects/stats');
       setStats(statsRes.data.data);
 
       setLoading(false);
@@ -58,10 +48,8 @@ export default function WorkflowProjects() {
     if (!confirm('Projekt wirklich löschen?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/workflows/projects/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // ? SECURITY FIX: Use central api instance (already imported)
+      await api.delete(`/workflows/projects/${id}`);
       toast.success('Projekt gelöscht');
       fetchData();
     } catch (error) {

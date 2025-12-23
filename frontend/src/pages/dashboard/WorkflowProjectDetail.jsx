@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+import { api } from '../../utils/api';
 
 export default function WorkflowProjectDetail() {
   const { id } = useParams();
@@ -21,19 +19,11 @@ export default function WorkflowProjectDetail() {
 
   const fetchProjectDetails = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
-      const projectRes = await axios.get(
-        `${API_URL}/api/workflows/projects/${id}`,
-        { headers }
-      );
+      // ? SECURITY FIX: Use central api instance
+      const projectRes = await api.get(`/workflows/projects/${id}`);
       setProject(projectRes.data.data);
 
-      const sessionsRes = await axios.get(
-        `${API_URL}/api/workflows/sessions/${id}`,
-        { headers }
-      );
+      const sessionsRes = await api.get(`/workflows/sessions/${id}`);
       setSessions(sessionsRes.data.data);
 
       setLoading(false);
@@ -46,12 +36,8 @@ export default function WorkflowProjectDetail() {
 
   const handleCompleteSession = async (sessionId, progress, notes) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `${API_URL}/api/workflows/sessions/${sessionId}/complete`,
-        { progress, notes },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      // ? SECURITY FIX: Use central api instance
+      await api.post(`/workflows/sessions/${sessionId}/complete`, { progress, notes });
       toast.success('Session abgeschlossen!');
       setShowCompleteModal(false);
       fetchProjectDetails();

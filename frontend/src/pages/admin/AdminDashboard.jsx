@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarIcon, UsersIcon, CogIcon, CodeBracketIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../../utils/api';
+import { getAccessToken } from '../../utils/tokenHelper';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -26,10 +25,8 @@ const AdminDashboard = () => {
   const [showSetup, setShowSetup] = useState(true);
   const user = JSON.parse(localStorage.getItem('jnUser') || localStorage.getItem('user') || '{}');
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   useEffect(() => {
     fetchStats();
@@ -37,19 +34,12 @@ const AdminDashboard = () => {
   }, []);
 
   const fetchSetupProgress = async () => {
-    const token = getToken();
-    if (!token) return;
-
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
-
+    // ? SECURITY FIX: Use central api instance
     try {
       // Check salon info
-      const salonRes = await fetch(`${API_URL}/salons/my-salon`, { headers }).catch(() => null);
-      if (salonRes?.ok) {
-        const salonData = await salonRes.json();
+      const salonRes = await api.get('/salons/my-salon').catch(() => null);
+      if (salonRes?.data) {
+        const salonData = salonRes.data;
         const salon = salonData.data || salonData.salon || salonData;
         setSetupProgress(prev => ({
           ...prev,
@@ -60,9 +50,9 @@ const AdminDashboard = () => {
       }
 
       // Check services
-      const servicesRes = await fetch(`${API_URL}/services`, { headers }).catch(() => null);
-      if (servicesRes?.ok) {
-        const servicesData = await servicesRes.json();
+      const servicesRes = await api.get('/services').catch(() => null);
+      if (servicesRes?.data) {
+        const servicesData = servicesRes.data;
         const services = servicesData.data || servicesData.services || [];
         setSetupProgress(prev => ({
           ...prev,
@@ -71,9 +61,9 @@ const AdminDashboard = () => {
       }
 
       // Check bookings
-      const bookingsRes = await fetch(`${API_URL}/bookings?limit=1`, { headers }).catch(() => null);
-      if (bookingsRes?.ok) {
-        const bookingsData = await bookingsRes.json();
+      const bookingsRes = await api.get('/bookings?limit=1').catch(() => null);
+      if (bookingsRes?.data) {
+        const bookingsData = bookingsRes.data;
         const bookings = bookingsData.bookings || bookingsData.data || [];
         setSetupProgress(prev => ({
           ...prev,
@@ -94,45 +84,36 @@ const AdminDashboard = () => {
       return;
     }
 
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
-
+    // ? SECURITY FIX: Use central api instance
     try {
       // Fetch booking stats
-      const statsRes = await fetch(`${API_URL}/bookings/stats`, { headers });
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        if (statsData.success) {
-          setStats(prev => ({
-            ...prev,
-            confirmedBookings: statsData.stats?.confirmedBookings || 0,
-            pendingBookings: statsData.stats?.pendingBookings || 0,
-            upcomingBookings: (statsData.stats?.confirmedBookings || 0) + (statsData.stats?.pendingBookings || 0)
-          }));
-        }
+      const statsRes = await api.get('/bookings/stats');
+      if (statsRes.data.success) {
+        const statsData = statsRes.data;
+        setStats(prev => ({
+          ...prev,
+          confirmedBookings: statsData.stats?.confirmedBookings || 0,
+          pendingBookings: statsData.stats?.pendingBookings || 0,
+          upcomingBookings: (statsData.stats?.confirmedBookings || 0) + (statsData.stats?.pendingBookings || 0)
+        }));
       }
 
       // Fetch today's bookings
       const today = new Date().toISOString().split('T')[0];
-      const todayRes = await fetch(`${API_URL}/bookings/by-date?date=${today}`, { headers });
-      if (todayRes.ok) {
-        const todayData = await todayRes.json();
-        if (todayData.success) {
-          setStats(prev => ({
-            ...prev,
-            todayBookings: todayData.count || todayData.bookings?.length || 0
-          }));
-          setRecentBookings(todayData.bookings?.slice(0, 5) || []);
-        }
+      const todayRes = await api.get(`/bookings/by-date?date=${today}`);
+      if (todayRes.data.success) {
+        const todayData = todayRes.data;
+        setStats(prev => ({
+          ...prev,
+          todayBookings: todayData.count || todayData.bookings?.length || 0
+        }));
+        setRecentBookings(todayData.bookings?.slice(0, 5) || []);
       }
 
       // Fetch unique customers (count distinct customerEmail from bookings)
-      const bookingsRes = await fetch(`${API_URL}/bookings?limit=1000`, { headers });
-      if (bookingsRes.ok) {
-        const bookingsData = await bookingsRes.json();
-        if (bookingsData.success) {
+      const bookingsRes = await api.get('/bookings?limit=1000');
+      if (bookingsRes.data.success) {
+        const bookingsData = bookingsRes.data;
           const uniqueEmails = new Set(bookingsData.bookings?.map(b => b.customerEmail).filter(Boolean));
           setStats(prev => ({
             ...prev,

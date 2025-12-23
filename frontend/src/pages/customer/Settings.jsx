@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../context/NotificationContext';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../../utils/api';
+import { getAccessToken } from '../../utils/tokenHelper';
+import { captureError } from '../../utils/errorTracking';
 
 /**
  * CUSTOMER SETTINGS & PROFILE PAGE
@@ -43,10 +43,8 @@ export default function Settings() {
 
   const [bookingHistory, setBookingHistory] = useState([]);
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   // Fetch user profile and bookings on mount
   useEffect(() => {
@@ -68,11 +66,11 @@ export default function Settings() {
     };
 
     try {
+      // ? SECURITY FIX: Use central api instance
       // Fetch profile
-      const profileRes = await fetch(`${API_URL}/auth/profile`, { headers });
-      if (profileRes.ok) {
-        const profileData = await profileRes.json();
-        if (profileData.success && profileData.user) {
+      const profileRes = await api.get('/auth/profile');
+      if (profileRes.data.success && profileRes.data.user) {
+        const profileData = profileRes.data;
           const user = profileData.user;
           const nameParts = (user.name || '').split(' ');
           setProfile({
@@ -91,10 +89,9 @@ export default function Settings() {
       }
 
       // Fetch booking history
-      const bookingsRes = await fetch(`${API_URL}/bookings?limit=20`, { headers });
-      if (bookingsRes.ok) {
-        const bookingsData = await bookingsRes.json();
-        if (bookingsData.success && bookingsData.bookings) {
+      const bookingsRes = await api.get('/bookings?limit=20');
+      if (bookingsRes.data.success && bookingsRes.data.bookings) {
+        const bookingsData = bookingsRes.data;
           const formattedBookings = bookingsData.bookings.map(b => ({
             id: b._id,
             service: b.serviceId?.name || 'Service',
@@ -108,7 +105,7 @@ export default function Settings() {
         }
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      captureError(error, { context: 'fetchProfile' });
       showNotification('Fehler beim Laden der Daten', 'error');
     } finally {
       setLoading(false);
@@ -134,32 +131,26 @@ export default function Settings() {
     if (!token) return;
 
     try {
-      const res = await fetch(`${API_URL}/auth/profile`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: `${profile.firstName} ${profile.lastName}`.trim(),
-          phone: profile.phone,
-          birthDate: profile.birthDate,
-          gender: profile.gender,
-          address: profile.address,
-          city: profile.city,
-          zipCode: profile.zipCode,
-          country: profile.country
-        })
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.put('/auth/profile', {
+        name: `${profile.firstName} ${profile.lastName}`.trim(),
+        phone: profile.phone,
+        birthDate: profile.birthDate,
+        gender: profile.gender,
+        address: profile.address,
+        city: profile.city,
+        zipCode: profile.zipCode,
+        country: profile.country
       });
 
-      if (res.ok) {
+      if (res.data.success) {
         setEditMode(false);
         showNotification('Profil erfolgreich aktualisiert', 'success');
       } else {
         showNotification('Fehler beim Speichern', 'error');
       }
     } catch (error) {
-      console.error('Error saving profile:', error);
+      captureError(error, { context: 'saveProfile' });
       showNotification('Fehler beim Speichern', 'error');
     }
   };
@@ -174,16 +165,10 @@ export default function Settings() {
     if (!token) return;
 
     try {
-      const res = await fetch(`${API_URL}/auth/change-password`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          currentPassword: passwords.current,
-          newPassword: passwords.new
-        })
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.post('/auth/change-password', {
+        currentPassword: passwords.current,
+        newPassword: passwords.new
       });
 
       if (res.ok) {
@@ -194,7 +179,7 @@ export default function Settings() {
         showNotification(data.message || 'Fehler beim Ändern des Passworts', 'error');
       }
     } catch (error) {
-      console.error('Error changing password:', error);
+      captureError(error, { context: 'changePassword' });
       showNotification('Fehler beim Ändern des Passworts', 'error');
     }
   };

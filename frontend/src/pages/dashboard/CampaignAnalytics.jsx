@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -29,8 +29,6 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
-
 const CampaignAnalytics = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -48,17 +46,11 @@ const CampaignAnalytics = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      // ? SECURITY FIX: Use central api instance
 
       const [campaignRes, recipientsRes] = await Promise.all([
-        axios.get(
-          `${API_BASE_URL}/marketing/campaigns/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        ),
-        axios.get(
-          `${API_BASE_URL}/marketing/campaigns/${id}/recipients`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
+        api.get(`/marketing/campaigns/${id}`),
+        api.get(`/marketing/campaigns/${id}/recipients`)
       ]);
 
       setCampaign(campaignRes.data.data);

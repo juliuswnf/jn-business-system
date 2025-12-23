@@ -42,12 +42,10 @@ const TattooProjectEditor = () => {
 
   const fetchCustomers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/customers', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) setCustomers(data.customers);
+      // ? SECURITY FIX: Use central api instance
+      const { api } = await import('../../utils/api');
+      const res = await api.get('/customers');
+      if (res.data.success) setCustomers(res.data.customers);
     } catch (error) {
       console.error('Error fetching customers:', error);
     }
@@ -55,12 +53,10 @@ const TattooProjectEditor = () => {
 
   const fetchEmployees = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/employees', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) setEmployees(data.employees);
+      // ? SECURITY FIX: Use central api instance
+      const { api } = await import('../../utils/api');
+      const res = await api.get('/employees');
+      if (res.data.success) setEmployees(res.data.employees);
     } catch (error) {
       console.error('Error fetching employees:', error);
     }
@@ -68,11 +64,10 @@ const TattooProjectEditor = () => {
 
   const fetchProject = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/tattoo/projects/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
+      // ? SECURITY FIX: Use central api instance
+      const { api } = await import('../../utils/api');
+      const res = await api.get(`/tattoo/projects/${id}`);
+      const data = res.data;
       if (data.success) {
         const project = data.project;
         setFormData({
@@ -100,25 +95,17 @@ const TattooProjectEditor = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const url = isEdit ? `/api/tattoo/projects/${id}` : '/api/tattoo/projects';
-      const method = isEdit ? 'PUT' : 'POST';
-
+      // ? SECURITY FIX: Use central api instance
+      const { api } = await import('../../utils/api');
       const payload = {
         ...formData,
         estimatedPrice: Math.round(formData.estimatedPrice * 100)
       };
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
+      const res = isEdit
+        ? await api.put(`/tattoo/projects/${id}`, payload)
+        : await api.post('/tattoo/projects', payload);
+      const data = res.data;
       if (data.success) {
         toast.success(isEdit ? 'Projekt aktualisiert' : 'Projekt erstellt');
         navigate(`/dashboard/tattoo/projects/${data.project._id}`);

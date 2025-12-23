@@ -52,6 +52,14 @@ export const createPaymentIntent = async (req, res) => {
       });
     }
 
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     const paymentIntent = await getStripe().paymentIntents.create({
       amount: Math.round(amount * 100),
       currency: 'eur',
@@ -96,6 +104,23 @@ export const processPayment = async (req, res) => {
       });
     }
 
+    // First check booking ownership before processing payment
+    const bookingCheck = await Booking.findById(bookingId).maxTimeMS(5000);
+    if (!bookingCheck) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (req.user.role !== 'ceo' && bookingCheck.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     const booking = await Booking.findByIdAndUpdate(
       bookingId,
       {
@@ -105,13 +130,6 @@ export const processPayment = async (req, res) => {
       },
       { new: true }
     );
-
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: 'Booking not found'
-      });
-    }
 
     const payment = await Payment.create({
       bookingId,
@@ -143,8 +161,9 @@ export const processPayment = async (req, res) => {
 export const getPaymentHistory = async (req, res) => {
   try {
     const { bookingId, salonId } = req.query;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    // ? SECURITY FIX: Validate and limit pagination to prevent DoS
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20)); // Max 100 items
 
     if (page < 1 || limit < 1 || limit > 100) {
       return res.status(400).json({
@@ -499,12 +518,20 @@ export const getPaymentDetails = async (req, res) => {
     const { paymentId } = req.params;
 
     const payment = await Payment.findById(paymentId)
-      .populate('bookingId').maxTimeMS(5000);
+      .populate('bookingId', 'salonId').maxTimeMS(5000);
 
     if (!payment) {
       return res.status(404).json({
         success: false,
         message: 'Payment not found'
+      });
+    }
+
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (req.user.role !== 'ceo' && payment.bookingId?.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 

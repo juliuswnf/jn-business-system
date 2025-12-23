@@ -38,11 +38,9 @@ const BusinessLogin = () => {
           return;
         }
 
-        // Store auth data (both new and legacy keys for compatibility)
-        localStorage.setItem('jnAuthToken', data.token);
-        localStorage.setItem('jnUser', JSON.stringify(data.user));
+        // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+        // Only store access token temporarily (short-lived, 15 minutes)
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
 
         // Auth data saved, redirecting
 
@@ -128,7 +126,7 @@ const BusinessLogin = () => {
                 <input type="checkbox" className="mr-2 rounded bg-gray-800 border-gray-700" />
                 <span className="text-gray-400">Angemeldet bleiben</span>
               </label>
-              <Link to="/forgot-password" className="text-indigo-400 hover:text-indigo-300">
+              <Link to="/forgot-password?role=business" className="text-indigo-400 hover:text-indigo-300">
                 Passwort vergessen?
               </Link>
             </div>

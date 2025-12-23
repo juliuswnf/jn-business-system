@@ -1,5 +1,6 @@
 ﻿import React, { createContext, useState, useCallback, useEffect } from 'react';
 import api, { authAPI } from '../utils/api';
+import { captureError, captureMessage } from '../utils/errorTracking';
 
 // Create Context
 export const AuthContext = createContext();
@@ -12,23 +13,25 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [token, setToken] = useState(null);
 
-  // Initialize auth from localStorage on mount
+  // Initialize auth - check if user is authenticated via API
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       try {
-        const storedToken = localStorage.getItem('jnAuthToken');
-        const storedUser = localStorage.getItem('jnUser');
-
-        if (storedToken && storedUser) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+        // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+        // Check if user is authenticated by calling the profile endpoint
+        const response = await api.get('/auth/profile');
+        if (response.data.success) {
+          const user = response.data.user;
+          setUser(user);
           isAuthenticatedSet(true);
-          
-          // Set default api header
-          api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+          // Access token will be sent automatically via interceptor from cookie
         }
       } catch (err) {
-        console.error('Auth initialization error:', err);
+        // Not authenticated or token expired
+        setUser(null);
+        isAuthenticatedSet(false);
+        // Clear any leftover localStorage tokens
+        localStorage.removeItem('token');
         localStorage.removeItem('jnAuthToken');
         localStorage.removeItem('jnUser');
       } finally {
@@ -48,21 +51,18 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login(email, password);
       const { token, user } = response.data;
 
-      // Store in state
+      // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+      // Only store access token temporarily (short-lived, 15 minutes)
+      // Refresh token is in HTTP-only cookie and cannot be accessed via JavaScript
       setToken(token);
       setUser(user);
       isAuthenticatedSet(true);
 
-      // Store in localStorage
-      localStorage.setItem('jnAuthToken', token);
-      localStorage.setItem('jnUser', JSON.stringify(user));
-
+      // Store access token temporarily for API requests (will be removed after full migration)
+      localStorage.setItem('token', token);
+      
       // Set api default header
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      // For backward compatibility keep older keys
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
 
       return { success: true, user, token };
     } catch (err) {
@@ -83,21 +83,17 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.register(userData);
       const { token, user } = response.data;
 
-      // Store in state
+      // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+      // Only store access token temporarily (short-lived, 15 minutes)
       setToken(token);
       setUser(user);
       isAuthenticatedSet(true);
 
-      // Store in localStorage
-      localStorage.setItem('jnAuthToken', token);
-      localStorage.setItem('jnUser', JSON.stringify(user));
+      // Store access token temporarily for API requests
+      localStorage.setItem('token', token);
 
       // Set api default header
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      // Backwards compatibility
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
 
       return { success: true, user, token };
     } catch (err) {
@@ -116,7 +112,7 @@ export const AuthProvider = ({ children }) => {
       try {
         await authAPI.logout();
       } catch (err) {
-        console.warn('Logout API call failed:', err);
+        captureMessage('Logout API call failed', 'warning', { error: err.message });
       }
 
       // Clear state
@@ -125,10 +121,11 @@ export const AuthProvider = ({ children }) => {
       isAuthenticatedSet(false);
       setError(null);
 
-      // Clear localStorage
+      // ? SECURITY FIX: Clear localStorage tokens
+      // HTTP-only cookies will be cleared by the backend
+      localStorage.removeItem('token');
       localStorage.removeItem('jnAuthToken');
       localStorage.removeItem('jnUser');
-      localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       localStorage.removeItem('tempUser');
@@ -138,7 +135,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (err) {
-      console.error('Logout error:', err);
+      captureError(err, { context: 'logout' });
       return { success: false, error: err.message };
     }
   }, []);
@@ -160,7 +157,7 @@ export const AuthProvider = ({ children }) => {
         return false;
       }
     } catch (err) {
-      console.error('Token verification error:', err);
+      captureError(err, { context: 'verifyToken' });
       logout();
       return false;
     }

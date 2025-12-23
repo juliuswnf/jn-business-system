@@ -317,6 +317,14 @@ export const getBooking = async (req, res) => {
       });
     }
 
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     res.status(200).json({
       success: true,
       booking

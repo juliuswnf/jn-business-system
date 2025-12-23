@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { employeeAPI, formatError } from '../../utils/api';
 import { LoadingSpinner } from '../common';
+import { captureError } from '../../utils/errorTracking';
 import './EmployeeNotificationSettings.css';
 
 export default function EmployeeNotificationSettings() {
@@ -30,7 +31,7 @@ export default function EmployeeNotificationSettings() {
       setError(null);
     } catch (err) {
       setError(formatError(err));
-      console.error('Error loading preferences:', err);
+      captureError(err, { context: 'loadNotificationPreferences' });
     } finally {
       setLoading(false);
     }

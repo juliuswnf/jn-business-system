@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../utils/api';
+import { getAccessToken } from '../utils/tokenHelper';
 
 const CustomerDashboard = () => {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [pastBookings, setPastBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -24,19 +21,13 @@ const CustomerDashboard = () => {
         return;
       }
 
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-
+      // ? SECURITY FIX: Use central api instance
       try {
         // Fetch customer's bookings
-        const res = await fetch(`${API_URL}/bookings?limit=50`, { headers });
+        const res = await api.get('/bookings?limit=50');
 
-        if (res.ok) {
-          const data = await res.json();
-
-          if (data.success && data.bookings) {
+        if (res.data.success && res.data.bookings) {
+          const data = res.data;
             const now = new Date();
 
             // Split into upcoming and past
@@ -88,19 +79,11 @@ const CustomerDashboard = () => {
 
   // Cancel booking handler
   const handleCancelBooking = async (bookingId) => {
-    const token = getToken();
-    if (!token) return;
-
+    // ? SECURITY FIX: Use central api instance
     try {
-      const res = await fetch(`${API_URL}/bookings/${bookingId}/cancel`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const res = await api.patch(`/bookings/${bookingId}/cancel`);
 
-      if (res.ok) {
+      if (res.data.success) {
         // Move booking to past and update status
         setUpcomingBookings(prev => prev.filter(b => b.id !== bookingId));
         const cancelledBooking = upcomingBookings.find(b => b.id === bookingId);

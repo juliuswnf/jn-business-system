@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNotification } from '../../context/NotificationContext';
 import { employeeAPI, formatError } from '../../utils/api';
 import { LoadingSpinner } from '../common';
+import { captureError } from '../../utils/errorTracking';
 import './EmployeeDashboard.css';
 
 export default function EmployeeDashboard() {
@@ -30,7 +31,7 @@ export default function EmployeeDashboard() {
       setShifts(shiftsRes.data.shifts);
     } catch (err) {
       setError(formatError(err));
-      console.error('Error fetching employee data:', err);
+      captureError(err, { context: 'fetchEmployeeDashboard' });
     } finally {
       setLoading(false);
     }

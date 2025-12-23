@@ -1,5 +1,6 @@
 import twilio from 'twilio';
 import ISMSProvider from './ISMSProvider.js';
+import logger from '../../utils/logger.js';
 
 /**
  * Twilio SMS Provider Implementation
@@ -44,7 +45,7 @@ export default class TwilioProvider extends ISMSProvider {
         provider: 'twilio'
       };
     } catch (error) {
-      console.error('Twilio SMS send error:', error);
+      logger.error('Twilio SMS send error:', error);
       throw new Error(`Twilio: ${error.message}`);
     }
   }
@@ -69,7 +70,7 @@ export default class TwilioProvider extends ISMSProvider {
         } : null
       };
     } catch (error) {
-      console.error('Twilio status check error:', error);
+      logger.error('Twilio status check error:', error);
       throw new Error(`Twilio: ${error.message}`);
     }
   }
@@ -112,7 +113,7 @@ export default class TwilioProvider extends ISMSProvider {
 
       return signature === expectedSignature;
     } catch (error) {
-      console.error('Twilio webhook validation error:', error);
+      logger.error('Twilio webhook validation error:', error);
       return false;
     }
   }

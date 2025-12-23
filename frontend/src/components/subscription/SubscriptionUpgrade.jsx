@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 /**
  * Subscription Upgrade Component
@@ -73,23 +74,17 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/subscriptions/manage/upgrade`,
-        {
-          newTier: selectedTier,
-          billingCycle,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.post('/subscriptions/manage/upgrade', {
+        newTier: selectedTier,
+        billingCycle,
+      });
 
       if (response.data.success) {
         onSuccess(response.data);
       }
     } catch (err) {
-      console.error('Upgrade error:', err);
+      captureError(err, { context: 'subscriptionUpgrade' });
       setError(err.response?.data?.message || 'Upgrade fehlgeschlagen');
     } finally {
       setLoading(false);

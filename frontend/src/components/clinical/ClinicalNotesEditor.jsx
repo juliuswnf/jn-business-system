@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Shield, Lock, Eye, AlertTriangle, Save, FileText, Clock, User } from 'lucide-react';
 import api from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 export default function ClinicalNotesEditor({ customerId, salonId }) {
   const [notes, setNotes] = useState([]);
@@ -27,7 +28,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
       const response = await api.get(`/api/clinical-notes/patient/${customerId}`);
       setNotes(response.data.notes || []);
     } catch (error) {
-      console.error('Error fetching clinical notes:', error);
+      captureError(error, { context: 'fetchClinicalNotes' });
     } finally {
       setLoading(false);
     }
@@ -51,7 +52,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
       await fetchClinicalNotes();
       resetForm();
     } catch (error) {
-      console.error('Error saving clinical note:', error);
+      captureError(error, { context: 'saveClinicalNote' });
       alert('Failed to save clinical note');
     }
   };
@@ -71,7 +72,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
       });
       setIsEditing(false);
     } catch (error) {
-      console.error('Error viewing clinical note:', error);
+      captureError(error, { context: 'viewClinicalNote' });
     }
   };
 

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Mail, Phone, Trash2, Edit, Users } from 'lucide-react';
+import { getAccessToken } from '../../utils/tokenHelper';
+import { captureError } from '../../utils/errorTracking';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -18,7 +20,8 @@ export default function Employees() {
     role: 'employee'
   });
 
-  const getToken = () => localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
+  // ? SECURITY FIX: Use token helper instead of direct localStorage access
+  const getToken = () => getAccessToken();
 
   useEffect(() => {
     fetchEmployees();
@@ -60,7 +63,7 @@ export default function Employees() {
         setFormData({ name: '', email: '', phone: '', role: 'employee' });
       }
     } catch (error) {
-      console.error('Error creating employee:', error);
+      captureError(error, { context: 'createEmployee' });
     }
   };
 
@@ -74,7 +77,7 @@ export default function Employees() {
       });
       setEmployees(employees.filter(e => e._id !== id));
     } catch (error) {
-      console.error('Error deleting employee:', error);
+      captureError(error, { context: 'deleteEmployee' });
     }
   };
 

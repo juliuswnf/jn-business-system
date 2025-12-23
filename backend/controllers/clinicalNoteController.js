@@ -1,6 +1,7 @@
 ﻿import ClinicalNote from '../models/ClinicalNote.js';
 import Salon from '../models/Salon.js';
 import AuditLog from '../models/AuditLog.js';
+import logger from '../utils/logger.js';
 
 /**
  * Clinical Notes Controller
@@ -95,7 +96,7 @@ export const createClinicalNote = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error creating clinical note:', error);
+    logger.error('Error creating clinical note:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -137,7 +138,7 @@ export const getClinicalNote = async (req, res) => {
     try {
       decryptedContent = clinicalNote.decryptContent();
     } catch (error) {
-      console.error('Decryption failed:', error);
+      logger.error('Decryption failed:', error);
       return res.status(500).json({
         success: false,
         message: 'Failed to decrypt clinical note'
@@ -174,7 +175,7 @@ export const getClinicalNote = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting clinical note:', error);
+    logger.error('Error getting clinical note:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -366,7 +367,7 @@ export const deleteClinicalNote = async (req, res) => {
       message: 'Clinical note deleted'
     });
   } catch (error) {
-    console.error('Error deleting clinical note:', error);
+    logger.error('Error deleting clinical note:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

@@ -3,13 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { UIContext } from '../../context/UIContext';
 import { authAPI } from '../../utils/api';
+import { captureMessage } from '../../utils/errorTracking';
 
 export default function Navbar() {
   const { toggleSidebar, sidebarOpen } = useContext(UIContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+  // For display purposes, we can get user from AuthContext or API
+  // For now, keep minimal localStorage access for backward compatibility
+  const token = localStorage.getItem('token'); // Temporary access token
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -26,7 +30,7 @@ export default function Navbar() {
     try {
       await authAPI.logout();
     } catch (error) {
-      console.warn('Logout API failed:', error);
+      captureMessage('Logout API failed', 'warning', { error: error.message });
     }
     // Clear ALL auth data from localStorage
     localStorage.removeItem('jnAuthToken');

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
+import { captureError } from '../utils/errorTracking';
 
 export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) {
   const [pricingTiers, setPricingTiers] = useState([]);
@@ -31,7 +32,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
         }
       }
     } catch (err) {
-      console.error('Error fetching pricing data:', err);
+      captureError(err, { context: 'fetchPricingData' });
     } finally {
       setLoading(false);
     }

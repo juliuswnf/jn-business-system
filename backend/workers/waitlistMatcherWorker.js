@@ -3,6 +3,7 @@ import Booking from '../models/Booking.js';
 import Waitlist from '../models/Waitlist.js';
 import SlotSuggestion from '../models/SlotSuggestion.js';
 import { sendWaitlistOffer } from '../services/smsService.js';
+import logger from '../utils/logger.js';
 
 /**
  * Waitlist Matcher Worker
@@ -16,12 +17,12 @@ let isRunning = false;
 
 async function processWaitlistMatching() {
   if (isRunning) {
-    console.log('[WaitlistMatcher] Already running, skipping...');
+    logger.info('[WaitlistMatcher] Already running, skipping...');
     return;
   }
 
   isRunning = true;
-  console.log('[WaitlistMatcher] Starting waitlist matcher worker...');
+  logger.info('[WaitlistMatcher] Starting waitlist matcher worker...');
 
   try {
     // Find recently cancelled bookings (last 1 hour)
@@ -34,7 +35,7 @@ async function processWaitlistMatching() {
       .populate('salon', 'businessName phone')
       .populate('service', 'name duration price');
 
-    console.log(`[WaitlistMatcher] Found ${cancelledBookings.length} recently cancelled bookings`);
+    logger.info(`[WaitlistMatcher] Found ${cancelledBookings.length} recently cancelled bookings`);
 
     let matched = 0;
     let skipped = 0;
@@ -64,12 +65,12 @@ async function processWaitlistMatching() {
           .limit(10); // Top 10 candidates
 
         if (waitlist.length === 0) {
-          console.log(`[WaitlistMatcher] No waitlist entries for booking ${booking._id}`);
+          logger.info(`[WaitlistMatcher] No waitlist entries for booking ${booking._id}`);
           skipped++;
           continue;
         }
 
-        console.log(`[WaitlistMatcher] Found ${waitlist.length} waitlist candidates for booking ${booking._id}`);
+        logger.info(`[WaitlistMatcher] Found ${waitlist.length} waitlist candidates for booking ${booking._id}`);
 
         // Score each candidate
         const scoredCandidates = waitlist.map(entry => {
@@ -140,7 +141,7 @@ async function processWaitlistMatching() {
         // Send SMS offer
         try {
           await sendWaitlistOffer(topCandidate.entry, suggestion);
-          console.log(`[WaitlistMatcher] ✅ Matched slot ${booking._id} to customer ${topCandidate.entry.customerId._id} (score: ${topCandidate.matchScore})`);
+          logger.info(`[WaitlistMatcher] ✅ Matched slot ${booking._id} to customer ${topCandidate.entry.customerId._id} (score: ${topCandidate.matchScore})`);
 
           // Update waitlist entry
           topCandidate.entry.notificationsSent += 1;
@@ -149,20 +150,20 @@ async function processWaitlistMatching() {
 
           matched++;
         } catch (smsError) {
-          console.error(`[WaitlistMatcher] Failed to send waitlist SMS:`, smsError.message);
+          logger.error(`[WaitlistMatcher] Failed to send waitlist SMS:`, smsError.message);
           errors++;
         }
 
       } catch (error) {
-        console.error(`[WaitlistMatcher] Error processing booking ${booking._id}:`, error);
+        logger.error(`[WaitlistMatcher] Error processing booking ${booking._id}:`, error);
         errors++;
       }
     }
 
-    console.log(`[WaitlistMatcher] Finished: ${matched} matched, ${skipped} skipped, ${errors} errors`);
+    logger.info(`[WaitlistMatcher] Finished: ${matched} matched, ${skipped} skipped, ${errors} errors`);
 
   } catch (error) {
-    console.error('[WaitlistMatcher] Fatal error:', error);
+    logger.error('[WaitlistMatcher] Fatal error:', error);
   } finally {
     isRunning = false;
   }
@@ -172,7 +173,7 @@ async function processWaitlistMatching() {
  * Start the waitlist matcher worker
  */
 export function startWaitlistMatcher() {
-  console.log('[WaitlistMatcher] Initializing waitlist matcher worker (runs every 15 minutes)...');
+  logger.info('[WaitlistMatcher] Initializing waitlist matcher worker (runs every 15 minutes)...');
 
   // Run immediately on startup
   processWaitlistMatching();
@@ -182,7 +183,7 @@ export function startWaitlistMatcher() {
     processWaitlistMatching();
   });
 
-  console.log('[WaitlistMatcher] Worker scheduled ✅');
+  logger.info('[WaitlistMatcher] Worker scheduled ✅');
 }
 
 export default startWaitlistMatcher;

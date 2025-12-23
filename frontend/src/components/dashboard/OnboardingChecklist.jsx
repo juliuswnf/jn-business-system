@@ -5,6 +5,7 @@ import {
   Check, ChevronRight, X, Sparkles 
 } from 'lucide-react';
 import { salonAPI, serviceAPI } from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 const CHECKLIST_ITEMS = [
   { id: 'info', label: 'Studio-Info hinzufügen', icon: Building2, link: '/onboarding' },
@@ -61,7 +62,7 @@ export default function OnboardingChecklist() {
         setDismissed(true);
       }
     } catch (error) {
-      console.error('Onboarding check error:', error);
+      captureError(error, { context: 'checkOnboarding' });
     } finally {
       setLoading(false);
     }

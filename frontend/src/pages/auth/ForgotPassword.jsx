@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { authAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';
 
 const ForgotPassword = () => {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { showNotification } = useNotification();
+  
+  // Get role from query parameter (business or customer)
+  const role = searchParams.get('role') || 'business';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await authAPI.forgotPassword(email);
+      const response = await authAPI.forgotPassword(email, role);
       if (response.data.success) {
         setSubmitted(true);
         showNotification('Link zum Zurücksetzen wurde gesendet!', 'success');

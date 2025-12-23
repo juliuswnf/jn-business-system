@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { captureError } from '../../utils/errorTracking';
 
 /**
  * UserMenu Component - Account dropdown with settings and logout
@@ -18,7 +19,7 @@ const UserMenu = () => {
       try {
         setUser(JSON.parse(storedUser));
       } catch (e) {
-        console.error('Error parsing user data');
+        captureError(new Error('Error parsing user data'), { context: 'UserMenu' });
       }
     }
   }, []);

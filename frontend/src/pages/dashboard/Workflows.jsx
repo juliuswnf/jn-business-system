@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+import { api } from '../../utils/api';
 
 export default function Workflows() {
   const [industries, setIndustries] = useState([]);
@@ -16,18 +14,23 @@ export default function Workflows() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
-
+      // ? SECURITY FIX: Use central api instance
       // Get available industries
-      const industriesRes = await axios.get(`${API_URL}/api/workflows/industries`);
+      const industriesRes = await api.get('/workflows/industries');
       setIndustries(industriesRes.data.data);
 
+      // Get salonId from user profile instead of decoding token
+      const profileRes = await api.get('/auth/profile');
+      const salonId = profileRes.data.user?.salonId;
+      
+      if (!salonId) {
+        toast.error('Kein Salon zugeordnet');
+        setLoading(false);
+        return;
+      }
+
       // Get active workflows
-      const salonId = JSON.parse(atob(token.split('.')[1])).salonId;
-      const workflowsRes = await axios.get(
-        `${API_URL}/api/workflows/${salonId}?enabled=true`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const workflowsRes = await api.get(`/workflows/${salonId}?enabled=true`);
       setActiveWorkflows(workflowsRes.data.data);
 
       setLoading(false);
@@ -40,13 +43,8 @@ export default function Workflows() {
 
   const handleEnableWorkflow = async (industry, features) => {
     try {
-      const token = localStorage.getItem('token');
-
-      await axios.post(
-        `${API_URL}/api/workflows/enable`,
-        { industry, features },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      // ? SECURITY FIX: Use central api instance
+      await api.post('/workflows/enable', { industry, features });
 
       toast.success('Workflow aktiviert!');
       fetchData();

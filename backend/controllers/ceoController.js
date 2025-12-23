@@ -8,6 +8,7 @@ import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
 import User from '../models/User.js';
 import ErrorLog from '../models/ErrorLog.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
@@ -861,18 +862,23 @@ export const getAllCustomers = async (req, res) => {
       ];
     }
 
-    // Search by name or email
-    if (search) {
+    // Search by name or email (with ReDoS protection)
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
       const searchFilter = {
         $or: [
-          { name: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } }
+          { name: { $regex: escapedSearch, $options: 'i' } },
+          { email: { $regex: escapedSearch, $options: 'i' } }
         ]
       };
       filter = { ...filter, ...searchFilter };
     }
 
-    const skip = (page - 1) * limit;
+    // ? SECURITY FIX: Validate and limit pagination to prevent DoS
+    const validatedPage = Math.max(1, parseInt(page) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 20)); // Max 100 items
+    const skip = (validatedPage - 1) * validatedLimit;
+    
     const total = await Salon.countDocuments(filter);
 
     const customers = await Salon.find(filter)
@@ -880,14 +886,14 @@ export const getAllCustomers = async (req, res) => {
       .select('name email phone address isActive isPremium subscription createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(validatedLimit);
 
     res.status(200).json({
       success: true,
       count: customers.length,
       total,
-      page: parseInt(page),
-      totalPages: Math.ceil(total / limit),
+      page: validatedPage,
+      totalPages: Math.ceil(total / validatedLimit),
       customers: customers.map(c => {
         // Determine plan type
         let planType = 'starter';
@@ -1025,21 +1031,26 @@ export const getAllUsers = async (req, res) => {
       filter.role = role;
     }
 
-    if (search) {
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
+        { name: { $regex: escapedSearch, $options: 'i' } },
+        { email: { $regex: escapedSearch, $options: 'i' } }
       ];
     }
 
-    const skip = (page - 1) * limit;
+    // ? SECURITY FIX: Validate and limit pagination to prevent DoS
+    const validatedPage = Math.max(1, parseInt(page) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 20)); // Max 100 items
+    const skip = (validatedPage - 1) * validatedLimit;
+    
     const total = await User.countDocuments(filter);
 
     const users = await User.find(filter).lean().maxTimeMS(5000)
       .select('name email role companyName isActive isBanned createdAt lastLogin')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(validatedLimit);
 
     // Count by role
     const roleCounts = await User.aggregate([
@@ -1067,8 +1078,8 @@ export const getAllUsers = async (req, res) => {
       success: true,
       count: users.length,
       total,
-      page: parseInt(page),
-      totalPages: Math.ceil(total / limit),
+      page: validatedPage,
+      totalPages: Math.ceil(total / validatedLimit),
       counts,
       users: users.map(u => ({
         id: u._id,

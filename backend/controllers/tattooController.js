@@ -3,6 +3,7 @@ import TattooSession from '../models/TattooSession.js';
 import Consent from '../models/Consent.js';
 import Customer from '../models/Customer.js';
 import logger from '../utils/logger.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 /**
  * Tattoo Controller
@@ -95,11 +96,12 @@ export const getProjects = async (req, res) => {
     if (status) filters.status = status;
     if (customerId) filters.customerId = customerId;
     if (artistId) filters.artistId = artistId;
-    if (search) {
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
       filters.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { style: { $regex: search, $options: 'i' } }
+        { name: { $regex: escapedSearch, $options: 'i' } },
+        { description: { $regex: escapedSearch, $options: 'i' } },
+        { style: { $regex: escapedSearch, $options: 'i' } }
       ];
     }
 

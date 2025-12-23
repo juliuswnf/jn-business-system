@@ -23,12 +23,10 @@ const TattooProjectDetails = () => {
   const fetchProjectDetails = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/tattoo/projects/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const data = await res.json();
+      // ? SECURITY FIX: Use central api instance
+      const { api } = await import('../../utils/api');
+      const res = await api.get(`/tattoo/projects/${id}`);
+      const data = res.data;
       if (data.success) {
         setProject(data.project);
         setSessions(data.sessions);
@@ -46,17 +44,10 @@ const TattooProjectDetails = () => {
 
   const handleCompleteSession = async (sessionId, progress, notes) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/tattoo/sessions/${sessionId}/complete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ progress, notes })
-      });
-
-      const data = await res.json();
+      // ? SECURITY FIX: Use central api instance
+      const { api } = await import('../../utils/api');
+      const res = await api.post(`/tattoo/sessions/${sessionId}/complete`, { progress, notes });
+      const data = res.data;
       if (data.success) {
         toast.success('Session abgeschlossen!');
         setShowCompleteModal(null);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
+import { captureError } from '../../utils/errorTracking';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -17,10 +18,8 @@ export default function Customers() {
   const [customerDetails, setCustomerDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   // Debounce search
   useEffect(() => {
@@ -34,27 +33,14 @@ export default function Customers() {
   const fetchCustomers = useCallback(async () => {
     try {
       setLoading(true);
-      const token = getToken();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
+      // ? SECURITY FIX: Use central api instance
       const params = new URLSearchParams();
       if (debouncedSearch) params.append('search', debouncedSearch);
 
-      const res = await fetch(`${API_URL}/crm/customers?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const res = await api.get(`/crm/customers?${params}`);
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setCustomers(data.customers || []);
-        }
+      if (res.data.success) {
+        setCustomers(res.data.customers || []);
       }
     } catch (error) {
       showNotification('Fehler beim Laden der Kunden', 'error');
@@ -66,24 +52,16 @@ export default function Customers() {
   // Fetch stats
   const fetchStats = useCallback(async () => {
     try {
-      const token = getToken();
-      if (!token) return;
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get('/crm/stats');
 
-      const res = await fetch(`${API_URL}/crm/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
+      if (res.data.success) {
+        const data = res.data;
           setStats(data.stats);
         }
       }
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      captureError(error, { context: 'fetchStats' });
     }
   }, []);
 
@@ -98,17 +76,11 @@ export default function Customers() {
     setLoadingDetails(true);
 
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/crm/customers/${encodeURIComponent(email)}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get(`/crm/customers/${encodeURIComponent(email)}`);
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
+      if (res.data.success) {
+        const data = res.data;
           setCustomerDetails(data.customer);
         }
       }

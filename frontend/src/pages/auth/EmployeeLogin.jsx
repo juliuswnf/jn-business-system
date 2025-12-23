@@ -21,10 +21,10 @@ const EmployeeLogin = () => {
     try {
       const response = await authAPI.employeeLogin(email, password);
       if (response.data.success) {
-        const { token, refreshToken, user } = response.data;
+        // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+        const { token, user } = response.data;
+        // Only store access token temporarily (short-lived, 15 minutes)
         localStorage.setItem('token', token);
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(user));
         success('Anmeldung erfolgreich');
         navigate('/employee/dashboard');
       }
@@ -87,7 +87,7 @@ const EmployeeLogin = () => {
 
         <div className="mt-6 text-center text-sm text-gray-400 border-t border-gray-700 pt-4 space-y-2">
           <div>
-            <Link to="/forgot-password" className="text-indigo-300 hover:text-indigo-200 font-semibold">
+            <Link to="/forgot-password?role=business" className="text-indigo-300 hover:text-indigo-200 font-semibold">
               Passwort vergessen?
             </Link>
           </div>

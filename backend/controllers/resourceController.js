@@ -1,6 +1,8 @@
 ﻿import Resource from '../models/Resource.js';
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
+import logger from '../utils/logger.js';
+import { isValidObjectId } from '../utils/validation.js';
 
 /**
  * Resource Controller
@@ -98,6 +100,13 @@ export const getSalonResources = async (req, res) => {
 export const getResourceById = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+
+    // Validate ObjectId
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid resource ID format' });
+    }
 
     const resource = await Resource.findById(id)
       .populate('compatibleServices', 'name duration price')
@@ -107,12 +116,20 @@ export const getResourceById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (userRole !== 'ceo' && resource.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     return res.json({
       success: true,
       resource
     });
   } catch (error) {
-    console.error('Error getting resource:', error);
+    logger.error('Error getting resource:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -169,7 +186,7 @@ export const checkResourceAvailability = async (req, res) => {
       maxCapacity: resource.capacity
     });
   } catch (error) {
-    console.error('Error checking resource availability:', error);
+    logger.error('Error checking resource availability:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -246,7 +263,7 @@ export const scheduleMaintenance = async (req, res) => {
       resource
     });
   } catch (error) {
-    console.error('Error scheduling maintenance:', error);
+    logger.error('Error scheduling maintenance:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -293,7 +310,7 @@ export const deleteResource = async (req, res) => {
       message: 'Resource deleted'
     });
   } catch (error) {
-    console.error('Error deleting resource:', error);
+    logger.error('Error deleting resource:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

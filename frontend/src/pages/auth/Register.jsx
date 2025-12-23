@@ -112,11 +112,9 @@ export default function Register() {
       if (response.data.success) {
         const { token, user } = response.data;
         
-        // Set all localStorage keys synchronously BEFORE any async operations
-        localStorage.setItem('jnAuthToken', token);
-        localStorage.setItem('jnUser', JSON.stringify(user));
+        // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+        // Only store access token temporarily (short-lived, 15 minutes)
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
         
         // Set default auth header for all future requests
         const { api } = await import('../../utils/api');

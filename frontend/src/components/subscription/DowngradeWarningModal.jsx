@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { api } from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 /**
  * Downgrade Warning Modal
@@ -77,23 +78,17 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/subscriptions/manage/downgrade`,
-        {
-          newTier,
-          immediate,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.post('/subscriptions/manage/downgrade', {
+        newTier,
+        immediate,
+      });
 
       if (response.data.success) {
         onConfirm(response.data);
       }
     } catch (err) {
-      console.error('Downgrade error:', err);
+      captureError(err, { context: 'subscriptionDowngrade' });
       setError(err.response?.data?.message || 'Downgrade fehlgeschlagen');
     } finally {
       setLoading(false);

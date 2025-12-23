@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../hooks/useNotification';
 import { FiClock, FiStar } from 'react-icons/fi';
 import SalonSelector from '../../components/booking/SalonSelector';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../../utils/api';
+import { getAccessToken } from '../../utils/tokenHelper';
+import { captureError } from '../../utils/errorTracking';
 
 /**
  * CUSTOMER BOOKING - Angemeldeter Kunde
@@ -50,9 +50,8 @@ export default function Booking() {
     '16:00', '16:30', '17:00', '17:30'
   ];
 
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   // Initial load: fetch customer profile
   useEffect(() => {
@@ -64,14 +63,12 @@ export default function Booking() {
     const token = getToken();
 
     try {
+      // ? SECURITY FIX: Use central api instance
       // Fetch customer profile
       if (token) {
-        const profileRes = await fetch(`${API_URL}/auth/profile`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (profileRes.ok) {
-          const profileData = await profileRes.json();
-          if (profileData.success && profileData.user) {
+        const profileRes = await api.get('/auth/profile');
+        if (profileRes.data.success && profileRes.data.user) {
+          const profileData = profileRes.data;
             setCustomerProfile({
               name: profileData.user.name || 'Kunde',
               email: profileData.user.email || '',
@@ -81,7 +78,7 @@ export default function Booking() {
         }
       }
     } catch (error) {
-      console.error('Error fetching initial data:', error);
+      captureError(error, { context: 'fetchInitialData' });
     } finally {
       setLoading(false);
     }
@@ -96,12 +93,12 @@ export default function Booking() {
       salonSlug: salon.slug
     }));
 
+    // ? SECURITY FIX: Use central api instance (public endpoint, no auth needed)
     // Fetch services and employees for this salon
     try {
-      const res = await fetch(`${API_URL}/bookings/public/s/${salon.slug}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
+      const res = await api.get(`/bookings/public/s/${salon.slug}`);
+      if (res.data.success) {
+        const data = res.data;
           setServices(data.services?.map(s => ({
             id: s._id,
             name: s.name,
@@ -119,7 +116,7 @@ export default function Booking() {
         }
       }
     } catch (error) {
-      console.error('Error fetching salon details:', error);
+      captureError(error, { context: 'fetchSalonDetails' });
     }
 
     setBookingStep(1);
@@ -134,19 +131,15 @@ export default function Booking() {
 
   const fetchAvailableSlots = async () => {
     try {
-      const res = await fetch(`${API_URL}/bookings/public/s/${bookingData.salonSlug}/available-slots`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: bookingData.date,
-          serviceId: bookingData.serviceId,
-          employeeId: bookingData.employeeId || undefined
-        })
+      // ? SECURITY FIX: Use central api instance (public endpoint, no auth needed)
+      const res = await api.post(`/bookings/public/s/${bookingData.salonSlug}/available-slots`, {
+        date: bookingData.date,
+        serviceId: bookingData.serviceId,
+        employeeId: bookingData.employeeId || undefined
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.slots) {
+      if (res.data.success && res.data.slots) {
+        const data = res.data;
           setAvailableSlots(data.slots);
           setBookedSlots(data.bookedSlots || []);
           return;
@@ -188,16 +181,14 @@ export default function Booking() {
       // ✅ SRE FIX #30: Generate idempotency key
       const idempotencyKey = `booking-${customerProfile.email}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+      // ? SECURITY FIX: Use central api instance (public endpoint, no auth needed)
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
-      const res = await fetch(`${API_URL}/bookings/public/s/${bookingData.salonSlug}/book`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          serviceId: bookingData.serviceId,
-          employeeId: bookingData.employeeId || undefined,
-          bookingDate: {
-            date: bookingData.date, // "2025-12-15"
-            time: bookingData.time  // "14:00"
+      const res = await api.post(`/bookings/public/s/${bookingData.salonSlug}/book`, {
+        serviceId: bookingData.serviceId,
+        employeeId: bookingData.employeeId || undefined,
+        bookingDate: {
+          date: bookingData.date, // "2025-12-15"
+          time: bookingData.time  // "14:00"
           },
           customerName: customerProfile.name,
           customerEmail: customerProfile.email,
@@ -207,14 +198,10 @@ export default function Booking() {
         })
       });
 
-      let data = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
+      // ? SECURITY FIX: Response is already parsed by axios
+      const data = res.data;
 
-      if (res.ok && data?.success) {
+      if (data?.success) {
         // ✅ SRE FIX #38: Show email warnings if any
         if (data.warnings && data.warnings.length > 0) {
           showNotification('Termin gebucht! ' + data.warnings[0], 'warning');
@@ -250,7 +237,7 @@ export default function Booking() {
         }
       }
     } catch (error) {
-      console.error('Booking error:', error);
+      captureError(error, { context: 'createBooking' });
       showNotification('Fehler beim Buchen des Termins', 'error');
     } finally {
       setSubmitting(false);

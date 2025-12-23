@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNotification } from '../../hooks/useNotification';
+import { getAccessToken } from '../../utils/tokenHelper';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -24,27 +25,19 @@ export default function BrandingSettings() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   // Fetch branding settings
   useEffect(() => {
     const fetchBranding = async () => {
       try {
-        const token = getToken();
-        if (!token) return;
+        // ? SECURITY FIX: Use central api instance
+        const { api } = await import('../../utils/api');
+        const res = await api.get('/branding');
 
-        const res = await fetch(`${API_URL}/branding`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (res.ok) {
-          const data = await res.json();
+        if (res.data) {
+          const data = res.data;
           if (data.success) {
             setBranding(data.branding);
             setPermissions(data.permissions);
@@ -64,19 +57,11 @@ export default function BrandingSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/branding`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(branding)
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.put('/branding', branding);
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         showNotification('Branding-Einstellungen gespeichert', 'success');
       } else {
         showNotification(data.error || 'Fehler beim Speichern', 'error');
@@ -98,16 +83,13 @@ export default function BrandingSettings() {
     formData.append('logo', file);
 
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/branding/logo`, {
-        method: 'POST',
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.post('/branding/logo', formData, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
+          'Content-Type': 'multipart/form-data'
+        }
       });
-
-      const data = await res.json();
+      const data = res.data;
 
       if (res.ok && data.success) {
         setBranding(prev => ({ ...prev, logo: data.logoUrl }));
@@ -125,15 +107,10 @@ export default function BrandingSettings() {
   // Delete logo
   const handleDeleteLogo = async () => {
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/branding/logo`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.delete('/branding/logo');
 
-      if (res.ok) {
+      if (res.data.success) {
         setBranding(prev => ({ ...prev, logo: null }));
         showNotification('Logo gelöscht', 'success');
       }
@@ -147,17 +124,11 @@ export default function BrandingSettings() {
     if (!confirm('Möchten Sie das Branding wirklich auf Standard zurücksetzen?')) return;
 
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/branding/reset`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.post('/branding/reset');
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         setBranding(data.branding);
         showNotification('Branding zurückgesetzt', 'success');
       }

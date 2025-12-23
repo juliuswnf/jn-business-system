@@ -5,6 +5,7 @@
  */
 
 import SupportTicket from '../models/SupportTicket.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // ==================== GET ALL TICKETS ====================
 export const getAllTickets = async (req, res) => {
@@ -26,14 +27,20 @@ export const getAllTickets = async (req, res) => {
     if (category) query.category = category;
     if (assignedTo) query.assignedTo = assignedTo;
 
-    if (search) {
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
       query.$or = [
-        { ticketNumber: { $regex: search, $options: 'i' } },
-        { subject: { $regex: search, $options: 'i' } },
-        { customerEmail: { $regex: search, $options: 'i' } },
-        { customerName: { $regex: search, $options: 'i' } }
+        { ticketNumber: { $regex: escapedSearch, $options: 'i' } },
+        { subject: { $regex: escapedSearch, $options: 'i' } },
+        { customerEmail: { $regex: escapedSearch, $options: 'i' } },
+        { customerName: { $regex: escapedSearch, $options: 'i' } }
       ];
     }
+
+    // ? SECURITY FIX: Validate and limit pagination to prevent DoS
+    const validatedPage = Math.max(1, parseInt(page) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 20)); // Max 100 items
+    const skip = (validatedPage - 1) * validatedLimit;
 
     const tickets = await SupportTicket.find(query)
       .lean()
@@ -41,8 +48,8 @@ export const getAllTickets = async (req, res) => {
         priority: -1, // urgent first
         createdAt: -1
       })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit))
+      .skip(skip)
+      .limit(validatedLimit)
       .maxTimeMS(5000);
 
     const total = await SupportTicket.countDocuments(query);
@@ -92,10 +99,10 @@ export const getAllTickets = async (req, res) => {
       stats: statsObj,
       priorityStats: priorityObj,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: validatedPage,
+        limit: validatedLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validatedLimit)
       }
     });
   } catch (error) {

@@ -61,6 +61,15 @@ export const updateSalon = async (req, res) => {
       });
     }
 
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    // CEO can update any salon, others can only update their own salon
+    if (req.user.role !== 'ceo' && salon._id.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     // ? HIGH FIX #11: Only update whitelisted fields
     const updateData = {};
     for (const field of ALLOWED_SALON_FIELDS) {
@@ -136,8 +145,9 @@ export const getSalonBookings = async (req, res) => {
   try {
     const salonId = req.params.salonId || req.user.salonId;
     const { status, startDate, endDate } = req.query;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    // ? SECURITY FIX: Validate and limit pagination to prevent DoS
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20)); // Max 100 items
 
     let filter = { salonId };
 

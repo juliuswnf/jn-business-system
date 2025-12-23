@@ -379,14 +379,22 @@ export const trackClick = async (req, res) => {
     // Mark as clicked
     await recipient.markAsClicked();
 
-    // Redirect to booking page - URL is constructed from DB, not user input, safe
+    // Redirect to booking page - URL is constructed from DB, not user input, but validate for safety
     const salon = await Salon.findById(recipient.campaignId.salonId);
     if (!salon || !salon.slug) {
       return res.redirect(`${process.env.FRONTEND_URL}/404`);
     }
-    const redirectUrl = `${process.env.FRONTEND_URL}/booking/${encodeURIComponent(salon.slug)}?code=${encodeURIComponent(recipient.discountCode)}`;
-
-    res.redirect(redirectUrl);
+    
+    // SECURITY: Validate redirect URL to prevent open redirect attacks
+    const { validateUrl } = await import('../utils/securityHelpers.js');
+    try {
+      const redirectUrl = `${process.env.FRONTEND_URL}/booking/${encodeURIComponent(salon.slug)}?code=${encodeURIComponent(recipient.discountCode || '')}`;
+      const validatedUrl = validateUrl(redirectUrl, [process.env.FRONTEND_URL?.replace(/^https?:\/\//, '')].filter(Boolean));
+      return res.redirect(validatedUrl);
+    } catch (error) {
+      logger.error('Invalid redirect URL:', error);
+      return res.redirect(`${process.env.FRONTEND_URL}/404`);
+    }
   } catch (error) {
     logger.error('[ERROR] Track click error:', error);
     res.redirect(`${process.env.FRONTEND_URL}/404`);

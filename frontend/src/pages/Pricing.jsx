@@ -11,7 +11,7 @@ const plans = [
     yearlyPrice: 1290,
     yearlyMonthlyCost: 107.50,
     features: [
-      { name: 'Mitarbeiter', value: '3', description: 'Bis zu 3 Mitarbeiter können das System nutzen' },
+      { name: 'Mitarbeiter', value: '5', description: 'Bis zu 5 Mitarbeiter können das System nutzen' },
       { name: 'Standorte', value: '1', description: 'Für einen Unternehmens-Standort' },
       { name: 'Buchungen/Monat', value: '100', description: 'Bis zu 100 Termine pro Monat verwaltbar' },
       { name: 'Kunden', value: '200', description: 'Bis zu 200 Kundenkontakte speicherbar' },
@@ -42,7 +42,7 @@ const plans = [
     yearlyMonthlyCost: 207.50,
     popular: true,
     features: [
-      { name: 'Mitarbeiter', value: 'Unbegrenzt', description: 'Beliebig viele Mitarbeiter können das System nutzen' },
+      { name: 'Mitarbeiter', value: '30', description: 'Bis zu 30 Mitarbeiter können das System nutzen' },
       { name: 'Standorte', value: '2', description: 'Für bis zu 2 Standorte' },
       { name: 'Buchungen/Monat', value: 'Unbegrenzt', description: 'Keine Begrenzung bei der Anzahl der Termine' },
       { name: 'Kunden', value: 'Unbegrenzt', description: 'Unbegrenzt viele Kundenkontakte speichern' },

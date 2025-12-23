@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import axios from 'axios';
+import { api } from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
@@ -45,20 +46,14 @@ const CheckoutForm = ({ tier, billingCycle, onSuccess, onError }) => {
         throw new Error(pmError.message);
       }
 
+      // ? SECURITY FIX: Use central api instance
       // Create subscription
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/subscriptions/manage/create`,
-        {
-          tier,
-          billingCycle,
-          paymentMethodId: paymentMethod.id,
-          email,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await api.post('/subscriptions/manage/create', {
+        tier,
+        billingCycle,
+        paymentMethodId: paymentMethod.id,
+        email,
+      });
 
       if (response.data.success) {
         const { subscription } = response.data;
@@ -77,7 +72,7 @@ const CheckoutForm = ({ tier, billingCycle, onSuccess, onError }) => {
         onSuccess(subscription);
       }
     } catch (error) {
-      console.error('Subscription error:', error);
+      captureError(error, { context: 'subscriptionCheckout' });
       onError(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);

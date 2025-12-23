@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { FileText, CheckCircle, XCircle, AlertTriangle, Download, Upload, Edit, Eye, FileSignature } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
+import { captureError } from '../../utils/errorTracking';
+import { api } from '../../utils/api';
 
 /**
  * Consent Form Flow Component
@@ -21,17 +23,12 @@ export default function ConsentFormFlow({ customerId, businessType }) {
 
   const fetchForms = async () => {
     try {
-      const response = await fetch(`/api/consent-forms/customer/${customerId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setForms(data.forms);
+      const response = await api.get(`/consent-forms/customer/${customerId}`);
+      if (response.data.success) {
+        setForms(response.data.forms);
       }
     } catch (error) {
-      console.error('Failed to fetch consent forms:', error);
+      captureError(error, { context: 'fetchConsentForms' });
     } finally {
       setLoading(false);
     }
@@ -49,34 +46,26 @@ export default function ConsentFormFlow({ customerId, businessType }) {
     const signatureData = signatureRef.current.toDataURL();
 
     try {
-      const response = await fetch('/api/consent-forms', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          customerId,
-          formType: formData.get('formType'),
-          formTitle: formData.get('formTitle'),
-          formContent: formData.get('formContent'),
-          signature: signatureData,
-          customerName: formData.get('customerName'),
-          customerEmail: formData.get('customerEmail'),
-          customerConsent: formData.get('customerConsent') === 'on'
-        })
+      const response = await api.post('/consent-forms', {
+        customerId,
+        formType: formData.get('formType'),
+        formTitle: formData.get('formTitle'),
+        formContent: formData.get('formContent'),
+        signature: signatureData,
+        customerName: formData.get('customerName'),
+        customerEmail: formData.get('customerEmail'),
+        customerConsent: formData.get('customerConsent') === 'on'
       });
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         setShowSignModal(false);
         fetchForms();
         alert('Consent form signed successfully');
       } else {
-        alert(data.message);
+        alert(response.data.message);
       }
     } catch (error) {
-      console.error('Failed to sign form:', error);
+      captureError(error, { context: 'signConsentForm' });
       alert('Failed to sign form');
     }
   };
@@ -90,24 +79,16 @@ export default function ConsentFormFlow({ customerId, businessType }) {
     }
 
     try {
-      const response = await fetch(`/api/consent-forms/${selectedForm._id}/revoke`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ reason })
-      });
+      const response = await api.post(`/consent-forms/${selectedForm._id}/revoke`, { reason });
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         setShowRevokeModal(false);
         setSelectedForm(null);
         fetchForms();
         alert('Consent revoked successfully');
       }
     } catch (error) {
-      console.error('Failed to revoke consent:', error);
+      captureError(error, { context: 'revokeConsent' });
       alert('Failed to revoke consent');
     }
   };

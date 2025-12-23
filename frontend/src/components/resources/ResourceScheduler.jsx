@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, CheckCircle, AlertCircle, Plus, Trash2, Settings } from 'lucide-react';
+import { captureError } from '../../utils/errorTracking';
 
 /**
  * Resource Scheduler Component
@@ -21,12 +22,10 @@ export default function ResourceScheduler() {
 
   const fetchResources = async () => {
     try {
-      const response = await fetch('/api/resources', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      // ? SECURITY FIX: Use central api instance instead of fetch
+      const { api } = await import('../../utils/api');
+      const response = await api.get('/resources');
+      const data = response.data;
       if (data.success) {
         setResources(data.resources);
         if (data.resources.length > 0 && !selectedResource) {
@@ -34,7 +33,7 @@ export default function ResourceScheduler() {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch resources:', error);
+      captureError(error, { context: 'fetchResources' });
     } finally {
       setLoading(false);
     }
@@ -44,17 +43,15 @@ export default function ResourceScheduler() {
     if (!selectedDate) return;
 
     try {
-      const response = await fetch(`/api/resources/bookings?date=${selectedDate}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      // ? SECURITY FIX: Use central api instance instead of fetch
+      const { api } = await import('../../utils/api');
+      const response = await api.get(`/resources/bookings?date=${selectedDate}`);
+      const data = response.data;
       if (data.success) {
         setBookings(data.bookings);
       }
     } catch (error) {
-      console.error('Failed to fetch bookings:', error);
+      captureError(error, { context: 'fetchBookings' });
     }
   };
 
@@ -63,31 +60,25 @@ export default function ResourceScheduler() {
     const formData = new FormData(e.target);
 
     try {
-      const response = await fetch('/api/resources/bookings', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          resourceId: formData.get('resourceId'),
-          date: formData.get('date'),
-          startTime: formData.get('startTime'),
-          endTime: formData.get('endTime'),
-          purpose: formData.get('purpose'),
-          notes: formData.get('notes')
-        })
+      // ? SECURITY FIX: Use central api instance instead of fetch
+      const { api } = await import('../../utils/api');
+      const response = await api.post('/resources/bookings', {
+        resourceId: formData.get('resourceId'),
+        date: formData.get('date'),
+        startTime: formData.get('startTime'),
+        endTime: formData.get('endTime'),
+        purpose: formData.get('purpose'),
+        notes: formData.get('notes')
       });
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         setShowAddModal(false);
         fetchBookings();
       } else {
-        alert(data.message);
+        alert(response.data.message);
       }
     } catch (error) {
-      console.error('Failed to create booking:', error);
+      captureError(error, { context: 'createResourceBooking' });
       alert('Failed to create booking');
     }
   };
@@ -97,29 +88,23 @@ export default function ResourceScheduler() {
     const formData = new FormData(e.target);
 
     try {
-      const response = await fetch(`/api/resources/${selectedResource}/maintenance`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          scheduledDate: formData.get('scheduledDate'),
-          startTime: formData.get('startTime'),
-          endTime: formData.get('endTime'),
-          maintenanceType: formData.get('maintenanceType'),
-          description: formData.get('description')
-        })
+      // ? SECURITY FIX: Use central api instance instead of fetch
+      const { api } = await import('../../utils/api');
+      const response = await api.post(`/resources/${selectedResource}/maintenance`, {
+        scheduledDate: formData.get('scheduledDate'),
+        startTime: formData.get('startTime'),
+        endTime: formData.get('endTime'),
+        maintenanceType: formData.get('maintenanceType'),
+        description: formData.get('description')
       });
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         setShowMaintenanceModal(false);
         fetchResources();
         fetchBookings();
       }
     } catch (error) {
-      console.error('Failed to schedule maintenance:', error);
+      captureError(error, { context: 'scheduleMaintenance' });
     }
   };
 
@@ -127,19 +112,15 @@ export default function ResourceScheduler() {
     if (!confirm('Cancel this booking?')) return;
 
     try {
-      const response = await fetch(`/api/resources/bookings/${bookingId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // ? SECURITY FIX: Use central api instance instead of fetch
+      const { api } = await import('../../utils/api');
+      const response = await api.delete(`/resources/bookings/${bookingId}`);
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         fetchBookings();
       }
     } catch (error) {
-      console.error('Failed to cancel booking:', error);
+      captureError(error, { context: 'cancelResourceBooking' });
     }
   };
 

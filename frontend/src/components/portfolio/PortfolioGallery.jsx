@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { X, Heart, Eye, Filter, ChevronLeft, ChevronRight, Star, Upload } from 'lucide-react';
 import api from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 const CATEGORIES = [
   'All',
@@ -42,7 +43,7 @@ export default function PortfolioGallery({ salonId, artistId, isArtistView = fal
       const response = await api.get(endpoint);
       setPortfolioItems(response.data.portfolio || []);
     } catch (error) {
-      console.error('Error fetching portfolio:', error);
+      captureError(error, { context: 'fetchPortfolio' });
     } finally {
       setLoading(false);
     }
@@ -70,7 +71,7 @@ export default function PortfolioGallery({ salonId, artistId, isArtistView = fal
         )
       );
     } catch (error) {
-      console.error('Error liking item:', error);
+      captureError(error, { context: 'likePortfolioItem' });
     }
   };
 
@@ -78,7 +79,7 @@ export default function PortfolioGallery({ salonId, artistId, isArtistView = fal
     try {
       await api.post(`/api/portfolio/${itemId}/view`);
     } catch (error) {
-      console.error('Error incrementing view:', error);
+      captureError(error, { context: 'incrementPortfolioView' });
     }
   };
 

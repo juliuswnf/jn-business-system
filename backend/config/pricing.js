@@ -20,7 +20,7 @@ export const PRICING_TIERS = {
 
     // Limits
     limits: {
-      staff: 3,
+      staff: 5,
       locations: 1,
       bookingsPerMonth: 200,
       customers: 500,
@@ -88,7 +88,7 @@ export const PRICING_TIERS = {
 
     // Limits
     limits: {
-      staff: 10,
+      staff: 30,
       locations: 1,
       bookingsPerMonth: 1000,
       customers: -1, // Unlimited

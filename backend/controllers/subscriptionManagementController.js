@@ -1,5 +1,6 @@
 ﻿import stripePaymentService from '../services/stripePaymentService.js';
 import { PRICING_TIERS, compareTiers } from '../config/pricing.js';
+import logger from '../utils/logger.js';
 
 /**
  * Subscription Management Controller
@@ -63,7 +64,7 @@ export const createSubscription = async (req, res) => {
         : 'Subscription created successfully'
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error creating subscription:', error);
+    logger.error('[Subscription Controller] Error creating subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create subscription',

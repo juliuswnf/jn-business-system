@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiSearch, FiMapPin, FiScissors, FiChevronRight } from 'react-icons/fi';
+import { captureError } from '../../utils/errorTracking';
 
 /**
  * SalonSelector Component
@@ -31,7 +32,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
         }
       }
     } catch (error) {
-      console.error('Error fetching salons:', error);
+      captureError(error, { context: 'fetchSalons' });
     } finally {
       setLoading(false);
     }
@@ -52,7 +53,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
         }
       }
     } catch (error) {
-      console.error('Error searching salons:', error);
+      captureError(error, { context: 'searchSalons' });
     }
   };
 

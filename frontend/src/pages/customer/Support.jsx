@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../../utils/api';
+import { getAccessToken } from '../../utils/tokenHelper';
+import { captureError } from '../../utils/errorTracking';
 
 const Support = () => {
   const [tickets, setTickets] = useState([]);
@@ -15,37 +15,20 @@ const Support = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   // Fetch tickets
   const fetchTickets = async () => {
     setLoading(true);
-    const token = getToken();
-
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
+    // ? SECURITY FIX: Use central api instance
     try {
-      const res = await fetch(`${API_URL}/support/tickets`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setTickets(data.tickets || []);
-        }
+      const res = await api.get('/support/tickets');
+      if (res.data.success) {
+        setTickets(res.data.tickets || []);
       }
     } catch (err) {
-      console.error('Error fetching tickets:', err);
+      captureError(err, { context: 'fetchTickets' });
     } finally {
       setLoading(false);
     }
@@ -70,18 +53,11 @@ const Support = () => {
     }
 
     try {
-      const res = await fetch(`${API_URL}/support/tickets`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newTicket)
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.post('/support/tickets', newTicket);
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         setSuccess(`Ticket ${data.ticket.ticketNumber} wurde erstellt. Wir melden uns bald bei Ihnen.`);
         setNewTicket({ subject: '', description: '', category: 'general' });
         setShowNewTicket(false);
@@ -90,7 +66,7 @@ const Support = () => {
         setError(data.message || 'Fehler beim Erstellen des Tickets');
       }
     } catch (err) {
-      console.error('Error creating ticket:', err);
+      captureError(err, { context: 'createTicket' });
       setError('Netzwerkfehler. Bitte versuchen Sie es erneut.');
     } finally {
       setSubmitting(false);
@@ -99,25 +75,16 @@ const Support = () => {
 
   // Fetch ticket details
   const handleViewTicket = async (ticketId) => {
-    const token = getToken();
-    if (!token) return;
-
+    // ? SECURITY FIX: Use central api instance
     try {
-      const res = await fetch(`${API_URL}/support/tickets/${ticketId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
+      const res = await api.get(`/support/tickets/${ticketId}`);
+      const data = res.data;
+      if (data.success) {
           setSelectedTicket(data.ticket);
         }
       }
     } catch (err) {
-      console.error('Error fetching ticket details:', err);
+      captureError(err, { context: 'fetchTicketDetails' });
     }
   };
 
@@ -130,24 +97,16 @@ const Support = () => {
     const token = getToken();
 
     try {
-      const res = await fetch(`${API_URL}/support/tickets/${selectedTicket._id}/reply`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ message: newReply })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.post(`/support/tickets/${selectedTicket._id}/reply`, { message: newReply });
+      const data = res.data;
+      if (data.success) {
           setSelectedTicket(data.ticket);
           setNewReply('');
         }
       }
     } catch (err) {
-      console.error('Error adding reply:', err);
+      captureError(err, { context: 'addReply' });
     } finally {
       setSubmitting(false);
     }
@@ -160,20 +119,15 @@ const Support = () => {
     const token = getToken();
 
     try {
-      const res = await fetch(`${API_URL}/support/tickets/${selectedTicket._id}/close`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.put(`/support/tickets/${selectedTicket._id}/close`);
 
       if (res.ok) {
         setSelectedTicket(null);
         fetchTickets();
       }
     } catch (err) {
-      console.error('Error closing ticket:', err);
+      captureError(err, { context: 'closeTicket' });
     }
   };
 

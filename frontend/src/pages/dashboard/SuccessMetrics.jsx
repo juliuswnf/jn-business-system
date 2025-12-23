@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { getAccessToken } from '../../utils/tokenHelper';
+import { captureError } from '../../utils/errorTracking';
 import {
   TrendingUp,
   TrendingDown,
@@ -34,7 +36,8 @@ const SuccessMetrics = () => {
   const [period, setPeriod] = useState('30d');
   const [activeTab, setActiveTab] = useState('overview');
 
-  const getToken = () => localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   useEffect(() => {
     fetchAllData();
@@ -42,34 +45,29 @@ const SuccessMetrics = () => {
 
   const fetchAllData = async () => {
     setLoading(true);
-    const token = getToken();
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
-
+    // ? SECURITY FIX: Use central api instance (already imported)
     try {
       // Fetch all data in parallel
       const [metricsRes, trendsRes, servicesRes, peakRes, customersRes] = await Promise.all([
-        fetch(`${API_URL}/salons/analytics/overview`, { headers }),
-        fetch(`${API_URL}/salons/analytics/trends?period=${period}`, { headers }),
-        fetch(`${API_URL}/salons/analytics/top-services`, { headers }),
-        fetch(`${API_URL}/salons/analytics/peak-hours`, { headers }),
-        fetch(`${API_URL}/salons/analytics/customers`, { headers })
+        api.get('/salons/analytics/overview'),
+        api.get(`/salons/analytics/trends?period=${period}`),
+        api.get('/salons/analytics/top-services'),
+        api.get('/salons/analytics/peak-hours'),
+        api.get('/salons/analytics/customers')
       ]);
 
-      if (metricsRes.ok) {
-        const data = await metricsRes.json();
+      if (metricsRes.data) {
+        const data = metricsRes.data;
         setMetrics(data.metrics);
       }
 
-      if (trendsRes.ok) {
-        const data = await trendsRes.json();
+      if (trendsRes.data) {
+        const data = trendsRes.data;
         setTrends(data.data || []);
       }
 
-      if (servicesRes.ok) {
-        const data = await servicesRes.json();
+      if (servicesRes.data) {
+        const data = servicesRes.data;
         // Calculate percentages
         const total = data.services?.reduce((sum, s) => sum + s.bookings, 0) || 1;
         setTopServices(data.services?.map(s => ({
@@ -78,17 +76,17 @@ const SuccessMetrics = () => {
         })) || []);
       }
 
-      if (peakRes.ok) {
-        const data = await peakRes.json();
+      if (peakRes.data) {
+        const data = peakRes.data;
         setPeakHours(data);
       }
 
-      if (customersRes.ok) {
-        const data = await customersRes.json();
+      if (customersRes.data) {
+        const data = customersRes.data;
         setCustomerInsights(data.insights);
       }
     } catch (error) {
-      console.error('Failed to fetch metrics:', error);
+      captureError(error, { context: 'fetchMetrics' });
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { captureError } from '../../utils/errorTracking';
 import {
   Calendar,
   Clock,
@@ -101,7 +102,7 @@ export default function Bookings() {
         setTotal(response.data.total || 0);
       }
     } catch (error) {
-      console.error('Error loading bookings:', error);
+      captureError(error, { context: 'loadBookings' });
       toast.error('Fehler beim Laden der Buchungen');
     } finally {
       setLoading(false);
@@ -136,7 +137,7 @@ export default function Bookings() {
         ));
       }
     } catch (error) {
-      console.error('Error sending SMS confirmation:', error);
+      captureError(error, { context: 'sendSMSConfirmation' });
       const errorMessage = error.response?.data?.message || 'Fehler beim Senden der SMS';
       toast.error(errorMessage);
     } finally {

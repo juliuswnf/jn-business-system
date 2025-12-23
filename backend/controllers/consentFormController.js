@@ -72,7 +72,7 @@ export const createConsentForm = async (req, res) => {
       consentForm
     });
   } catch (error) {
-    console.error('Error creating consent form:', error);
+    logger.error('Error creating consent form:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -96,7 +96,7 @@ export const getCustomerConsents = async (req, res) => {
       consents
     });
   } catch (error) {
-    console.error('Error getting customer consents:', error);
+    logger.error('Error getting customer consents:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -114,12 +114,20 @@ export const getConsentById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
 
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (req.user.role !== 'ceo' && consent.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     return res.json({
       success: true,
       consent
     });
   } catch (error) {
-    console.error('Error getting consent:', error);
+    logger.error('Error getting consent:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -134,6 +142,14 @@ export const revokeConsent = async (req, res) => {
     const consent = await ConsentForm.findById(id).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
+    }
+
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (req.user.role !== 'ceo' && consent.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
     }
 
     // Check if already revoked
@@ -153,7 +169,7 @@ export const revokeConsent = async (req, res) => {
       revokedAt: consent.revokedAt
     });
   } catch (error) {
-    console.error('Error revoking consent:', error);
+    logger.error('Error revoking consent:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -187,7 +203,7 @@ export const checkConsentValidity = async (req, res) => {
       reason: !isValid ? 'Consent expired or revoked' : null
     });
   } catch (error) {
-    console.error('Error checking consent validity:', error);
+    logger.error('Error checking consent validity:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -220,7 +236,7 @@ export const getExpiringConsents = async (req, res) => {
       count: expiringConsents.length
     });
   } catch (error) {
-    console.error('Error getting expiring consents:', error);
+    logger.error('Error getting expiring consents:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -235,6 +251,14 @@ export const downloadConsentPDF = async (req, res) => {
 
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
+    }
+
+    // ? SECURITY FIX: Authorization check - prevent IDOR
+    if (req.user.role !== 'ceo' && consent.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
     }
 
     // If PDF already exists, validate and redirect to it
@@ -273,7 +297,7 @@ export const downloadConsentPDF = async (req, res) => {
       consent
     });
   } catch (error) {
-    console.error('Error downloading consent PDF:', error);
+    logger.error('Error downloading consent PDF:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -301,7 +325,7 @@ export const addWitnessSignature = async (req, res) => {
       consent
     });
   } catch (error) {
-    console.error('Error adding witness signature:', error);
+    logger.error('Error adding witness signature:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -327,14 +351,18 @@ export const getSalonConsents = async (req, res) => {
     if (consentType) query.consentType = consentType;
     if (typeof isActive !== 'undefined') query.isActive = isActive === 'true';
 
-    const skip = (page - 1) * limit;
+    // ? SECURITY FIX: Validate and limit pagination to prevent DoS
+    const validatedPage = Math.max(1, parseInt(page) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 20)); // Max 100 items
+    const skip = (validatedPage - 1) * validatedLimit;
 
     const consents = await ConsentForm.find(query)
       .sort({ signedAt: -1 })
-      .limit(parseInt(limit).lean().maxTimeMS(5000))
       .skip(skip)
+      .limit(validatedLimit)
       .populate('customerId', 'name email')
-      .lean();
+      .lean()
+      .maxTimeMS(5000);
 
     const total = await ConsentForm.countDocuments(query);
 
@@ -343,13 +371,14 @@ export const getSalonConsents = async (req, res) => {
       consents,
       pagination: {
         page: parseInt(page),
-        limit: parseInt(limit),
+        limit: validatedLimit,
+        page: validatedPage,
         total,
         pages: Math.ceil(total / limit)
       }
     });
   } catch (error) {
-    console.error('Error getting salon consents:', error);
+    logger.error('Error getting salon consents:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

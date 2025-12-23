@@ -5,6 +5,7 @@
  */
 
 import AuditLog from '../models/AuditLog.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // ==================== GET AUDIT LOGS ====================
 export const getAuditLogs = async (req, res) => {
@@ -25,7 +26,9 @@ export const getAuditLogs = async (req, res) => {
     const query = {};
 
     if (category) query.category = category;
-    if (action) query.action = { $regex: action, $options: 'i' };
+    if (action && typeof action === 'string' && action.length <= 50) {
+      query.action = { $regex: escapeRegExp(action), $options: 'i' };
+    }
     if (userId) query.userId = userId;
     if (resourceType) query.resourceType = resourceType;
     if (status) query.status = status;
@@ -36,20 +39,28 @@ export const getAuditLogs = async (req, res) => {
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
-    if (search) {
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
       query.$or = [
-        { userEmail: { $regex: search, $options: 'i' } },
-        { userName: { $regex: search, $options: 'i' } },
-        { action: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { ipAddress: { $regex: search, $options: 'i' } }
+        { userEmail: { $regex: escapedSearch, $options: 'i' } },
+        { userName: { $regex: escapedSearch, $options: 'i' } },
+        { action: { $regex: escapedSearch, $options: 'i' } },
+        { description: { $regex: escapedSearch, $options: 'i' } },
+        { ipAddress: { $regex: escapedSearch, $options: 'i' } }
       ];
     }
 
+    // ? SECURITY FIX: Validate and limit pagination to prevent DoS
+    const validatedPage = Math.max(1, parseInt(page) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 50)); // Max 100 items
+    const skip = (validatedPage - 1) * validatedLimit;
+
     const logs = await AuditLog.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1).lean().maxTimeMS(5000) * limit)
-      .limit(parseInt(limit))
+      .skip(skip)
+      .limit(validatedLimit)
+      .lean()
+      .maxTimeMS(5000)
       .populate('userId', 'name email');
 
     const total = await AuditLog.countDocuments(query);
@@ -59,7 +70,8 @@ export const getAuditLogs = async (req, res) => {
       logs,
       pagination: {
         page: parseInt(page),
-        limit: parseInt(limit),
+        limit: validatedLimit,
+        page: validatedPage,
         total,
         pages: Math.ceil(total / limit)
       }
@@ -176,10 +188,12 @@ export const getSecurityAlerts = async (req, res) => {
     // Get recent failed login attempts
     const failedLogins = await AuditLog.find({
       action: { $regex: /login.*failed/i },
-      createdAt: { $gte: new Date(Date.now().lean().maxTimeMS(5000) - 24 * 60 * 60 * 1000) }
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
     })
     .sort({ createdAt: -1 })
-    .limit(20);
+    .limit(20)
+    .lean()
+    .maxTimeMS(5000);
 
     // Get suspicious activities
     const suspiciousActivities = await AuditLog.find({
@@ -187,10 +201,12 @@ export const getSecurityAlerts = async (req, res) => {
         { status: 'failed' },
         { action: { $regex: /suspicious|blocked|banned/i } }
       ],
-      createdAt: { $gte: new Date(Date.now().lean().maxTimeMS(5000) - 24 * 60 * 60 * 1000) }
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
     })
     .sort({ createdAt: -1 })
-    .limit(20);
+    .limit(20)
+    .lean()
+    .maxTimeMS(5000);
 
     // IP addresses with multiple failed attempts
     const suspiciousIPs = await AuditLog.aggregate([

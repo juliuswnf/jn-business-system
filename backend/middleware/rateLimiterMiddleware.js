@@ -350,19 +350,49 @@ const ceoLoginLimiter = rateLimit({
 
 const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // Only 3 password reset requests per hour
+  max: 3, // Only 3 password reset requests per hour per email
   message: {
     success: false,
     message: 'Zu viele Passwort-Reset-Anfragen. Bitte versuchen Sie es in einer Stunde erneut.'
   },
   store: memoryStoreAdapter,
-  keyGenerator: (req) => `pwreset:${req.body?.email || req.ip}`,
+  keyGenerator: (req) => {
+    // Rate limit by both email and IP for better security
+    const email = req.body?.email?.toLowerCase()?.trim() || 'unknown';
+    const ip = req.ip || 'unknown';
+    return `pwreset:email:${email}:ip:${ip}`;
+  },
   handler: (req, res) => {
-    logger.warn(`⚠️ Password reset rate limit exceeded for ${req.body?.email || req.ip}`);
+    const email = req.body?.email || 'unknown';
+    logger.warn(`⚠️ Password reset rate limit exceeded for email: ${email}, IP: ${req.ip}`);
     res.status(429).json({
       success: false,
       message: 'Zu viele Passwort-Reset-Anfragen. Bitte überprüfen Sie Ihre E-Mails oder warten Sie eine Stunde.',
       retryAfter: 3600
+    });
+  }
+});
+
+// Separate limiter for token verification (prevent brute-force on tokens)
+const tokenVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 verification attempts per 15 minutes per token
+  message: {
+    success: false,
+    message: 'Zu viele Token-Verifizierungsversuche. Bitte warten Sie 15 Minuten.'
+  },
+  store: memoryStoreAdapter,
+  keyGenerator: (req) => {
+    const token = req.body?.token || req.query?.token || 'unknown';
+    const tokenHash = require('crypto').createHash('sha256').update(token).digest('hex').substring(0, 16);
+    return `tokenverify:${tokenHash}:${req.ip || 'unknown'}`;
+  },
+  handler: (req, res) => {
+    logger.warn(`⚠️ Token verification rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({
+      success: false,
+      message: 'Zu viele Token-Verifizierungsversuche. Bitte warten Sie 15 Minuten.',
+      retryAfter: 900
     });
   }
 });
@@ -559,23 +589,28 @@ process.on('SIGINT', () => {
 export default generalLimiter;
 
 export {
-  memoryStoreAdapter,
+  // Rate Limiters
   generalLimiter,
   authLimiter,
   strictLimiter,
   apiLimiter,
-  paymentLimiter,
-  uploadLimiter,
-  emailLimiter,
-  searchLimiter,
-  exportLimiter,
-  bookingLimiter,
+  mutationLimiter,
   reviewLimiter,
   ceoLoginLimiter,
   passwordResetLimiter,
+  tokenVerifyLimiter,
   registrationLimiter,
+  emailLimiter,
+  bookingCreationLimiter,
+  searchLimiter,
+  paymentLimiter,
+  uploadLimiter,
+  exportLimiter,
+  bookingLimiter,
   widgetLimiter,
   publicBookingLimiter,
+  // Utilities
+  memoryStoreAdapter,
   customLimiter,
   adminBypass,
   createRateLimiter,
@@ -583,7 +618,5 @@ export {
   resetRateLimiter,
   resetRateLimitKey,
   getRateLimitInfo,
-  rateLimiterMiddlewareChain,
-  bookingCreationLimiter, // ? HIGH FIX #10
-  mutationLimiter // ? HIGH FIX #10
+  rateLimiterMiddlewareChain
 };

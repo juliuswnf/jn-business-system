@@ -6,6 +6,7 @@ import xss from 'xss-clean';
 import hpp from 'hpp';
 import compression from 'compression';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import mongoose from 'mongoose';
@@ -192,8 +193,9 @@ app.use(compression());
 app.post('/api/webhooks/stripe', webhookMiddleware, stripeWebhookController.handleStripeWebhook);
 app.use('/api/webhooks', webhookRoutes); // MessageBird webhooks
 
-// 4️⃣ BODY PARSING
+// 4️⃣ BODY PARSING & COOKIES
 app.use(express.json({ limit: '50mb' }));
+app.use(cookieParser());
 
 // 4?? LOGGING & MONITORING
 // ? AUDIT FIX: Add request context middleware for structured logging
@@ -226,6 +228,22 @@ app.get('/health', async (req, res) => {
     });
   }
 });
+
+// ==================== SENTRY TEST ENDPOINT ====================
+// Only available in development or when explicitly enabled
+if (process.env.NODE_ENV === 'development' || process.env.SENTRY_ENABLED === 'true') {
+  app.get('/api/test-sentry', (req, res) => {
+    // Test Sentry error tracking
+    throw new Error('🧪 Test Sentry Backend Error - This is intentional!');
+  });
+
+  app.get('/api/test-sentry-message', (req, res) => {
+    // Test Sentry message tracking
+    const { captureMessage } = require('./config/sentry.js');
+    captureMessage('🧪 Test Sentry Backend Message - This is intentional!', { level: 'info' });
+    res.json({ success: true, message: 'Sentry message sent!' });
+  });
+}
 
 // Metrics endpoint (protected - CEO only in production)
 app.get('/api/metrics', async (req, res) => {

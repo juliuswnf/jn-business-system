@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { settingsAPI, formatError } from '../../utils/api';
 import { LoadingSpinner } from '../common';
+import { captureError } from '../../utils/errorTracking';
 import './AccountStatus.css';
 
 export default function AccountStatus() {
@@ -19,7 +20,7 @@ export default function AccountStatus() {
       setError(null);
     } catch (err) {
       setError(formatError(err));
-      console.error('Error loading account status:', err);
+      captureError(err, { context: 'loadAccountStatus' });
     } finally {
       setLoading(false);
     }

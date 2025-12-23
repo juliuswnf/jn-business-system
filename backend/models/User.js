@@ -86,6 +86,22 @@ const userSchema = new mongoose.Schema(
       select: false
     },
 
+    passwordResetAttempts: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    passwordResetLockUntil: {
+      type: Date,
+      select: false
+    },
+
+    passwordResetLastAttempt: {
+      type: Date,
+      select: false
+    },
+
     passwordChangedAt: {
       type: Date,
       select: false
@@ -222,10 +238,46 @@ userSchema.methods.comparePassword = async function(enteredPassword) {
 };
 
 userSchema.methods.getPasswordResetToken = function() {
+  // Check if account is locked due to too many reset attempts
+  if (this.passwordResetLockUntil && this.passwordResetLockUntil > Date.now()) {
+    const minutesLeft = Math.ceil((this.passwordResetLockUntil - Date.now()) / (1000 * 60));
+    throw new Error(`Account temporarily locked. Please try again in ${minutesLeft} minute(s).`);
+  }
+
+  // Reset attempts if lock expired
+  if (this.passwordResetLockUntil && this.passwordResetLockUntil <= Date.now()) {
+    this.passwordResetAttempts = 0;
+    this.passwordResetLockUntil = null;
+  }
+
   const resetToken = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
   this.passwordResetExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  this.passwordResetLastAttempt = new Date();
   return resetToken;
+};
+
+userSchema.methods.incPasswordResetAttempts = async function() {
+  // Reset if lock expired
+  if (this.passwordResetLockUntil && this.passwordResetLockUntil < Date.now()) {
+    this.passwordResetAttempts = 0;
+    this.passwordResetLockUntil = null;
+  } else {
+    this.passwordResetAttempts += 1;
+    // Lock after 5 failed attempts for 1 hour
+    if (this.passwordResetAttempts >= 5) {
+      this.passwordResetLockUntil = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      logger.warn(`⚠️ Password reset locked for account: ${this.email}`);
+    }
+  }
+  this.passwordResetLastAttempt = new Date();
+  return await this.save();
+};
+
+userSchema.methods.resetPasswordResetAttempts = async function() {
+  this.passwordResetAttempts = 0;
+  this.passwordResetLockUntil = null;
+  return await this.save();
 };
 
 userSchema.methods.getEmailVerificationToken = function() {

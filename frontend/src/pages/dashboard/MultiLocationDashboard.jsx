@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNotification } from '../../hooks/useNotification';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { getAccessToken } from '../../utils/tokenHelper';
+import { api } from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 export default function MultiLocationDashboard() {
   const { showNotification } = useNotification();
@@ -14,58 +15,38 @@ export default function MultiLocationDashboard() {
   const [adding, setAdding] = useState(false);
   const [upgradeRequired, setUpgradeRequired] = useState(false);
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   // Fetch locations
   const fetchLocations = async () => {
     try {
-      const token = getToken();
-      if (!token) return;
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get('/locations');
+      const data = res.data;
 
-      const res = await fetch(`${API_URL}/locations`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         setLocations(data.locations);
         setUpgradeRequired(false);
       } else if (data.upgradeRequired) {
         setUpgradeRequired(true);
       }
     } catch (error) {
-      console.error('Error fetching locations:', error);
+      captureError(error, { context: 'fetchLocations' });
     }
   };
 
   // Fetch consolidated dashboard
   const fetchDashboard = async () => {
     try {
-      const token = getToken();
-      if (!token) return;
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get('/locations/dashboard');
 
-      const res = await fetch(`${API_URL}/locations/dashboard`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setDashboard(data.dashboard);
-        }
+      if (res.data.success) {
+        setDashboard(res.data.dashboard);
       }
     } catch (error) {
-      console.error('Error fetching dashboard:', error);
+      captureError(error, { context: 'fetchDashboard' });
     } finally {
       setLoading(false);
     }
@@ -82,19 +63,11 @@ export default function MultiLocationDashboard() {
     setAdding(true);
 
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/locations`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newLocation)
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.post('/locations', newLocation);
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         showNotification('Standort hinzugefügt', 'success');
         setShowAddModal(false);
         setNewLocation({ name: '', email: '', businessType: 'hair-salon' });
@@ -113,18 +86,11 @@ export default function MultiLocationDashboard() {
   // Switch location
   const handleSwitchLocation = async (salonId) => {
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/locations/${salonId}/switch`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.post(`/locations/${salonId}/switch`);
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         // Store selected location in localStorage
         localStorage.setItem('activeLocationId', salonId);
         showNotification(data.message, 'success');
@@ -143,17 +109,11 @@ export default function MultiLocationDashboard() {
     }
 
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/locations/${salonId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.delete(`/locations/${salonId}`);
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         showNotification('Standort entfernt', 'success');
         fetchLocations();
         fetchDashboard();

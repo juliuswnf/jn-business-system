@@ -1,5 +1,6 @@
 ﻿import { PRICING_TIERS, FEATURE_NAMES, compareTiers } from '../config/pricing.js';
 import smsService from '../services/smsService.js';
+import logger from '../utils/logger.js';
 
 /**
  * Pricing Controller - Handle pricing tier and feature access
@@ -38,7 +39,7 @@ export const getPricingTiers = async (req, res) => {
       tiers
     });
   } catch (error) {
-    console.error('[Pricing Controller] Error getting pricing tiers:', error);
+    logger.error('[Pricing Controller] Error getting pricing tiers:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get pricing tiers',
@@ -99,7 +100,7 @@ export const getCurrentTier = async (req, res) => {
       features: enabledFeatures
     });
   } catch (error) {
-    console.error('[Pricing Controller] Error getting current tier:', error);
+    logger.error('[Pricing Controller] Error getting current tier:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get current tier',
@@ -127,7 +128,7 @@ export const getFeatureComparison = async (req, res) => {
       features: comparison
     });
   } catch (error) {
-    console.error('[Pricing Controller] Error getting feature comparison:', error);
+    logger.error('[Pricing Controller] Error getting feature comparison:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get feature comparison',
@@ -169,7 +170,7 @@ export const getSMSUsage = async (req, res) => {
       smsUsage: stats
     });
   } catch (error) {
-    console.error('[Pricing Controller] Error getting SMS usage:', error);
+    logger.error('[Pricing Controller] Error getting SMS usage:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get SMS usage',
@@ -225,7 +226,7 @@ export const checkFeatureAccess = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('[Pricing Controller] Error checking feature access:', error);
+    logger.error('[Pricing Controller] Error checking feature access:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to check feature access',
@@ -259,7 +260,7 @@ export const compareTiersEndpoint = async (req, res) => {
       tiersEqual: comparison === 0
     });
   } catch (error) {
-    console.error('[Pricing Controller] Error comparing tiers:', error);
+    logger.error('[Pricing Controller] Error comparing tiers:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to compare tiers',

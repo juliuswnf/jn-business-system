@@ -1,6 +1,7 @@
 ﻿import ProgressEntry from '../models/ProgressEntry.js';
 import Salon from '../models/Salon.js';
 import { uploadToCloudinary } from '../utils/cloudinaryHelper.js';
+import logger from '../utils/logger.js';
 import fs from 'fs';
 
 /**
@@ -70,7 +71,7 @@ export const createProgressEntry = async (req, res) => {
       progressEntry
     });
   } catch (error) {
-    console.error('Error creating progress entry:', error);
+    logger.error('Error creating progress entry:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -132,7 +133,7 @@ export const uploadProgressPhotos = async (req, res) => {
       photos: progressEntry.photos
     });
   } catch (error) {
-    console.error('Error uploading progress photo:', error);
+    logger.error('Error uploading progress photo:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -168,7 +169,7 @@ export const getClientProgressHistory = async (req, res) => {
       count: progressEntries.length
     });
   } catch (error) {
-    console.error('Error getting progress history:', error);
+    logger.error('Error getting progress history:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -205,7 +206,7 @@ export const getProgressSummary = async (req, res) => {
       summary
     });
   } catch (error) {
-    console.error('Error getting progress summary:', error);
+    logger.error('Error getting progress summary:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -246,7 +247,7 @@ export const updateProgressEntry = async (req, res) => {
       progressEntry
     });
   } catch (error) {
-    console.error('Error updating progress entry:', error);
+    logger.error('Error updating progress entry:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -277,7 +278,7 @@ export const deleteProgressEntry = async (req, res) => {
       message: 'Progress entry deleted'
     });
   } catch (error) {
-    console.error('Error deleting progress entry:', error);
+    logger.error('Error deleting progress entry:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -310,7 +311,7 @@ export const getWeightTrend = async (req, res) => {
       weightTrend: weightEntries
     });
   } catch (error) {
-    console.error('Error getting weight trend:', error);
+    logger.error('Error getting weight trend:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -343,7 +344,7 @@ export const getPerformanceTrend = async (req, res) => {
       performanceTrend: performanceEntries
     });
   } catch (error) {
-    console.error('Error getting performance trend:', error);
+    logger.error('Error getting performance trend:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -377,7 +378,7 @@ export const getTrainerStatistics = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting trainer statistics:', error);
+    logger.error('Error getting trainer statistics:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

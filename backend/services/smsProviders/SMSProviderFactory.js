@@ -1,5 +1,6 @@
 import TwilioProvider from './TwilioProvider.js';
 import MessageBirdProvider from './MessageBirdProvider.js';
+import logger from '../../utils/logger.js';
 
 /**
  * SMS Provider Factory
@@ -29,7 +30,7 @@ class SMSProviderFactory {
       this.selectProvider();
       this.initialized = true;
     } catch (error) {
-      console.warn('⚠️ SMS Provider initialization deferred:', error.message);
+      logger.warn('⚠️ SMS Provider initialization deferred:', error.message);
       // Don't throw - allow the app to start without SMS configured
     }
   }
@@ -51,7 +52,7 @@ class SMSProviderFactory {
     const provider = this.providers.get(configuredProvider);
     if (provider && provider.isAvailable()) {
       this.activeProvider = provider;
-      console.log(`✅ SMS Provider: ${provider.getName().toUpperCase()}`);
+      logger.info(`✅ SMS Provider: ${provider.getName().toUpperCase()}`);
       return;
     }
 
@@ -59,7 +60,7 @@ class SMSProviderFactory {
     for (const [name, prov] of this.providers.entries()) {
       if (prov.isAvailable()) {
         this.activeProvider = prov;
-        console.log(`⚠️ SMS Provider ${configuredProvider} not available, using ${name.toUpperCase()} as fallback`);
+        logger.warn(`⚠️ SMS Provider ${configuredProvider} not available, using ${name.toUpperCase()} as fallback`);
         return;
       }
     }
@@ -112,7 +113,7 @@ class SMSProviderFactory {
     }
 
     this.activeProvider = provider;
-    console.log(`🔄 Switched SMS provider to ${providerName.toUpperCase()}`);
+    logger.info(`🔄 Switched SMS provider to ${providerName.toUpperCase()}`);
     return provider;
   }
 }

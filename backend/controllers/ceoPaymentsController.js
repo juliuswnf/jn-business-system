@@ -6,6 +6,7 @@
 
 import Salon from '../models/Salon.js';
 import Payment from '../models/Payment.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
@@ -45,18 +46,21 @@ export const getAllTransactions = async (req, res) => {
       }
     }
 
-    if (search) {
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
       query.$or = [
-        { customerEmail: { $regex: search, $options: 'i' } },
-        { customerName: { $regex: search, $options: 'i' } },
-        { stripePaymentId: { $regex: search, $options: 'i' } }
+        { customerEmail: { $regex: escapedSearch, $options: 'i' } },
+        { customerName: { $regex: escapedSearch, $options: 'i' } },
+        { stripePaymentId: { $regex: escapedSearch, $options: 'i' } }
       ];
     }
 
     const transactions = await Payment.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1).lean().maxTimeMS(5000) * limit)
-      .limit(parseInt(limit))
+      .skip(skip)
+      .limit(validatedLimit)
+      .lean()
+      .maxTimeMS(5000)
       .populate('companyId', 'name email');
 
     const total = await Payment.countDocuments(query);
@@ -83,8 +87,8 @@ export const getAllTransactions = async (req, res) => {
       transactions,
       totals: totals[0] || { totalAmount: 0, totalRefunded: 0, count: 0 },
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: validatedPage,
+        limit: validatedLimit,
         total,
         pages: Math.ceil(total / limit)
       }

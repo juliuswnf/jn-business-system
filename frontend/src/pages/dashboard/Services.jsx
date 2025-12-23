@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, X, Check, Clock, DollarSign } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
 import { serviceAPI } from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 export default function Services() {
   const { showNotification } = useNotification();
@@ -28,7 +29,7 @@ export default function Services() {
       const servicesList = response.data?.data || response.data || [];
       setServices(servicesList);
     } catch (error) {
-      console.error('Error fetching services:', error);
+      captureError(error, { context: 'fetchServices' });
       showNotification('Fehler beim Laden der Services', 'error');
     } finally {
       setLoading(false);
@@ -87,7 +88,7 @@ export default function Services() {
       handleClose();
       fetchServices();
     } catch (error) {
-      console.error('Error saving service:', error);
+      captureError(error, { context: 'saveService' });
       showNotification('Fehler beim Speichern', 'error');
     }
   };
@@ -100,7 +101,7 @@ export default function Services() {
       showNotification('Service gelöscht', 'success');
       fetchServices();
     } catch (error) {
-      console.error('Error deleting service:', error);
+      captureError(error, { context: 'deleteService' });
       showNotification('Fehler beim Löschen', 'error');
     }
   };

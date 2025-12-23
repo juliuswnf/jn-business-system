@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SMSUsageWidget from '../components/SMSUsageWidget';
-
-// API Base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { api } from '../utils/api';
+import { getAccessToken, getUser } from '../utils/tokenHelper';
 
 const BusinessOwnerDashboard = () => {
   const [todaysBookings, setTodaysBookings] = useState([]);
@@ -17,16 +16,8 @@ const BusinessOwnerDashboard = () => {
     totalServices: 0
   });
 
-  // Get auth token
-  const getToken = () => {
-    return localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  };
-
-  // Get user data
-  const getUser = () => {
-    const userStr = localStorage.getItem('jnUser') || localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
-  };
+  // ? SECURITY FIX: Use token helper
+  const getToken = () => getAccessToken();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,26 +30,22 @@ const BusinessOwnerDashboard = () => {
         return;
       }
 
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-
+      // ? SECURITY FIX: Use central api instance
       try {
+        const user = getUser();
+        
         // Fetch today's bookings
         const today = new Date().toISOString().split('T')[0];
-        const todayRes = await fetch(`${API_URL}/bookings/by-date?date=${today}`, { headers });
-        if (todayRes.ok) {
-          const todayData = await todayRes.json();
-          if (todayData.success) {
-            setTodaysBookings(todayData.bookings?.map(b => ({
-              id: b._id,
-              customer: b.customerName || 'Unbekannt',
-              service: b.serviceId?.name || 'Service',
-              time: new Date(b.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
-              status: b.status
-            })) || []);
-          }
+        const todayRes = await api.get(`/bookings/by-date?date=${today}`);
+        if (todayRes.data.success) {
+          const todayData = todayRes.data;
+          setTodaysBookings(todayData.bookings?.map(b => ({
+            id: b._id,
+            customer: b.customerName || 'Unbekannt',
+            service: b.serviceId?.name || 'Service',
+            time: new Date(b.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
+            status: b.status
+          })) || []);
         }
 
         // Fetch upcoming bookings (next 7 days)
@@ -67,61 +54,52 @@ const BusinessOwnerDashboard = () => {
         const nextWeek = new Date();
         nextWeek.setDate(nextWeek.getDate() + 7);
         
-        const upcomingRes = await fetch(`${API_URL}/bookings?startDate=${tomorrow.toISOString()}&endDate=${nextWeek.toISOString()}&limit=10`, { headers });
-        if (upcomingRes.ok) {
-          const upcomingData = await upcomingRes.json();
-          if (upcomingData.success) {
-            setUpcomingBookings(upcomingData.bookings?.map(b => ({
-              id: b._id,
-              customer: b.customerName || 'Unbekannt',
-              service: b.serviceId?.name || 'Service',
-              time: new Date(b.bookingDate).toLocaleString('de-DE', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              }),
-              status: b.status
-            })) || []);
-          }
+        const upcomingRes = await api.get(`/bookings?startDate=${tomorrow.toISOString()}&endDate=${nextWeek.toISOString()}&limit=10`);
+        if (upcomingRes.data.success) {
+          const upcomingData = upcomingRes.data;
+          setUpcomingBookings(upcomingData.bookings?.map(b => ({
+            id: b._id,
+            customer: b.customerName || 'Unbekannt',
+            service: b.serviceId?.name || 'Service',
+            time: new Date(b.bookingDate).toLocaleString('de-DE', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            }),
+            status: b.status
+          })) || []);
         }
 
         // Fetch services
-        const servicesRes = await fetch(`${API_URL}/salons/services`, { headers });
-        if (servicesRes.ok) {
-          const servicesData = await servicesRes.json();
-          if (servicesData.success) {
-            setServices(servicesData.services?.map(s => ({
-              id: s._id,
-              name: s.name,
-              price: s.price,
-              duration: s.duration
-            })) || []);
-          }
+        const servicesRes = await api.get('/salons/services');
+        if (servicesRes.data.success) {
+          const servicesData = servicesRes.data;
+          setServices(servicesData.services?.map(s => ({
+            id: s._id,
+            name: s.name,
+            price: s.price,
+            duration: s.duration
+          })) || []);
         }
 
         // Fetch booking stats
-        const statsRes = await fetch(`${API_URL}/bookings/stats`, { headers });
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          if (statsData.success) {
-            setStats({
-              todayCount: statsData.stats?.todayBookings || todaysBookings.length,
-              upcomingCount: statsData.stats?.pendingBookings || upcomingBookings.length,
-              totalServices: services.length
-            });
-          }
+        const statsRes = await api.get('/bookings/stats');
+        if (statsRes.data.success) {
+          const statsData = statsRes.data;
+          setStats({
+            todayCount: statsData.stats?.todayBookings || todaysBookings.length,
+            upcomingCount: statsData.stats?.pendingBookings || upcomingBookings.length,
+            totalServices: services.length
+          });
         }
 
         // Generate widget code based on salon slug
         if (user?.salonId) {
-          const salonRes = await fetch(`${API_URL}/salons/my-salon`, { headers });
-          if (salonRes.ok) {
-            const salonData = await salonRes.json();
-            if (salonData.success && salonData.salon?.slug) {
-              const baseUrl = window.location.origin;
-              setWidgetCode(`<iframe src="${baseUrl}/widget/${salonData.salon.slug}" width="100%" height="600px" style="border: none;"></iframe>`);
-            }
+          const salonRes = await api.get('/salons/my-salon');
+          if (salonRes.data.success && salonRes.data.salon?.slug) {
+            const baseUrl = window.location.origin;
+            setWidgetCode(`<iframe src="${baseUrl}/widget/${salonRes.data.salon.slug}" width="100%" height="600px" style="border: none;"></iframe>`);
           }
         }
 

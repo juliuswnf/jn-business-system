@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+import { api } from '../../utils/api';
 
 /**
  * Tattoo Projects Dashboard
@@ -27,12 +25,8 @@ const TattooProjects = () => {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_URL}/api/tattoo/projects/stats`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.get('/tattoo/projects/stats');
 
       if (res.data.success) {
         setStats(res.data.stats);
@@ -46,17 +40,13 @@ const TattooProjects = () => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      // ? SECURITY FIX: Use central api instance
 
       const queryParams = new URLSearchParams();
       if (filters.status) queryParams.append('status', filters.status);
       if (filters.search) queryParams.append('search', filters.search);
 
-      const res = await axios.get(`${API_URL}/api/tattoo/projects?${queryParams}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const res = await api.get(`/tattoo/projects?${queryParams}`);
 
       if (res.data.success) {
         setProjects(res.data.projects);
@@ -75,12 +65,8 @@ const TattooProjects = () => {
     if (!confirm('Projekt wirklich löschen? Alle Sessions werden abgebrochen.')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.delete(`${API_URL}/api/tattoo/projects/${projectId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      // ? SECURITY FIX: Use central api instance
+      const res = await api.delete(`/tattoo/projects/${projectId}`);
 
       if (res.data.success) {
         toast.success('Projekt gelöscht');

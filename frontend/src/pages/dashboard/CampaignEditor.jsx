@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -14,8 +14,6 @@ import {
   Percent,
   Euro
 } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 const CampaignEditor = () => {
   const { id } = useParams();
@@ -58,11 +56,8 @@ const CampaignEditor = () => {
 
   const loadCampaign = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${API_BASE_URL}/marketing/campaigns/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.get(`/marketing/campaigns/${id}`);
       setCampaign(response.data.data);
     } catch (error) {
       toast.error('Fehler beim Laden der Campaign');
@@ -75,21 +70,13 @@ const CampaignEditor = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      // ? SECURITY FIX: Use central api instance
 
       if (id) {
-        await axios.put(
-          `${API_BASE_URL}/marketing/campaigns/${id}`,
-          campaign,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await api.put(`/marketing/campaigns/${id}`, campaign);
         toast.success('Campaign gespeichert!');
       } else {
-        const response = await axios.post(
-          `${API_BASE_URL}/marketing/campaigns`,
-          campaign,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await api.post('/marketing/campaigns', campaign);
         toast.success('Campaign erstellt!');
         navigate(`/dashboard/campaign-editor/${response.data.data._id}`);
       }
@@ -102,8 +89,8 @@ const CampaignEditor = () => {
 
   const loadPreview = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
+      // ? SECURITY FIX: Use central api instance
+      const response = await api.get(
         `${API_BASE_URL}/marketing/campaigns/${id}/preview`,
         { headers: { Authorization: `Bearer ${token}` } }
       );

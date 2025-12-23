@@ -3,6 +3,7 @@ import { Check, Clock, DollarSign, Calendar, TrendingUp, Package as PackageIcon,
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import api from '../../utils/api';
+import { captureError } from '../../utils/errorTracking';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -22,7 +23,7 @@ export default function PackagePurchaseFlow({ salonId }) {
       const response = await api.get(`/api/packages/salon/${salonId}`);
       setPackages(response.data.packages || []);
     } catch (error) {
-      console.error('Error fetching packages:', error);
+      captureError(error, { context: 'fetchPackages' });
     } finally {
       setLoading(false);
     }
@@ -246,7 +247,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
       }, 2000);
 
     } catch (err) {
-      console.error('Payment error:', err);
+      captureError(err, { context: 'packagePayment' });
       setError(err.response?.data?.message || 'Payment failed. Please try again.');
       setLoading(false);
     }

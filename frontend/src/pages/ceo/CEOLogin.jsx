@@ -112,7 +112,7 @@ const CEOLogin = () => {
           <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
             <input type="checkbox" className="rounded text-indigo-500" /> Angemeldet bleiben
           </label>
-          <a href="/forgot-password" className="text-sm text-indigo-300 hover:text-indigo-200">Passwort vergessen?</a>
+          <a href="/forgot-password?role=business" className="text-sm text-indigo-300 hover:text-indigo-200">Passwort vergessen?</a>
         </div>
 
         <ButtonLoading type="submit" isLoading={isSubmitting || isLoading} loadingText="Überprüfe..." variant="primary" className="w-full">

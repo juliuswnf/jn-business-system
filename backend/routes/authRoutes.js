@@ -6,6 +6,7 @@ import {
   authLimiter,
   ceoLoginLimiter,
   passwordResetLimiter,
+  tokenVerifyLimiter,
   registrationLimiter,
   emailLimiter
 } from '../middleware/rateLimiterMiddleware.js';
@@ -28,6 +29,7 @@ router.post('/employee-login', authLimiter, authController.employeeLogin);
 
 // Password Management - Strict rate limiting
 router.post('/forgot-password', passwordResetLimiter, authController.forgotPassword);
+router.post('/verify-reset-token', tokenVerifyLimiter, authController.verifyPasswordResetToken);
 router.post('/reset-password', passwordResetLimiter, authController.resetPassword);
 
 // Refresh Token (public - accepts expired token)

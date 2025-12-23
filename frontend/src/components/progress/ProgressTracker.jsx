@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
+import { captureError } from '../../utils/errorTracking';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -59,7 +60,7 @@ export default function ProgressTracker({ customerId, trainerId }) {
       setWeightTrend(weightRes.data.trend || []);
       setPerformanceTrend(performanceRes.data.trend || []);
     } catch (error) {
-      console.error('Error fetching progress data:', error);
+      captureError(error, { context: 'fetchProgressData' });
     } finally {
       setLoading(false);
     }

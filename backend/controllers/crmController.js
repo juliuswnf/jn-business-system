@@ -9,6 +9,7 @@
 
 import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 /**
  * Get all customers for a salon (aggregated from bookings)
@@ -53,14 +54,15 @@ export const getCustomers = async (req, res) => {
       }
     ];
 
-    // Add search filter
-    if (search) {
+    // Add search filter (with ReDoS protection)
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
       aggregation.push({
         $match: {
           $or: [
-            { customerName: { $regex: search, $options: 'i' } },
-            { customerEmail: { $regex: search, $options: 'i' } },
-            { customerPhone: { $regex: search, $options: 'i' } }
+            { customerName: { $regex: escapedSearch, $options: 'i' } },
+            { customerEmail: { $regex: escapedSearch, $options: 'i' } },
+            { customerPhone: { $regex: escapedSearch, $options: 'i' } }
           ]
         }
       });
@@ -373,7 +375,7 @@ export const addCustomerNote = async (req, res) => {
     const booking = await Booking.findOneAndUpdate(
       {
         salonId,
-        customerEmail: { $regex: new RegExp(`^${email}$`, 'i') }
+        customerEmail: { $regex: new RegExp(`^${escapeRegExp(email)}$`, 'i') }
       },
       {
         $push: {
