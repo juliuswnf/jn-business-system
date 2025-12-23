@@ -27,9 +27,9 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
   };
 
   const features = {
-    starter: ['3 Mitarbeiter', '1 Standort', '200 Buchungen/Monat', 'Basis-Features'],
+    starter: ['5 Mitarbeiter', '1 Standort', '200 Buchungen/Monat', 'Basis-Features'],
     professional: [
-      '10 Mitarbeiter',
+      '30 Mitarbeiter',
       '1 Standort',
       '1.000 Buchungen/Monat',
       'Marketing-Automation',

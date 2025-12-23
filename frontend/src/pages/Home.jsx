@@ -1348,7 +1348,7 @@ function Home() {
               <div className="text-2xl font-bold mb-2">€129</div>
               <div className="text-gray-300 mb-4">Starter</div>
               <ul className="space-y-3 text-sm">
-                {['3 Mitarbeiter', '100 Buchungen/Mo', 'NO-SHOW-KILLER Basic', 'E-Mail Support'].map((item, i) => (
+                {['5 Mitarbeiter', '100 Buchungen/Mo', 'NO-SHOW-KILLER Basic', 'E-Mail Support'].map((item, i) => (
                   <li key={i} className="flex items-center gap-2 text-gray-300">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
