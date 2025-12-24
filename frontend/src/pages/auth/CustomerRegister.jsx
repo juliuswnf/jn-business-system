@@ -75,9 +75,8 @@ export default function CustomerRegister() {
 
       if (response.data.success) {
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-        const { token, user } = response.data;
-        // Only store access token temporarily (short-lived, 15 minutes)
-        localStorage.setItem('token', token);
+        // Tokens are automatically sent by browser with withCredentials: true
+        // No need to store in localStorage
         
         showNotification('Registrierung erfolgreich!', 'success');
         setTimeout(() => {

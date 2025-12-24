@@ -55,10 +55,19 @@ const emailQueueSchema = new mongoose.Schema({
   lastAttemptAt: {
     type: Date
   },
+  nextRetryAt: {
+    type: Date,
+    index: true
+  },
+  retryCount: {
+    type: Number,
+    default: 0
+  },
   error: {
     message: String,
     stack: String,
-    code: String
+    code: String,
+    isTransient: Boolean // ? SECURITY FIX: Distinguish transient vs permanent errors
   },
 
   // Related Documents
@@ -100,6 +109,7 @@ const emailQueueSchema = new mongoose.Schema({
 
 // Compound indexes for efficient queries
 emailQueueSchema.index({ status: 1, scheduledFor: 1 });
+emailQueueSchema.index({ status: 1, nextRetryAt: 1 }); // ? SECURITY FIX: Index for retry logic
 emailQueueSchema.index({ salon: 1, status: 1 });
 emailQueueSchema.index({ booking: 1 });
 emailQueueSchema.index({ type: 1, status: 1 });
@@ -147,9 +157,14 @@ emailQueueSchema.methods.cancel = function() {
 // Check if email is ready to send
 emailQueueSchema.methods.isReadyToSend = function() {
   const now = new Date();
+  const isScheduled = this.scheduledFor <= now;
+  const isRetryReady = !this.nextRetryAt || this.nextRetryAt <= now;
+  const hasAttemptsLeft = this.attempts < this.maxAttempts;
+  
   return this.status === 'pending' &&
-         this.scheduledFor <= now &&
-         this.attempts < this.maxAttempts;
+         isScheduled &&
+         isRetryReady &&
+         hasAttemptsLeft;
 };
 
 // Statics
@@ -160,6 +175,11 @@ emailQueueSchema.statics.getReadyToSend = function(limit = 100) {
   return this.find({
     status: 'pending',
     scheduledFor: { $lte: now },
+    $or: [
+      { nextRetryAt: { $exists: false } },
+      { nextRetryAt: { $lte: now } },
+      { nextRetryAt: null }
+    ],
     attempts: { $lt: 3 }
   })
     .sort({ priority: -1, scheduledFor: 1 })

@@ -14,8 +14,10 @@ const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from header
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    // ? SECURITY FIX: Get token from HTTP-only cookie first (preferred), then from header (for backward compatibility)
+    if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
+    } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
 
@@ -172,7 +174,10 @@ const optionalAuth = async (req, res, next) => {
   try {
     let token;
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    // ? SECURITY FIX: Get token from HTTP-only cookie first (preferred), then from header (for backward compatibility)
+    if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
+    } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
 

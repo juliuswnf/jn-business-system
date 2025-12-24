@@ -12,6 +12,7 @@ const router = express.Router();
 router.post(
   '/intent',
   authMiddleware.protect,
+  securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for payments
   paymentLimiter,
   securityMiddleware.validateContentType,
   paymentController.createPaymentIntent
@@ -21,6 +22,7 @@ router.post(
 router.post(
   '/process',
   authMiddleware.protect,
+  securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for payments
   paymentLimiter,
   securityMiddleware.validateContentType,
   paymentController.processPayment
@@ -48,6 +50,7 @@ router.get(
 router.post(
   '/refund',
   authMiddleware.protect,
+  securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for refunds
   paymentLimiter,
   securityMiddleware.validateContentType,
   paymentController.refundPayment

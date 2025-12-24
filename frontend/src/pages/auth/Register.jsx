@@ -110,15 +110,9 @@ export default function Register() {
       });
 
       if (response.data.success) {
-        const { token, user } = response.data;
-        
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-        // Only store access token temporarily (short-lived, 15 minutes)
-        localStorage.setItem('token', token);
-        
-        // Set default auth header for all future requests
-        const { api } = await import('../../utils/api');
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        // Tokens are automatically sent by browser with withCredentials: true
+        // No need to store in localStorage or set headers manually
 
         // Clear session storage
         sessionStorage.removeItem('selectedPlan');

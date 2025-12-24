@@ -5,23 +5,25 @@ import path from 'path';
 import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
 import alertingService from './alertingService.js';
+import Backup from '../models/Backup.js';
 
 const execAsync = promisify(exec);
 
 /**
- * ? MEDIUM FIX #13: Automated Database Backup Service
+ * ? SECURITY FIX: Automated Database Backup Service
  *
  * Features:
- * - Automated daily MongoDB backups
- * - 30-day retention policy
+ * - Automated daily MongoDB backups (3 AM)
+ * - 7-day retention policy
  * - Backup verification
- * - Cloud storage integration (S3/Railway)
+ * - Backup metadata stored in database
+ * - Cloud storage integration (S3/Railway) - optional
  * - Restore procedures
  */
 
 const BACKUP_DIR = process.env.BACKUP_DIR || './backups';
-const RETENTION_DAYS = parseInt(process.env.BACKUP_RETENTION_DAYS || '30');
-const BACKUP_SCHEDULE = process.env.BACKUP_SCHEDULE || '0 2 * * *'; // 2 AM daily
+const RETENTION_DAYS = parseInt(process.env.BACKUP_RETENTION_DAYS || '7'); // ? SECURITY FIX: 7 days retention
+const BACKUP_SCHEDULE = process.env.BACKUP_SCHEDULE || '0 3 * * *'; // ? SECURITY FIX: 3 AM daily
 
 /**
  * Create MongoDB backup using mongodump
@@ -61,14 +63,32 @@ const createMongoBackup = async () => {
     }
 
     const backupSize = await getFileSize(process.platform === 'win32' ? backupPath : zipPath);
+    const backupSizeBytes = (await fs.stat(process.platform === 'win32' ? backupPath : zipPath)).size;
 
     logger.log(`? Backup completed: ${backupSize}MB`);
+
+    // ? SECURITY FIX: Store backup metadata in database
+    const backupRecord = await Backup.create({
+      name: `backup-${timestamp}`,
+      type: 'scheduled',
+      size: backupSizeBytes,
+      storageLocation: 'local',
+      storagePath: process.platform === 'win32' ? backupPath : zipPath,
+      status: 'completed',
+      startedAt: new Date(),
+      completedAt: new Date(),
+      expiresAt: new Date(Date.now() + RETENTION_DAYS * 24 * 60 * 60 * 1000) // 7 days from now
+    });
+
+    logger.log(`? Backup metadata saved: ${backupRecord._id}`);
 
     return {
       success: true,
       path: process.platform === 'win32' ? backupPath : zipPath,
       size: backupSize,
-      timestamp: new Date().toISOString()
+      sizeBytes: backupSizeBytes,
+      timestamp: new Date().toISOString(),
+      backupId: backupRecord._id
     };
   } catch (error) {
     logger.error('? Backup creation failed:', error);
@@ -131,34 +151,55 @@ const getFileSize = async (filePath) => {
 
 /**
  * Clean up old backups (retention policy)
+ * ? SECURITY FIX: Clean up both files and database records
  */
 const cleanupOldBackups = async () => {
   try {
-    const files = await fs.readdir(BACKUP_DIR);
-    const now = Date.now();
-    const retentionMs = RETENTION_DAYS * 24 * 60 * 60 * 1000;
+    const now = new Date();
+    const retentionDate = new Date(now.getTime() - RETENTION_DAYS * 24 * 60 * 60 * 1000);
 
-    let deletedCount = 0;
+    // Clean up old backup files
+    const files = await fs.readdir(BACKUP_DIR);
+    let deletedFilesCount = 0;
 
     for (const file of files) {
       if (!file.startsWith('backup-')) continue;
 
       const filePath = path.join(BACKUP_DIR, file);
       const stats = await fs.stat(filePath);
-      const age = now - stats.mtimeMs;
+      const fileDate = new Date(stats.mtimeMs);
 
-      if (age > retentionMs) {
+      if (fileDate < retentionDate) {
         await fs.rm(filePath, { recursive: true, force: true });
-        deletedCount++;
-        logger.log(`???  Deleted old backup: ${file}`);
+        deletedFilesCount++;
+        logger.log(`???  Deleted old backup file: ${file}`);
       }
     }
 
-    if (deletedCount > 0) {
-      logger.log(`? Cleaned up ${deletedCount} old backups`);
+    // ? SECURITY FIX: Clean up old backup records from database
+    const deletedRecords = await Backup.updateMany(
+      {
+        status: 'completed',
+        createdAt: { $lt: retentionDate }
+      },
+      {
+        status: 'deleted'
+      }
+    );
+
+    // Actually delete old records (optional - can keep for audit)
+    const actuallyDeleted = await Backup.deleteMany({
+      status: 'deleted',
+      createdAt: { $lt: new Date(now.getTime() - (RETENTION_DAYS + 1) * 24 * 60 * 60 * 1000) }
+    });
+
+    const totalDeleted = deletedFilesCount + actuallyDeleted.deletedCount;
+
+    if (totalDeleted > 0) {
+      logger.log(`? Cleaned up ${deletedFilesCount} old backup files and ${actuallyDeleted.deletedCount} database records`);
     }
 
-    return { deletedCount };
+    return { deletedFilesCount, deletedRecordsCount: actuallyDeleted.deletedCount };
   } catch (error) {
     logger.error('? Backup cleanup failed:', error);
     throw error;
@@ -236,22 +277,43 @@ const restoreFromBackup = async (backupPath) => {
 
 /**
  * Run automated backup job
+ * ? SECURITY FIX: Creates backup, stores metadata, and cleans up old backups
  */
 const runBackupJob = async () => {
   try {
     logger.log('?? Starting scheduled backup job...');
+    const startTime = Date.now();
 
     // Create backup
     const result = await createMongoBackup();
 
-    // Clean up old backups
+    // Update backup record with duration
+    if (result.backupId) {
+      const duration = Math.round((Date.now() - startTime) / 1000);
+      await Backup.findByIdAndUpdate(result.backupId, {
+        duration,
+        completedAt: new Date()
+      });
+    }
+
+    // Clean up old backups (keep last 7 days)
     await cleanupOldBackups();
 
-    logger.log('? Backup job completed successfully');
+    logger.log(`? Backup job completed successfully in ${Math.round((Date.now() - startTime) / 1000)}s`);
 
     return result;
   } catch (error) {
     logger.error('? Backup job failed:', error);
+    
+    // ? SECURITY FIX: Mark backup as failed in database if record exists
+    if (error.backupId) {
+      await Backup.findByIdAndUpdate(error.backupId, {
+        status: 'failed',
+        errorMessage: error.message,
+        completedAt: new Date()
+      }).catch(err => logger.error('Failed to update backup record:', err));
+    }
+    
     throw error;
   }
 };

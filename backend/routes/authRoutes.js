@@ -4,6 +4,7 @@ import ceoMiddleware from '../middleware/ceoMiddleware.js';
 import authController from '../controllers/authController.js';
 import {
   authLimiter,
+  loginIPLimiter,
   ceoLoginLimiter,
   passwordResetLimiter,
   tokenVerifyLimiter,
@@ -19,13 +20,15 @@ const router = express.Router();
 router.post('/register', registrationLimiter, authController.register);
 
 // Login - Standard (Customer/Admin) - Rate limited
-router.post('/login', authLimiter, authController.login);
+// ? SECURITY FIX: Apply both email-based and IP-based rate limiting
+router.post('/login', loginIPLimiter, authLimiter, authController.login);
 
 // CEO Login - Extra strict rate limiting
 router.post('/ceo-login', ceoLoginLimiter, authController.ceoLogin);
 
 // Employee Login - Rate limited
-router.post('/employee-login', authLimiter, authController.employeeLogin);
+// ? SECURITY FIX: Apply both email-based and IP-based rate limiting
+router.post('/employee-login', loginIPLimiter, authLimiter, authController.employeeLogin);
 
 // Password Management - Strict rate limiting
 router.post('/forgot-password', passwordResetLimiter, authController.forgotPassword);

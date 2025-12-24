@@ -13,13 +13,23 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    // ? SECURITY FIX: Tokens are now in HTTP-only cookies, but we still need to send access token in header
-    // Access token is short-lived and sent in response body, we'll get it from there
-    // For now, try to get from localStorage as fallback (will be removed after full migration)
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+    // Browser sends cookies automatically with withCredentials: true
+    // No need to manually set Authorization header - backend reads from cookies
+    
+    // ? SECURITY FIX: Add CSRF token to all state-changing requests
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(config.method?.toUpperCase())) {
+      // Get CSRF token from cookie (set by backend, readable by JavaScript)
+      const csrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
+      
+      if (csrfToken) {
+        config.headers['X-CSRF-Token'] = csrfToken;
+      }
     }
+    
     return config;
   },
   (error) => Promise.reject(error)
@@ -57,19 +67,17 @@ api.interceptors.response.use(
         });
 
         if (response.data.success) {
-          const newToken = response.data.token;
-          // Store access token temporarily (short-lived, 15 minutes)
-          // This will be removed once we fully migrate to cookies
-          localStorage.setItem('token', newToken);
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          // ? SECURITY FIX: New tokens are set as HTTP-only cookies by backend
+          // No need to store in localStorage or set header manually
+          // Browser will send cookies automatically with withCredentials: true
           return api(originalRequest);
         }
       } catch (refreshError) {
-        // Clear all tokens on refresh failure
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+        // ? SECURITY FIX: Tokens are in HTTP-only cookies, cleared by backend on logout
+        // Clear any leftover localStorage data
         localStorage.removeItem('jnAuthToken');
         localStorage.removeItem('jnUser');
+        localStorage.removeItem('user');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }

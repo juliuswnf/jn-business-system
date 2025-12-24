@@ -3,8 +3,7 @@ import {
   UserIcon, 
   BuildingOfficeIcon, 
   BriefcaseIcon,
-  ArrowRightIcon,
-  StarIcon
+  ArrowRightIcon
 } from '@heroicons/react/24/outline';
 
 function LoginSelection() {
@@ -34,7 +33,6 @@ function LoginSelection() {
       bgGradient: 'from-purple-500/10 to-pink-400/10',
       borderColor: 'border-purple-500/30',
       hoverBorder: 'hover:border-purple-500/60',
-      popular: true,
     },
     {
       id: 'employee',
@@ -51,26 +49,16 @@ function LoginSelection() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-black to-zinc-900">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.1),transparent_50%)]" />
-      </div>
-
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-12">
-        <div className="max-w-6xl w-full">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 mb-6">
-              <StarIcon className="w-8 h-8 text-white" />
-              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                Willkommen zurück
-              </h1>
-            </div>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
-              Wählen Sie den passenden Login für Ihr Konto
-            </p>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 py-20">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4">
+            Willkommen zurück
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
+            Wählen Sie den passenden Login für Ihr Konto
+          </p>
+        </div>
 
           {/* Login Options Grid */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -82,16 +70,6 @@ function LoginSelection() {
                   to={option.link}
                   className={`group relative overflow-hidden rounded-2xl border-2 ${option.borderColor} ${option.hoverBorder} bg-gradient-to-br ${option.bgGradient} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-${option.gradient.split(' ')[0]}/20`}
                 >
-                  {/* Popular Badge */}
-                  {option.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-                      <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-400 text-black text-xs font-bold rounded-full shadow-lg">
-                        <StarIcon className="w-3 h-3" />
-                        BELIEBT
-                      </span>
-                    </div>
-                  )}
-
                   {/* Content */}
                   <div className="p-8 relative z-10">
                     {/* Icon */}
@@ -160,7 +138,6 @@ function LoginSelection() {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

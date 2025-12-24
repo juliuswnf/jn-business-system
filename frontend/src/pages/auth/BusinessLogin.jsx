@@ -39,8 +39,8 @@ const BusinessLogin = () => {
         }
 
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-        // Only store access token temporarily (short-lived, 15 minutes)
-        localStorage.setItem('token', data.token);
+        // Tokens are automatically sent by browser with withCredentials: true
+        // No need to store in localStorage
 
         // Auth data saved, redirecting
 

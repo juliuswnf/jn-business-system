@@ -105,20 +105,30 @@ stripeEventSchema.statics.hasBeenProcessed = async function (stripeEventId) {
 
 /**
  * Record new event (idempotent)
+ * ? SECURITY FIX: Saves event immediately with processed: false to prevent race conditions
+ * Returns existing event if already exists
  */
 stripeEventSchema.statics.recordEvent = async function (stripeEventId, eventType, eventData) {
+  // First check if event already exists
+  const existingEvent = await this.findOne({ stripeEventId });
+  if (existingEvent) {
+    return existingEvent;
+  }
+  
+  // Try to create new event with processed: false
   try {
     const event = new this({
       stripeEventId,
       eventType,
       eventData,
-      status: 'pending'
+      status: 'pending' // ? SECURITY FIX: Start with pending, set processed after successful processing
     });
     await event.save();
     return event;
   } catch (error) {
-    // Duplicate key error = event already exists
+    // Duplicate key error = event was created by another request between check and save
     if (error.code === 11000) {
+      // Return the existing event
       return await this.findOne({ stripeEventId });
     }
     throw error;

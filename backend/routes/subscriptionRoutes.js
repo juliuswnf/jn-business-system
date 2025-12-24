@@ -1,5 +1,6 @@
 ﻿import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
+import securityMiddleware from '../middleware/securityMiddleware.js';
 import subscriptionController from '../controllers/subscriptionController.js';
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router.get('/plans', subscriptionController.getPlans);
 router.post(
   '/checkout',
   authMiddleware.protect,
+  securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for subscriptions
   subscriptionController.createCheckout
 );
 
@@ -22,6 +24,7 @@ router.post(
 router.post(
   '/portal',
   authMiddleware.protect,
+  securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for subscriptions
   subscriptionController.createPortal
 );
 

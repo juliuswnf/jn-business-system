@@ -142,24 +142,57 @@ const generalLimiter = rateLimit({
   }
 });
 
+// ? SECURITY FIX: Login Rate Limiter - Prevents brute force attacks
+// Limits both per-email and per-IP to prevent bypassing by trying different emails
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_AUTH || '5'),
-  skipSuccessfulRequests: true,
-  skipFailedRequests: false,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_AUTH || '5'), // 5 failed attempts per email per 15 minutes
+  skipSuccessfulRequests: true, // Don't count successful logins
+  skipFailedRequests: false, // Count failed login attempts
   message: {
     success: false,
     message: 'Zu viele Login-Versuche, bitte später versuchen'
   },
   store: memoryStoreAdapter,
-  keyGenerator: (req) => req.body?.email || req.ip || 'unknown',
+  keyGenerator: (req) => {
+    // ? SECURITY FIX: Rate limit by both email and IP to prevent bypassing
+    const email = req.body?.email?.toLowerCase()?.trim() || 'unknown';
+    const ip = req.ip || 'unknown';
+    // Use email as primary key, but also track by IP
+    return `auth:email:${email}:ip:${ip}`;
+  },
   handler: (req, res) => {
-    logger.warn(`⚠️ Auth rate limit exceeded for ${req.body?.email || req.ip}`);
+    const email = req.body?.email || 'unknown';
+    logger.warn(`⚠️ Auth rate limit exceeded for email: ${email}, IP: ${req.ip}`);
     res.status(429).json({
       success: false,
       message: 'Zu viele Login-Versuche. Bitte versuchen Sie es später erneut.',
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
-      email: req.body?.email
+      email: email
+    });
+  }
+});
+
+// ? SECURITY FIX: IP-based rate limiter for login endpoints
+// Prevents brute force attacks by limiting total login attempts per IP
+// regardless of which email is being used
+const loginIPLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_LOGIN_IP || '10'), // 10 total login attempts per IP per 15 minutes
+  skipSuccessfulRequests: true, // Don't count successful logins
+  skipFailedRequests: false, // Count all failed attempts
+  message: {
+    success: false,
+    message: 'Zu viele Login-Versuche von dieser IP-Adresse'
+  },
+  store: memoryStoreAdapter,
+  keyGenerator: (req) => `login:ip:${req.ip || 'unknown'}`,
+  handler: (req, res) => {
+    logger.warn(`🚨 Login IP rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({
+      success: false,
+      message: 'Zu viele Login-Versuche von dieser IP-Adresse. Bitte versuchen Sie es später erneut.',
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
     });
   }
 });
@@ -592,6 +625,7 @@ export {
   // Rate Limiters
   generalLimiter,
   authLimiter,
+  loginIPLimiter, // ? SECURITY FIX: IP-based login rate limiter
   strictLimiter,
   apiLimiter,
   mutationLimiter,

@@ -11,6 +11,64 @@ import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';
 import emailService from '../services/emailService.js';
 import emailTemplateService from '../services/emailTemplateService.js';
+import alertingService from '../services/alertingService.js';
+
+/**
+ * ? SECURITY FIX: Determine if error is transient (retryable) or permanent
+ * Transient errors: Timeout, Connection Reset, Network issues
+ * Permanent errors: Invalid Email, Authentication Failed, Invalid Format
+ */
+const isTransientError = (error) => {
+  const errorMessage = error.message?.toLowerCase() || '';
+  const errorCode = error.code?.toLowerCase() || '';
+  
+  // Transient error patterns
+  const transientPatterns = [
+    'timeout',
+    'connection reset',
+    'connection refused',
+    'econnrefused',
+    'etimedout',
+    'network',
+    'temporary',
+    'retry',
+    'rate limit',
+    'too many requests',
+    'service unavailable',
+    '503',
+    '502',
+    '504',
+    'econnreset'
+  ];
+  
+  // Permanent error patterns
+  const permanentPatterns = [
+    'invalid email',
+    'email address',
+    'authentication failed',
+    'unauthorized',
+    '401',
+    '403',
+    'invalid format',
+    'malformed',
+    'rejected',
+    'bounced',
+    'blacklisted'
+  ];
+  
+  // Check for permanent errors first
+  if (permanentPatterns.some(pattern => errorMessage.includes(pattern) || errorCode.includes(pattern))) {
+    return false;
+  }
+  
+  // Check for transient errors
+  if (transientPatterns.some(pattern => errorMessage.includes(pattern) || errorCode.includes(pattern))) {
+    return true;
+  }
+  
+  // Default: assume transient (can retry)
+  return true;
+};
 
 /**
  * Process all pending emails in the queue
@@ -18,14 +76,16 @@ import emailTemplateService from '../services/emailTemplateService.js';
 const processEmailQueue = async () => {
   try {
     const now = new Date();
-    // Get all pending emails that are due
+    // ? SECURITY FIX: Get emails ready to send (scheduled and retry time passed)
     const pendingEmails = await EmailQueue.find({
       status: 'pending',
       scheduledFor: { $lte: now },
       $or: [
-        { attempts: { $exists: false } },
-        { attempts: { $lt: 3 } }
-      ]
+        { nextRetryAt: { $exists: false } },
+        { nextRetryAt: { $lte: now } },
+        { nextRetryAt: null }
+      ],
+      attempts: { $lt: 3 }
     }).limit(50); // Process in batches
     
     if (pendingEmails.length === 0) {
@@ -157,19 +217,46 @@ const processEmailQueueItem = async (queueItem) => {
     logger.error(`? Failed to send email ${queueItem._id}:`, error.message);
     logger.error(`   Error stack: ${error.stack}`);
     
+    // ? SECURITY FIX: Determine if error is transient or permanent
+    const isTransient = isTransientError(error);
+    
     // Increment retry counter
     queueItem.attempts = (queueItem.attempts || 0) + 1;
+    queueItem.retryCount = (queueItem.retryCount || 0) + 1;
     queueItem.lastAttemptAt = new Date();
     queueItem.error = {
       message: error.message,
       stack: error.stack,
-      code: error.code || 'UNKNOWN'
+      code: error.code || 'UNKNOWN',
+      isTransient
     };
     
-    // If max retries reached, mark as failed
-    if (queueItem.attempts >= queueItem.maxAttempts) {
+    // If permanent error or max retries reached, mark as failed
+    if (!isTransient || queueItem.attempts >= queueItem.maxAttempts) {
       queueItem.status = 'failed';
-      logger.error(`?? Email ${queueItem._id} failed after ${queueItem.attempts} attempts - PERMANENT FAILURE`);
+      queueItem.nextRetryAt = null;
+      logger.error(`?? Email ${queueItem._id} failed after ${queueItem.attempts} attempts - ${isTransient ? 'MAX RETRIES REACHED' : 'PERMANENT FAILURE'}`);
+      
+      // ? SECURITY FIX: Alert for critical emails that failed
+      const criticalTypes = ['confirmation', 'payment_receipt', 'booking_confirmation'];
+      if (criticalTypes.includes(queueItem.type)) {
+        try {
+          await alertingService.sendAlert({
+            type: 'email_failure',
+            severity: 'critical',
+            title: `Critical Email Failed: ${queueItem.type}`,
+            message: `Failed to send ${queueItem.type} email after ${queueItem.attempts} attempts`,
+            details: {
+              emailId: queueItem._id,
+              recipient: queueItem.to,
+              error: error.message,
+              isTransient
+            }
+          });
+        } catch (alertError) {
+          logger.error('Failed to send alert for email failure:', alertError);
+        }
+      }
       
       // Log failed send (with required fields, non-blocking)
       try {
@@ -188,11 +275,12 @@ const processEmailQueueItem = async (queueItem) => {
         logger.warn(`??  Failed to log email failure: ${logError.message}`);
       }
     } else {
-      // Schedule retry with exponential backoff
-      const backoffMinutes = Math.pow(2, queueItem.attempts) * 5; // 5, 10, 20 minutes
-      queueItem.scheduledFor = new Date(Date.now() + backoffMinutes * 60 * 1000);
+      // ? SECURITY FIX: Schedule retry with exponential backoff (1min, 5min, 15min)
+      const backoffMinutes = queueItem.attempts === 1 ? 1 : 
+                            queueItem.attempts === 2 ? 5 : 15;
+      queueItem.nextRetryAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
       queueItem.status = 'pending'; // Keep as pending for retry
-      logger.log(`?? Scheduled retry #${queueItem.attempts} in ${backoffMinutes} minutes`);
+      logger.log(`?? Scheduled retry #${queueItem.attempts} in ${backoffMinutes} minutes (transient error)`);
     }
     await queueItem.save();
   }

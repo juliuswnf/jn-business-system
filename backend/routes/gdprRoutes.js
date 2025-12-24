@@ -1,5 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
+import securityMiddleware from '../middleware/securityMiddleware.js';
 const { protect } = authMiddleware;
 import {
   exportUserData,
@@ -31,7 +32,7 @@ router.get('/export', protect, exportUserData);
 // @route   POST /api/gdpr/delete
 // @desc    Delete/Anonymize user data (Right to be Forgotten)
 // @access  Private
-router.post('/delete', protect, validateBody(deleteAccountSchema), deleteUserData);
+router.post('/delete', protect, securityMiddleware.validateCSRFToken, validateBody(deleteAccountSchema), deleteUserData);
 
 // @route   GET /api/gdpr/retention-info
 // @desc    Get data retention policy information

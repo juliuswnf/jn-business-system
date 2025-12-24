@@ -46,9 +46,8 @@ const TwoFAVerify = () => {
       const response = await authAPI.verify2FACode(code);
       if (response.data.success) {
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-        const { token } = response.data.data;
-        // Only store access token temporarily (short-lived, 15 minutes)
-        localStorage.setItem('token', token);
+        // Tokens are automatically sent by browser with withCredentials: true
+        // No need to store in localStorage
         
         showNotification('2FA verified successfully!', 'success');
         setTimeout(() => {

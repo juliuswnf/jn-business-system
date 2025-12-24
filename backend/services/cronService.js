@@ -177,8 +177,8 @@ export const initializeCronJobs = () => {
   try {
     logger.log('?? Initializing Cron Jobs...');
 
-    // ? MEDIUM FIX #13: Automated Database Backups
-    // Every day at 2 AM - Create database backup
+    // ? SECURITY FIX: Automated Database Backups
+    // Every day at 3 AM - Create database backup
     cron.schedule(backupService.BACKUP_SCHEDULE, async () => {
       try {
         logger.log('?? Starting scheduled database backup...');

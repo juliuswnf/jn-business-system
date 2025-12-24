@@ -52,19 +52,12 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data;
 
       // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-      // Only store access token temporarily (short-lived, 15 minutes)
-      // Refresh token is in HTTP-only cookie and cannot be accessed via JavaScript
-      setToken(token);
+      // Tokens are automatically sent by browser with withCredentials: true
+      // No need to store in localStorage or set headers manually
       setUser(user);
       isAuthenticatedSet(true);
 
-      // Store access token temporarily for API requests (will be removed after full migration)
-      localStorage.setItem('token', token);
-      
-      // Set api default header
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      return { success: true, user, token };
+      return { success: true, user };
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Login failed';
       setError(errorMessage);
@@ -84,18 +77,12 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data;
 
       // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-      // Only store access token temporarily (short-lived, 15 minutes)
-      setToken(token);
+      // Tokens are automatically sent by browser with withCredentials: true
+      // No need to store in localStorage or set headers manually
       setUser(user);
       isAuthenticatedSet(true);
 
-      // Store access token temporarily for API requests
-      localStorage.setItem('token', token);
-
-      // Set api default header
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      return { success: true, user, token };
+      return { success: true, user };
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Registration failed';
       setError(errorMessage);
@@ -121,17 +108,12 @@ export const AuthProvider = ({ children }) => {
       isAuthenticatedSet(false);
       setError(null);
 
-      // ? SECURITY FIX: Clear localStorage tokens
-      // HTTP-only cookies will be cleared by the backend
-      localStorage.removeItem('token');
+      // ? SECURITY FIX: Tokens are in HTTP-only cookies, cleared by backend
+      // Clear any leftover localStorage data
       localStorage.removeItem('jnAuthToken');
       localStorage.removeItem('jnUser');
-      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       localStorage.removeItem('tempUser');
-
-      // Remove api header
-      delete api.defaults.headers.common['Authorization'];
 
       return { success: true };
     } catch (err) {

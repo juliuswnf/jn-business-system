@@ -1,5 +1,6 @@
 ﻿import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
+import securityMiddleware from '../middleware/securityMiddleware.js';
 import { checkTenantAccess, enforceTenantFilter } from '../middleware/tenantMiddleware.js';
 import { bookingCreationLimiter, mutationLimiter } from '../middleware/rateLimiterMiddleware.js';
 import bookingController from '../controllers/bookingController.js';
@@ -25,15 +26,18 @@ router.get('/by-date', bookingController.getBookingsByDate);
 router.get('/:id', checkTenantAccess('booking'), bookingController.getBooking);
 
 // ? HIGH FIX #10: Create booking with rate limiter (DoS protection)
-router.post('/', bookingCreationLimiter, bookingController.createBooking);
+// ? SECURITY FIX: CSRF protection for booking creation
+router.post('/', securityMiddleware.validateCSRFToken, bookingCreationLimiter, bookingController.createBooking);
 
 // ? HIGH FIX #10: Update booking with rate limiter
-router.put('/:id', mutationLimiter, checkTenantAccess('booking'), bookingController.updateBooking);
+// ? SECURITY FIX: CSRF protection for booking updates
+router.put('/:id', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.updateBooking);
 
 // ? HIGH FIX #10: Confirm/Cancel/Complete/Delete with rate limiter
-router.patch('/:id/confirm', mutationLimiter, checkTenantAccess('booking'), bookingController.confirmBooking);
-router.patch('/:id/cancel', mutationLimiter, checkTenantAccess('booking'), bookingController.cancelBooking);
-router.patch('/:id/complete', mutationLimiter, checkTenantAccess('booking'), bookingController.completeBooking);
-router.delete('/:id', mutationLimiter, checkTenantAccess('booking'), bookingController.deleteBooking);
+// ? SECURITY FIX: CSRF protection for state-changing operations
+router.patch('/:id/confirm', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.confirmBooking);
+router.patch('/:id/cancel', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.cancelBooking);
+router.patch('/:id/complete', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.completeBooking);
+router.delete('/:id', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.deleteBooking);
 
 export default router;

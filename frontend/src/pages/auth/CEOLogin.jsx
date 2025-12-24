@@ -39,11 +39,11 @@ const CEOLogin = () => {
 
       // CEO Login response received
 
-        // SUCCESS - Login complete with token
+        // SUCCESS - Login complete
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-        if (data.success && data.token) {
-          // Only store access token temporarily (short-lived, 15 minutes)
-          localStorage.setItem('token', data.token);
+        if (data.success) {
+          // Tokens are automatically sent by browser with withCredentials: true
+          // No need to store in localStorage
 
         notification.success(data.message || 'Zugang autorisiert');
 

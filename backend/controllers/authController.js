@@ -7,6 +7,7 @@ import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import LifecycleEmail from '../models/LifecycleEmail.js';
 import { isValidEmail, validatePassword, sanitizeErrorMessage } from '../utils/validation.js';
+import { generateCSRFToken } from '../middleware/securityMiddleware.js';
 
 /**
  * Auth Controller - MVP Version
@@ -200,7 +201,7 @@ export const register = async (req, res) => {
 
     logger.info(`✅ User registered: ${user.email} (${user.role})`);
 
-    // Set secure HTTP-only cookie for refresh token
+    // Set secure HTTP-only cookies for both tokens
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -209,10 +210,21 @@ export const register = async (req, res) => {
       path: '/api/auth'
     });
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/'
+    });
+
+    // ? SECURITY FIX: Generate CSRF token for state-changing operations
+    generateCSRFToken(req, res, () => {});
+
     res.status(201).json({
       success: true,
-      token: accessToken,
-      refreshToken, // Also send in response for mobile apps
+      // Tokens are now in HTTP-only cookies, not in response body for security
+      refreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON(),
       salon: salon ? {
@@ -291,7 +303,7 @@ export const login = async (req, res) => {
 
     logger.info(`? User logged in: ${user.email} (${user.role})`);
 
-    // Set secure HTTP-only cookie for refresh token
+    // Set secure HTTP-only cookies for both tokens
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -300,10 +312,18 @@ export const login = async (req, res) => {
       path: '/api/auth'
     });
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/'
+    });
+
     res.status(200).json({
       success: true,
-      token: accessToken,
-      refreshToken, // Also send in response for mobile apps
+      // Tokens are now in HTTP-only cookies, not in response body for security
+      refreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });
@@ -589,7 +609,7 @@ export const ceoLogin = async (req, res) => {
 
     logger.info(`[CEO-SECURITY] ✅ SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
 
-    // Set secure HTTP-only cookie for refresh token
+    // Set secure HTTP-only cookies for both tokens
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -598,10 +618,21 @@ export const ceoLogin = async (req, res) => {
       path: '/api/auth'
     });
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day for CEO
+      path: '/'
+    });
+
+    // ? SECURITY FIX: Generate CSRF token for state-changing operations
+    generateCSRFToken(req, res, () => {});
+
     res.status(200).json({
       success: true,
-      token: accessToken,
-      refreshToken, // Also send in response for mobile apps
+      // Tokens are now in HTTP-only cookies, not in response body for security
+      refreshToken, // Also send in response for mobile apps only
       expiresIn: 24 * 60 * 60, // 1 day in seconds
       user: user.toJSON(),
       message: 'Willkommen im CEO Bereich'
@@ -692,7 +723,7 @@ export const employeeLogin = async (req, res) => {
 
     logger.info(`✅ Employee logged in: ${user.email} (${user.role})`);
 
-    // Set secure HTTP-only cookie for refresh token
+    // Set secure HTTP-only cookies for both tokens
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -701,10 +732,21 @@ export const employeeLogin = async (req, res) => {
       path: '/api/auth'
     });
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/'
+    });
+
+    // ? SECURITY FIX: Generate CSRF token for state-changing operations
+    generateCSRFToken(req, res, () => {});
+
     res.status(200).json({
       success: true,
-      token: accessToken,
-      refreshToken, // Also send in response for mobile apps
+      // Tokens are now in HTTP-only cookies, not in response body for security
+      refreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });
@@ -1527,7 +1569,7 @@ export const refreshToken = async (req, res) => {
 
     logger.info(`?? Token refreshed for: ${user.email}`);
 
-    // Set secure HTTP-only cookie for new refresh token
+    // Set secure HTTP-only cookies for both new tokens
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -1536,10 +1578,21 @@ export const refreshToken = async (req, res) => {
       path: '/api/auth'
     });
 
+    res.cookie('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/'
+    });
+
+    // ? SECURITY FIX: Generate new CSRF token after token refresh
+    generateCSRFToken(req, res, () => {});
+
     res.status(200).json({
       success: true,
-      token: newAccessToken,
-      refreshToken: newRefreshToken, // Also send in response for mobile apps
+      // Tokens are now in HTTP-only cookies, not in response body for security
+      refreshToken: newRefreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });
