@@ -206,11 +206,12 @@ export const deleteCampaign = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
 
-    await campaign.deleteOne();
+    // ? SECURITY FIX: Soft delete instead of hard delete
+    await campaign.softDelete(req.user._id);
 
     res.json({
       success: true,
-      message: 'Campaign gelöscht'
+      message: 'Campaign gelöscht (Soft Delete)'
     });
   } catch (error) {
     logger.error('[ERROR] Delete campaign error:', error);

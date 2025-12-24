@@ -97,6 +97,19 @@ const widgetSchema = new mongoose.Schema(
       default: '100%'
     },
 
+    // ==================== SOFT DELETE ====================
+    deletedAt: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+
     height: {
       type: String,
       default: '600px'
@@ -266,6 +279,38 @@ widgetSchema.statics.getStats = async function(salonId) {
       ? (widget.stats.totalBookings / widget.stats.totalViews * 100).toFixed(2)
       : 0
   };
+};
+
+// ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
+widgetSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+widgetSchema.pre('countDocuments', function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+// ==================== SOFT DELETE METHODS ====================
+widgetSchema.methods.softDelete = async function(userId) {
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  return await this.save();
+};
+
+widgetSchema.methods.restore = async function() {
+  this.deletedAt = null;
+  this.deletedBy = null;
+  return await this.save();
+};
+
+widgetSchema.methods.isDeleted = function() {
+  return this.deletedAt !== null;
 };
 
 // ==================== PRE-SAVE HOOKS ====================

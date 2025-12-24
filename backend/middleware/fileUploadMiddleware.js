@@ -5,25 +5,37 @@ import crypto from 'crypto';
 import logger from '../utils/logger.js';
 
 /**
- * ? SRE FIX #33: File Upload Validation
- * Prevents file upload bombs, validates type and size
+ * ? SECURITY FIX: File Upload Validation
+ * Prevents malicious file uploads, validates type, size, and dimensions
+ * 
+ * Features:
+ * - MIME type validation
+ * - File extension whitelist
+ * - File size limits
+ * - Image dimension validation (via Sharp)
+ * - Filename sanitization
+ * - Path traversal prevention
  */
 
-// Allowed MIME types
+// Allowed MIME types (strict whitelist)
 const ALLOWED_MIME_TYPES = [
   'image/jpeg',
   'image/jpg',
   'image/png',
   'image/webp',
-  'image/gif'
+  'image/gif',
+  'image/svg+xml' // For logos
 ];
 
-// Max file size: 5MB
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+// Allowed file extensions (must match MIME types)
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
 
-// Max image dimensions
-const MAX_IMAGE_WIDTH = 4000;
-const MAX_IMAGE_HEIGHT = 4000;
+// Max file size: 5MB (configurable)
+const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '5242880'); // 5MB default
+
+// Max image dimensions (prevent image bombs)
+const MAX_IMAGE_WIDTH = parseInt(process.env.MAX_IMAGE_WIDTH || '4000');
+const MAX_IMAGE_HEIGHT = parseInt(process.env.MAX_IMAGE_HEIGHT || '4000');
 
 // Storage configuration
 const storage = multer.diskStorage({
@@ -47,22 +59,41 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter: Validate MIME type and extension
+// ? SECURITY FIX: File filter with comprehensive validation
 const fileFilter = (req, file, cb) => {
-  // Check MIME type
-  if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-    return cb(new Error(`Invalid file type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`), false);
+  try {
+    // 1. Validate MIME type (primary check)
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      logger.warn(`⚠️ Rejected file upload: Invalid MIME type "${file.mimetype}" from ${req.ip}`);
+      return cb(new Error(`Invalid file type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`), false);
+    }
+
+    // 2. Validate file extension (secondary check - defense in depth)
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      logger.warn(`⚠️ Rejected file upload: Invalid extension "${ext}" from ${req.ip}`);
+      return cb(new Error(`Invalid file extension. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`), false);
+    }
+
+    // 3. Validate filename (prevent path traversal)
+    const filename = path.basename(file.originalname);
+    if (filename.includes('..') || filename.includes('/') || filename.includes('\\') || filename.includes('\0')) {
+      logger.warn(`⚠️ Rejected file upload: Dangerous filename "${filename}" from ${req.ip}`);
+      return cb(new Error('Invalid filename - path traversal detected'), false);
+    }
+
+    // 4. Validate filename length
+    if (filename.length > 255) {
+      logger.warn(`⚠️ Rejected file upload: Filename too long from ${req.ip}`);
+      return cb(new Error('Filename too long (max 255 characters)'), false);
+    }
+
+    // All checks passed
+    cb(null, true);
+  } catch (error) {
+    logger.error('❌ File filter error:', error);
+    cb(error, false);
   }
-
-  // Check file extension
-  const ext = path.extname(file.originalname).toLowerCase();
-  const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
-
-  if (!allowedExts.includes(ext)) {
-    return cb(new Error(`Invalid file extension. Allowed: ${allowedExts.join(', ')}`), false);
-  }
-
-  cb(null, true);
 };
 
 // Multer configuration
@@ -76,19 +107,28 @@ export const upload = multer({
 });
 
 /**
- * Validate image dimensions after upload
- * Use with sharp: npm install sharp
+ * ? SECURITY FIX: Validate image dimensions and format using Sharp
+ * Prevents image bombs (extremely large images that consume memory)
+ * 
+ * @param {string} filePath - Path to uploaded file
+ * @returns {Promise<Object>} Validation result with dimensions
  */
 export const validateImageDimensions = async (filePath) => {
   try {
     // Lazy load sharp (only if needed)
     const sharp = (await import('sharp')).default;
 
+    // Get image metadata
     const metadata = await sharp(filePath).metadata();
 
+    // Validate dimensions (prevent image bombs)
     if (metadata.width > MAX_IMAGE_WIDTH || metadata.height > MAX_IMAGE_HEIGHT) {
-      // Delete invalid file
-      fs.unlinkSync(filePath);
+      // Delete invalid file immediately
+      try {
+        fs.unlinkSync(filePath);
+      } catch (unlinkError) {
+        logger.error('Failed to delete invalid image:', unlinkError);
+      }
 
       throw new Error(
         `Image dimensions too large. Max: ${MAX_IMAGE_WIDTH}x${MAX_IMAGE_HEIGHT}px, ` +
@@ -96,20 +136,65 @@ export const validateImageDimensions = async (filePath) => {
       );
     }
 
+    // Validate format (ensure it's actually an image)
+    const validFormats = ['jpeg', 'jpg', 'png', 'webp', 'gif', 'svg'];
+    if (!validFormats.includes(metadata.format)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch (unlinkError) {
+        logger.error('Failed to delete invalid image:', unlinkError);
+      }
+
+      throw new Error(`Invalid image format: ${metadata.format}`);
+    }
+
+    logger.log(`✅ Image validated: ${metadata.width}x${metadata.height}px, format: ${metadata.format}`);
+
     return {
       valid: true,
       width: metadata.width,
       height: metadata.height,
-      format: metadata.format
+      format: metadata.format,
+      size: metadata.size || null
     };
   } catch (error) {
-    // If sharp not installed, skip dimension check (backwards compatible)
+    // If sharp not installed, log warning but don't fail (backwards compatible)
     if (error.code === 'MODULE_NOT_FOUND') {
-      logger.warn('?? sharp not installed - skipping image dimension validation');
-      return { valid: true, skipped: true };
+      logger.warn('⚠️ sharp not installed - skipping image dimension validation');
+      logger.warn('⚠️ Install sharp for full image validation: npm install sharp');
+      return { valid: true, skipped: true, reason: 'sharp_not_installed' };
     }
 
+    // Re-throw validation errors
     throw error;
+  }
+};
+
+/**
+ * ? SECURITY FIX: Validate file using Sharp (MIME type verification)
+ * Ensures file is actually what it claims to be (not just renamed)
+ */
+export const validateFileWithSharp = async (filePath) => {
+  try {
+    const sharp = (await import('sharp')).default;
+    
+    // Try to read metadata - if it fails, file is not a valid image
+    await sharp(filePath).metadata();
+    
+    return { valid: true };
+  } catch (error) {
+    if (error.code === 'MODULE_NOT_FOUND') {
+      return { valid: true, skipped: true };
+    }
+    
+    // File is not a valid image - delete it
+    try {
+      fs.unlinkSync(filePath);
+    } catch (unlinkError) {
+      logger.error('Failed to delete invalid file:', unlinkError);
+    }
+    
+    throw new Error('File is not a valid image');
   }
 };
 
@@ -185,6 +270,7 @@ export const handleUploadError = (err, req, res, next) => {
 export default {
   upload,
   validateImageDimensions,
+  validateFileWithSharp,
   sanitizeFilename,
   handleUploadError
 };

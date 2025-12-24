@@ -4,6 +4,7 @@ import logger from '../utils/logger.js';
  * Essential payment operations only
  */
 
+import mongoose from 'mongoose';
 import Stripe from 'stripe';
 import Booking from '../models/Booking.js';
 import Payment from '../models/Payment.js';
@@ -85,10 +86,15 @@ export const createPaymentIntent = async (req, res) => {
 // ==================== PROCESS PAYMENT ====================
 
 export const processPayment = async (req, res) => {
+  // ? SECURITY FIX: Use MongoDB transaction for atomic payment processing
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { bookingId, paymentIntentId, amount, paymentMethod } = req.body;
 
     if (!bookingId || !paymentIntentId || !amount) {
+      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields'
@@ -98,6 +104,7 @@ export const processPayment = async (req, res) => {
     const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== 'succeeded') {
+      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: 'Payment not successful'
@@ -105,8 +112,9 @@ export const processPayment = async (req, res) => {
     }
 
     // First check booking ownership before processing payment
-    const bookingCheck = await Booking.findById(bookingId).maxTimeMS(5000);
+    const bookingCheck = await Booking.findById(bookingId).maxTimeMS(5000).session(session);
     if (!bookingCheck) {
+      await session.abortTransaction();
       return res.status(404).json({
         success: false,
         message: 'Booking not found'
@@ -115,12 +123,23 @@ export const processPayment = async (req, res) => {
 
     // ? SECURITY FIX: Authorization check - prevent IDOR
     if (req.user.role !== 'ceo' && bookingCheck.salonId.toString() !== req.user.salonId?.toString()) {
+      await session.abortTransaction();
       return res.status(403).json({
         success: false,
         message: 'Access denied - Resource belongs to another salon'
       });
     }
 
+    // Check if booking is already paid (prevent double payment)
+    if (bookingCheck.paymentStatus === 'paid') {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Booking is already paid'
+      });
+    }
+
+    // Update booking within transaction
     const booking = await Booking.findByIdAndUpdate(
       bookingId,
       {
@@ -128,10 +147,11 @@ export const processPayment = async (req, res) => {
         paymentStatus: 'paid',
         paymentId: paymentIntentId
       },
-      { new: true }
+      { new: true, session }
     );
 
-    const payment = await Payment.create({
+    // Create payment record within transaction
+    const [payment] = await Payment.create([{
       bookingId,
       amount,
       currency: 'EUR',
@@ -139,7 +159,10 @@ export const processPayment = async (req, res) => {
       stripePaymentIntentId: paymentIntentId,
       status: 'completed',
       transactionId: paymentIntent.id
-    });
+    }], { session });
+
+    // Commit transaction
+    await session.commitTransaction();
 
     res.status(200).json({
       success: true,
@@ -148,11 +171,14 @@ export const processPayment = async (req, res) => {
       booking
     });
   } catch (error) {
+    await session.abortTransaction();
     logger.error('ProcessPayment Error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal Server Error'
     });
+  } finally {
+    session.endSession();
   }
 };
 

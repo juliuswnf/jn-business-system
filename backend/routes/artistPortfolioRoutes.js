@@ -64,7 +64,31 @@ const upload = multer({
 // ==================== ROUTES ====================
 
 // Create/Upload portfolio item (Protected - Artist only)
-router.post('/upload', protect, upload.single('image'), uploadPortfolioItem);
+// ? SECURITY FIX: Uses centralized file upload validation with Sharp dimension check
+router.post('/upload', protect, upload.single('image'), async (req, res, next) => {
+  try {
+    // ? SECURITY FIX: Validate image dimensions with Sharp
+    if (req.file) {
+      const { validateImageDimensions } = await import('../middleware/fileUploadMiddleware.js');
+      await validateImageDimensions(req.file.path);
+    }
+    next();
+  } catch (error) {
+    // Clean up invalid file
+    if (req.file) {
+      const fs = await import('fs');
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkError) {
+        // Ignore cleanup errors
+      }
+    }
+    return res.status(400).json({
+      success: false,
+      message: error.message || 'Image validation failed'
+    });
+  }
+}, uploadPortfolioItem);
 
 // Get public portfolio for a salon
 router.get('/salon/:salonId', getPublicPortfolio);

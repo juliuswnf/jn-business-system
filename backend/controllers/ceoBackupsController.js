@@ -239,8 +239,8 @@ export const deleteBackup = async (req, res) => {
       fs.unlinkSync(backup.storagePath);
     }
 
-    // Delete record
-    await Backup.findByIdAndDelete(backupId);
+    // ? SECURITY FIX: Soft delete instead of hard delete
+    await backup.softDelete(req.user._id);
 
     res.status(200).json({
       success: true,

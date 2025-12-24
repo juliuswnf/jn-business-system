@@ -306,11 +306,14 @@ export const deleteCampaign = async (req, res) => {
       });
     }
 
-    // Delete related queue items
-    await EmailQueue.deleteMany({ campaignId: campaign._id });
+    // Delete related queue items (soft delete)
+    await EmailQueue.updateMany(
+      { campaignId: campaign._id },
+      { deletedAt: new Date(), deletedBy: req.user._id }
+    );
 
-    // Delete the campaign
-    await EmailLog.findByIdAndDelete(campaignId);
+    // ? SECURITY FIX: Soft delete instead of hard delete
+    await campaign.softDelete(req.user._id);
 
     res.status(200).json({
       success: true,

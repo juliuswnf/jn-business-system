@@ -114,6 +114,19 @@ const emailLogSchema = new mongoose.Schema(
     updatedAt: {
       type: Date,
       default: Date.now
+    },
+
+    // ==================== SOFT DELETE ====================
+    deletedAt: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
     }
   },
   { timestamps: true }
@@ -450,6 +463,38 @@ emailLogSchema.pre('save', async function(next) {
     next(err);
   }
 });
+
+// ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
+emailLogSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+emailLogSchema.pre('countDocuments', function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+// ==================== SOFT DELETE METHODS ====================
+emailLogSchema.methods.softDelete = async function(userId) {
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  return await this.save();
+};
+
+emailLogSchema.methods.restore = async function() {
+  this.deletedAt = null;
+  this.deletedBy = null;
+  return await this.save();
+};
+
+emailLogSchema.methods.isDeleted = function() {
+  return this.deletedAt !== null;
+};
 
 // ? AUDIT FIX: Multi-tenant plugin (companyId = salonId)
 emailLogSchema.plugin(multiTenantPlugin);

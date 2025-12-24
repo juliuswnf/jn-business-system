@@ -47,8 +47,9 @@ const setCooldown = (alertType) => {
 
 /**
  * Send alert via configured channels
+ * ? SECURITY FIX: Export for use in other services
  */
-const sendAlert = async (alert) => {
+export const sendAlert = async (alert) => {
   const { type, severity, title, message, details } = alert;
 
   // Check cooldown

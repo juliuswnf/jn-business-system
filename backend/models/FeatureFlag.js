@@ -64,12 +64,40 @@ const featureFlagSchema = new mongoose.Schema(
     lastModifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
+    },
+
+    // ==================== SOFT DELETE ====================
+    deletedAt: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
     }
   },
   {
     timestamps: true
   }
 );
+
+// ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
+featureFlagSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+featureFlagSchema.pre('countDocuments', function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
 
 // Method to check if flag is enabled for a salon
 featureFlagSchema.methods.isEnabledFor = function(salonId, plan) {
@@ -95,6 +123,23 @@ featureFlagSchema.methods.isEnabledFor = function(salonId, plan) {
   }
 
   return false;
+};
+
+// ==================== SOFT DELETE METHODS ====================
+featureFlagSchema.methods.softDelete = async function(userId) {
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  return await this.save();
+};
+
+featureFlagSchema.methods.restore = async function() {
+  this.deletedAt = null;
+  this.deletedBy = null;
+  return await this.save();
+};
+
+featureFlagSchema.methods.isDeleted = function() {
+  return this.deletedAt !== null;
 };
 
 const FeatureFlag = mongoose.model('FeatureFlag', featureFlagSchema);

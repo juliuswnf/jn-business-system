@@ -71,7 +71,20 @@ const backupSchema = new mongoose.Schema(
       ref: 'User'
     },
     notes: String,
-    metadata: mongoose.Schema.Types.Mixed
+    metadata: mongoose.Schema.Types.Mixed,
+
+    // ==================== SOFT DELETE ====================
+    deletedAt: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
   },
   {
     timestamps: true
@@ -83,6 +96,21 @@ backupSchema.index({ createdAt: -1 });
 backupSchema.index({ status: 1 });
 backupSchema.index({ type: 1 });
 
+// ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
+backupSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+backupSchema.pre('countDocuments', function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
 // Format size helper
 backupSchema.pre('save', function(next) {
   if (this.size) {
@@ -92,6 +120,24 @@ backupSchema.pre('save', function(next) {
   }
   next();
 });
+
+// ==================== SOFT DELETE METHODS ====================
+backupSchema.methods.softDelete = async function(userId) {
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  this.status = 'deleted'; // Also mark status as deleted
+  return await this.save();
+};
+
+backupSchema.methods.restore = async function() {
+  this.deletedAt = null;
+  this.deletedBy = null;
+  return await this.save();
+};
+
+backupSchema.methods.isDeleted = function() {
+  return this.deletedAt !== null;
+};
 
 const Backup = mongoose.model('Backup', backupSchema);
 

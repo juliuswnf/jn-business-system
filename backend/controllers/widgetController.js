@@ -282,9 +282,10 @@ export const deleteWidget = async (req, res) => {
       });
     }
 
-    await widget.deleteOne();
+    // ? SECURITY FIX: Soft delete instead of hard delete
+    await widget.softDelete(req.user._id);
 
-    logger.log(`? Widget deleted: ${widget._id}`);
+    logger.log(`? Widget soft-deleted: ${widget._id}`);
 
     return res.status(200).json({
       success: true,

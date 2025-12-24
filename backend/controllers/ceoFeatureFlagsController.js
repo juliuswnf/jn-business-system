@@ -201,13 +201,16 @@ export const deleteFlag = async (req, res) => {
   try {
     const { flagId } = req.params;
 
-    const flag = await FeatureFlag.findByIdAndDelete(flagId);
+    const flag = await FeatureFlag.findById(flagId);
     if (!flag) {
       return res.status(404).json({
         success: false,
         message: 'Feature flag not found'
       });
     }
+
+    // ? SECURITY FIX: Soft delete instead of hard delete
+    await flag.softDelete(req.user._id);
 
     res.status(200).json({
       success: true,

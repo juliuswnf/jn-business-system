@@ -74,7 +74,20 @@ const workflowProjectSchema = new mongoose.Schema({
     item: String,
     checked: { type: Boolean, default: false },
     required: { type: Boolean, default: false }
-  }]
+  }],
+
+  // ==================== SOFT DELETE ====================
+  deletedAt: {
+    type: Date,
+    default: null,
+    index: true
+  },
+
+  deletedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  }
 }, {
   timestamps: true
 });
@@ -86,6 +99,7 @@ workflowProjectSchema.index({ industry: 1 });
 workflowProjectSchema.index({ salonId: 1, industry: 1 });
 workflowProjectSchema.index({ salonId: 1, createdAt: -1 });
 workflowProjectSchema.index({ artistId: 1 });
+workflowProjectSchema.index({ deletedAt: 1 }); // For soft delete queries
 
 // Virtuals
 workflowProjectSchema.virtual('sessionsPopulated', {
@@ -220,6 +234,39 @@ workflowProjectSchema.statics.getByIndustry = async function(salonId, industry) 
     .populate('customerId', 'firstName lastName email phone')
     .populate('artistId', 'firstName lastName')
     .sort({ createdAt: -1 });
+};
+
+// ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
+workflowProjectSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+workflowProjectSchema.pre('countDocuments', function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+// ==================== SOFT DELETE METHODS ====================
+workflowProjectSchema.methods.softDelete = async function(userId) {
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  this.status = 'cancelled'; // Also mark as cancelled
+  return await this.save();
+};
+
+workflowProjectSchema.methods.restore = async function() {
+  this.deletedAt = null;
+  this.deletedBy = null;
+  return await this.save();
+};
+
+workflowProjectSchema.methods.isDeleted = function() {
+  return this.deletedAt !== null;
 };
 
 const WorkflowProject = mongoose.model('WorkflowProject', workflowProjectSchema);

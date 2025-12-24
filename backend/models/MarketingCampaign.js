@@ -164,6 +164,19 @@ const MarketingCampaignSchema = new mongoose.Schema(
         type: Date,
         index: true
       }
+    },
+
+    // ==================== SOFT DELETE ====================
+    deletedAt: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
     }
   },
   {
@@ -255,6 +268,39 @@ MarketingCampaignSchema.pre('save', function(next) {
   }
   next();
 });
+
+// ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
+MarketingCampaignSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+MarketingCampaignSchema.pre('countDocuments', function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+// ==================== SOFT DELETE METHODS ====================
+MarketingCampaignSchema.methods.softDelete = async function(userId) {
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  this.status = 'paused'; // Also pause the campaign
+  return await this.save();
+};
+
+MarketingCampaignSchema.methods.restore = async function() {
+  this.deletedAt = null;
+  this.deletedBy = null;
+  return await this.save();
+};
+
+MarketingCampaignSchema.methods.isDeleted = function() {
+  return this.deletedAt !== null;
+};
 
 // Ensure virtuals are included in JSON
 MarketingCampaignSchema.set('toJSON', { virtuals: true });

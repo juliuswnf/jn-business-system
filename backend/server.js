@@ -97,6 +97,7 @@ import tattooRoutes from './routes/tattoo.js';
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
 import webhookMiddleware from './middleware/webhookMiddleware.js';
+import { apiVersioningMiddleware } from './middleware/apiVersioningMiddleware.js';
 
 // Import Controllers
 import stripeWebhookController from './controllers/stripeWebhookController.js';
@@ -197,6 +198,10 @@ app.use('/api/webhooks', webhookRoutes); // MessageBird webhooks
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 
+// 5️⃣ API VERSIONING (MUST BE BEFORE ROUTES)
+// ? SECURITY FIX: Apply API versioning middleware (forwards /api/* to /api/v1/*)
+app.use(apiVersioningMiddleware);
+
 // 4?? LOGGING & MONITORING
 // ? AUDIT FIX: Add request context middleware for structured logging
 app.use(addRequestContext);
@@ -269,74 +274,78 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       health: '/health',
-      auth: '/api/auth',
-      ceo: '/api/ceo',
-      salon: '/api/salon',
-      bookings: '/api/bookings',
-      publicBooking: '/api/bookings/public/s/:slug',
-      widget: '/api/widget',
-      payments: '/api/payments',
-      subscriptions: '/api/subscriptions',
+      version: 'v1',
+      auth: '/api/v1/auth',
+      ceo: '/api/v1/ceo',
+      salon: '/api/v1/salon',
+      bookings: '/api/v1/bookings',
+      publicBooking: '/api/v1/bookings/public/s/:slug',
+      widget: '/api/v1/widget',
+      payments: '/api/v1/payments',
+      subscriptions: '/api/v1/subscriptions',
       webhooks: '/api/webhooks/stripe',
       // Multi-Industry Endpoints
-      portfolio: '/api/portfolio',
-      clinicalNotes: '/api/clinical-notes',
-      consentForms: '/api/consent-forms',
-      packages: '/api/packages',
-      progress: '/api/progress',
-      resources: '/api/resources'
-    }
+      portfolio: '/api/v1/portfolio',
+      clinicalNotes: '/api/v1/clinical-notes',
+      consentForms: '/api/v1/consent-forms',
+      packages: '/api/v1/packages',
+      progress: '/api/v1/progress',
+      resources: '/api/v1/resources'
+    },
+    note: 'All /api/* routes are automatically forwarded to /api/v1/* for backward compatibility'
   });
 });
 
-// ==================== API ROUTES - MVP ONLY ====================
+// ==================== API ROUTES - VERSIONED (v1) ====================
+// Note: apiVersioningMiddleware is applied above (after body parsing)
+// It automatically forwards /api/* to /api/v1/* for backward compatibility
 
 // Public Routes (No Auth Required)
-app.use('/api/auth', authRoutes);
-app.use('/api/bookings/public', publicBookingRoutes);
-app.use('/api/widget', widgetRoutes); // Embeddable Widget API
-app.use('/api/subscriptions', subscriptionRoutes); // Stripe Subscription Management
-app.use('/api/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected)
-app.use('/api/system', systemRoutes); // ? MEDIUM FIX #13 & #14: Health & Backups (/health, /health/detailed, /backups/*)
-app.use('/api/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: public + protected)
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/bookings/public', publicBookingRoutes);
+app.use('/api/v1/widget', widgetRoutes); // Embeddable Widget API
+app.use('/api/v1/subscriptions', subscriptionRoutes); // Stripe Subscription Management
+app.use('/api/v1/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected)
+app.use('/api/v1/system', systemRoutes); // ? MEDIUM FIX #13 & #14: Health & Backups (/health, /health/detailed, /backups/*)
+app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: public + protected)
 
 // Protected Routes (Auth Required)
-app.use('/api/salon', authMiddleware.protect, salonRoutes);
-app.use('/api/bookings', authMiddleware.protect, bookingRoutes);
-app.use('/api/payments', authMiddleware.protect, paymentRoutes);
-app.use('/api/services', authMiddleware.protect, serviceRoutes);
-app.use('/api/employees', authMiddleware.protect, employeeRoutes);
-app.use('/api/ceo', ceoRoutes); // Auth middleware is already in ceoRoutes
-app.use('/api/gdpr', gdprRoutes); // GDPR Compliance (Protected)
+app.use('/api/v1/salon', authMiddleware.protect, salonRoutes);
+app.use('/api/v1/bookings', authMiddleware.protect, bookingRoutes);
+app.use('/api/v1/payments', authMiddleware.protect, paymentRoutes);
+app.use('/api/v1/services', authMiddleware.protect, serviceRoutes);
+app.use('/api/v1/employees', authMiddleware.protect, employeeRoutes);
+app.use('/api/v1/ceo', ceoRoutes); // Auth middleware is already in ceoRoutes
+app.use('/api/v1/gdpr', gdprRoutes); // GDPR Compliance (Protected)
 
 // Multi-Industry Routes - Phase 2
-app.use('/api/portfolio', artistPortfolioRoutes); // Mixed: upload protected, galleries public
-app.use('/api/clinical-notes', authMiddleware.protect, clinicalNoteRoutes); // ALL PROTECTED - HIPAA
-app.use('/api/consent-forms', consentFormRoutes); // Mixed: signing public, management protected
-app.use('/api/packages', packageRoutes); // Mixed: purchase flow public/protected
-app.use('/api/progress', authMiddleware.protect, progressRoutes); // ALL PROTECTED - Client privacy
-app.use('/api/resources', resourceRoutes); // Mixed: availability public, management protected
-app.use('/api/support', authMiddleware.protect, supportRoutes); // Customer Support Tickets
-app.use('/api/crm', authMiddleware.protect, crmRoutes); // CRM - Customer Management
-app.use('/api/branding', authMiddleware.protect, brandingRoutes); // Custom Branding
-app.use('/api/locations', authMiddleware.protect, multiLocationRoutes); // Multi-Location (Enterprise)
+app.use('/api/v1/portfolio', artistPortfolioRoutes); // Mixed: upload protected, galleries public
+app.use('/api/v1/clinical-notes', authMiddleware.protect, clinicalNoteRoutes); // ALL PROTECTED - HIPAA
+app.use('/api/v1/consent-forms', consentFormRoutes); // Mixed: signing public, management protected
+app.use('/api/v1/packages', packageRoutes); // Mixed: purchase flow public/protected
+app.use('/api/v1/progress', authMiddleware.protect, progressRoutes); // ALL PROTECTED - Client privacy
+app.use('/api/v1/resources', resourceRoutes); // Mixed: availability public, management protected
+app.use('/api/v1/support', authMiddleware.protect, supportRoutes); // Customer Support Tickets
+app.use('/api/v1/crm', authMiddleware.protect, crmRoutes); // CRM - Customer Management
+app.use('/api/v1/branding', authMiddleware.protect, brandingRoutes); // Custom Branding
+app.use('/api/v1/locations', authMiddleware.protect, multiLocationRoutes); // Multi-Location (Enterprise)
 
 // NO-SHOW-KILLER Routes - Phase 2
-app.use('/api/sms-consent', smsConsentRoutes); // SMS GDPR Consent (Public + Protected)
-app.use('/api/confirmations', confirmationRoutes); // Booking Confirmations (Mixed: public confirm link)
-app.use('/api/waitlist', waitlistRoutes); // Waitlist Management (Public join + Protected admin)
-app.use('/api/marketing', marketingRoutes); // Marketing Automation (Protected)
-app.use('/api/slot-suggestions', slotSuggestionRoutes); // Slot Suggestions (Public accept/reject)
+app.use('/api/v1/sms-consent', smsConsentRoutes); // SMS GDPR Consent (Public + Protected)
+app.use('/api/v1/confirmations', confirmationRoutes); // Booking Confirmations (Mixed: public confirm link)
+app.use('/api/v1/waitlist', waitlistRoutes); // Waitlist Management (Public join + Protected admin)
+app.use('/api/v1/marketing', marketingRoutes); // Marketing Automation (Protected)
+app.use('/api/v1/slot-suggestions', slotSuggestionRoutes); // Slot Suggestions (Public accept/reject)
 
 // Tattoo Studio Routes
-app.use('/api/tattoo', tattooRoutes); // Tattoo Studio Features (Projects, Sessions, Consents, Portfolio)
+app.use('/api/v1/tattoo', tattooRoutes); // Tattoo Studio Features (Projects, Sessions, Consents, Portfolio)
 
 // Workflow System Routes (Industry-Specific Features)
 import workflowRoutes from './routes/workflows.js';
-app.use('/api/workflows', workflowRoutes); // Workflow Management (Multi-Industry)
+app.use('/api/v1/workflows', workflowRoutes); // Workflow Management (Multi-Industry)
 
 // Pricing Wizard Routes
-app.use('/api/pricing-wizard', pricingWizardRoutes); // Intelligent Tier Recommendation (Public + Analytics)
+app.use('/api/v1/pricing-wizard', pricingWizardRoutes); // Intelligent Tier Recommendation (Public + Analytics)
 
 // ==================== 404 HANDLER (BEFORE ERROR HANDLER) ====================
 app.use('*', (req, res, _next) => {
@@ -560,11 +569,16 @@ const startLifecycleWorker = () => {
 };
 
 // ==================== ALERTING SERVICE ====================
-const startAlertingService = () => {
+const startAlertingService = async () => {
   try {
     // Start health checks every 60 seconds
     alertingService.startHealthChecks(getMetrics, 60000);
-    logger.info('? Alerting service started');
+
+    // ? SECURITY FIX: Start periodic health checks with auto-alerts
+    const { startPeriodicHealthChecks } = await import('./services/healthCheckService.js');
+    startPeriodicHealthChecks(60000); // Check every 60 seconds
+
+    logger.info('? Alerting service started with auto-alerts');
   } catch (error) {
     logger.error('?? Alerting service initialization error:', error.message || error);
     logger.error('Error stack:', error.stack);
@@ -621,7 +635,7 @@ const startServer = async () => {
     await initializeCrons();
     startEmailWorker();
     startLifecycleWorker();
-    startAlertingService();
+    await startAlertingService();
     startNoShowKillerWorkers(); // 🔥 NO-SHOW-KILLER System
     startMarketingWorkers(); // 📧 Marketing Automation
 

@@ -315,10 +315,10 @@ export const deleteProject = async (req, res) => {
     // Cancel project (cancels all sessions)
     await project.cancelProject();
 
-    // Delete project
-    await WorkflowProject.findByIdAndDelete(id);
+    // ? SECURITY FIX: Soft delete instead of hard delete
+    await project.softDelete(req.user._id);
 
-    logger.info(`Project deleted: ${id}`);
+    logger.info(`Project soft-deleted: ${id}`);
 
     res.json({
       success: true,

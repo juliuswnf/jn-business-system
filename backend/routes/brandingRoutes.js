@@ -5,9 +5,6 @@
  */
 
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import {
   getBranding,
   updateBranding,
@@ -15,37 +12,10 @@ import {
   deleteLogo,
   resetBranding
 } from '../controllers/brandingController.js';
+// ? SECURITY FIX: Use centralized file upload middleware
+import { upload, validateImageDimensions, handleUploadError } from '../middleware/fileUploadMiddleware.js';
 
 const router = express.Router();
-
-// Setup file upload for logos
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads/logos'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
-    cb(null, `logo-${req.user.salonId}-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml', 'image/webp'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Nur JPEG, PNG, SVG und WebP Dateien sind erlaubt'), false);
-  }
-};
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-  fileFilter
-});
 
 // All routes require authentication (applied in server.js)
 
@@ -67,8 +37,31 @@ router.put('/', updateBranding);
  * @route   POST /api/branding/logo
  * @desc    Upload salon logo
  * @access  Protected (salon_owner, Professional+ tier)
+ * ? SECURITY FIX: Uses centralized file upload validation with Sharp dimension check
  */
-router.post('/logo', upload.single('logo'), uploadLogo);
+router.post('/logo', upload.single('logo'), handleUploadError, async (req, res, next) => {
+  try {
+    // ? SECURITY FIX: Validate image dimensions with Sharp
+    if (req.file) {
+      await validateImageDimensions(req.file.path);
+    }
+    next();
+  } catch (error) {
+    // Clean up invalid file
+    if (req.file) {
+      const fs = await import('fs');
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkError) {
+        // Ignore cleanup errors
+      }
+    }
+    return res.status(400).json({
+      success: false,
+      message: error.message || 'Image validation failed'
+    });
+  }
+}, uploadLogo);
 
 /**
  * @route   DELETE /api/branding/logo
