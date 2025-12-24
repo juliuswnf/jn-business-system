@@ -160,6 +160,19 @@ const tattooProjectSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+
+  // ==================== SOFT DELETE ====================
+  deletedAt: {
+    type: Date,
+    default: null,
+    index: true
+  },
+
+  deletedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
   }
 }, {
   timestamps: true
@@ -170,6 +183,7 @@ tattooProjectSchema.index({ salonId: 1, status: 1 });
 tattooProjectSchema.index({ customerId: 1 });
 tattooProjectSchema.index({ artistId: 1 });
 tattooProjectSchema.index({ salonId: 1, createdAt: -1 });
+tattooProjectSchema.index({ deletedAt: 1 }); // For soft delete queries
 
 // ==================== Virtual: Sessions ====================
 tattooProjectSchema.virtual('sessions', {
@@ -280,6 +294,39 @@ tattooProjectSchema.statics.getDashboardStats = async function(salonId) {
   };
 
   return stats;
+};
+
+// ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
+tattooProjectSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+tattooProjectSchema.pre('countDocuments', function(next) {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
+
+// ==================== SOFT DELETE METHODS ====================
+tattooProjectSchema.methods.softDelete = async function(userId) {
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  this.status = 'cancelled'; // Also mark as cancelled
+  return await this.save();
+};
+
+tattooProjectSchema.methods.restore = async function() {
+  this.deletedAt = null;
+  this.deletedBy = null;
+  return await this.save();
+};
+
+tattooProjectSchema.methods.isDeleted = function() {
+  return this.deletedAt !== null;
 };
 
 // ==================== Pre-save Middleware ====================

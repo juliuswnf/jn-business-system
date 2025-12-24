@@ -232,13 +232,14 @@ export const deleteProject = async (req, res) => {
     // Cancel all sessions first
     await project.cancelProject();
 
-    // Delete all sessions
+    // Soft delete all sessions (if TattooSession has soft delete)
+    // Note: TattooSession.deleteMany is OK here as sessions are part of the project
     await TattooSession.deleteMany({ projectId: id });
 
-    // Delete project
-    await project.deleteOne();
+    // ? SECURITY FIX: Soft delete instead of hard delete
+    await project.softDelete(req.user._id);
 
-    logger.log(`🗑️ Tattoo project deleted: ${project.name}`);
+    logger.log(`🗑️ Tattoo project soft-deleted: ${project.name}`);
 
     res.json({
       success: true,

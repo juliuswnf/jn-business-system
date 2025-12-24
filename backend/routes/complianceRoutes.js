@@ -1,6 +1,7 @@
 ﻿import express from 'express';
 import { authenticateToken, authorize } from '../middleware/authMiddleware.js';
-import { upload } from '../middleware/uploadMiddleware.js';
+// ? SECURITY FIX: Use centralized file upload middleware
+import { upload, validateImageDimensions, handleUploadError } from '../middleware/fileUploadMiddleware.js';
 import {
   getBaas,
   createBaa,
@@ -44,11 +45,36 @@ router.get(
 );
 
 // Create BAA
+// ? SECURITY FIX: Uses centralized file upload validation
 router.post(
   '/baas',
   authenticateToken,
   authorize(['ceo', 'admin']),
   upload.single('document'),
+  handleUploadError,
+  async (req, res, next) => {
+    try {
+      // ? SECURITY FIX: Validate file if it's an image
+      if (req.file && req.file.mimetype.startsWith('image/')) {
+        await validateImageDimensions(req.file.path);
+      }
+      next();
+    } catch (error) {
+      // Clean up invalid file
+      if (req.file) {
+        const fs = await import('fs');
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (unlinkError) {
+          // Ignore cleanup errors
+        }
+      }
+      return res.status(400).json({
+        success: false,
+        message: error.message || 'File validation failed'
+      });
+    }
+  },
   createBaa
 );
 
