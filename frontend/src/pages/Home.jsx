@@ -247,10 +247,130 @@ function Home() {
       </section>
 
       {/* Visual Feature Showcase */}
+      {/* NO-SHOW-KILLER Feature Section */}
+      <section className="py-24 px-6 bg-gradient-to-b from-black to-zinc-900">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-block px-4 py-2 bg-orange-500/20 border border-orange-500/50 rounded-full mb-6">
+                <span className="text-orange-400 font-semibold text-sm">NEU: NO-SHOW-KILLER</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+                Keine No-Shows mehr – automatische Gebührenabrechnung
+              </h2>
+              <p className="text-gray-400 text-lg mb-8">
+                Schützen Sie Ihr Business vor verlorenen Terminen. Mit dem NO-SHOW-KILLER werden Kunden automatisch zur Verantwortung gezogen, wenn sie nicht erscheinen.
+              </p>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-white font-medium">Automatische Gebührenabrechnung</span>
+                    <p className="text-gray-400 text-sm">Bei Nichterscheinen wird die Gebühr automatisch von der hinterlegten Karte abgebucht</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-white font-medium">Direktes Auszahlung auf Ihr Konto</span>
+                    <p className="text-gray-400 text-sm">Geld geht direkt auf Ihr Stripe-Konto – keine Wartezeiten</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-white font-medium">DSGVO-konform & rechtssicher</span>
+                    <p className="text-gray-400 text-sm">Automatische Löschung nach 90 Tagen, Policy-Akzeptanz, Dispute-Evidence</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-white font-medium">Ein Klick im Dashboard</span>
+                    <p className="text-gray-400 text-sm">Markieren Sie No-Shows einfach per Button – der Rest passiert automatisch</p>
+                  </div>
+                </li>
+              </ul>
+              <div className="flex gap-4">
+                <a
+                  href="/pricing"
+                  className="px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition"
+                >
+                  Jetzt starten
+                </a>
+                <a
+                  href="/dashboard/settings?tab=noShowKiller"
+                  className="px-8 py-4 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 transition"
+                >
+                  Mehr erfahren
+                </a>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-2xl">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-white">NO-SHOW-KILLER Dashboard</h3>
+                    <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">Aktiv</span>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-zinc-800 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-400 text-sm">Gebühr pro No-Show</span>
+                        <span className="text-white font-bold">€15,00</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>Stripe-Gebühr</span>
+                        <span>-€0,46</span>
+                      </div>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-700">
+                        <span className="text-gray-300 font-medium">Sie erhalten</span>
+                        <span className="text-green-400 font-bold">€14,54</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-zinc-800 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-white mb-1">0</div>
+                        <div className="text-xs text-gray-400">No-Shows</div>
+                      </div>
+                      <div className="bg-zinc-800 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-400 mb-1">€0</div>
+                        <div className="text-xs text-gray-400">Eingenommen</div>
+                      </div>
+                      <div className="bg-zinc-800 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-blue-400 mb-1">0%</div>
+                        <div className="text-xs text-gray-400">No-Show-Rate</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6 Hauptfunktionen Section */}
       <section className="py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold mb-4 text-white">6 Haupt-Features die Ihr Business voranbringen</h2>
+            <h2 className="text-4xl font-bold mb-4 text-white">6 Hauptfunktionen die Ihr Business voranbringen</h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               Einfach zu bedienen, leistungsstark und speziell für Ihr Geschäft entwickelt
             </p>
@@ -1399,7 +1519,7 @@ function Home() {
             to="/pricing"
             className="inline-block px-10 py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition"
           >
-            Alle Features vergleichen
+            Alle Funktionen vergleichen
           </Link>
         </div>
       </section>

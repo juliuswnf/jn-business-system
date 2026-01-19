@@ -18,6 +18,7 @@ export default function CustomerRegister() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [apiError, setApiError] = useState('');
 
   const handleChange = (e) => {
@@ -203,16 +204,26 @@ export default function CustomerRegister() {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Passwort bestätigen</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Passwort wiederholen"
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-gray-700'
-                }`}
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Passwort wiederholen"
+                  className={`w-full px-4 py-3 pr-10 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    errors.confirmPassword ? 'border-red-500' : 'border-gray-700'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm hover:text-white transition-colors"
+                  aria-label={showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                >
+                  {showConfirmPassword ? 'Verstecken' : 'Anzeigen'}
+                </button>
+              </div>
               {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
 

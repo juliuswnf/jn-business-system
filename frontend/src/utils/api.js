@@ -40,6 +40,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // ✅ FIX: Silently handle expected 401 errors for auth endpoints (user not logged in)
+    const isExpected401 = error.response?.status === 401 && (
+      originalRequest?.url?.includes('/auth/profile') ||
+      originalRequest?.url?.includes('/auth/refresh-token')
+    );
+
     // Silently handle 404 errors for confirmations endpoint
     // (not all bookings have confirmations, so 404 is expected)
     if (error.response?.status === 404 && originalRequest?.url?.includes('/confirmations/')) {
@@ -60,6 +66,20 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+      
+      // Prevent infinite loop - if refresh-token also returns 401, stop retrying
+      if (originalRequest?.url?.includes('/auth/refresh-token')) {
+        localStorage.removeItem('jnAuthToken');
+        localStorage.removeItem('jnUser');
+        localStorage.removeItem('user');
+        // Don't redirect if already on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+        // Silently reject - this is expected when not logged in
+        return Promise.reject(error);
+      }
+      
       try {
         // ? SECURITY FIX: Refresh token is now in HTTP-only cookie, no need to get from localStorage
         const response = await axios.post(`${API_URL}/auth/refresh-token`, {}, {
@@ -78,7 +98,14 @@ api.interceptors.response.use(
         localStorage.removeItem('jnAuthToken');
         localStorage.removeItem('jnUser');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        // Only redirect if not already on login page to prevent loops
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+        // Silently reject if it's an expected 401 (user not logged in)
+        if (isExpected401) {
+          return Promise.reject(refreshError);
+        }
         return Promise.reject(refreshError);
       }
     }
@@ -848,7 +875,7 @@ export const getErrorMessage = (error) => {
   if (error.response?.data?.message) return error.response.data.message;
   if (error.response?.data?.error?.message) return error.response.data.error.message;
   if (error.message) return error.message;
-  return 'An error occurred';
+  return 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
 };
 
 export const getSuccessData = (response) => {

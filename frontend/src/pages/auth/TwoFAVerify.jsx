@@ -18,8 +18,8 @@ const TwoFAVerify = () => {
       <div className="min-h-screen bg-primary text-white flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="rounded-lg bg-zinc-900 border border-zinc-800 p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Invalid Session</h2>
-            <p className="text-gray-400 mb-6">Please log in again.</p>
+            <h2 className="text-2xl font-bold text-white mb-4">Ungültige Sitzung</h2>
+            <p className="text-gray-400 mb-6">Bitte melden Sie sich erneut an.</p>
             <Link
               to="/login"
               className="inline-block px-8 py-3 rounded-lg bg-accent hover:bg-accent-light text-primary font-semibold transition"
@@ -36,7 +36,7 @@ const TwoFAVerify = () => {
     e.preventDefault();
 
     if (code.length < 6) {
-      showNotification('Code must be at least 6 characters', 'error');
+      showNotification('Der Code muss mindestens 6 Zeichen lang sein', 'error');
       return;
     }
 

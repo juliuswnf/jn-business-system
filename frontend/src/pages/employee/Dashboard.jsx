@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { authAPI, bookingAPI, employeeAPI, api } from '../../utils/api';
-import { getAccessToken } from '../../utils/tokenHelper';
 import { captureError } from '../../utils/errorTracking';
 
 export default function Dashboard() {
@@ -14,9 +13,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -24,7 +20,7 @@ export default function Dashboard() {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    // ? SECURITY FIX: Use central api instance
+    // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
 
     try {
       // Fetch employee profile

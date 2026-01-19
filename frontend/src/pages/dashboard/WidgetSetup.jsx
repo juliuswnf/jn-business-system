@@ -179,7 +179,7 @@ export default function WidgetSetup() {
             <div className="p-4 md:p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Header Text</label>
+                  <label className="block text-sm text-zinc-400 mb-2">Überschrift</label>
                   <input
                     type="text"
                     value={config.headerText}
@@ -190,7 +190,7 @@ export default function WidgetSetup() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Button Text</label>
+                  <label className="block text-sm text-zinc-400 mb-2">Button-Text</label>
                   <input
                     type="text"
                     value={config.buttonText}

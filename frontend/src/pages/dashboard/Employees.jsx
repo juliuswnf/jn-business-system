@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Mail, Phone, Trash2, Edit, Users } from 'lucide-react';
-import { getAccessToken } from '../../utils/tokenHelper';
+import { api } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /**
  * Employees Dashboard - Mitarbeiter verwalten
@@ -20,25 +18,19 @@ export default function Employees() {
     role: 'employee'
   });
 
-  // ? SECURITY FIX: Use token helper instead of direct localStorage access
-  const getToken = () => getAccessToken();
-
   useEffect(() => {
     fetchEmployees();
   }, []);
 
   const fetchEmployees = async () => {
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/employees`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) {
-        setEmployees(data.data || []);
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
+      const res = await api.get('/employees');
+      if (res.data.success) {
+        setEmployees(res.data.data || []);
       }
     } catch (error) {
-      // Error handled by UI state
+      captureError(error, { context: 'fetchEmployees' });
     } finally {
       setLoading(false);
     }
@@ -47,18 +39,10 @@ export default function Employees() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = getToken();
-      const res = await fetch(`${API_URL}/employees`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (data.success) {
-        setEmployees([...employees, data.data]);
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
+      const res = await api.post('/employees', formData);
+      if (res.data.success) {
+        setEmployees([...employees, res.data.data]);
         setShowModal(false);
         setFormData({ name: '', email: '', phone: '', role: 'employee' });
       }
@@ -70,11 +54,8 @@ export default function Employees() {
   const handleDelete = async (id) => {
     if (!window.confirm('Mitarbeiter wirklich löschen?')) return;
     try {
-      const token = getToken();
-      await fetch(`${API_URL}/employees/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
+      await api.delete(`/employees/${id}`);
       setEmployees(employees.filter(e => e._id !== id));
     } catch (error) {
       captureError(error, { context: 'deleteEmployee' });

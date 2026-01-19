@@ -14,10 +14,14 @@ import {
   Send,
   Filter,
   Search,
-  RefreshCw
+  RefreshCw,
+  X,
+  RotateCcw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../../utils/api';
+import { useIsMobile } from '../../hooks/useMediaQuery';
+import MobileBookingCard from '../../components/Dashboard/MobileBookingCard';
 
 /**
  * Bookings Page with SMS Confirmation Integration
@@ -34,6 +38,8 @@ export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sendingConfirmation, setSendingConfirmation] = useState({});
+  const [markingNoShow, setMarkingNoShow] = useState({});
+  const isMobile = useIsMobile();
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
@@ -143,6 +149,97 @@ export default function Bookings() {
     } finally {
       setSendingConfirmation(prev => ({ ...prev, [booking._id]: false }));
     }
+  };
+
+  /**
+   * Mark booking as No-Show and charge fee
+   */
+  const handleMarkAsNoShow = async (booking) => {
+    if (!window.confirm(`Möchten Sie diese Buchung wirklich als "Nicht erschienen" markieren? Es wird eine Gebühr von €${(booking.noShowFee?.amount || 1500) / 100} abgebucht.`)) {
+      return;
+    }
+
+    try {
+      setMarkingNoShow(prev => ({ ...prev, [booking._id]: true }));
+
+      const response = await api.patch(`/bookings/${booking._id}/no-show`);
+
+      if (response.data.success) {
+        toast.success('Buchung als "Nicht erschienen" markiert. Gebühr wurde abgebucht.');
+        
+        // Update booking in state
+        setBookings(prev => prev.map(b =>
+          b._id === booking._id
+            ? {
+                ...b,
+                status: 'no_show',
+                noShowFee: response.data.booking.noShowFee
+              }
+            : b
+        ));
+      }
+    } catch (error) {
+      captureError(error, { context: 'handleMarkAsNoShow' });
+      const errorMessage = error.response?.data?.message || 'Fehler beim Markieren als No-Show';
+      toast.error(errorMessage);
+    } finally {
+      setMarkingNoShow(prev => ({ ...prev, [booking._id]: false }));
+    }
+  };
+
+  /**
+   * Undo No-Show and refund fee
+   */
+  const handleUndoNoShow = async (booking) => {
+    if (!window.confirm('Möchten Sie die No-Show-Markierung rückgängig machen? Die Gebühr wird zurückerstattet.')) {
+      return;
+    }
+
+    try {
+      setMarkingNoShow(prev => ({ ...prev, [booking._id]: true }));
+
+      const response = await api.patch(`/bookings/${booking._id}/undo-no-show`);
+
+      if (response.data.success) {
+        toast.success('No-Show-Markierung rückgängig gemacht. Gebühr wurde zurückerstattet.');
+        
+        // Update booking in state
+        setBookings(prev => prev.map(b =>
+          b._id === booking._id
+            ? {
+                ...b,
+                status: response.data.booking.status || 'confirmed',
+                noShowFee: response.data.booking.noShowFee
+              }
+            : b
+        ));
+      }
+    } catch (error) {
+      captureError(error, { context: 'handleUndoNoShow' });
+      const errorMessage = error.response?.data?.message || 'Fehler beim Rückgängigmachen';
+      toast.error(errorMessage);
+    } finally {
+      setMarkingNoShow(prev => ({ ...prev, [booking._id]: false }));
+    }
+  };
+
+  /**
+   * Check if No-Show button should be shown
+   */
+  const shouldShowNoShowButton = (booking) => {
+    // Only for confirmed or completed bookings
+    if (!['confirmed', 'completed'].includes(booking.status)) return false;
+
+    // Don't show if already marked as no_show
+    if (booking.status === 'no_show') return false;
+
+    // Only show if booking has payment method (No-Show-Killer enabled)
+    if (!booking.paymentMethodId) return false;
+
+    // Only show if booking date is in the past
+    const now = new Date();
+    const bookingDate = new Date(booking.bookingDate);
+    return bookingDate < now;
   };
 
   /**
@@ -378,6 +475,12 @@ export default function Bookings() {
               </div>
               <p className="text-gray-400">Keine Buchungen gefunden</p>
             </div>
+          ) : isMobile ? (
+            <div className="space-y-3">
+              {filteredBookings.map((booking) => (
+                <MobileBookingCard key={booking._id} booking={booking} onUpdate={loadBookings} />
+              ))}
+            </div>
           ) : (
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <table className="w-full min-w-[800px]">
@@ -476,31 +579,76 @@ export default function Bookings() {
 
                       {/* Actions */}
                       <td className="px-3 sm:px-6 py-4">
-                        {shouldShowSMSButton(booking) && (
-                          <button
-                            onClick={() => sendSMSConfirmation(booking)}
-                            disabled={sendingConfirmation[booking._id]}
-                            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {sendingConfirmation[booking._id] ? (
-                              <>
-                                <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
-                                <span className="hidden sm:inline">Sende...</span>
-                              </>
-                            ) : (
-                              <>
-                                <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="hidden sm:inline">SMS senden</span>
-                              </>
-                            )}
-                          </button>
-                        )}
+                        <div className="flex flex-col gap-2">
+                          {/* No-Show Button */}
+                          {shouldShowNoShowButton(booking) && (
+                            <button
+                              onClick={() => handleMarkAsNoShow(booking)}
+                              disabled={markingNoShow[booking._id]}
+                              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {markingNoShow[booking._id] ? (
+                                <>
+                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                                  <span className="hidden sm:inline">Wird verarbeitet...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="hidden sm:inline">Als No-Show markieren</span>
+                                </>
+                              )}
+                            </button>
+                          )}
 
-                        {booking.confirmation?.status === 'pending' && (
-                          <div className="text-xs text-zinc-500">
-                            SMS gesendet
-                          </div>
-                        )}
+                          {/* Undo No-Show Button */}
+                          {booking.status === 'no_show' && booking.noShowFee?.charged && (
+                            <button
+                              onClick={() => handleUndoNoShow(booking)}
+                              disabled={markingNoShow[booking._id]}
+                              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {markingNoShow[booking._id] ? (
+                                <>
+                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                                  <span className="hidden sm:inline">Wird verarbeitet...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="hidden sm:inline">Rückgängig machen</span>
+                                </>
+                              )}
+                            </button>
+                          )}
+
+                          {/* SMS Confirmation Button */}
+                          {shouldShowSMSButton(booking) && (
+                            <button
+                              onClick={() => sendSMSConfirmation(booking)}
+                              disabled={sendingConfirmation[booking._id]}
+                              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {sendingConfirmation[booking._id] ? (
+                                <>
+                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                                  <span className="hidden sm:inline">Sende...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="hidden sm:inline">SMS senden</span>
+                                </>
+                              )}
+                            </button>
+                          )}
+
+                          {booking.confirmation?.status === 'pending' && !shouldShowNoShowButton(booking) && (
+                            <div className="text-xs text-zinc-500">
+                              SMS gesendet
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </motion.tr>
                   ))}

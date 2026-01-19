@@ -78,7 +78,7 @@ export const getAllSalons = async (req, res) => {
     logger.error('GetAllSalons Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -94,7 +94,7 @@ export const searchSalons = async (req, res) => {
     if (!q || q.length < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Search query must be at least 2 characters'
+        message: 'Suchbegriff muss mindestens 2 Zeichen lang sein'
       });
     }
 
@@ -120,7 +120,7 @@ export const searchSalons = async (req, res) => {
     logger.error('SearchSalons Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -136,7 +136,7 @@ export const getSalonsByCity = async (req, res) => {
     if (!city) {
       return res.status(400).json({
         success: false,
-        message: 'City parameter is required'
+        message: 'Stadt-Parameter ist erforderlich'
       });
     }
 
@@ -176,7 +176,7 @@ export const getSalonsByCity = async (req, res) => {
     logger.error('GetSalonsByCity Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -194,7 +194,7 @@ export const getSalonBySlug = async (req, res) => {
     if (!salon) {
       return res.status(404).json({
         success: false,
-        message: 'Salon not found'
+        message: 'Salon nicht gefunden'
       });
     }
 
@@ -202,7 +202,7 @@ export const getSalonBySlug = async (req, res) => {
     if (!salon.hasActiveSubscription()) {
       return res.status(403).json({
         success: false,
-        message: 'Booking is currently unavailable'
+        message: 'Buchungen sind derzeit nicht verfügbar'
       });
     }
 
@@ -237,7 +237,7 @@ export const getSalonBySlug = async (req, res) => {
     logger.error('GetSalonBySlug Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -254,7 +254,7 @@ export const getAvailableSlots = async (req, res) => {
     if (!date || !serviceId) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide date and serviceId'
+        message: 'Bitte geben Sie Datum und Service-ID an'
       });
     }
 
@@ -263,7 +263,7 @@ export const getAvailableSlots = async (req, res) => {
     if (!salon || !salon.hasActiveSubscription()) {
       return res.status(404).json({
         success: false,
-        message: 'Salon not found or booking unavailable'
+        message: 'Salon nicht gefunden oder Buchungen nicht verfügbar'
       });
     }
 
@@ -272,7 +272,7 @@ export const getAvailableSlots = async (req, res) => {
     if (!service) {
       return res.status(404).json({
         success: false,
-        message: 'Service not found'
+        message: 'Service nicht gefunden'
       });
     }
 
@@ -286,7 +286,7 @@ export const getAvailableSlots = async (req, res) => {
       return res.status(200).json({
         success: true,
         slots: [],
-        message: 'Salon is closed on this day'
+        message: 'Der Salon ist an diesem Tag geschlossen'
       });
     }
 
@@ -360,7 +360,7 @@ export const getAvailableSlots = async (req, res) => {
     logger.error('GetAvailableSlots Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -391,7 +391,7 @@ export const createPublicBooking = async (req, res) => {
     if (!serviceId || !bookingDate || !customerName || !customerEmail) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields: serviceId, bookingDate, customerName, customerEmail'
+        message: 'Bitte geben Sie alle erforderlichen Felder an: serviceId, bookingDate, customerName, customerEmail'
       });
     }
 
@@ -406,12 +406,12 @@ export const createPublicBooking = async (req, res) => {
         // ? SRE FIX #38: Email status feedback
         const warnings = [];
         if (!existingBooking.emailsSent?.confirmation) {
-          warnings.push('Confirmation email is delayed. You will receive it within 15 minutes.');
+          warnings.push('Bestätigungs-E-Mail ist verzögert. Sie erhalten sie innerhalb von 15 Minuten.');
         }
 
         return res.status(200).json({
           success: true,
-          message: 'Booking already exists',
+          message: 'Buchung existiert bereits',
           booking: existingBooking,
           duplicate: true,
           warnings
@@ -424,13 +424,13 @@ export const createPublicBooking = async (req, res) => {
     if (!isValidObjectId(serviceId)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid service ID format'
+        message: 'Ungültiges Service-ID-Format'
       });
     }
     if (employeeId && !isValidObjectId(employeeId)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid employee ID format'
+        message: 'Ungültiges Mitarbeiter-ID-Format'
       });
     }
 
@@ -449,14 +449,14 @@ export const createPublicBooking = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: 'Invalid bookingDate format. Use { date: "YYYY-MM-DD", time: "HH:mm" }'
+        message: 'Ungültiges bookingDate-Format. Verwenden Sie { date: "YYYY-MM-DD", time: "HH:mm" }'
       });
     }
 
     if (!parsedBookingDate && typeof bookingDate === 'string') {
       return res.status(400).json({
         success: false,
-        message: 'Invalid date format'
+        message: 'Ungültiges Datumsformat'
       });
     }
 
@@ -465,7 +465,7 @@ export const createPublicBooking = async (req, res) => {
     if (!isValidEmail(customerEmail)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid email address'
+        message: 'Ungültige E-Mail-Adresse'
       });
     }
 
@@ -475,7 +475,7 @@ export const createPublicBooking = async (req, res) => {
       if (!phoneRegex.test(customerPhone)) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid phone number'
+          message: 'Ungültige Telefonnummer'
         });
       }
     }
@@ -487,7 +487,7 @@ export const createPublicBooking = async (req, res) => {
     if (!salon) {
       return res.status(404).json({
         success: false,
-        message: 'Salon not found'
+        message: 'Salon nicht gefunden'
       });
     }
 
@@ -504,7 +504,7 @@ export const createPublicBooking = async (req, res) => {
       if (!validation.valid) {
         return res.status(400).json({
           success: false,
-          message: validation.error || 'Invalid booking time'
+          message: validation.error || 'Ungültige Buchungszeit'
         });
       }
 
@@ -521,7 +521,7 @@ export const createPublicBooking = async (req, res) => {
     if (!salon.hasActiveSubscription()) {
       return res.status(403).json({
         success: false,
-        message: 'Booking is currently unavailable'
+        message: 'Buchungen sind derzeit nicht verfügbar'
       });
     }
 
@@ -558,7 +558,7 @@ export const createPublicBooking = async (req, res) => {
     if (!service) {
       return res.status(404).json({
         success: false,
-        message: 'Service not found'
+        message: 'Service nicht gefunden'
       });
     }
 
@@ -575,8 +575,111 @@ export const createPublicBooking = async (req, res) => {
     if (existingBooking) {
       return res.status(409).json({
         success: false,
-        message: 'This time slot is no longer available'
+        message: 'Dieser Zeitraum ist nicht mehr verfügbar'
       });
+    }
+
+    // ==================== NO-SHOW-KILLER: Payment Method Handling ====================
+    stage = 'handle_payment_method';
+    let stripeCustomerId = null;
+    let paymentMethodId = null;
+
+    if (salon.noShowKiller?.enabled) {
+      const { paymentMethodId: reqPaymentMethodId } = req.body;
+
+      // Payment Method is required when No-Show-Killer is enabled
+      if (!reqPaymentMethodId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Kreditkarte erforderlich. Bitte hinterlegen Sie eine Kreditkarte für den No-Show-Schutz.'
+        });
+      }
+
+      try {
+        // Import Stripe service
+        const stripeService = await import('../services/stripeService.js');
+
+        // Get or create Stripe customer for booking customer
+        stripeCustomerId = await stripeService.getOrCreateBookingCustomer(
+          customerEmail.toLowerCase(),
+          customerName,
+          customerPhone,
+          salon._id.toString()
+        );
+
+        // Attach payment method to customer
+        await stripeService.attachPaymentMethodToCustomer(stripeCustomerId, reqPaymentMethodId);
+        paymentMethodId = reqPaymentMethodId;
+
+        // ✅ Store payment method details in Customer model (for DSGVO auto-delete)
+        const Customer = (await import('../models/Customer.js')).default;
+        let customer = await Customer.findOne({
+          email: customerEmail.toLowerCase(),
+          salonId: salon._id
+        });
+
+        if (!customer) {
+          // Create customer record if doesn't exist
+          const [firstName, ...lastNameParts] = customerName.split(' ');
+          customer = await Customer.create({
+            salonId: salon._id,
+            firstName: firstName || customerName,
+            lastName: lastNameParts.join(' ') || '',
+            email: customerEmail.toLowerCase(),
+            phone: customerPhone || '',
+            stripeCustomerId: stripeCustomerId,
+            gdprConsent: {
+              paymentDataStorage: {
+                accepted: req.body.gdprConsentAccepted || false,
+                acceptedAt: req.body.gdprConsentAccepted ? new Date() : null,
+                ipAddress: req.ip || req.headers['x-forwarded-for'] || 'unknown'
+              }
+            }
+          });
+        } else {
+          // Update existing customer
+          if (!customer.stripeCustomerId) {
+            customer.stripeCustomerId = stripeCustomerId;
+          }
+          if (req.body.gdprConsentAccepted && !customer.gdprConsent?.paymentDataStorage?.accepted) {
+            customer.gdprConsent = {
+              paymentDataStorage: {
+                accepted: true,
+                acceptedAt: new Date(),
+                ipAddress: req.ip || req.headers['x-forwarded-for'] || 'unknown'
+              }
+            };
+          }
+        }
+
+        // Get payment method details from Stripe
+        const stripe = stripeService.getStripe ? stripeService.getStripe() : await import('stripe').then(m => new m.default(process.env.STRIPE_SECRET_KEY));
+        const paymentMethod = await stripe.paymentMethods.retrieve(reqPaymentMethodId);
+
+        // Add payment method to customer (with 90-day auto-delete schedule)
+        const scheduledDeletionAt = new Date();
+        scheduledDeletionAt.setDate(scheduledDeletionAt.getDate() + 90); // 90 days from now
+
+        customer.paymentMethods.push({
+          paymentMethodId: reqPaymentMethodId,
+          last4: paymentMethod.card?.last4 || '****',
+          brand: paymentMethod.card?.brand || 'unknown',
+          expiryMonth: paymentMethod.card?.exp_month || 0,
+          expiryYear: paymentMethod.card?.exp_year || 0,
+          createdAt: new Date(),
+          scheduledDeletionAt: scheduledDeletionAt
+        });
+
+        await customer.save();
+
+        logger.log(`✅ Payment method attached for booking customer: ${customerEmail}`);
+      } catch (stripeError) {
+        logger.error('Error handling payment method:', stripeError);
+        return res.status(400).json({
+          success: false,
+          message: 'Fehler beim Speichern der Kreditkarte. Bitte versuchen Sie es erneut.'
+        });
+      }
     }
 
     // Create booking (no Customer model - data stored directly in Booking)
@@ -594,7 +697,25 @@ export const createPublicBooking = async (req, res) => {
       language: language || salon.defaultLanguage || 'de',
       status: 'confirmed', // Auto-confirm public bookings
       confirmedAt: new Date(),
-      idempotencyKey: idempotencyKey || null // ? SRE FIX #30
+      idempotencyKey: idempotencyKey || null, // ? SRE FIX #30
+      // NO-SHOW-KILLER fields
+      stripeCustomerId: stripeCustomerId || null,
+      paymentMethodId: paymentMethodId || null,
+      // ✅ Legal compliance
+      noShowFeeAcceptance: req.body.noShowFeeAcceptance ? {
+        accepted: req.body.noShowFeeAcceptance.accepted || false,
+        acceptedAt: req.body.noShowFeeAcceptance.accepted ? new Date() : null,
+        ipAddress: req.ip || req.headers['x-forwarded-for'] || 'unknown',
+        userAgent: req.headers['user-agent'] || 'unknown',
+        terms: req.body.noShowFeeAcceptance.terms || null,
+        checkboxText: req.body.noShowFeeAcceptance.checkboxText || null
+      } : undefined,
+      // ✅ Dispute evidence
+      disputeEvidence: {
+        bookingCreatedAt: new Date(),
+        cancellationDeadline: new Date(parsedBookingDate.getTime() - 24 * 60 * 60 * 1000), // 24h before
+        serviceDescription: service.name || 'Service'
+      }
     });
 
     // Populate for email
@@ -653,7 +774,7 @@ export const createPublicBooking = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Booking created successfully! Check your email for confirmation.',
+      message: 'Buchung erfolgreich erstellt! Bitte überprüfen Sie Ihre E-Mails für die Bestätigung.',
       booking: {
         id: booking._id,
         bookingDate: booking.bookingDate,
@@ -672,7 +793,7 @@ export const createPublicBooking = async (req, res) => {
     });
     res.status(500).json({
       success: false,
-      message: sanitizeErrorMessage(error, 'Failed to create booking'),
+      message: sanitizeErrorMessage(error, 'Buchung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.'),
       requestId: req.id,
       stage
     });

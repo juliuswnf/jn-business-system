@@ -38,6 +38,10 @@ router.put('/:id', securityMiddleware.validateCSRFToken, mutationLimiter, checkT
 router.patch('/:id/confirm', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.confirmBooking);
 router.patch('/:id/cancel', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.cancelBooking);
 router.patch('/:id/complete', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.completeBooking);
+// ? NO-SHOW-KILLER: Mark as No-Show and charge fee
+router.patch('/:id/no-show', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.markAsNoShow);
+// ? NO-SHOW-KILLER: Undo No-Show and refund fee
+router.patch('/:id/undo-no-show', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.undoNoShow);
 router.delete('/:id', securityMiddleware.validateCSRFToken, mutationLimiter, checkTenantAccess('booking'), bookingController.deleteBooking);
 
 export default router;

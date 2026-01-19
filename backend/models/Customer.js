@@ -126,6 +126,73 @@ const customerSchema = new mongoose.Schema(
       default: 0
     },
 
+    // ==================== NO-SHOW-KILLER: Stripe Integration ====================
+    stripeCustomerId: {
+      type: String,
+      default: null,
+      sparse: true,
+      index: true,
+      comment: 'Stripe Customer ID for payment method storage'
+    },
+
+    // ==================== NO-SHOW-KILLER: Payment Methods ====================
+    paymentMethods: [{
+      paymentMethodId: {
+        type: String,
+        required: true
+      },
+      last4: {
+        type: String,
+        required: true
+      },
+      brand: {
+        type: String,
+        enum: ['visa', 'mastercard', 'amex', 'discover', 'diners', 'jcb', 'unionpay', 'unknown'],
+        required: true
+      },
+      expiryMonth: {
+        type: Number,
+        required: true
+      },
+      expiryYear: {
+        type: Number,
+        required: true
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+      },
+      // ✅ NEW: DSGVO auto-delete
+      scheduledDeletionAt: {
+        type: Date,
+        default: null,
+        comment: '90 days after last booking - auto-delete date'
+      },
+      deletedAt: {
+        type: Date,
+        default: null,
+        comment: 'When payment method was deleted'
+      }
+    }],
+
+    // ==================== NO-SHOW-KILLER: DSGVO Consent ====================
+    gdprConsent: {
+      paymentDataStorage: {
+        accepted: {
+          type: Boolean,
+          default: false
+        },
+        acceptedAt: {
+          type: Date,
+          default: null
+        },
+        ipAddress: {
+          type: String,
+          default: null
+        }
+      }
+    },
+
     // ==================== Status ====================
     status: {
       type: String,

@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import { authAPI } from '../../utils/api';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const BusinessLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const notification = useNotification();
@@ -77,7 +80,7 @@ const BusinessLogin = () => {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            Business Login
+            Geschäfts-Login
           </h1>
           <p className="text-gray-400">
             Zugang zu Ihrem Geschäfts-Dashboard
@@ -110,23 +113,38 @@ const BusinessLogin = () => {
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                 Passwort
               </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-10 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
+                  aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                >
+                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center">
-                <input type="checkbox" className="mr-2 rounded bg-gray-800 border-gray-700" />
-                <span className="text-gray-400">Angemeldet bleiben</span>
+              <label className="flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-gray-900 cursor-pointer transition-colors"
+                />
+                <span className="ml-2 text-gray-400 group-hover:text-gray-300 transition-colors">Angemeldet bleiben</span>
               </label>
-              <Link to="/forgot-password?role=business" className="text-indigo-400 hover:text-indigo-300">
+              <Link to="/forgot-password?role=business" className="text-indigo-400 hover:text-indigo-300 transition-colors">
                 Passwort vergessen?
               </Link>
             </div>

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { CalendarIcon, UsersIcon, CogIcon, CodeBracketIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
 import { api } from '../../utils/api';
-import { getAccessToken } from '../../utils/tokenHelper';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -24,9 +23,6 @@ const AdminDashboard = () => {
   });
   const [showSetup, setShowSetup] = useState(true);
   const user = JSON.parse(localStorage.getItem('jnUser') || localStorage.getItem('user') || '{}');
-
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
 
   useEffect(() => {
     fetchStats();
@@ -77,14 +73,8 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     setLoading(true);
-    const token = getToken();
-    
-    if (!token) {
-      setLoading(false);
-      return;
-    }
 
-    // ? SECURITY FIX: Use central api instance
+    // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
     try {
       // Fetch booking stats
       const statsRes = await api.get('/bookings/stats');

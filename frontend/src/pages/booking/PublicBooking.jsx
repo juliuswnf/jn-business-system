@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useParams, Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useNotification } from '../../hooks/useNotification';
-import { FiClock, FiStar, FiInfo } from 'react-icons/fi';
+import { FiInfo } from 'react-icons/fi';
 import { API_URL } from '../../utils/api';
 import { useAuth } from '../../hooks/useAuth';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import PaymentMethodStep from '../../components/Booking/PaymentMethodStep';
+import { useIsMobile } from '../../hooks/useMediaQuery';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 /**
  * PUBLIC BOOKING - Ohne Anmeldung
@@ -16,6 +22,7 @@ export default function PublicBooking() {
   const [searchParams] = useSearchParams();
   const { slug } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   // Support both route param (/s/:slug) and query param (?salon=xyz)
   const salonSlug = slug || searchParams.get('salon');
 
@@ -43,9 +50,7 @@ export default function PublicBooking() {
   const [employees, setEmployees] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
-  const [confirmation, setConfirmation] = useState(null);
-
-  // Step 0 = Service, 1 = Zeit, 2 = Daten, 3 = Übersicht, 4 = Bestätigung (Erfolg)
+  // Step 0 = Service, 1 = Zeit, 2 = Daten, 3 = Übersicht
   const [bookingStep, setBookingStep] = useState(0);
   const [bookingData, setBookingData] = useState({
     customerName: getPrefillFromUser().customerName || '',
@@ -58,6 +63,9 @@ export default function PublicBooking() {
     employee: '',
     employeeId: '',
   });
+  const [paymentMethodId, setPaymentMethodId] = useState(null);
+  const [noShowKillerEnabled, setNoShowKillerEnabled] = useState(false);
+  const [noShowFeeAmount, setNoShowFeeAmount] = useState(15);
 
   const { showNotification } = useNotification();
 
@@ -198,36 +206,58 @@ export default function PublicBooking() {
       const idempotencyKey = `booking-${Date.now()}-${Array.from(array, b => b.toString(16).padStart(2, '0')).join('')}`;
 
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
+      // Prepare request body
+      const requestBody = {
+        serviceId: bookingData.serviceId,
+        employeeId: bookingData.employeeId || undefined,
+        bookingDate: {
+          date: bookingData.date, // "2025-12-15"
+          time: bookingData.time  // "14:00"
+        },
+        customerName: bookingData.customerName,
+        customerEmail: bookingData.customerEmail,
+        customerPhone: bookingData.customerPhone,
+        idempotencyKey // ✅ SRE FIX #30
+      };
+
+      // Add payment method if No-Show-Killer is enabled
+      if (noShowKillerEnabled && paymentMethodId) {
+        requestBody.paymentMethodId = paymentMethodId;
+        requestBody.gdprConsentAccepted = true;
+        requestBody.noShowFeeAcceptance = {
+          accepted: true,
+          terms: `NO-SHOW-GEBÜHR RICHTLINIE\n\nBei Nichterscheinen wird eine Gebühr von €${noShowFeeAmount} automatisch von Ihrer hinterlegten Kreditkarte abgebucht. Sie können kostenlos stornieren, wenn Sie dies mindestens 24 Stunden vorher tun.`,
+          checkboxText: `Ich akzeptiere die No-Show-Gebühr von €${noShowFeeAmount} bei Nichterscheinen und habe die Richtlinie gelesen.`
+        };
+      }
+
       const res = await fetch(`${API_URL}/bookings/public/s/${salonSlug}/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          serviceId: bookingData.serviceId,
-          employeeId: bookingData.employeeId || undefined,
-          bookingDate: {
-            date: bookingData.date, // "2025-12-15"
-            time: bookingData.time  // "14:00"
-          },
-          customerName: bookingData.customerName,
-          customerEmail: bookingData.customerEmail,
-          customerPhone: bookingData.customerPhone,
-          idempotencyKey // ✅ SRE FIX #30
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (res.ok) {
-        // Show a proper confirmation window instead of toast popup
-        setConfirmation({
-          salonName: salonInfo?.name || 'Salon',
+        // Store confirmation data in sessionStorage and navigate to confirmation page
+        const confirmationData = {
+          salon: salonInfo?.name || 'Salon',
           service: bookingData.service,
           employee: bookingData.employee || 'Wird zugewiesen',
           date: bookingData.date,
           time: bookingData.time,
-          customerName: bookingData.customerName,
-          customerEmail: bookingData.customerEmail,
-          customerPhone: bookingData.customerPhone,
+          name: bookingData.customerName,
+          email: bookingData.customerEmail,
+          phone: bookingData.customerPhone,
+        };
+
+        // Store in sessionStorage as fallback
+        Object.entries(confirmationData).forEach(([key, value]) => {
+          sessionStorage.setItem(`booking_${key}`, value);
         });
-        setBookingStep(4);
+
+        // Navigate to confirmation page with URL params
+        const params = new URLSearchParams(confirmationData).toString();
+        navigate(`/booking/confirmation?${params}`);
       } else {
         const data = await res.json();
         showNotification(data.message || 'Fehler beim Buchen', 'error');
@@ -268,36 +298,213 @@ export default function PublicBooking() {
     { step: 3, label: 'Bestätigung' }
   ];
 
-  return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <div className="border-b border-zinc-800 bg-black sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
+  const StepIndicator = () => (
+    <div className="flex items-center justify-between mb-6 md:mb-8 overflow-x-auto px-2">
+      {stepLabels.map((step, index) => (
+        <div key={step.step} className="flex items-center min-w-0">
+          <div className="flex items-center">
+            <div
+              className={`
+                flex items-center justify-center
+                h-8 w-8 md:h-10 md:w-10
+                rounded-full
+                text-sm md:text-base
+                transition
+                ${bookingStep === step.step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}
+              `}
+            >
+              {index + 1}
+            </div>
+            <span className="ml-2 text-xs md:text-sm hidden sm:inline">{step.label}</span>
+          </div>
+          {index < stepLabels.length - 1 && (
+            <div className="w-8 md:w-12 h-px bg-gray-300 mx-2" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  const DateTimeSection = () => {
+    const isMobile = useIsMobile();
+    const upcomingDates = useMemo(() => {
+      return Array.from({ length: 14 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        return date;
+      });
+    }, []);
+
+    const handleDateSelect = (date) => {
+      setBookingData(prev => ({
+        ...prev,
+        date,
+        time: ''
+      }));
+    };
+
+    const handleTimeSelect = (slot) => {
+      setBookingData(prev => ({
+        ...prev,
+        time: slot
+      }));
+    };
+
+    return (
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+        <div className="order-1">
+          <div className="mb-4 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-1">Neuen Termin buchen</h1>
-              <p className="text-gray-300 text-sm">Wähle einen Salon und buche deinen Termin</p>
+              <p className="text-sm text-gray-500">Datum wählen *</p>
+              <h3 className="text-lg md:text-xl font-semibold">Kalender</h3>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-300">Ausgewählter Salon:</p>
-              <p className="font-semibold">{salonInfo?.name || 'Salon'}</p>
+            <span className="text-xs text-gray-400">{salonInfo?.name || 'Salon'}</span>
+          </div>
+          {isMobile ? (
+            <input
+              type="date"
+              min={new Date().toISOString().split('T')[0]}
+              value={bookingData.date}
+              onChange={(e) => handleDateSelect(e.target.value)}
+              className="w-full p-4 text-lg border-2 rounded-2xl bg-white focus:border-blue-500 transition touch-manipulation"
+            />
+          ) : (
+            <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+              {upcomingDates.map((date) => {
+                const dateStr = date.toISOString().split('T')[0];
+                const dayName = date.toLocaleDateString('de-DE', { weekday: 'short' });
+                const dayNum = date.getDate();
+                const monthName = date.toLocaleDateString('de-DE', { month: 'short' });
+                const isActive = bookingData.date === dateStr;
+                return (
+                  <button
+                    key={dateStr}
+                    onClick={() => handleDateSelect(dateStr)}
+                    className={`flex flex-col items-center rounded-2xl text-center px-2 py-3 text-sm transition ${
+                      isActive
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-gray-800 border border-gray-200 hover:border-blue-500'
+                    }`}
+                  >
+                    <span className="text-xs uppercase tracking-wider">{dayName}</span>
+                    <span className="text-lg font-bold">{dayNum}</span>
+                    <span className="text-xs text-gray-500">{monthName}</span>
+                  </button>
+                );
+              })}
             </div>
+          )}
+        </div>
+
+        <div className="order-2">
+          <div className="mb-4">
+            <p className="text-sm text-gray-500">Zeit auswählen *</p>
+            <h3 className="text-lg md:text-xl font-semibold">Verfügbare Slots</h3>
+          </div>
+          <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 max-h-96 overflow-y-auto">
+            {timeSlots.map(slot => {
+              const isBooked = bookedSlots.includes(slot);
+              const isSelected = bookingData.time === slot;
+              return (
+                <button
+                  key={slot}
+                  onClick={() => !isBooked && handleTimeSelect(slot)}
+                  disabled={isBooked}
+                  className={`
+                    rounded-2xl px-3 py-2 text-sm md:text-base transition
+                    ${isBooked ? 'bg-gray-200 text-gray-400 line-through' : ''}
+                    ${isSelected && !isBooked ? 'bg-blue-600 text-white' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-blue-500'}
+                  `}
+                >
+                  {slot}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
+    );
+  };
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12" id="booking-start">
-        {!isAuthenticated && (
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6 mb-8">
-            <h2 className="text-lg font-semibold text-white mb-1">Mit oder ohne Anmeldung buchen</h2>
-            <p className="text-sm text-gray-300 mb-4">
-              Optional kannst du dich anmelden, damit deine Kontodaten automatisch übernommen werden.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+  const BookingActions = () => (
+    <div className="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+      {bookingStep > 0 && (
+        <button
+          onClick={() => setBookingStep(prev => Math.max(prev - 1, 0))}
+          className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl border border-gray-300 bg-white text-black hover:bg-gray-100 touch-manipulation"
+        >
+          Zurück
+        </button>
+      )}
+      <button
+        onClick={() => {
+          if (bookingStep === 3) {
+            handleSubmit();
+          } else {
+            setBookingStep(prev => prev + 1);
+          }
+        }}
+        disabled={
+          (bookingStep === 0 && !bookingData.service) ||
+          (bookingStep === 1 && (!bookingData.date || !bookingData.time)) ||
+          (bookingStep === 2 && (!bookingData.customerName || !bookingData.customerEmail || !bookingData.customerPhone)) ||
+          submitting
+        }
+        className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed touch-manipulation"
+      >
+        {bookingStep === 3 ? (submitting ? 'Wird gebucht...' : 'Termin buchen') : 'Weiter'}
+      </button>
+    </div>
+  );
+
+  const ServiceGrid = () => (
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {services.map(service => {
+        const isSelected = bookingData.serviceId === service.id;
+        return (
+          <button
+            key={service.id}
+            onClick={() => handleServiceSelect(service)}
+            className={`
+              w-full text-left rounded-2xl p-4 md:p-5 shadow-sm transition
+              ${isSelected ? 'border-2 border-blue-500 bg-blue-50' : 'border border-gray-200 bg-white hover:border-blue-500'}
+            `}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base md:text-lg font-semibold">{service.name}</h3>
+              <span className="text-sm text-gray-500">{service.duration}</span>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">{service.description || 'Beschreibung folgt'}</p>
+            <div className="flex items-center justify-between text-sm md:text-base">
+              <span className="text-gray-500">Dauer</span>
+              <span className="font-semibold text-blue-600">{service.price}</span>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 px-4 py-6 md:px-8 md:py-10 lg:px-12 lg:py-12 text-gray-900">
+      <div className="w-full mx-auto max-w-full md:max-w-4xl space-y-6">
+        <header className="bg-black text-white rounded-2xl border border-zinc-800 shadow-lg p-6 md:p-8 flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-300">Öffentlicher Termin</p>
+              <h1 className="text-3xl font-bold">Neuen Termin buchen</h1>
+              <p className="text-sm text-gray-300 mt-1">Wähle deinen Wunsch-Salon und buche in wenigen Schritten.</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-400">Ausgewählter Salon</p>
+              <p className="text-lg font-semibold">{salonInfo?.name || 'Salon'}</p>
+            </div>
+          </div>
+          {!isAuthenticated && (
+            <div className="bg-zinc-900 bg-opacity-70 border border-zinc-800 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row gap-3">
               <Link
                 to={`/login?redirect=${encodeURIComponent(currentPathWithQuery)}`}
-                className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 transition shadow-md text-center"
+                className="flex-1 text-center px-4 py-3 bg-white text-black rounded-full font-semibold hover:bg-gray-100 touch-manipulation"
               >
                 Mit Anmeldung fortfahren
               </Link>
@@ -307,399 +514,172 @@ export default function PublicBooking() {
                   const el = document.getElementById('booking-start');
                   el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="flex-1 px-6 py-3 border border-zinc-600 hover:bg-zinc-800 rounded-full font-semibold transition"
+                className="flex-1 text-center px-4 py-3 border border-zinc-700 text-white rounded-full font-semibold hover:bg-zinc-900 touch-manipulation"
               >
                 Ohne Anmeldung fortfahren
               </button>
             </div>
-          </div>
-        )}
+          )}
+        </header>
 
-        {/* Progress Bar - 4 Steps */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between">
-            {stepLabels.map(({ step, label }, index) => (
-              <div key={step} className="flex items-center flex-1">
-                <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium transition ${
-                    step <= bookingStep ? 'bg-white text-black' : 'bg-zinc-800 text-gray-300'
-                  }`}>
-                    {step + 1}
-                  </div>
-                  <span className={`text-sm mt-2 ${step <= bookingStep ? 'text-white' : 'text-gray-300'}`}>
-                    {label}
-                  </span>
-                </div>
-                {index < 3 && (
-                  <div className={`flex-1 h-1 mx-4 -mt-6 transition ${step < bookingStep ? 'bg-white' : 'bg-zinc-800'}`} />
-                )}
+        <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8" id="booking-start">
+          <StepIndicator />
+
+          {bookingStep === 0 && (
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">Salon</p>
+                <h2 className="text-2xl font-semibold">{salonInfo?.name || 'Salon'}</h2>
+                <p className="text-sm text-gray-500">{salonInfo?.address?.street || 'Adresse folgt'}</p>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Step 0: Service Selection */}
-        {bookingStep === 0 && (
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
-            <div className="mb-6">
-              <p className="text-sm text-gray-300 mb-1">Ausgewählter Salon</p>
-              <h3 className="text-xl font-semibold">{salonInfo?.name || 'Salon'}</h3>
-            </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold">Welcher Service interessiert dich?</h3>
+                  <span className="text-sm text-gray-500">{services.length} Services verfügbar</span>
+                </div>
+                <ServiceGrid />
+              </div>
 
-            <h2 className="text-2xl font-bold mb-6">Welcher Service interessiert dich?</h2>
-
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
-              {services.length === 0 ? (
-                <p className="text-gray-400 col-span-2">Keine Services verfügbar</p>
-              ) : (
-                services.map((service) => (
-                  <div
-                    key={service.id}
-                    onClick={() => handleServiceSelect(service)}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition ${
-                      bookingData.service === service.name
-                        ? 'border-white bg-zinc-800'
-                        : 'border-zinc-700 hover:border-zinc-600 bg-zinc-800'
-                    }`}
-                  >
-                    <h3 className="font-semibold mb-2">{service.name}</h3>
-                    <div className="flex justify-between text-sm text-gray-300">
-                      <span className="flex items-center gap-2"><FiClock className="text-gray-300" /> {service.duration}</span>
-                      <span className="text-white font-bold">{service.price}</span>
-                    </div>
+              {employees.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold">Bevorzugter Mitarbeiter (optional)</h3>
+                    <span className="text-sm text-gray-500">({employees.length} verfügbar)</span>
                   </div>
-                ))
+                  <div className="space-y-2">
+                    {employees.map(emp => (
+                      <button
+                        key={emp.id}
+                        onClick={() => handleEmployeeSelect(emp)}
+                        className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-left transition border ${
+                          bookingData.employeeId === emp.id ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-gray-200 hover:border-blue-500 bg-white'
+                        }`}
+                      >
+                        <span className="font-medium">{emp.name}</span>
+                        <span className="text-sm text-gray-500">{emp.rating ? emp.rating.toFixed(1) : '⭐'}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
+          )}
 
-            {employees.length > 0 && (
-              <>
-                <h3 className="text-xl font-bold mb-4 mt-8">Bevorzugten Mitarbeiter wählen (optional)</h3>
-                <div className="space-y-3 mb-6">
-                  {employees.map((emp) => (
-                    <div
-                      key={emp.id}
-                      onClick={() => handleEmployeeSelect(emp)}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition ${
-                        bookingData.employee === emp.name
-                          ? 'border-white bg-white/5'
-                          : 'border-zinc-700 hover:border-zinc-600 bg-zinc-800'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold">{emp.name}</p>
-                        </div>
-                        {emp.rating > 0 && (
-                          <div className="flex items-center text-sm text-gray-300 gap-2">
-                            <FiStar className="text-yellow-400" />
-                            <span>{emp.rating.toFixed(1)}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+          {bookingStep === 1 && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Service</p>
+                  <h2 className="text-2xl font-bold">{bookingData.service || 'Bitte wählen'}</h2>
                 </div>
-              </>
-            )}
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => setBookingStep(1)}
-                disabled={!bookingData.service}
-                className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-md"
-              >
-                Weiter
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 1: Date & Time Selection */}
-        {bookingStep === 1 && (
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
-            <div className="mb-6">
-              <p className="text-sm text-gray-300 mb-1">{salonInfo?.name || 'Salon'}</p>
-              <p className="text-gray-300">{bookingData.service}</p>
-            </div>
-
-            <h2 className="text-2xl font-bold mb-6">Wann möchtest du kommen?</h2>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-3">Datum wählen *</label>
-              <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
-                {Array.from({ length: 14 }, (_, i) => {
-                  const date = new Date();
-                  date.setDate(date.getDate() + i);
-                  const dateStr = date.toISOString().split('T')[0];
-                  const dayName = date.toLocaleDateString('de-DE', { weekday: 'short' });
-                  const dayNum = date.getDate();
-                  const monthName = date.toLocaleDateString('de-DE', { month: 'short' });
-                  return (
-                    <button
-                      key={dateStr}
-                      onClick={() => setBookingData(prev => ({ ...prev, date: dateStr, time: '' }))}
-                      className={`py-3 px-2 rounded-lg font-medium transition flex flex-col items-center ${
-                        bookingData.date === dateStr
-                          ? 'bg-white text-black'
-                          : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
-                      }`}
-                    >
-                      <span className="text-xs opacity-70">{dayName}</span>
-                      <span className="text-lg font-bold">{dayNum}</span>
-                      <span className="text-xs opacity-70">{monthName}</span>
-                    </button>
-                  );
-                })}
+                <button
+                  onClick={() => setBookingStep(0)}
+                  className="text-sm text-blue-500 underline"
+                >
+                  Service ändern
+                </button>
               </div>
+              <DateTimeSection />
+              <BookingActions />
             </div>
+          )}
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-3">Verfügbare Zeiten *</label>
-              <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-                {timeSlots.map((slot) => {
-                  const isBooked = bookedSlots.includes(slot);
-                  return (
-                    <button
-                      key={slot}
-                      onClick={() => !isBooked && setBookingData(prev => ({ ...prev, time: slot }))}
-                      disabled={isBooked}
-                      className={`py-2 px-3 rounded-lg font-medium transition ${
-                        isBooked
-                          ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed line-through'
-                          : bookingData.time === slot
-                            ? 'bg-white text-black'
-                            : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => setBookingStep(0)}
-                className="flex-1 px-6 py-3 border border-zinc-600 hover:bg-zinc-800 rounded-full font-semibold transition"
-              >
-                Zurück
-              </button>
-              <button
-                onClick={() => setBookingStep(2)}
-                disabled={!bookingData.date || !bookingData.time}
-                className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-md"
-              >
-                Zur Übersicht
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Customer Data */}
-        {bookingStep === 2 && (
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-6">Deine Kontaktdaten</h2>
-
-            <div className="space-y-4">
+          {bookingStep === 2 && (
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-2">Vollständiger Name *</label>
-                <input
-                  type="text"
-                  name="customerName"
-                  value={bookingData.customerName}
-                  onChange={handleInputChange}
-                  placeholder="Max Mustermann"
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:border-zinc-500 focus:outline-none transition"
-                  required
-                />
+                <p className="text-sm text-gray-500">Termin</p>
+                <h2 className="text-2xl font-bold">
+                  {bookingData.date ? `${new Date(bookingData.date).toLocaleDateString('de-DE')} um ${bookingData.time}` : 'Datum & Uhrzeit auswählen'}
+                </h2>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">E-Mail Adresse *</label>
-                <input
-                  type="email"
-                  name="customerEmail"
-                  value={bookingData.customerEmail}
-                  onChange={handleInputChange}
-                  placeholder="email@beispiel.de"
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:border-zinc-500 focus:outline-none transition"
-                  required
-                />
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-600">Vollständiger Name *</label>
+                  <input
+                    type="text"
+                    name="customerName"
+                    value={bookingData.customerName}
+                    onChange={handleInputChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none touch-manipulation"
+                    placeholder="Max Mustermann"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-600">E-Mail Adresse *</label>
+                  <input
+                    type="email"
+                    name="customerEmail"
+                    value={bookingData.customerEmail}
+                    onChange={handleInputChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none touch-manipulation"
+                    placeholder="email@beispiel.de"
+                  />
+                </div>
               </div>
-
               <div>
-                <label className="block text-sm font-medium mb-2">Telefonnummer *</label>
+                <label className="block mb-2 text-sm font-medium text-gray-600">Telefonnummer *</label>
                 <input
                   type="tel"
                   name="customerPhone"
                   value={bookingData.customerPhone}
                   onChange={handleInputChange}
-                  placeholder="+49 XXX XXXXXXX"
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:border-zinc-500 focus:outline-none transition"
-                  required
+                  className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none touch-manipulation"
+                  placeholder="+49 123 456789"
                 />
               </div>
-
-              <div className="p-4 bg-zinc-800 bg-opacity-50 rounded-lg text-sm text-gray-300 flex items-start gap-3">
-                <FiInfo className="mt-1" />
-                <div><span className="font-semibold">Hinweis:</span> Du erhältst die Bestätigung per E‑Mail.</div>
+              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-start gap-3 text-sm text-blue-700">
+                <FiInfo className="mt-1 text-blue-600" />
+                <p>Du erhältst die Buchungsbestätigung direkt per E-Mail.</p>
               </div>
+              <BookingActions />
             </div>
+          )}
 
-            <div className="flex gap-4 mt-6">
-              <button
-                onClick={() => setBookingStep(1)}
-                className="flex-1 px-6 py-3 border border-zinc-600 hover:bg-zinc-800 rounded-full font-semibold transition"
-              >
-                Zurück
-              </button>
-              <button
-                onClick={() => setBookingStep(3)}
-                disabled={!bookingData.customerName || !bookingData.customerEmail || !bookingData.customerPhone}
-                className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-md"
-              >
-                Weiter
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Confirmation */}
-        {bookingStep === 3 && (
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-6">Termin-Übersicht</h2>
-
-            <div className="space-y-4 mb-8 p-6 bg-zinc-800 bg-opacity-50 rounded-lg">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Salon:</span>
-                <span className="font-semibold">{salonInfo?.name || 'Salon'}</span>
+          {bookingStep === 3 && (
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm text-gray-500">Dein Termin</p>
+                <h2 className="text-2xl font-bold">Übersicht & Zahlung</h2>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Name:</span>
-                <span className="font-semibold">{bookingData.customerName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">E-Mail:</span>
-                <span className="font-semibold">{bookingData.customerEmail}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Telefon:</span>
-                <span className="font-semibold">{bookingData.customerPhone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Service:</span>
-                <span className="font-semibold">{bookingData.service}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Mitarbeiter:</span>
-                <span className="font-semibold">{bookingData.employee || 'Wird zugewiesen'}</span>
-              </div>
-              <div className="border-t border-zinc-700 pt-4 mt-4">
-                <div className="flex justify-between font-bold text-lg">
-                  <span>Termin:</span>
-                  <span>
-                    {new Date(bookingData.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })} um {bookingData.time} Uhr
-                  </span>
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
+                  <p className="text-sm text-gray-500">Salon</p>
+                  <p className="font-semibold">{salonInfo?.name || 'Salon'}</p>
+                </div>
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
+                  <p className="text-sm text-gray-500">Service</p>
+                  <p className="font-semibold">{bookingData.service}</p>
+                  <p className="text-sm text-gray-500">Mitarbeiter</p>
+                  <p className="font-semibold">{bookingData.employee || 'Wird zugewiesen'}</p>
                 </div>
               </div>
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
+                <p className="text-sm text-gray-500">Kontaktdaten</p>
+                <p className="font-semibold">{bookingData.customerName}</p>
+                <p className="text-sm text-gray-500">{bookingData.customerEmail}</p>
+                <p className="text-sm text-gray-500">{bookingData.customerPhone}</p>
+              </div>
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
+                <p className="text-sm text-gray-500">Termin</p>
+                <p className="font-semibold">
+                  {bookingData.date ? `${new Date(bookingData.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}` : '-'}{' '}
+                  um {bookingData.time || '-'} Uhr
+                </p>
+              </div>
+              <Elements stripe={stripePromise}>
+                <PaymentMethodStep
+                  onComplete={(methodId) => setPaymentMethodId(methodId)}
+                  onBack={() => setBookingStep(2)}
+                  feeAmount={noShowFeeAmount}
+                  loading={submitting}
+                  salonName={salonInfo?.name}
+                />
+              </Elements>
+              <BookingActions />
             </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => setBookingStep(2)}
-                className="flex-1 px-6 py-3 border border-zinc-600 hover:bg-zinc-800 rounded-full font-semibold transition"
-              >
-                Ändern
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 disabled:opacity-50 transition shadow-md"
-              >
-                {submitting ? 'Wird gebucht...' : 'Termin buchen'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Success Confirmation Window */}
-        {bookingStep === 4 && confirmation && (
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-2">Termin bestätigt</h2>
-            <p className="text-gray-300 mb-6">Du erhältst die Bestätigung per E-Mail.</p>
-
-            <div className="space-y-4 mb-8 p-6 bg-zinc-800 bg-opacity-50 rounded-lg">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Salon:</span>
-                <span className="font-semibold">{confirmation.salonName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Service:</span>
-                <span className="font-semibold">{confirmation.service}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Mitarbeiter:</span>
-                <span className="font-semibold">{confirmation.employee}</span>
-              </div>
-
-              <div className="border-t border-zinc-700 pt-4 mt-4">
-                <div className="flex justify-between font-bold text-lg">
-                  <span>Termin:</span>
-                  <span>
-                    {new Date(confirmation.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })} um {confirmation.time} Uhr
-                  </span>
-                </div>
-              </div>
-
-              <div className="border-t border-zinc-700 pt-4 mt-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-300">Name:</span>
-                  <span className="font-semibold">{confirmation.customerName}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-300">E-Mail:</span>
-                  <span className="font-semibold">{confirmation.customerEmail}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-300">Telefon:</span>
-                  <span className="font-semibold">{confirmation.customerPhone}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setConfirmation(null);
-                  setBookingStep(0);
-                  setBookingData({
-                    customerName: getPrefillFromUser().customerName || '',
-                    customerEmail: getPrefillFromUser().customerEmail || '',
-                    customerPhone: getPrefillFromUser().customerPhone || '',
-                    service: '',
-                    serviceId: '',
-                    date: '',
-                    time: '',
-                    employee: '',
-                    employeeId: '',
-                  });
-                }}
-                className="flex-1 px-6 py-3 bg-white text-black rounded-full font-semibold hover:opacity-95 transition shadow-md"
-              >
-                Neuen Termin buchen
-              </button>
-              <Link
-                to="/"
-                className="flex-1 px-6 py-3 border border-zinc-600 hover:bg-zinc-800 rounded-full font-semibold transition text-center"
-              >
-                Zur Homepage
-              </Link>
-            </div>
-          </div>
-        )}
+          )}
+        </section>
       </div>
     </div>
   );

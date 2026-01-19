@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { useNotification } from '../../context/NotificationContext';
 import { api } from '../../utils/api';
-import { getAccessToken } from '../../utils/tokenHelper';
 
 const CEOSettings = () => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -44,9 +43,6 @@ const CEOSettings = () => {
     ipWhitelist: '',
     sessionTimeout: 30
   });
-
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
 
   // Get user from localStorage
   useEffect(() => {

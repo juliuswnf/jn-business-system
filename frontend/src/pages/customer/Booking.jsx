@@ -3,7 +3,6 @@ import { useNotification } from '../../hooks/useNotification';
 import { FiClock, FiStar } from 'react-icons/fi';
 import SalonSelector from '../../components/booking/SalonSelector';
 import { api } from '../../utils/api';
-import { getAccessToken } from '../../utils/tokenHelper';
 import { captureError } from '../../utils/errorTracking';
 
 /**
@@ -50,9 +49,6 @@ export default function Booking() {
     '16:00', '16:30', '17:00', '17:30'
   ];
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   // Initial load: fetch customer profile
   useEffect(() => {
     fetchInitialData();
@@ -60,25 +56,25 @@ export default function Booking() {
 
   const fetchInitialData = async () => {
     setLoading(true);
-    const token = getToken();
 
     try {
-      // ? SECURITY FIX: Use central api instance
-      // Fetch customer profile
-      if (token) {
-        const profileRes = await api.get('/auth/profile');
-        if (profileRes.data.success && profileRes.data.user) {
-          const profileData = profileRes.data;
-            setCustomerProfile({
-              name: profileData.user.name || 'Kunde',
-              email: profileData.user.email || '',
-              phone: profileData.user.phone || ''
-            });
-          }
-        }
+      // ✅ FIX: Tokens are in HTTP-only cookies, so always try to fetch profile
+      // The API will return 401 if not authenticated, which is fine
+      const profileRes = await api.get('/auth/profile');
+      if (profileRes.data.success && profileRes.data.user) {
+        const profileData = profileRes.data;
+        setCustomerProfile({
+          name: profileData.user.name || 'Kunde',
+          email: profileData.user.email || '',
+          phone: profileData.user.phone || ''
+        });
       }
     } catch (error) {
-      captureError(error, { context: 'fetchInitialData' });
+      // If 401, user is not authenticated - this is expected if not logged in
+      // But for customer booking page, user should be logged in
+      if (error.response?.status !== 401) {
+        captureError(error, { context: 'fetchInitialData' });
+      }
     } finally {
       setLoading(false);
     }
@@ -99,21 +95,20 @@ export default function Booking() {
       const res = await api.get(`/bookings/public/s/${salon.slug}`);
       if (res.data.success) {
         const data = res.data;
-          setServices(data.services?.map(s => ({
-            id: s._id,
-            name: s.name,
-            duration: `${s.duration || 30} min`,
-            price: `${s.price || 0}€`,
-            durationMinutes: s.duration || 30
-          })) || []);
+        setServices(data.services?.map(s => ({
+          id: s._id,
+          name: s.name,
+          duration: `${s.duration || 30} min`,
+          price: `${s.price || 0}€`,
+          durationMinutes: s.duration || 30
+        })) || []);
 
-          setEmployees(data.employees?.map(e => ({
-            id: e._id,
-            name: e.name,
-            rating: 4.5,
-            appointments: 0
-          })) || []);
-        }
+        setEmployees(data.employees?.map(e => ({
+          id: e._id,
+          name: e.name,
+          rating: 4.5,
+          appointments: 0
+        })) || []);
       }
     } catch (error) {
       captureError(error, { context: 'fetchSalonDetails' });
@@ -140,10 +135,9 @@ export default function Booking() {
 
       if (res.data.success && res.data.slots) {
         const data = res.data;
-          setAvailableSlots(data.slots);
-          setBookedSlots(data.bookedSlots || []);
-          return;
-        }
+        setAvailableSlots(data.slots);
+        setBookedSlots(data.bookedSlots || []);
+        return;
       }
     } catch (error) {
       // Using default slots
@@ -175,6 +169,18 @@ export default function Booking() {
 
   const handleSubmit = async () => {
     if (submitting) return;
+    
+    // ✅ FIX: Validate required fields before submitting
+    if (!customerProfile.name || !customerProfile.email) {
+      showNotification('Bitte stellen Sie sicher, dass Ihr Profil vollständig ist (Name und E-Mail).', 'error');
+      return;
+    }
+    
+    if (!bookingData.serviceId || !bookingData.date || !bookingData.time) {
+      showNotification('Bitte füllen Sie alle erforderlichen Felder aus.', 'error');
+      return;
+    }
+    
     setSubmitting(true);
 
     try {
@@ -189,13 +195,12 @@ export default function Booking() {
         bookingDate: {
           date: bookingData.date, // "2025-12-15"
           time: bookingData.time  // "14:00"
-          },
-          customerName: customerProfile.name,
-          customerEmail: customerProfile.email,
-          customerPhone: customerProfile.phone,
-          notes: bookingData.note,
-          idempotencyKey // ✅ SRE FIX #30
-        })
+        },
+        customerName: customerProfile.name,
+        customerEmail: customerProfile.email,
+        customerPhone: customerProfile.phone,
+        notes: bookingData.note,
+        idempotencyKey // ✅ SRE FIX #30
       });
 
       // ? SECURITY FIX: Response is already parsed by axios

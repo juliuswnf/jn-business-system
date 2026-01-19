@@ -2,9 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
+import { api } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function Customers() {
   const navigate = useNavigate();
@@ -18,9 +17,6 @@ export default function Customers() {
   const [customerDetails, setCustomerDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -33,7 +29,7 @@ export default function Customers() {
   const fetchCustomers = useCallback(async () => {
     try {
       setLoading(true);
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const params = new URLSearchParams();
       if (debouncedSearch) params.append('search', debouncedSearch);
 
@@ -52,7 +48,7 @@ export default function Customers() {
   // Fetch stats
   const fetchStats = useCallback(async () => {
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.get('/crm/stats');
 
       if (res.data.success) {
@@ -76,7 +72,7 @@ export default function Customers() {
     setLoadingDetails(true);
 
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.get(`/crm/customers/${encodeURIComponent(email)}`);
 
       if (res.data.success) {

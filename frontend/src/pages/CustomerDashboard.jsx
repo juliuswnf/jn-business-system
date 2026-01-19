@@ -1,27 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../utils/api';
-import { getAccessToken } from '../utils/tokenHelper';
 
 const CustomerDashboard = () => {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [pastBookings, setPastBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   useEffect(() => {
     const fetchBookings = async () => {
       setLoading(true);
-      const token = getToken();
 
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       try {
         // Fetch customer's bookings
         const res = await api.get('/bookings?limit=50');

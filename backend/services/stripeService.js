@@ -408,6 +408,137 @@ export const createBillingPortalSession = async (salon, returnUrl) => {
   }
 };
 
+/**
+ * Get or create Stripe customer for booking customer (not salon)
+ * Used for No-Show-Killer payment method storage
+ * @param {String} email - Customer email
+ * @param {String} name - Customer name
+ * @param {String} phone - Customer phone (optional)
+ * @param {String} salonId - Salon ID for metadata
+ * @returns {String} - Stripe customer ID
+ */
+export const getOrCreateBookingCustomer = async (email, name, phone, salonId) => {
+  try {
+    const stripe = getStripe();
+    
+    // Search for existing customer by email
+    const existingCustomers = await stripe.customers.list({
+      email: email.toLowerCase(),
+      limit: 1
+    });
+
+    if (existingCustomers.data.length > 0) {
+      const customer = existingCustomers.data[0];
+      logger.log(`✅ Found existing Stripe customer: ${customer.id}`);
+      return customer.id;
+    }
+
+    // Create new customer
+    const customer = await stripe.customers.create({
+      email: email.toLowerCase(),
+      name: name,
+      phone: phone || undefined,
+      metadata: {
+        type: 'booking_customer',
+        salonId: salonId?.toString() || 'unknown'
+      }
+    });
+
+    logger.log(`✅ Created Stripe customer for booking: ${customer.id}`);
+    return customer.id;
+  } catch (error) {
+    logger.error('Error getting/creating booking customer:', error);
+    throw error;
+  }
+};
+
+/**
+ * Attach payment method to customer and set as default
+ * @param {String} customerId - Stripe customer ID
+ * @param {String} paymentMethodId - Stripe payment method ID
+ * @returns {Object} - Updated customer
+ */
+export const attachPaymentMethodToCustomer = async (customerId, paymentMethodId) => {
+  try {
+    const stripe = getStripe();
+    
+    // Attach payment method to customer
+    await stripe.paymentMethods.attach(paymentMethodId, {
+      customer: customerId
+    });
+
+    // Set as default payment method
+    await stripe.customers.update(customerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId
+      }
+    });
+
+    logger.log(`✅ Attached payment method ${paymentMethodId} to customer ${customerId}`);
+    return { success: true };
+  } catch (error) {
+    logger.error('Error attaching payment method:', error);
+    throw error;
+  }
+};
+
+/**
+ * Charge No-Show-Fee from saved payment method
+ * @param {String} customerId - Stripe customer ID
+ * @param {String} paymentMethodId - Stripe payment method ID
+ * @param {Number} amount - Amount in cents
+ * @param {String} description - Payment description
+ * @param {Object} metadata - Additional metadata
+ * @returns {Object} - Payment Intent
+ */
+export const chargeNoShowFee = async (customerId, paymentMethodId, amount, description, metadata = {}) => {
+  try {
+    const stripe = getStripe();
+    
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: 'eur',
+      customer: customerId,
+      payment_method: paymentMethodId,
+      off_session: true,
+      confirm: true,
+      description: description,
+      metadata: {
+        type: 'no_show_fee',
+        ...metadata
+      }
+    });
+
+    logger.log(`✅ Charged No-Show-Fee: €${amount / 100} - Payment Intent: ${paymentIntent.id}`);
+    return paymentIntent;
+  } catch (error) {
+    logger.error('Error charging No-Show-Fee:', error);
+    throw error;
+  }
+};
+
+/**
+ * Refund No-Show-Fee
+ * @param {String} paymentIntentId - Stripe Payment Intent ID
+ * @returns {Object} - Refund object
+ */
+export const refundNoShowFee = async (paymentIntentId) => {
+  try {
+    const stripe = getStripe();
+    
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentIntentId,
+      reason: 'requested_by_customer'
+    });
+
+    logger.log(`✅ Refunded No-Show-Fee: Refund ID ${refund.id}`);
+    return refund;
+  } catch (error) {
+    logger.error('Error refunding No-Show-Fee:', error);
+    throw error;
+  }
+};
+
 export default {
   createStripeCustomer,
   createSubscription,
@@ -418,5 +549,9 @@ export default {
   handleSuccessfulPayment,
   handleFailedPayment,
   createCheckoutSession,
-  createBillingPortalSession
+  createBillingPortalSession,
+  getOrCreateBookingCustomer,
+  attachPaymentMethodToCustomer,
+  chargeNoShowFee,
+  refundNoShowFee
 };
