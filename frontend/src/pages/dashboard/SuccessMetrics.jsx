@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { getAccessToken } from '../../utils/tokenHelper';
 import { captureError } from '../../utils/errorTracking';
 import {
   TrendingUp,
@@ -35,9 +34,6 @@ const SuccessMetrics = () => {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('30d');
   const [activeTab, setActiveTab] = useState('overview');
-
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
 
   useEffect(() => {
     fetchAllData();

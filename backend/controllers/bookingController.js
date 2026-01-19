@@ -27,7 +27,7 @@ export const createBooking = async (req, res) => {
     if (!salonId || !serviceId || !bookingDate || !customerEmail) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields: salonId, serviceId, bookingDate, customerEmail'
+        message: 'Bitte geben Sie alle erforderlichen Felder an: salonId, serviceId, bookingDate, customerEmail'
       });
     }
 
@@ -39,7 +39,7 @@ export const createBooking = async (req, res) => {
         logger.info(`?? Duplicate booking attempt detected: ${idempotencyKey}`);
         return res.status(200).json({
           success: true,
-          message: 'Booking already exists',
+          message: 'Buchung existiert bereits',
           booking: existingBooking,
           duplicate: true
         });
@@ -48,13 +48,13 @@ export const createBooking = async (req, res) => {
 
     // Validate ObjectIds
     if (!isValidObjectId(salonId)) {
-      return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+      return res.status(400).json({ success: false, message: 'Ungültiges Salon-ID-Format' });
     }
     if (!isValidObjectId(serviceId)) {
-      return res.status(400).json({ success: false, message: 'Invalid service ID format' });
+      return res.status(400).json({ success: false, message: 'Ungültiges Service-ID-Format' });
     }
     if (employeeId && !isValidObjectId(employeeId)) {
-      return res.status(400).json({ success: false, message: 'Invalid employee ID format' });
+      return res.status(400).json({ success: false, message: 'Ungültiges Mitarbeiter-ID-Format' });
     }
 
     // ? AUDIT FIX: Parse and validate date with timezone support
@@ -106,7 +106,7 @@ export const createBooking = async (req, res) => {
     if (!service) {
       return res.status(404).json({
         success: false,
-        message: 'Service not found'
+        message: 'Service nicht gefunden'
       });
     }
 
@@ -289,7 +289,7 @@ export const getBookings = async (req, res) => {
     logger.error('GetBookings Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -333,7 +333,7 @@ export const getBooking = async (req, res) => {
     logger.error('GetBooking Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -436,7 +436,7 @@ export const updateBooking = async (req, res) => {
     logger.error('UpdateBooking Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -484,7 +484,7 @@ export const confirmBooking = async (req, res) => {
     logger.error('ConfirmBooking Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -532,7 +532,7 @@ export const cancelBooking = async (req, res) => {
     logger.error('CancelBooking Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -580,7 +580,7 @@ export const completeBooking = async (req, res) => {
     logger.error('CompleteBooking Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -625,7 +625,260 @@ export const deleteBooking = async (req, res) => {
     logger.error('DeleteBooking Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
+    });
+  }
+};
+
+// ==================== MARK AS NO-SHOW ====================
+
+export const markAsNoShow = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ObjectId
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültige Buchungs-ID'
+      });
+    }
+
+    // Load booking with salon
+    const booking = await Booking.findById(id)
+      .populate('salonId')
+      .maxTimeMS(5000);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Buchung nicht gefunden'
+      });
+    }
+
+    // ? TENANT ISOLATION CHECK
+    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Zugriff verweigert - Ressource gehört zu einem anderen Salon'
+      });
+    }
+
+    // Check if already marked as no-show
+    if (booking.status === 'no_show') {
+      return res.status(400).json({
+        success: false,
+        message: 'Buchung wurde bereits als No-Show markiert'
+      });
+    }
+
+    // Update booking status
+    booking.status = 'no_show';
+    booking.noShowMarkedAt = new Date();
+    booking.noShowMarkedBy = req.user._id;
+
+    // Attempt to charge No-Show-Fee if enabled
+    let feeCharged = false;
+    if (booking.salonId?.noShowKiller?.enabled && booking.paymentMethodId) {
+      try {
+        const feeAmount = booking.salonId.noShowKiller.feeAmount || 1500; // Default €15.00
+
+        // ✅ Use Stripe Connect if available, otherwise fallback to regular Stripe
+        let chargeResult;
+        if (booking.salonId.stripe?.connectedAccountId && booking.salonId.stripe?.chargesEnabled) {
+          // Use Stripe Connect (direct payout to salon)
+          const stripeConnectService = await import('../services/stripeConnectService.js');
+          chargeResult = await stripeConnectService.chargeNoShowFeeConnect(booking, booking.salonId);
+
+          booking.noShowFee = {
+            charged: true,
+            amount: feeAmount,
+            chargeId: chargeResult.chargeId,
+            transferId: chargeResult.transferId || null,
+            chargedAt: new Date(),
+            breakdown: chargeResult.breakdown
+          };
+        } else {
+          // Fallback to regular Stripe (platform account)
+          const stripeService = await import('../services/stripeService.js');
+          const paymentIntent = await stripeService.chargeNoShowFee(
+            booking.stripeCustomerId,
+            booking.paymentMethodId,
+            feeAmount,
+            `No-Show-Gebühr - ${booking.salonId.name}`,
+            {
+              bookingId: booking._id.toString(),
+              salonId: booking.salonId._id.toString(),
+              type: 'no_show_fee'
+            }
+          );
+
+          // Calculate breakdown for regular Stripe
+          const stripeFee = Math.round(25 + (feeAmount * 0.014)); // €0.25 + 1.4%
+          const salonReceives = feeAmount - stripeFee;
+
+          booking.noShowFee = {
+            charged: true,
+            amount: feeAmount,
+            chargeId: paymentIntent.id,
+            chargedAt: new Date(),
+            breakdown: {
+              totalCharged: feeAmount,
+              stripeFee: stripeFee,
+              salonReceives: salonReceives,
+              platformCommission: 0
+            }
+          };
+        }
+
+        feeCharged = true;
+        logger.info(`✅ No-Show-Fee charged: €${feeAmount / 100} for booking ${booking._id}`);
+
+        // Send email to customer about No-Show-Fee
+        const emailService = (await import('../services/emailService.js')).default;
+        await emailService.sendEmail({
+          to: booking.customerEmail,
+          subject: `No-Show-Gebühr wurde berechnet - ${booking.salonId.name}`,
+          text: `Hallo ${booking.customerName},\n\nSie sind nicht zu Ihrem Termin erschienen:\n\nTermin: ${new Date(booking.bookingDate).toLocaleDateString('de-DE')} um ${new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}\nSalon: ${booking.salonId.name}\n\nNo-Show-Gebühr: €${(feeAmount / 100).toFixed(2)}\nDie Gebühr wurde von Ihrer hinterlegten Kreditkarte abgebucht.\n\nBei Fragen kontaktieren Sie bitte:\n${booking.salonId.email} | ${booking.salonId.phone || ''}\n\nMit freundlichen Grüßen\n${booking.salonId.name}`,
+          html: `
+            <h2>No-Show-Gebühr wurde berechnet</h2>
+            <p>Hallo ${booking.customerName},</p>
+            <p>Sie sind nicht zu Ihrem Termin erschienen:</p>
+            <ul>
+              <li><strong>Termin:</strong> ${new Date(booking.bookingDate).toLocaleDateString('de-DE')} um ${new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</li>
+              <li><strong>Salon:</strong> ${booking.salonId.name}</li>
+            </ul>
+            <p><strong>No-Show-Gebühr: €${(feeAmount / 100).toFixed(2)}</strong></p>
+            <p>Die Gebühr wurde von Ihrer hinterlegten Kreditkarte abgebucht.</p>
+            <p>Bei Fragen kontaktieren Sie bitte:<br>${booking.salonId.email}${booking.salonId.phone ? ` | ${booking.salonId.phone}` : ''}</p>
+          `
+        });
+
+      } catch (error) {
+        booking.noShowFee = {
+          charged: false,
+          error: error.message,
+          attemptedAt: new Date()
+        };
+
+        logger.error(`❌ Failed to charge No-Show-Fee: ${error.message}`);
+
+        // Notify salon about failed charge
+        const emailService = (await import('../services/emailService.js')).default;
+        await emailService.sendEmail({
+          to: booking.salonId.email,
+          subject: '⚠️ No-Show-Gebühr konnte nicht abgebucht werden',
+          text: `Die No-Show-Gebühr für ${booking.customerName} (${booking.customerEmail}) konnte nicht abgebucht werden.\n\nGrund: ${error.message}\n\nBitte kontaktieren Sie den Kunden für manuelle Abrechnung.`,
+          html: `<h2>⚠️ No-Show-Gebühr konnte nicht abgebucht werden</h2><p>Die No-Show-Gebühr für <strong>${booking.customerName}</strong> (${booking.customerEmail}) konnte nicht abgebucht werden.</p><p><strong>Grund:</strong> ${error.message}</p><p>Bitte kontaktieren Sie den Kunden für manuelle Abrechnung.</p>`
+        });
+      }
+    } else if (booking.salonId?.noShowKiller?.enabled && !booking.paymentMethodId) {
+      // No payment method available
+      logger.warn(`⚠️ No payment method available for No-Show-Fee: Booking ${booking._id}`);
+    }
+
+    await booking.save();
+
+    res.json({
+      success: true,
+      message: 'Als No-Show markiert',
+      feeCharged: feeCharged,
+      booking: booking
+    });
+  } catch (error) {
+    logger.error('MarkAsNoShow Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Fehler beim Markieren als No-Show'
+    });
+  }
+};
+
+// ==================== UNDO NO-SHOW ====================
+
+export const undoNoShow = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ObjectId
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültige Buchungs-ID'
+      });
+    }
+
+    // Load booking
+    const booking = await Booking.findById(id)
+      .populate('salonId')
+      .maxTimeMS(5000);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Buchung nicht gefunden'
+      });
+    }
+
+    // ? TENANT ISOLATION CHECK
+    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Zugriff verweigert - Ressource gehört zu einem anderen Salon'
+      });
+    }
+
+    // Check if marked as no-show
+    if (booking.status !== 'no_show') {
+      return res.status(400).json({
+        success: false,
+        message: 'Buchung wurde nicht als No-Show markiert'
+      });
+    }
+
+    // Refund if fee was charged
+    if (booking.noShowFee?.charged && booking.noShowFee.chargeId) {
+      try {
+        const stripeService = await import('../services/stripeService.js');
+        const refund = await stripeService.refundNoShowFee(booking.noShowFee.chargeId);
+
+        booking.noShowFee.refunded = true;
+        booking.noShowFee.refundedAt = new Date();
+        booking.noShowFee.refundId = refund.id;
+
+        // Email customer about refund
+        const emailService = (await import('../services/emailService.js')).default;
+        await emailService.sendEmail({
+          to: booking.customerEmail,
+          subject: `No-Show-Gebühr erstattet - ${booking.salonId.name}`,
+          text: `Hallo ${booking.customerName},\n\nDie No-Show-Gebühr von €${(booking.noShowFee.amount / 100).toFixed(2)} wurde erstattet.\n\nDas Geld wird in 5-10 Werktagen auf Ihrer Karte gutgeschrieben.\n\nMit freundlichen Grüßen\n${booking.salonId.name}`,
+          html: `<h2>No-Show-Gebühr erstattet</h2><p>Hallo ${booking.customerName},</p><p>Die No-Show-Gebühr von <strong>€${(booking.noShowFee.amount / 100).toFixed(2)}</strong> wurde erstattet.</p><p>Das Geld wird in 5-10 Werktagen auf Ihrer Karte gutgeschrieben.</p>`
+        });
+
+        logger.info(`✅ No-Show-Fee refunded: Refund ID ${refund.id}`);
+      } catch (error) {
+        logger.error(`❌ Failed to refund No-Show-Fee: ${error.message}`);
+        // Continue with status update even if refund fails
+      }
+    }
+
+    // Revert status
+    booking.status = 'completed';
+    booking.noShowMarkedAt = null;
+    booking.noShowMarkedBy = null;
+
+    await booking.save();
+
+    res.json({
+      success: true,
+      message: 'No-Show rückgängig gemacht',
+      booking: booking
+    });
+  } catch (error) {
+    logger.error('UndoNoShow Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Fehler beim Rückgängigmachen der No-Show-Markierung'
     });
   }
 };
@@ -662,7 +915,7 @@ export const getBookingStats = async (req, res) => {
     logger.error('GetBookingStats Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -676,7 +929,7 @@ export const getBookingsByDate = async (req, res) => {
     if (!date) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a date'
+        message: 'Bitte geben Sie ein Datum an'
       });
     }
 
@@ -710,13 +963,13 @@ export const getBookingsByDate = async (req, res) => {
       count: bookings.length,
       bookings,
       // Warning if limit reached
-      ...(bookings.length === limit && { warning: 'Result limit reached, some bookings may not be shown' })
+      ...(bookings.length === limit && { warning: 'Ergebnislimit erreicht, einige Buchungen werden möglicherweise nicht angezeigt' })
     });
   } catch (error) {
     logger.error('GetBookingsByDate Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Interner Serverfehler'
     });
   }
 };
@@ -731,6 +984,8 @@ export default {
   confirmBooking,
   cancelBooking,
   completeBooking,
+  markAsNoShow,
+  undoNoShow,
   deleteBooking,
   getBookingStats,
   getBookingsByDate

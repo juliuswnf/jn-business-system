@@ -324,6 +324,8 @@ export default {
   recordFailedLogin,
   xssProtection,
   csrfProtection,
+  generateCSRFToken, // ? SECURITY FIX: Export CSRF token generation
+  validateCSRFToken, // ? SECURITY FIX: Export CSRF token validation
   sqlInjectionPrevention,
   securityHeaders,
   validateInput,

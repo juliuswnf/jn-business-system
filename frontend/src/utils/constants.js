@@ -131,23 +131,23 @@ export const VALIDATION = {
 
 export const MESSAGES = {
   SUCCESS: {
-    CREATED: 'Successfully created',
-    UPDATED: 'Successfully updated',
-    DELETED: 'Successfully deleted',
-    SAVED: 'Changes saved'
+    CREATED: 'Erfolgreich erstellt',
+    UPDATED: 'Erfolgreich aktualisiert',
+    DELETED: 'Erfolgreich gelöscht',
+    SAVED: 'Änderungen gespeichert'
   },
   ERROR: {
-    GENERIC: 'An error occurred',
-    NETWORK: 'Network error',
-    UNAUTHORIZED: 'Please log in again',
-    FORBIDDEN: 'You do not have permission',
-    NOT_FOUND: 'Resource not found',
-    VALIDATION: 'Validation error'
+    GENERIC: 'Ein Fehler ist aufgetreten',
+    NETWORK: 'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.',
+    UNAUTHORIZED: 'Bitte melden Sie sich erneut an',
+    FORBIDDEN: 'Sie haben keine Berechtigung für diese Aktion',
+    NOT_FOUND: 'Die angeforderte Ressource wurde nicht gefunden',
+    VALIDATION: 'Bitte überprüfen Sie Ihre Eingaben'
   },
   CONFIRM: {
-    DELETE: 'Are you sure you want to delete this?',
-    LOGOUT: 'Are you sure you want to log out?',
-    CANCEL: 'Are you sure you want to cancel?'
+    DELETE: 'Möchten Sie dies wirklich löschen?',
+    LOGOUT: 'Möchten Sie sich wirklich abmelden?',
+    CANCEL: 'Möchten Sie wirklich abbrechen?'
   }
 };
 

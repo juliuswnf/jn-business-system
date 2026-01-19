@@ -45,6 +45,7 @@ import authRoutes from './routes/authRoutes.js';
 import salonRoutes from './routes/salonRoutes.js';
 import publicBookingRoutes from './routes/publicBookingRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import stripeConnectRoutes from './routes/stripeConnectRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import subscriptionManagementRoutes from './routes/subscriptionManagement.js';
@@ -150,7 +151,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID', 'X-CSRF-Token'],
   exposedHeaders: ['X-Request-ID']
 }));
 

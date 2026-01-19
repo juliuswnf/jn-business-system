@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNotification } from '../../hooks/useNotification';
-import { getAccessToken } from '../../utils/tokenHelper';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -24,9 +23,6 @@ export default function BrandingSettings() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
-
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
 
   // Fetch branding settings
   useEffect(() => {

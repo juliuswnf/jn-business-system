@@ -63,9 +63,24 @@ refreshTokenSchema.index({ tokenHash: 1, isRevoked: 1 });
 
 /**
  * Hash token before saving
+ * ✅ FIX: Also hash on create if tokenHash is not already set
  */
 refreshTokenSchema.pre('save', function(next) {
-  if (this.isModified('token') && this.token) {
+  // If token is modified or tokenHash is missing, hash the token
+  if (this.token && (!this.tokenHash || this.isModified('token'))) {
+    this.tokenHash = crypto.createHash('sha256').update(this.token).digest('hex');
+  }
+  next();
+});
+
+/**
+ * Hash token before creating (validate hook runs before pre('save'))
+ * ✅ FIX: Ensure tokenHash is ALWAYS set during validation phase
+ */
+refreshTokenSchema.pre('validate', function(next) {
+  // CRITICAL: Set tokenHash before validation runs (required field)
+  if (this.token) {
+    // Always recalculate tokenHash from token to ensure consistency
     this.tokenHash = crypto.createHash('sha256').update(this.token).digest('hex');
   }
   next();

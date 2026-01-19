@@ -277,6 +277,174 @@ const bookingSchema = new mongoose.Schema(
       default: null
     },
 
+    // ==================== NO-SHOW-KILLER: Stripe Payment Method ====================
+    stripeCustomerId: {
+      type: String,
+      default: null,
+      sparse: true,
+      index: true,
+      comment: 'Stripe Customer ID for No-Show-Fee charging'
+    },
+    paymentMethodId: {
+      type: String,
+      default: null,
+      sparse: true,
+      comment: 'Stripe Payment Method ID (saved card)'
+    },
+
+    // ==================== NO-SHOW-KILLER: Fee Tracking ====================
+    noShowFee: {
+      charged: {
+        type: Boolean,
+        default: false
+      },
+      amount: {
+        type: Number,
+        default: null,
+        comment: 'Fee amount in cents'
+      },
+      chargeId: {
+        type: String,
+        default: null,
+        comment: 'Stripe Payment Intent ID'
+      },
+      transferId: {
+        type: String,
+        default: null,
+        comment: 'Stripe Transfer ID (to salon via Connect)'
+      },
+      chargedAt: {
+        type: Date,
+        default: null
+      },
+      error: {
+        type: String,
+        default: null,
+        comment: 'Error message if charge failed'
+      },
+      attemptedAt: {
+        type: Date,
+        default: null
+      },
+      refunded: {
+        type: Boolean,
+        default: false
+      },
+      refundedAt: {
+        type: Date,
+        default: null
+      },
+      refundId: {
+        type: String,
+        default: null,
+        comment: 'Stripe Refund ID'
+      },
+      // ✅ NEW: Fee breakdown (Stripe Connect)
+      breakdown: {
+        totalCharged: {
+          type: Number,
+          default: null,
+          comment: 'Total amount charged (€15.00)'
+        },
+        stripeFee: {
+          type: Number,
+          default: null,
+          comment: 'Stripe fee (€0.46)'
+        },
+        salonReceives: {
+          type: Number,
+          default: null,
+          comment: 'Amount salon receives (€14.54)'
+        },
+        platformCommission: {
+          type: Number,
+          default: 0,
+          comment: 'Platform commission (€0.00)'
+        }
+      }
+    },
+
+    // ==================== NO-SHOW-KILLER: Legal Compliance ====================
+    noShowFeeAcceptance: {
+      accepted: {
+        type: Boolean,
+        default: false,
+        comment: 'Customer accepted No-Show-Fee policy'
+      },
+      acceptedAt: {
+        type: Date,
+        default: null
+      },
+      ipAddress: {
+        type: String,
+        default: null,
+        comment: 'IP address when policy was accepted'
+      },
+      userAgent: {
+        type: String,
+        default: null,
+        comment: 'User agent when policy was accepted'
+      },
+      terms: {
+        type: String,
+        default: null,
+        comment: 'Full terms text that was accepted'
+      },
+      checkboxText: {
+        type: String,
+        default: null,
+        comment: 'Checkbox text shown to user'
+      }
+    },
+
+    // ==================== NO-SHOW-KILLER: Dispute Evidence ====================
+    disputeEvidence: {
+      bookingCreatedAt: {
+        type: Date,
+        default: null
+      },
+      remindersSent: [{
+        type: {
+          type: String,
+          enum: ['sms', 'email'],
+          default: 'email'
+        },
+        sentAt: {
+          type: Date,
+          default: null
+        },
+        deliveryStatus: {
+          type: String,
+          default: 'sent'
+        }
+      }],
+      customerCommunication: {
+        type: String,
+        default: null,
+        comment: 'Email/SMS logs for dispute evidence'
+      },
+      cancellationDeadline: {
+        type: Date,
+        default: null,
+        comment: 'Deadline for free cancellation (24h before)'
+      },
+      serviceDescription: {
+        type: String,
+        default: null,
+        comment: 'Service description for dispute evidence'
+      }
+    },
+
+    noShowMarkedAt: {
+      type: Date,
+      default: null
+    },
+    noShowMarkedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+
     // ==================== Email Tracking ====================
     emailsSent: {
       confirmation: { type: Boolean, default: false },

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../utils/api';
-import { getAccessToken } from '../../utils/tokenHelper';
 import { captureError } from '../../utils/errorTracking';
 
 const Support = () => {
@@ -15,13 +14,10 @@ const Support = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   // Fetch tickets
   const fetchTickets = async () => {
     setLoading(true);
-    // ? SECURITY FIX: Use central api instance
+    // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
     try {
       const res = await api.get('/support/tickets');
       if (res.data.success) {
@@ -45,15 +41,8 @@ const Support = () => {
     setError('');
     setSuccess('');
 
-    const token = getToken();
-    if (!token) {
-      setError('Bitte melden Sie sich an');
-      setSubmitting(false);
-      return;
-    }
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.post('/support/tickets', newTicket);
       const data = res.data;
 
@@ -94,10 +83,9 @@ const Support = () => {
     if (!newReply.trim() || !selectedTicket) return;
 
     setSubmitting(true);
-    const token = getToken();
 
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.post(`/support/tickets/${selectedTicket._id}/reply`, { message: newReply });
       const data = res.data;
       if (data.success) {
@@ -116,10 +104,8 @@ const Support = () => {
   const handleCloseTicket = async () => {
     if (!selectedTicket) return;
 
-    const token = getToken();
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.put(`/support/tickets/${selectedTicket._id}/close`);
 
       if (res.ok) {

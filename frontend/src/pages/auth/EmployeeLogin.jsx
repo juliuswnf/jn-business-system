@@ -1,104 +1,153 @@
-﻿import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { authAPI, formatError } from '../../utils/api';
-import { useNotification } from '../../hooks/useNotification';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
-import { AuthLayout } from '../../components/layout';
+﻿import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useNotification } from '../../context/NotificationContext';
+import { authAPI } from '../../utils/api';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const EmployeeLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { success, error } = useNotification();
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const notification = useNotification();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (loading) return;
     setLoading(true);
+    setError('');
 
     try {
       const response = await authAPI.employeeLogin(email, password);
-      if (response.data.success) {
+      const data = response.data;
+
+      if (data.success) {
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
         // Tokens are automatically sent by browser with withCredentials: true
         // No need to store in localStorage
-        success('Anmeldung erfolgreich');
+
+        notification.success('Anmeldung erfolgreich');
         navigate('/employee/dashboard');
+        return;
+      } else {
+        const msg = data.message || 'Anmeldung fehlgeschlagen';
+        setError(msg);
+        notification.error(msg);
+        setLoading(false);
       }
     } catch (err) {
-      error(formatError(err));
-    } finally {
+      console.error('Employee login error:', err);
+      const errorMsg = err.response?.data?.message || 'Verbindungsfehler. Bitte versuchen Sie es erneut.';
+      setError(errorMsg);
+      notification.error(errorMsg);
       setLoading(false);
     }
   };
 
-  if (loading) return <LoadingSpinner />;
-
   return (
-    <AuthLayout title="JN Business" subtitle="Mitarbeiter-Login">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">E-Mail</label>
-          <div className="relative">
-            <FiMail className="absolute left-3 top-3 text-gray-400" size={18} />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Ihre E-Mail"
-              className="input-field w-full pl-10 pr-4 py-3"
-              required
-            />
-          </div>
+    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Mitarbeiter-Login
+          </h1>
+          <p className="text-gray-400">
+            Zugang zu Ihrem Mitarbeiter-Dashboard
+          </p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Passwort</label>
-          <div className="relative">
-            <FiLock className="absolute left-3 top-3 text-gray-400" size={18} />
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Ihr Passwort"
-              className="input-field w-full pl-10 pr-10 py-3"
-              required
-            />
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-8">
+          {error && (
+            <div className="mb-4 p-4 bg-red-900/50 border border-red-500 rounded-lg text-red-200 text-sm">
+              <span className="font-medium">Fehler:</span> {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                E-Mail Adresse
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="ihre@email.de"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                Passwort
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-10 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
+                  aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                >
+                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-gray-900 cursor-pointer transition-colors"
+                />
+                <span className="ml-2 text-gray-400 group-hover:text-gray-300 transition-colors">Angemeldet bleiben</span>
+              </label>
+              <Link to="/forgot-password?role=business" className="text-indigo-400 hover:text-indigo-300 transition-colors">
+                Passwort vergessen?
+              </Link>
+            </div>
+
             <button
-              type="button"
-              className="absolute right-3 top-3 text-gray-400 hover:text-gray-200"
-              onClick={() => setShowPassword(!showPassword)}
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              {loading ? 'Anmelden...' : 'Anmelden'}
             </button>
-          </div>
+          </form>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-primary w-full"
-        >
-          {loading ? 'Anmeldung...' : 'Anmelden'}
-        </button>
-
-        <div className="mt-6 text-center text-sm text-gray-400 border-t border-gray-700 pt-4 space-y-2">
-          <div>
-            <Link to="/forgot-password?role=business" className="text-indigo-300 hover:text-indigo-200 font-semibold">
-              Passwort vergessen?
+        <div className="mt-6 text-center">
+          <p className="text-gray-400">
+            Kein Mitarbeiterkonto?{' '}
+            <Link to="/login" className="text-white hover:text-gray-300 font-medium">
+              Zur Login-Auswahl
             </Link>
-          </div>
-          <div>
-            <p className="text-gray-400">
-              Kein Mitarbeiterkonto?{' '}
-              <Link to="/login" className="text-indigo-300 hover:text-indigo-200 font-semibold">Kunden-Login</Link>
-            </p>
-          </div>
+          </p>
         </div>
-      </form>
-    </AuthLayout>
+
+        <div className="mt-4 text-center">
+          <Link to="/login" className="text-sm text-gray-500 hover:text-gray-300">
+            ← Zurück zur Auswahl
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 

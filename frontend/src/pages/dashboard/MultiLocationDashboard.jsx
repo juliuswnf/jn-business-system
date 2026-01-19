@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNotification } from '../../hooks/useNotification';
-import { getAccessToken } from '../../utils/tokenHelper';
 import { api } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
 
@@ -15,13 +14,10 @@ export default function MultiLocationDashboard() {
   const [adding, setAdding] = useState(false);
   const [upgradeRequired, setUpgradeRequired] = useState(false);
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   // Fetch locations
   const fetchLocations = async () => {
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.get('/locations');
       const data = res.data;
 
@@ -39,7 +35,7 @@ export default function MultiLocationDashboard() {
   // Fetch consolidated dashboard
   const fetchDashboard = async () => {
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.get('/locations/dashboard');
 
       if (res.data.success) {
@@ -63,7 +59,7 @@ export default function MultiLocationDashboard() {
     setAdding(true);
 
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.post('/locations', newLocation);
       const data = res.data;
 
@@ -179,7 +175,7 @@ export default function MultiLocationDashboard() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Multi-Location Dashboard</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Multi-Standort Übersicht</h1>
           <p className="text-gray-300">Alle Ihre Standorte auf einen Blick</p>
         </div>
         {locations.length < 5 && (

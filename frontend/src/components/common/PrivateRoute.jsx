@@ -1,7 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { api } from '../../utils/api';
-import { getAccessToken } from '../../utils/tokenHelper';
 
 export default function PrivateRoute({ children, requiredRole }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -10,16 +9,10 @@ export default function PrivateRoute({ children, requiredRole }) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // ? SECURITY FIX: Check authentication via API instead of localStorage
-      const token = getAccessToken();
-      if (!token) {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
-      }
-
+      // ✅ FIX: Tokens are in HTTP-only cookies, so always try API call
+      // Browser sends cookies automatically with withCredentials: true
       try {
-        // Verify token by getting user profile
+        // Verify authentication by getting user profile
         const response = await api.get('/auth/profile');
         if (response.data.success) {
           setUser(response.data.user);
@@ -28,6 +21,7 @@ export default function PrivateRoute({ children, requiredRole }) {
           setIsAuthenticated(false);
         }
       } catch (error) {
+        // 401 is expected if user is not authenticated
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);

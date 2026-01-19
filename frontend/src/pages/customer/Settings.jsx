@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../context/NotificationContext';
 import { api } from '../../utils/api';
-import { getAccessToken } from '../../utils/tokenHelper';
 import { captureError } from '../../utils/errorTracking';
 
 /**
@@ -43,9 +42,6 @@ export default function Settings() {
 
   const [bookingHistory, setBookingHistory] = useState([]);
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   // Fetch user profile and bookings on mount
   useEffect(() => {
     fetchProfileAndBookings();
@@ -53,20 +49,10 @@ export default function Settings() {
 
   const fetchProfileAndBookings = async () => {
     setLoading(true);
-    const token = getToken();
-
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
 
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, so always try API call
+      // Browser sends cookies automatically with withCredentials: true
       // Fetch profile
       const profileRes = await api.get('/auth/profile');
       if (profileRes.data.success && profileRes.data.user) {
@@ -127,11 +113,8 @@ export default function Settings() {
   };
 
   const handleSaveProfile = async () => {
-    const token = getToken();
-    if (!token) return;
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.put('/auth/profile', {
         name: `${profile.firstName} ${profile.lastName}`.trim(),
         phone: profile.phone,
@@ -161,11 +144,8 @@ export default function Settings() {
       return;
     }
 
-    const token = getToken();
-    if (!token) return;
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const res = await api.post('/auth/change-password', {
         currentPassword: passwords.current,
         newPassword: passwords.new

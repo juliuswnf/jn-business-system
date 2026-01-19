@@ -15,31 +15,56 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize auth - check if user is authenticated via API
   useEffect(() => {
+    let isMounted = true;
+    
     const initializeAuth = async () => {
       try {
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
         // Check if user is authenticated by calling the profile endpoint
         const response = await api.get('/auth/profile');
-        if (response.data.success) {
+        if (isMounted && response.data.success) {
           const user = response.data.user;
           setUser(user);
           isAuthenticatedSet(true);
           // Access token will be sent automatically via interceptor from cookie
+        } else if (isMounted) {
+          // If response is not successful, clear state
+          setUser(null);
+          isAuthenticatedSet(false);
         }
       } catch (err) {
-        // Not authenticated or token expired
-        setUser(null);
-        isAuthenticatedSet(false);
-        // Clear any leftover localStorage tokens
-        localStorage.removeItem('token');
-        localStorage.removeItem('jnAuthToken');
-        localStorage.removeItem('jnUser');
+        // Not authenticated or token expired - this is normal if user is not logged in
+        // ✅ FIX: Don't treat 401 as an error - it's expected when user is not logged in
+        const isExpected401 = err.response?.status === 401;
+        
+        if (isMounted) {
+          setUser(null);
+          isAuthenticatedSet(false);
+          // Clear any leftover localStorage tokens
+          localStorage.removeItem('token');
+          localStorage.removeItem('jnAuthToken');
+          localStorage.removeItem('jnUser');
+          localStorage.removeItem('user');
+          localStorage.removeItem('tempUser');
+        }
+        
+        // Only log if it's not an expected 401 (user not logged in)
+        if (!isExpected401 && err.response?.status !== 401) {
+          console.error('Auth initialization error:', err);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     initializeAuth();
+    
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Login function
@@ -59,7 +84,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, user };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Login failed';
+      const errorMessage = err.response?.data?.message || 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -84,7 +109,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, user };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Registration failed';
+      const errorMessage = err.response?.data?.message || 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -95,14 +120,15 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = useCallback(async () => {
     try {
-      // Call logout API
+      // Call logout API FIRST to clear cookies on backend
       try {
         await authAPI.logout();
       } catch (err) {
+        // Even if API call fails, we'll clear local state
         captureMessage('Logout API call failed', 'warning', { error: err.message });
       }
 
-      // Clear state
+      // Then clear local state
       setUser(null);
       setToken(null);
       isAuthenticatedSet(false);
@@ -118,6 +144,10 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (err) {
       captureError(err, { context: 'logout' });
+      // Still clear state even on error
+      setUser(null);
+      setToken(null);
+      isAuthenticatedSet(false);
       return { success: false, error: err.message };
     }
   }, []);

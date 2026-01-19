@@ -212,6 +212,93 @@ const salonSchema = new mongoose.Schema({
     }
   },
 
+  // ==================== NO-SHOW-KILLER ====================
+  noShowKiller: {
+    enabled: {
+      type: Boolean,
+      default: false,
+      comment: 'Enable automatic No-Show-Fee charging'
+    },
+    feeAmount: {
+      type: Number,
+      default: 1500, // €15.00 in cents
+      min: 500, // Minimum €5.00
+      max: 3000, // Maximum €30.00
+      comment: 'No-Show-Fee in cents (e.g., 1500 = €15.00)'
+    },
+    currency: {
+      type: String,
+      default: 'eur',
+      enum: ['eur', 'usd', 'gbp', 'chf'],
+      comment: 'Currency for No-Show-Fee'
+    },
+    requireCardForBooking: {
+      type: Boolean,
+      default: true,
+      comment: 'Require credit card at booking time when No-Show-Killer is enabled'
+    },
+    // ✅ NEW: Fee split configuration (Stripe Connect)
+    platformCommission: {
+      type: Number,
+      default: 0,
+      comment: 'Platform commission in cents (0% - salon keeps all, pays Stripe fees)'
+    },
+    salonReceives: {
+      type: Number,
+      default: 1454, // €14.54 (€15.00 - €0.46 Stripe fee)
+      comment: 'Amount salon receives after Stripe fees'
+    }
+  },
+
+  // ==================== STRIPE CONNECT ====================
+  stripe: {
+    // Existing subscription fields
+    connectedAccountId: {
+      type: String,
+      default: null,
+      sparse: true,
+      index: true,
+      comment: 'Stripe Connect Account ID'
+    },
+    accountStatus: {
+      type: String,
+      enum: ['not_created', 'pending', 'active', 'restricted', 'rejected'],
+      default: 'not_created',
+      comment: 'Stripe Connect account status'
+    },
+    chargesEnabled: {
+      type: Boolean,
+      default: false,
+      comment: 'Can accept charges'
+    },
+    payoutsEnabled: {
+      type: Boolean,
+      default: false,
+      comment: 'Can receive payouts'
+    },
+    onboardingCompletedAt: {
+      type: Date,
+      default: null,
+      comment: 'When Stripe Connect onboarding was completed'
+    },
+    accountType: {
+      type: String,
+      enum: ['standard', 'express'],
+      default: 'express',
+      comment: 'Stripe Connect account type'
+    },
+    country: {
+      type: String,
+      default: 'DE',
+      comment: 'Stripe Connect account country'
+    },
+    currency: {
+      type: String,
+      default: 'eur',
+      comment: 'Stripe Connect account currency'
+    }
+  },
+
   // Subscription & Billing
   subscription: {
     status: {

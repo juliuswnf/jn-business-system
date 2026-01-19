@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { subscriptionAPI } from '../utils/api';
-import { getAccessToken } from '../utils/tokenHelper';
+import { subscriptionAPI, api } from '../utils/api';
 
 const plans = {
   starter: {
@@ -61,10 +60,26 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const isYearly = searchParams.get('billing') === 'yearly';
-  const isLoggedIn = !!getAccessToken();
 
   const plan = plans[planId];
+
+  // ✅ FIX: Check authentication via API (tokens are in HTTP-only cookies)
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await api.get('/auth/profile');
+        setIsLoggedIn(response.data.success);
+      } catch (error) {
+        setIsLoggedIn(false);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     if (!plan) {

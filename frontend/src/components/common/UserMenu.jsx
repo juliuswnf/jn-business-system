@@ -1,28 +1,18 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { captureError } from '../../utils/errorTracking';
+import { useAuth } from '../../hooks/useAuth';
 
 /**
  * UserMenu Component - Account dropdown with settings and logout
  * Shows only when user is logged in
  */
 const UserMenu = () => {
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showArrow, setShowArrow] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        captureError(new Error('Error parsing user data'), { context: 'UserMenu' });
-      }
-    }
-  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -36,16 +26,25 @@ const UserMenu = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    // Clear ALL auth data from localStorage
-    localStorage.removeItem('jnAuthToken');
-    localStorage.removeItem('jnUser');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('tempUser');
+  const handleLogout = async () => {
     setShowMenu(false);
-    window.location.replace('/');
+    
+    try {
+      // Call logout API to clear cookies on backend
+      // IMPORTANT: Must complete before redirecting
+      await logout();
+      
+      // Wait a tiny moment to ensure response is fully processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+    } catch (error) {
+      console.error('Logout error:', error);
+      captureError(error, { context: 'UserMenuLogout' });
+    }
+    
+    // Always redirect to home after logout completes (or fails)
+    // Force a full page reload to clear all state
+    window.location.href = '/';
   };
 
   const getSettingsLink = () => {

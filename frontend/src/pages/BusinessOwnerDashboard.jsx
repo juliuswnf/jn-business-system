@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SMSUsageWidget from '../components/SMSUsageWidget';
 import { api } from '../utils/api';
-import { getAccessToken, getUser } from '../utils/tokenHelper';
 
 const BusinessOwnerDashboard = () => {
   const [todaysBookings, setTodaysBookings] = useState([]);
@@ -16,23 +15,12 @@ const BusinessOwnerDashboard = () => {
     totalServices: 0
   });
 
-  // ? SECURITY FIX: Use token helper
-  const getToken = () => getAccessToken();
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const token = getToken();
-      const user = getUser();
 
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       try {
-        const user = getUser();
         
         // Fetch today's bookings
         const today = new Date().toISOString().split('T')[0];

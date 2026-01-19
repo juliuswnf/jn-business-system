@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../components/common/UserMenu';
 import { api } from '../utils/api';
-import { getAccessToken } from '../utils/tokenHelper';
 import { captureError } from '../utils/errorTracking';
 
 // Icons als SVG Components
@@ -85,25 +84,13 @@ const CEODashboard = () => {
   // Subscriptions State
   const [subscriptions, setSubscriptions] = useState([]);
 
-  // Get auth token (using token helper)
-  const getToken = () => {
-    return getAccessToken();
-  };
-
   // Fetch all data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
 
-      const token = getToken();
-      if (!token) {
-        setError('Nicht autorisiert');
-        setLoading(false);
-        return;
-      }
-
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       try {
         // Fetch stats
         const statsRes = await api.get('/ceo/stats');
@@ -1423,11 +1410,6 @@ const SystemControlTab = () => {
   const [allStarting, setAllStarting] = useState(false);
   const [allStopping, setAllStopping] = useState(false);
 
-  // Get auth token (using token helper)
-  const getToken = () => {
-    return getAccessToken();
-  };
-
   // Check service status
   const checkServiceStatus = async (serviceId) => {
     // ? SECURITY FIX: Use central api instance
@@ -1468,15 +1450,8 @@ const SystemControlTab = () => {
     setActionLoading(prev => ({ ...prev, [serviceId]: 'starting' }));
     addLog(`Starte ${serviceId}...`, 'info');
 
-    const token = getToken();
-    if (!token) {
-      addLog('Nicht autorisiert', 'error');
-      setActionLoading(prev => ({ ...prev, [serviceId]: null }));
-      return;
-    }
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const response = await api.post(`/ceo/system/start/${serviceId}`);
       const data = response.data;
 
@@ -1500,15 +1475,8 @@ const SystemControlTab = () => {
     setActionLoading(prev => ({ ...prev, [serviceId]: 'stopping' }));
     addLog(`Stoppe ${serviceId}...`, 'info');
 
-    const token = getToken();
-    if (!token) {
-      addLog('Nicht autorisiert', 'error');
-      setActionLoading(prev => ({ ...prev, [serviceId]: null }));
-      return;
-    }
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const response = await api.post(`/ceo/system/stop/${serviceId}`);
       const data = response.data;
 
@@ -1532,15 +1500,8 @@ const SystemControlTab = () => {
     setAllStarting(true);
     addLog('[SYS] Starte alle Services...', 'info');
 
-    const token = getToken();
-    if (!token) {
-      addLog('Nicht autorisiert', 'error');
-      setAllStarting(false);
-      return;
-    }
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const response = await api.post('/ceo/system/start-all');
       const data = response.data;
 
@@ -1574,15 +1535,8 @@ const SystemControlTab = () => {
     setAllStopping(true);
     addLog('[SYS] Stoppe alle Services...', 'info');
 
-    const token = getToken();
-    if (!token) {
-      addLog('Nicht autorisiert', 'error');
-      setAllStopping(false);
-      return;
-    }
-
     try {
-      // ? SECURITY FIX: Use central api instance
+      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       const response = await api.post('/ceo/system/stop-all');
       const data = response.data;
 

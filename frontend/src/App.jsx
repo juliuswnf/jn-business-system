@@ -1,8 +1,9 @@
-import { useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
+import { api } from './utils/api';
 
 // Critical path - load immediately
 import Home from './pages/Home';
@@ -38,6 +39,7 @@ const CustomerBooking = lazy(() => import('./pages/customer/Booking'));
 const CustomerSettings = lazy(() => import('./pages/customer/Settings'));
 const CustomerProfile = lazy(() => import('./pages/customer/Profile'));
 const CustomerSupport = lazy(() => import('./pages/customer/Support'));
+const BookingAction = lazy(() => import('./pages/BookingAction'));
 const Services = lazy(() => import('./pages/dashboard/Services'));
 const Employees = lazy(() => import('./pages/dashboard/Employees'));
 const Customers = lazy(() => import('./pages/company/Customers'));
@@ -89,6 +91,7 @@ const PricingWizard = lazy(() => import('./pages/onboarding/PricingWizard'));
 
 // Public Booking (no auth required)
 const PublicBooking = lazy(() => import('./pages/booking/PublicBooking'));
+const BookingConfirmation = lazy(() => import('./pages/booking/BookingConfirmation'));
 const Salons = lazy(() => import('./pages/public/Salons'));
 
 // Error Pages
@@ -141,19 +144,53 @@ const KeyboardShortcuts = () => {
 
 /**
  * Protected Route Component
+ * ✅ FIX: Check authentication via API instead of localStorage (HTTP-only cookies)
  */
 const ProtectedRoute = ({ children, requiredRole, allowedRoles }) => {
-  // Check both token keys for compatibility
-  const token = localStorage.getItem('jnAuthToken') || localStorage.getItem('token');
-  const storedUser = localStorage.getItem('jnUser') || localStorage.getItem('user');
-  const user = JSON.parse(storedUser || '{}');
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [user, setUser] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  if (!token) {
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // ✅ FIX: Verify authentication via API (tokens are in HTTP-only cookies)
+        const response = await api.get('/auth/profile');
+        if (response.data.success) {
+          setUser(response.data.user);
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p>Lade...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
   // Check for specific required role
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredRole && user?.role !== requiredRole) {
     // Redirect to appropriate dashboard based on role
     if (user.role === 'customer') {
       return <Navigate to="/customer/dashboard" replace />;
@@ -165,7 +202,7 @@ const ProtectedRoute = ({ children, requiredRole, allowedRoles }) => {
   }
 
   // Check for allowed roles array
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(user?.role)) {
     if (user.role === 'customer') {
       return <Navigate to="/customer/dashboard" replace />;
     } else if (user.role === 'ceo') {
@@ -682,6 +719,14 @@ function App() {
         <Route
           path="/booking/public"
           element={<LazyPage><PublicBooking /></LazyPage>}
+        />
+        <Route
+          path="/booking/confirmation"
+          element={<LazyPage><BookingConfirmation /></LazyPage>}
+        />
+        <Route
+          path="/booking/action/:token"
+          element={<LazyPage><BookingAction /></LazyPage>}
         />
 
         {/* ==================== ERROR ROUTES ==================== */}

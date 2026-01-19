@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import { authAPI } from '../../utils/api';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const CustomerLogin = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const notification = useNotification();
@@ -101,23 +104,38 @@ const CustomerLogin = () => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">Passwort</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input-field"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input-field w-full pr-10"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
+                  aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                >
+                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center">
-                <input type="checkbox" className="mr-2 rounded" />
-                <span className="text-gray-400">Angemeldet bleiben</span>
+              <label className="flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-gray-900 cursor-pointer transition-colors"
+                />
+                <span className="ml-2 text-gray-400 group-hover:text-gray-300 transition-colors">Angemeldet bleiben</span>
               </label>
-              <Link to="/forgot-password?role=customer" className="text-gray-200 hover:text-white">Passwort vergessen?</Link>
+              <Link to="/forgot-password?role=customer" className="text-gray-200 hover:text-white transition-colors">Passwort vergessen?</Link>
             </div>
 
             <button

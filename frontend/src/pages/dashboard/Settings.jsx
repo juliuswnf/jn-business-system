@@ -4,6 +4,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
 import { salonAPI } from '../../utils/api';
 import { Link } from 'react-router-dom';
+import NoShowKillerSettings from './Settings/NoShowKiller';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 
@@ -39,6 +41,7 @@ export default function Settings() {
     emailReview: true,
     smsReminder: false
   });
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     fetchSettings();
@@ -109,7 +112,8 @@ export default function Settings() {
     { id: 'studio', label: 'Studio-Info', icon: Building2 },
     { id: 'hours', label: 'Öffnungszeiten', icon: Clock },
     { id: 'integrations', label: 'Integrationen', icon: Star },
-    { id: 'notifications', label: 'Benachrichtigungen', icon: Bell }
+    { id: 'notifications', label: 'Benachrichtigungen', icon: Bell },
+    { id: 'noShowKiller', label: 'NO-SHOW-KILLER', icon: CreditCard }
   ];
 
   if (loading) return <LoadingSpinner />;
@@ -122,6 +126,12 @@ export default function Settings() {
           Verwalte dein Studio, Öffnungszeiten und Integrationen
         </p>
       </div>
+
+      {isMobile && (
+        <div className="mb-4 px-4 py-3 rounded-2xl bg-yellow-500/10 text-yellow-600 border border-yellow-200 text-sm">
+          Einige Einstellungen (z. B. Integrationen oder No-Show-Killer) sind nur am Desktop verfügbar.
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-zinc-800 pb-4">
@@ -427,6 +437,9 @@ export default function Settings() {
             </div>
           </div>
         )}
+
+        {/* No-Show-Killer Tab */}
+        {activeTab === 'noShowKiller' && <NoShowKillerSettings />}
         </div>
       </div>
 

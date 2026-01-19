@@ -36,10 +36,14 @@ const generateRefreshToken = () => {
 const createRefreshToken = async (userId, deviceInfo = {}) => {
   const token = generateRefreshToken();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  
+  // Hash token before saving (required field)
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
   const refreshToken = await RefreshToken.create({
     userId,
     token,
+    tokenHash, // ✅ FIX: Set tokenHash manually before create
     expiresAt,
     deviceInfo: {
       userAgent: deviceInfo.userAgent || 'unknown',
@@ -66,7 +70,7 @@ export const register = async (req, res) => {
     if (!email || !password || !fullName) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email, password and name'
+        message: 'Bitte geben Sie E-Mail-Adresse, Passwort und Name ein'
       });
     }
 
@@ -74,7 +78,7 @@ export const register = async (req, res) => {
     if (!isValidEmail(email)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid email address'
+        message: 'Bitte geben Sie eine gültige E-Mail-Adresse ein'
       });
     }
 
@@ -238,7 +242,7 @@ export const register = async (req, res) => {
     logger.error('Register Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Registration failed',
+      message: 'Registrierung fehlgeschlagen. Bitte überprüfen Sie Ihre Eingaben.',
       ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
@@ -254,7 +258,7 @@ export const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password'
+        message: 'Bitte geben Sie E-Mail-Adresse und Passwort ein'
       });
     }
 
@@ -273,7 +277,7 @@ export const login = async (req, res) => {
     if (user.isLocked) {
       return res.status(403).json({
         success: false,
-        message: 'Account is locked. Too many failed login attempts.'
+        message: 'Konto gesperrt. Zu viele fehlgeschlagene Anmeldeversuche. Bitte versuchen Sie es später erneut.'
       });
     }
 
@@ -331,7 +335,7 @@ export const login = async (req, res) => {
     logger.error('? Login Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Login failed'
+      message: 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.'
     });
   }
 };
@@ -656,7 +660,7 @@ export const employeeLogin = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password'
+        message: 'Bitte geben Sie E-Mail-Adresse und Passwort ein'
       });
     }
 
@@ -667,7 +671,7 @@ export const employeeLogin = async (req, res) => {
       logger.warn(`?? Employee login attempt with non-existent email: ${email}`);
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Ungültige Zugangsdaten'
       });
     }
 
@@ -676,7 +680,7 @@ export const employeeLogin = async (req, res) => {
       logger.warn(`?? Non-employee user attempted employee login: ${email} (role: ${user.role})`);
       return res.status(403).json({
         success: false,
-        message: 'Access denied. Employee credentials required.'
+        message: 'Zugriff verweigert. Mitarbeiter-Zugangsdaten erforderlich.'
       });
     }
 
@@ -685,7 +689,7 @@ export const employeeLogin = async (req, res) => {
       logger.warn(`?? Employee ${email} attempted login to wrong company`);
       return res.status(403).json({
         success: false,
-        message: 'Access denied. Invalid company.'
+        message: 'Zugriff verweigert. Ungültiges Unternehmen.'
       });
     }
 
@@ -693,7 +697,7 @@ export const employeeLogin = async (req, res) => {
     if (user.isLocked) {
       return res.status(403).json({
         success: false,
-        message: 'Account is locked. Too many failed login attempts.'
+        message: 'Konto gesperrt. Zu viele fehlgeschlagene Anmeldeversuche. Bitte versuchen Sie es später erneut.'
       });
     }
 
@@ -705,7 +709,7 @@ export const employeeLogin = async (req, res) => {
       await user.incLoginAttempts();
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Ungültige Zugangsdaten'
       });
     }
 
@@ -754,7 +758,7 @@ export const employeeLogin = async (req, res) => {
     logger.error('? Employee Login Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Login failed'
+      message: 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.'
     });
   }
 };
@@ -780,7 +784,7 @@ export const getProfile = async (req, res) => {
     logger.error('? GetProfile Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching profile'
+      message: 'Fehler beim Laden des Profils'
     });
   }
 };
@@ -795,7 +799,7 @@ export const updateProfile = async (req, res) => {
     if (!name && !phone && !avatar && !language) {
       return res.status(400).json({
         success: false,
-        message: 'At least one field required'
+        message: 'Mindestens ein Feld muss ausgefüllt werden'
       });
     }
 
@@ -840,7 +844,7 @@ export const updateProfile = async (req, res) => {
     logger.error('? UpdateProfile Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error updating profile'
+      message: 'Fehler beim Aktualisieren des Profils'
     });
   }
 };
@@ -855,7 +859,7 @@ export const changePassword = async (req, res) => {
     if (!oldPassword || !newPassword || !confirmPassword) {
       return res.status(400).json({
         success: false,
-        message: 'Please fill all fields'
+        message: 'Bitte füllen Sie alle Felder aus'
       });
     }
 
@@ -913,7 +917,7 @@ export const changePassword = async (req, res) => {
     logger.error('? ChangePassword Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error changing password'
+      message: 'Fehler beim Ändern des Passworts'
     });
   }
 };
@@ -943,15 +947,37 @@ export const logout = async (req, res) => {
       }
     }
 
-    // Clear refresh token cookie
-    res.clearCookie('refreshToken', {
+    // Clear both cookies (refreshToken and accessToken)
+    // IMPORTANT: Must use exact same options as when setting the cookies
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
+      domain: undefined // Don't set domain for localhost
+    };
+
+    // Clear refreshToken cookie
+    res.clearCookie('refreshToken', {
+      ...cookieOptions,
       path: '/api/auth'
     });
 
-    logger.info(`🚪 User logged out: ${userId}`);
+    // Clear accessToken cookie (even if it doesn't exist)
+    res.clearCookie('accessToken', {
+      ...cookieOptions,
+      path: '/'
+    });
+
+    // Also clear XSRF-TOKEN to prevent any CSRF attacks
+    res.clearCookie('XSRF-TOKEN', {
+      httpOnly: false, // XSRF token is not httpOnly
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/'
+    });
+
+    logger.info(`🚪 User logged out successfully: ${userId}`);
+    logger.info(`📋 Cookies cleared: refreshToken (path: /api/auth), accessToken (path: /), XSRF-TOKEN (path: /)`);
 
     res.status(200).json({
       success: true,
@@ -959,13 +985,31 @@ export const logout = async (req, res) => {
     });
   } catch (error) {
     logger.error('❌ Logout Error:', error);
-    // Still clear cookie even on error
-    res.clearCookie('refreshToken', {
+    // Still clear both cookies even on error
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
+      domain: undefined
+    };
+
+    res.clearCookie('refreshToken', {
+      ...cookieOptions,
       path: '/api/auth'
     });
+
+    res.clearCookie('accessToken', {
+      ...cookieOptions,
+      path: '/'
+    });
+
+    res.clearCookie('XSRF-TOKEN', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/'
+    });
+
     res.status(500).json({
       success: false,
       message: 'Logout fehlgeschlagen'
@@ -994,7 +1038,7 @@ export const forgotPassword = async (req, res) => {
       if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
       return res.status(400).json({
         success: false,
-        message: 'Email required'
+        message: 'E-Mail-Adresse ist erforderlich'
       });
     }
 
@@ -1229,7 +1273,7 @@ export const forgotPassword = async (req, res) => {
     logger.error('? ForgotPassword Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error processing password reset'
+      message: 'Fehler beim Zurücksetzen des Passworts'
     });
   }
 };
@@ -1248,7 +1292,7 @@ export const resetPassword = async (req, res) => {
       if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
       return res.status(400).json({
         success: false,
-        message: 'Token and password required'
+        message: 'Token und Passwort sind erforderlich'
       });
     }
 
@@ -1267,7 +1311,7 @@ export const resetPassword = async (req, res) => {
       if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired reset token'
+        message: 'Ungültiger oder abgelaufener Reset-Token. Bitte fordern Sie einen neuen an.'
       });
     }
 
@@ -1289,7 +1333,7 @@ export const resetPassword = async (req, res) => {
       logger.warn(`⚠️ Invalid password reset token used from IP: ${clientIp}`);
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired reset token'
+        message: 'Ungültiger oder abgelaufener Reset-Token. Bitte fordern Sie einen neuen an.'
       });
     }
 
@@ -1298,7 +1342,7 @@ export const resetPassword = async (req, res) => {
       logger.warn(`🔒 Password reset blocked - account locked: ${user.email} from IP: ${clientIp}`);
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired reset token'
+        message: 'Ungültiger oder abgelaufener Reset-Token. Bitte fordern Sie einen neuen an.'
       });
     }
 
@@ -1339,7 +1383,7 @@ export const verifyToken = (req, res) => {
     logger.error('? VerifyToken Error:', error);
     res.status(401).json({
       success: false,
-      message: 'Invalid token'
+      message: 'Ungültiger Token'
     });
   }
 };
@@ -1358,7 +1402,7 @@ export const verifyPasswordResetToken = async (req, res) => {
       if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired reset token'
+        message: 'Ungültiger oder abgelaufener Reset-Token. Bitte fordern Sie einen neuen an.'
       });
     }
 
@@ -1380,7 +1424,7 @@ export const verifyPasswordResetToken = async (req, res) => {
       logger.warn(`⚠️ Invalid password reset token verification attempt from IP: ${clientIp}`);
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired reset token'
+        message: 'Ungültiger oder abgelaufener Reset-Token. Bitte fordern Sie einen neuen an.'
       });
     }
 
@@ -1389,7 +1433,7 @@ export const verifyPasswordResetToken = async (req, res) => {
       logger.warn(`🔒 Token verification blocked - account locked: ${user.email} from IP: ${clientIp}`);
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired reset token'
+        message: 'Ungültiger oder abgelaufener Reset-Token. Bitte fordern Sie einen neuen an.'
       });
     }
 
