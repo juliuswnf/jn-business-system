@@ -19,7 +19,10 @@
     "validate-env": "node scripts/validateEnv.js",
     "pre-launch": "node scripts/preLaunchCheck.js",
     "migrate": "node scripts/migrateData.js",
-    "test:email": "node scripts/emailDeliverabilityTest.js"
+    "migrate:soft-delete": "node scripts/migrateToSoftDelete.js",
+    "migrate:onboarding": "node migrations/migrate-onboarding-fields.js",
+    "test:email": "node scripts/emailDeliverabilityTest.js",
+    "create:test-accounts": "node scripts/createTestBusinessAccounts.js"
   },
   "dependencies": {
     "@sentry/node": "^10.31.0",

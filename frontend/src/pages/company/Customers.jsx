@@ -53,8 +53,7 @@ export default function Customers() {
 
       if (res.data.success) {
         const data = res.data;
-          setStats(data.stats);
-        }
+        setStats(data.stats);
       }
     } catch (error) {
       captureError(error, { context: 'fetchStats' });
@@ -77,9 +76,8 @@ export default function Customers() {
 
       if (res.data.success) {
         const data = res.data;
-          setCustomerDetails(data.customer);
+        setCustomerDetails(data.customer);
         }
-      }
     } catch (error) {
       showNotification('Fehler beim Laden der Kundendetails', 'error');
     } finally {

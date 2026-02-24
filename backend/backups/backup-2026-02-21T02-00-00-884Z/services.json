@@ -1,0 +1,122 @@
+[
+  {
+    "_id": "693b07e25690c515fc35f47b",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Herrenschnitt",
+    "description": "Klassischer Herrenhaarschnitt inkl. Waschen und Föhnen",
+    "price": 25,
+    "duration": 30,
+    "category": "Herren",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.528Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f47d",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Damenschnitt kurz",
+    "description": "Haarschnitt für kurzes Haar inkl. Waschen und Föhnen",
+    "price": 35,
+    "duration": 45,
+    "category": "Damen",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.584Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f47f",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Damenschnitt lang",
+    "description": "Haarschnitt für langes Haar inkl. Waschen und Föhnen",
+    "price": 45,
+    "duration": 60,
+    "category": "Damen",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.602Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f481",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Bartschnitt",
+    "description": "Professioneller Bartschnitt und Konturierung",
+    "price": 15,
+    "duration": 20,
+    "category": "Herren",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.618Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f483",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Färben kurz",
+    "description": "Haarfarbe für kurzes Haar inkl. Schnitt",
+    "price": 55,
+    "duration": 90,
+    "category": "Damen",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.634Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f485",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Färben lang",
+    "description": "Haarfarbe für langes Haar inkl. Schnitt",
+    "price": 75,
+    "duration": 120,
+    "category": "Damen",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.651Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f487",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Strähnchen",
+    "description": "Highlights/Lowlights nach Wahl",
+    "price": 65,
+    "duration": 90,
+    "category": "Damen",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.666Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f489",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Kinderschnitt",
+    "description": "Haarschnitt für Kinder bis 12 Jahre",
+    "price": 18,
+    "duration": 25,
+    "category": "Kinder",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.683Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f48b",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Waschen & Föhnen",
+    "description": "Haare waschen und föhnen ohne Schnitt",
+    "price": 20,
+    "duration": 30,
+    "category": "Damen",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.698Z",
+    "__v": 0
+  },
+  {
+    "_id": "693b07e25690c515fc35f48d",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "name": "Hochsteckfrisur",
+    "description": "Elegante Hochsteckfrisur für besondere Anlässe",
+    "price": 50,
+    "duration": 60,
+    "category": "Damen",
+    "isActive": true,
+    "createdAt": "2025-12-11T18:05:22.715Z",
+    "__v": 0
+  }
+]

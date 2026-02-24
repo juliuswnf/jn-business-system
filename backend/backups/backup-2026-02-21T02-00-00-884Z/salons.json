@@ -1,0 +1,1020 @@
+[
+  {
+    "_id": "6936054fc3f0f48ae67db4b7",
+    "name": "BABA Haare",
+    "slug": "mein-test-salon",
+    "owner": "6936054fc3f0f48ae67db4b4",
+    "email": "julius.wagenfeldt@gmail.com",
+    "phone": "+49 324234234",
+    "address": {
+      "street": "Brunnenstraße 8a",
+      "city": "Perl"
+    },
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "subscription": {
+      "status": "trial",
+      "trialEndsAt": "2026-01-06T22:53:03.387Z",
+      "cancelAtPeriodEnd": false,
+      "billingCycle": "monthly",
+      "grandfathered": false,
+      "paymentMethod": "stripe",
+      "smsResetDate": "2025-12-31T23:00:00.000Z",
+      "smsUsedThisMonth": 0,
+      "tier": "starter"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "createdAt": "2025-12-07T22:53:03.389Z",
+    "updatedAt": "2026-02-20T22:50:53.380Z",
+    "__v": 0,
+    "branding": {
+      "accentColor": "#10B981",
+      "buttonStyle": "rounded",
+      "fontFamily": "inter",
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "showPoweredBy": true
+    },
+    "businessType": "hair-salon",
+    "capacity": 5,
+    "compliance": {
+      "baaRequired": false,
+      "gdprEnhanced": true,
+      "hipaaEnabled": false,
+      "requiresConsent": false
+    },
+    "settings": {
+      "employeeCount": 1,
+      "maxConcurrentBookings": 5,
+      "workstationCount": 2
+    },
+    "terminology": {
+      "appointment": "Appointment",
+      "service": "Service",
+      "staff": "Stylist"
+    },
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6946a7ed517922ecd207339b",
+    "name": "Test Salon Julius",
+    "slug": "test-salon-julius",
+    "owner": "6946a7ec517922ecd2073398",
+    "businessType": "hair-salon",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "julius.test1@gmail.com",
+    "phone": "+49 123 456789",
+    "address": {
+      "street": "",
+      "city": "",
+      "postalCode": "",
+      "country": "Deutschland"
+    },
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "subscription": {
+      "status": "trial",
+      "trialEndsAt": "2026-01-19T13:43:09.272Z",
+      "tier": "starter",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2025-12-31T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2025-12-20T13:43:09.276Z",
+    "updatedAt": "2026-02-20T22:50:53.401Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6946abd8f0a2651dca16dea9",
+    "name": "JN Salon",
+    "slug": "jn-salon",
+    "owner": "6946abd8f0a2651dca16dea6",
+    "businessType": "hair-salon",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "julius.wagenfeldt@gmail.com",
+    "phone": "+352691774488",
+    "address": {
+      "street": "",
+      "city": "",
+      "postalCode": "",
+      "country": "Deutschland"
+    },
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "subscription": {
+      "status": "trial",
+      "trialEndsAt": "2026-01-19T13:59:52.567Z",
+      "tier": "starter",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2025-12-31T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2025-12-20T13:59:52.574Z",
+    "updatedAt": "2026-02-20T22:50:53.419Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6998bcc67891f173cdb04919",
+    "name": "Test Tattoostudio",
+    "slug": "test-tattoo",
+    "owner": "6998bcc67891f173cdb04915",
+    "businessType": "tattoo-piercing",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "test-tattoo@jnbusiness.de",
+    "phone": "+49 123 456789",
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "noShowKiller": {
+      "enabled": false,
+      "feeAmount": 1500,
+      "currency": "eur",
+      "requireCardForBooking": true,
+      "platformCommission": 0,
+      "salonReceives": 1454
+    },
+    "stripe": {
+      "connectedAccountId": null,
+      "accountStatus": "not_created",
+      "chargesEnabled": false,
+      "payoutsEnabled": false,
+      "onboardingCompletedAt": null,
+      "accountType": "express",
+      "country": "DE",
+      "currency": "eur"
+    },
+    "subscription": {
+      "status": "trial",
+      "tier": "enterprise",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2026-02-28T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false,
+      "trialEndsAt": "2026-03-06T19:57:58.889Z"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2026-02-20T19:57:58.887Z",
+    "updatedAt": "2026-02-20T22:50:53.434Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6998bcc77891f173cdb04925",
+    "name": "Test Medizin Ästhetik",
+    "slug": "test-medical",
+    "owner": "6998bcc77891f173cdb04921",
+    "businessType": "medical-aesthetics",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "test-medical@jnbusiness.de",
+    "phone": "+49 123 456789",
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "noShowKiller": {
+      "enabled": false,
+      "feeAmount": 1500,
+      "currency": "eur",
+      "requireCardForBooking": true,
+      "platformCommission": 0,
+      "salonReceives": 1454
+    },
+    "stripe": {
+      "connectedAccountId": null,
+      "accountStatus": "not_created",
+      "chargesEnabled": false,
+      "payoutsEnabled": false,
+      "onboardingCompletedAt": null,
+      "accountType": "express",
+      "country": "DE",
+      "currency": "eur"
+    },
+    "subscription": {
+      "status": "trial",
+      "tier": "enterprise",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2026-02-28T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false,
+      "trialEndsAt": "2026-03-06T19:57:59.101Z"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2026-02-20T19:57:59.100Z",
+    "updatedAt": "2026-02-20T22:50:53.451Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6998bcc77891f173cdb04931",
+    "name": "Test Wellness Spa",
+    "slug": "test-wellness",
+    "owner": "6998bcc77891f173cdb0492d",
+    "businessType": "spa-wellness",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "test-wellness@jnbusiness.de",
+    "phone": "+49 123 456789",
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "noShowKiller": {
+      "enabled": false,
+      "feeAmount": 1500,
+      "currency": "eur",
+      "requireCardForBooking": true,
+      "platformCommission": 0,
+      "salonReceives": 1454
+    },
+    "stripe": {
+      "connectedAccountId": null,
+      "accountStatus": "not_created",
+      "chargesEnabled": false,
+      "payoutsEnabled": false,
+      "onboardingCompletedAt": null,
+      "accountType": "express",
+      "country": "DE",
+      "currency": "eur"
+    },
+    "subscription": {
+      "status": "trial",
+      "tier": "enterprise",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2026-02-28T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false,
+      "trialEndsAt": "2026-03-06T19:57:59.289Z"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2026-02-20T19:57:59.289Z",
+    "updatedAt": "2026-02-20T22:50:53.470Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6998bcc77891f173cdb0493c",
+    "name": "Test Barbershop",
+    "slug": "test-barbershop",
+    "owner": "6998bcc77891f173cdb04938",
+    "businessType": "barbershop",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "test-barbershop@jnbusiness.de",
+    "phone": "+49 123 456789",
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "noShowKiller": {
+      "enabled": false,
+      "feeAmount": 1500,
+      "currency": "eur",
+      "requireCardForBooking": true,
+      "platformCommission": 0,
+      "salonReceives": 1454
+    },
+    "stripe": {
+      "connectedAccountId": null,
+      "accountStatus": "not_created",
+      "chargesEnabled": false,
+      "payoutsEnabled": false,
+      "onboardingCompletedAt": null,
+      "accountType": "express",
+      "country": "DE",
+      "currency": "eur"
+    },
+    "subscription": {
+      "status": "trial",
+      "tier": "enterprise",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2026-02-28T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false,
+      "trialEndsAt": "2026-03-06T19:57:59.474Z"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2026-02-20T19:57:59.473Z",
+    "updatedAt": "2026-02-20T22:50:53.486Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6998bcc77891f173cdb04945",
+    "name": "Test Beauty Salon",
+    "slug": "test-beauty",
+    "owner": "6998bcc77891f173cdb04942",
+    "businessType": "beauty-salon",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "test-beauty@jnbusiness.de",
+    "phone": "+49 123 456789",
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "noShowKiller": {
+      "enabled": false,
+      "feeAmount": 1500,
+      "currency": "eur",
+      "requireCardForBooking": true,
+      "platformCommission": 0,
+      "salonReceives": 1454
+    },
+    "stripe": {
+      "connectedAccountId": null,
+      "accountStatus": "not_created",
+      "chargesEnabled": false,
+      "payoutsEnabled": false,
+      "onboardingCompletedAt": null,
+      "accountType": "express",
+      "country": "DE",
+      "currency": "eur"
+    },
+    "subscription": {
+      "status": "trial",
+      "tier": "enterprise",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2026-02-28T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false,
+      "trialEndsAt": "2026-03-06T19:57:59.666Z"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2026-02-20T19:57:59.665Z",
+    "updatedAt": "2026-02-20T22:50:53.502Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6998bcc77891f173cdb0494b",
+    "name": "Test Nagelstudio",
+    "slug": "test-nails",
+    "owner": "6998bcc77891f173cdb04949",
+    "businessType": "nail-salon",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "test-nails@jnbusiness.de",
+    "phone": "+49 123 456789",
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "noShowKiller": {
+      "enabled": false,
+      "feeAmount": 1500,
+      "currency": "eur",
+      "requireCardForBooking": true,
+      "platformCommission": 0,
+      "salonReceives": 1454
+    },
+    "stripe": {
+      "connectedAccountId": null,
+      "accountStatus": "not_created",
+      "chargesEnabled": false,
+      "payoutsEnabled": false,
+      "onboardingCompletedAt": null,
+      "accountType": "express",
+      "country": "DE",
+      "currency": "eur"
+    },
+    "subscription": {
+      "status": "trial",
+      "tier": "enterprise",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2026-02-28T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false,
+      "trialEndsAt": "2026-03-06T19:57:59.849Z"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2026-02-20T19:57:59.848Z",
+    "updatedAt": "2026-02-20T22:50:53.535Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  },
+  {
+    "_id": "6998bcc87891f173cdb04951",
+    "name": "Test Hundepflege",
+    "slug": "test-petgrooming",
+    "owner": "6998bcc77891f173cdb0494f",
+    "businessType": "other",
+    "terminology": {
+      "service": "Service",
+      "staff": "Stylist",
+      "appointment": "Appointment"
+    },
+    "compliance": {
+      "hipaaEnabled": false,
+      "gdprEnhanced": true,
+      "requiresConsent": false,
+      "baaRequired": false
+    },
+    "email": "test-petgrooming@jnbusiness.de",
+    "phone": "+49 123 456789",
+    "businessHours": {
+      "monday": {
+        "closed": false
+      },
+      "tuesday": {
+        "closed": false
+      },
+      "wednesday": {
+        "closed": false
+      },
+      "thursday": {
+        "closed": false
+      },
+      "friday": {
+        "closed": false
+      },
+      "saturday": {
+        "closed": false
+      },
+      "sunday": {
+        "closed": true
+      }
+    },
+    "defaultLanguage": "de",
+    "timezone": "Europe/Berlin",
+    "bookingBuffer": 15,
+    "advanceBookingDays": 30,
+    "reminderHoursBefore": 24,
+    "reviewHoursAfter": 2,
+    "capacity": 5,
+    "settings": {
+      "maxConcurrentBookings": 5,
+      "employeeCount": 1,
+      "workstationCount": 2
+    },
+    "noShowKiller": {
+      "enabled": false,
+      "feeAmount": 1500,
+      "currency": "eur",
+      "requireCardForBooking": true,
+      "platformCommission": 0,
+      "salonReceives": 1454
+    },
+    "stripe": {
+      "connectedAccountId": null,
+      "accountStatus": "not_created",
+      "chargesEnabled": false,
+      "payoutsEnabled": false,
+      "onboardingCompletedAt": null,
+      "accountType": "express",
+      "country": "DE",
+      "currency": "eur"
+    },
+    "subscription": {
+      "status": "trial",
+      "tier": "enterprise",
+      "billingCycle": "monthly",
+      "paymentMethod": "stripe",
+      "smsUsedThisMonth": 0,
+      "smsResetDate": "2026-02-28T23:00:00.000Z",
+      "grandfathered": false,
+      "cancelAtPeriodEnd": false,
+      "trialEndsAt": "2026-03-06T19:58:00.048Z"
+    },
+    "isActive": true,
+    "isPremium": false,
+    "onboardingCompleted": false,
+    "branding": {
+      "logo": null,
+      "favicon": null,
+      "primaryColor": "#EF4444",
+      "secondaryColor": "#1F2937",
+      "accentColor": "#10B981",
+      "fontFamily": "inter",
+      "buttonStyle": "rounded",
+      "showPoweredBy": true
+    },
+    "deletedAt": null,
+    "deletedBy": null,
+    "createdAt": "2026-02-20T19:58:00.047Z",
+    "updatedAt": "2026-02-20T22:50:53.550Z",
+    "__v": 0,
+    "checklistCompletedAt": null,
+    "checklistDismissed": false,
+    "studioSetupCompleted": false,
+    "widgetConfigured": false
+  }
+]

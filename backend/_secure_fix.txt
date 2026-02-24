@@ -1,0 +1,9 @@
+# FIX ROUTE REGISTRATION
+
+# 1. Import securityRoutes after line 69
+Zeile nach dem letzten import hinzufügen:
+import securityRoutes from './routes/securityRoutes.js';
+
+# 2. Register both routes nach Zeile 349
+app.use('/api/v1/stripe-connect', authMiddleware.protect, stripeConnectRoutes);
+app.use('/api/v1/security', authMiddleware.protect, ceoMiddleware.checkCEO, securityRoutes);

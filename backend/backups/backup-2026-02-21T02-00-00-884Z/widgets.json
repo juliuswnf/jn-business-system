@@ -1,0 +1,36 @@
+[
+  {
+    "_id": "694875997c88bac8c459d07b",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "apiKey": "c6488926751cbf506cc73f1ee70824381684759b0aa50ee35444ba9122332eb9",
+    "allowedDomains": [],
+    "theme": {
+      "primaryColor": "#3B82F6",
+      "secondaryColor": "#1F2937",
+      "fontFamily": "Inter, system-ui, sans-serif",
+      "borderRadius": "8px"
+    },
+    "settings": {
+      "showLogo": true,
+      "showAddress": true,
+      "showBusinessHours": true,
+      "requirePhone": false,
+      "enableGuestBooking": true,
+      "defaultLanguage": "de",
+      "enableLanguageSwitch": true
+    },
+    "layout": "popup",
+    "width": "100%",
+    "height": "600px",
+    "isActive": true,
+    "stats": {
+      "totalBookings": 0,
+      "lastBookingAt": null,
+      "totalViews": 0,
+      "lastViewAt": null
+    },
+    "createdAt": "2025-12-21T22:32:57.305Z",
+    "updatedAt": "2025-12-21T22:32:57.312Z",
+    "__v": 0
+  }
+]

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Building2, MapPin, Clock, Scissors, Link2, Code, 
+import {
+  Building2, MapPin, Clock, Scissors, Link2, Code,
   Check, ChevronRight, ChevronLeft, Loader2, Copy, ExternalLink
 } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
@@ -79,10 +79,10 @@ export default function OnboardingWizard() {
     try {
       setLoading(true);
       const response = await salonAPI.getInfo().catch(() => null);
-      
+
       if (response?.data) {
         const salon = response.data;
-        
+
         setStudioInfo({
           name: salon.name || '',
           email: salon.email || '',
@@ -156,10 +156,10 @@ export default function OnboardingWizard() {
             setSaving(false);
             return;
           }
-          await salonAPI.update({ 
-            name: studioInfo.name, 
-            email: studioInfo.email, 
-            phone: studioInfo.phone 
+          await salonAPI.update({
+            name: studioInfo.name,
+            email: studioInfo.email,
+            phone: studioInfo.phone
           });
           break;
 
@@ -213,7 +213,11 @@ export default function OnboardingWizard() {
 
         case 6:
           // Complete onboarding
-          await salonAPI.update({ onboardingCompleted: true });
+          await salonAPI.update({
+            studioSetupCompleted: true,
+            'checklistSteps.widget.completed': true,
+            'checklistSteps.widget.completedAt': new Date()
+          });
           showNotification('Onboarding abgeschlossen! Dein Studio ist bereit.', 'success');
           navigate('/dashboard');
           return;
@@ -242,7 +246,7 @@ export default function OnboardingWizard() {
   };
 
   const updateService = (index, field, value) => {
-    setServices(prev => prev.map((s, i) => 
+    setServices(prev => prev.map((s, i) =>
       i === index ? { ...s, [field]: value } : s
     ));
   };
@@ -259,7 +263,7 @@ export default function OnboardingWizard() {
   };
 
   const updateHours = (index, field, value) => {
-    setOpeningHours(prev => prev.map((h, i) => 
+    setOpeningHours(prev => prev.map((h, i) =>
       i === index ? { ...h, [field]: value } : h
     ));
   };
@@ -281,17 +285,17 @@ export default function OnboardingWizard() {
             <h1 className="text-xl font-bold">Studio einrichten</h1>
             <span className="text-sm text-zinc-400">Schritt {currentStep} von 6</span>
           </div>
-          
+
           {/* Step Indicators */}
           <div className="flex gap-2">
             {STEPS.map((step) => (
-              <div 
+              <div
                 key={step.id}
                 className={`flex-1 h-2 rounded-full transition-all ${
-                  step.id < currentStep 
-                    ? 'bg-green-500' 
-                    : step.id === currentStep 
-                    ? 'bg-white' 
+                  step.id < currentStep
+                    ? 'bg-green-500'
+                    : step.id === currentStep
+                    ? 'bg-white'
                     : 'bg-zinc-700'
                 }`}
               />
@@ -313,7 +317,7 @@ export default function OnboardingWizard() {
 
         {/* Step Content */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8">
-          
+
           {/* Step 1: Studio Info */}
           {currentStep === 1 && (
             <div className="space-y-4">
@@ -406,7 +410,7 @@ export default function OnboardingWizard() {
               {openingHours.map((hours, index) => (
                 <div key={hours.day} className="flex items-center gap-4 py-2">
                   <span className="w-28 text-sm text-zinc-300">{hours.day}</span>
-                  
+
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -502,7 +506,7 @@ export default function OnboardingWizard() {
               <div className="bg-zinc-800 rounded-xl p-4 mb-4">
                 <h4 className="font-medium text-white mb-2">Wozu der Google Review Link?</h4>
                 <p className="text-sm text-zinc-400">
-                  Nach jedem Termin senden wir automatisch eine E-Mail mit deinem Review-Link. 
+                  Nach jedem Termin senden wir automatisch eine E-Mail mit deinem Review-Link.
                   Das erhöht deine Google-Bewertungen erheblich!
                 </p>
               </div>
@@ -520,9 +524,9 @@ export default function OnboardingWizard() {
                 />
               </div>
 
-              <a 
-                href="https://support.google.com/business/answer/7035772" 
-                target="_blank" 
+              <a
+                href="https://support.google.com/business/answer/7035772"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
               >
@@ -558,7 +562,7 @@ export default function OnboardingWizard() {
 
               <div className="bg-zinc-800 rounded-xl p-4">
                 <h4 className="font-medium text-white mb-2">Deine Buchungs-URL:</h4>
-                <a 
+                <a
                   href={`/s/${salonSlug || 'dein-studio'}`}
                   target="_blank"
                   rel="noopener noreferrer"

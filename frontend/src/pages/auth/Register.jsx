@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-do
 import { authAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';
 import { FiLock, FiClipboard } from 'react-icons/fi';
+import BusinessTypeModal from '../../components/onboarding/BusinessTypeModal';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -35,11 +36,13 @@ export default function Register() {
     companyCity: '',
     companyZip: '',
     businessType: '',
+    customBusinessType: '', // For "other" selection
     password: '',
     confirmPassword: '',
     userType: 'salon_owner',
     agreeToTerms: false,
   });
+  const [showBusinessTypeModal, setShowBusinessTypeModal] = useState(!checkoutEmail); // Show modal first if not from checkout
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -61,6 +64,21 @@ export default function Register() {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const handleBusinessTypeSelect = (data) => {
+    // data: { businessType, customBusinessType? }
+    setFormData((prev) => ({
+      ...prev,
+      businessType: data.businessType,
+      customBusinessType: data.customBusinessType || '',
+    }));
+    setShowBusinessTypeModal(false);
+  };
+
+  const handleBackFromModal = () => {
+    // Go back to pricing/checkout page
+    navigate(-1);
   };
 
   const validateForm = () => {
@@ -105,6 +123,7 @@ export default function Register() {
         phone: formData.phone,
         companyName: formData.companyName,
         businessType: formData.businessType,
+        ...(formData.customBusinessType && { customBusinessType: formData.customBusinessType }),
         password: formData.password,
         role: 'salon_owner',
         plan: planInfo.planId,
@@ -119,7 +138,7 @@ export default function Register() {
         sessionStorage.removeItem('selectedPlan');
 
         success('Registrierung erfolgreich! Weiterleitung...');
-        
+
         // Navigate immediately - no timeout needed since token is already set
         navigate('/dashboard', { replace: true });
       }
@@ -133,33 +152,25 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
+    <>
+      {/* Business Type Modal - Show first, before registration form */}
+      {showBusinessTypeModal && (
+        <BusinessTypeModal
+          onSelect={handleBusinessTypeSelect}
+          onBack={handleBackFromModal}
+        />
+      )}
+
+      {/* Registration Form - Show only after business type is selected */}
+      {!showBusinessTypeModal && (
+        <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="text-4xl font-bold mb-2">Konto erstellen</div>
           <p className="text-gray-400 text-lg">
-            Fast geschafft! Erstelle dein {planInfo.planName}-Konto
+            Bitte füllen Sie die erforderlichen Informationen aus
           </p>
-        </div>
-
-        {/* Plan Info Banner */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-white">{planInfo.planName} Plan</p>
-              <p className="text-sm text-gray-400">30 Tage kostenlos testen</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-xl font-bold text-white">€{planInfo.price}/Monat</p>
-            <p className="text-xs text-gray-500">nach Testphase</p>
-          </div>
         </div>
 
         {/* Form Container */}
@@ -244,33 +255,6 @@ export default function Register() {
                 />
                 {errors.companyName && <p className="text-red-400 text-xs mt-1">{errors.companyName}</p>}
               </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-200 mb-2">Ihre Branche <span className="text-red-400">*</span></label>
-                <select
-                  name="businessType"
-                  value={formData.businessType}
-                  onChange={handleChange}
-                  className={`input-field ${errors.businessType ? 'input-error' : ''}`}
-                >
-                  <option value="">Bitte wählen...</option>
-                  <option value="hair-salon">Friseursalon</option>
-                  <option value="beauty-salon">Beauty-Salon</option>
-                  <option value="spa-wellness">Wellness & Spa</option>
-                  <option value="tattoo-piercing">Tattoo-Studio & Piercing</option>
-                  <option value="medical-aesthetics">Medizinische Praxis / Ästhetik</option>
-                  <option value="personal-training">Personal Training / Fitness</option>
-                  <option value="physiotherapy">Physiotherapie</option>
-                  <option value="barbershop">Barbershop</option>
-                  <option value="nail-salon">Nagelstudio</option>
-                  <option value="massage-therapy">Massagepraxis</option>
-                  <option value="yoga-studio">Yoga-Studio</option>
-                  <option value="pilates-studio">Pilates-Studio</option>
-                  <option value="other">Andere</option>
-                </select>
-                {errors.businessType && <p className="text-red-400 text-xs mt-1">{errors.businessType}</p>}
-                <p className="text-xs text-gray-400 mt-1">Die Auswahl bestimmt, welche branchenspezifischen Funktionen Ihnen zur Verfügung stehen.</p>
-              </div>
             </div>
 
             {/* Security Info */}
@@ -348,6 +332,8 @@ export default function Register() {
           </div>
         </div>
       </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }

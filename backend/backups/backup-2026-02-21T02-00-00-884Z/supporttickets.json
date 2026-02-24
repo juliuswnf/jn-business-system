@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "6942fb78b5cb5dfd7ba2535a",
+    "ticketNumber": "TKT-MJAD9VSG-J1JR",
+    "salonId": null,
+    "userId": "6942fb53b5cb5dfd7ba25344",
+    "customerName": "undefined undefined",
+    "customerEmail": "niels.hemmerling@gmail.com",
+    "subject": "Test",
+    "description": "Das hier ist ein Test Ticket!!!",
+    "category": "technical",
+    "priority": "medium",
+    "status": "open",
+    "assignedTo": null,
+    "messages": [
+      {
+        "sender": "customer",
+        "content": "Das hier ist ein Test Ticket!!!",
+        "attachments": [],
+        "_id": "6942fb78b5cb5dfd7ba2535b",
+        "createdAt": "2025-12-17T18:50:32.371Z"
+      }
+    ],
+    "tags": [],
+    "createdAt": "2025-12-17T18:50:32.374Z",
+    "updatedAt": "2025-12-17T18:50:32.374Z",
+    "__v": 0
+  }
+]

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Copy, Check, Code, Palette, Type, Image, Eye } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
-import { widgetAPI, serviceAPI } from '../../utils/api';
+import { widgetAPI, serviceAPI, salonAPI } from '../../utils/api';
 
 export default function WidgetSetup() {
   const { showNotification } = useNotification();
@@ -60,6 +60,8 @@ export default function WidgetSetup() {
   const handleSave = async () => {
     try {
       await widgetAPI.updateConfig(config);
+      // Mark widget as configured in salon
+      await salonAPI.update({ widgetConfigured: true });
       showNotification('Widget-Konfiguration gespeichert', 'success');
     } catch (error) {
       showNotification('Fehler beim Speichern', 'error');

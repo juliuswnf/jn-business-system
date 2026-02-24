@@ -110,7 +110,6 @@ const AdminDashboard = () => {
             totalCustomers: uniqueEmails.size
           }));
         }
-      }
 
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -146,20 +145,20 @@ const AdminDashboard = () => {
                       Schließe diese Schritte ab, um dein Studio optimal einzurichten
                     </p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowSetup(false)}
                     className="text-indigo-300 hover:text-white text-sm"
                   >
                     Ausblenden
                   </button>
                 </div>
-                
+
                 <div className="grid md:grid-cols-5 gap-4">
-                  <Link 
+                  <Link
                     to="/dashboard/services"
                     className={`p-4 rounded-lg border transition ${
-                      setupProgress.hasServices 
-                        ? 'bg-green-500/10 border-green-500/30' 
+                      setupProgress.hasServices
+                        ? 'bg-green-500/10 border-green-500/30'
                         : 'bg-black/30 border-indigo-500/30 hover:border-indigo-400'
                     }`}
                   >
@@ -176,11 +175,11 @@ const AdminDashboard = () => {
                     </p>
                   </Link>
 
-                  <Link 
+                  <Link
                     to="/onboarding"
                     className={`p-4 rounded-lg border transition ${
-                      setupProgress.hasOpeningHours 
-                        ? 'bg-green-500/10 border-green-500/30' 
+                      setupProgress.hasOpeningHours
+                        ? 'bg-green-500/10 border-green-500/30'
                         : 'bg-black/30 border-indigo-500/30 hover:border-indigo-400'
                     }`}
                   >
@@ -197,11 +196,11 @@ const AdminDashboard = () => {
                     </p>
                   </Link>
 
-                  <Link 
+                  <Link
                     to="/onboarding"
                     className={`p-4 rounded-lg border transition ${
-                      setupProgress.hasAddress 
-                        ? 'bg-green-500/10 border-green-500/30' 
+                      setupProgress.hasAddress
+                        ? 'bg-green-500/10 border-green-500/30'
                         : 'bg-black/30 border-indigo-500/30 hover:border-indigo-400'
                     }`}
                   >
@@ -218,11 +217,11 @@ const AdminDashboard = () => {
                     </p>
                   </Link>
 
-                  <Link 
+                  <Link
                     to="/onboarding"
                     className={`p-4 rounded-lg border transition ${
-                      setupProgress.hasGoogleReview 
-                        ? 'bg-green-500/10 border-green-500/30' 
+                      setupProgress.hasGoogleReview
+                        ? 'bg-green-500/10 border-green-500/30'
                         : 'bg-black/30 border-indigo-500/30 hover:border-indigo-400'
                     }`}
                   >
@@ -239,10 +238,10 @@ const AdminDashboard = () => {
                     </p>
                   </Link>
 
-                  <div 
+                  <div
                     className={`p-4 rounded-lg border ${
-                      setupProgress.hasFirstBooking 
-                        ? 'bg-green-500/10 border-green-500/30' 
+                      setupProgress.hasFirstBooking
+                        ? 'bg-green-500/10 border-green-500/30'
                         : 'bg-black/30 border-gray-700'
                     }`}
                   >
@@ -262,7 +261,7 @@ const AdminDashboard = () => {
 
                 <div className="mt-4 flex items-center gap-4">
                   <div className="flex-1 bg-black/30 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${(Object.values(setupProgress).filter(v => v).length / 5) * 100}%` }}
                     />
@@ -330,7 +329,7 @@ const AdminDashboard = () => {
                           booking.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
                           'bg-gray-500/20 text-gray-400'
                         }`}>
-                          {booking.status === 'confirmed' ? 'Bestätigt' : 
+                          {booking.status === 'confirmed' ? 'Bestätigt' :
                            booking.status === 'pending' ? 'Ausstehend' : booking.status}
                         </span>
                       </div>
@@ -344,7 +343,7 @@ const AdminDashboard = () => {
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
               <h2 className="text-xl font-semibold text-white mb-4">Schnellaktionen</h2>
               <div className="grid md:grid-cols-2 gap-4">
-                <Link 
+                <Link
                   to="/dashboard/bookings"
                   className="flex items-center p-4 border-2 border-gray-700 rounded-lg hover:border-blue-500 transition-colors"
                 >
@@ -352,7 +351,7 @@ const AdminDashboard = () => {
                   <span className="font-medium text-white">Termine verwalten</span>
                 </Link>
 
-                <Link 
+                <Link
                   to="/dashboard/services"
                   className="flex items-center p-4 border-2 border-gray-700 rounded-lg hover:border-green-500 transition-colors"
                 >
@@ -360,7 +359,7 @@ const AdminDashboard = () => {
                   <span className="font-medium text-white">Services bearbeiten</span>
                 </Link>
 
-                <Link 
+                <Link
                   to="/dashboard/customers"
                   className="flex items-center p-4 border-2 border-gray-700 rounded-lg hover:border-purple-500 transition-colors"
                 >
@@ -368,7 +367,7 @@ const AdminDashboard = () => {
                   <span className="font-medium text-white">Kunden ansehen</span>
                 </Link>
 
-                <Link 
+                <Link
                   to="/dashboard/widget"
                   className="flex items-center p-4 border-2 border-gray-700 rounded-lg hover:border-yellow-500 transition-colors"
                 >

@@ -1,0 +1,177 @@
+[
+  {
+    "_id": "69404f41d910b1b390cb299f",
+    "type": "inactive_customers",
+    "__v": 0,
+    "active": true,
+    "createdAt": "2025-12-15T18:11:14.852Z",
+    "defaultMessage": {
+      "template": "Hallo {{customerName}}! Wir vermissen Sie bei {{salonName}}! 😊 Kommen Sie zurück und erhalten Sie {{discount}} Rabatt. Buchen: {{bookingLink}} (Gültig {{validDays}} Tage)",
+      "discountType": "percentage",
+      "discountValue": 20,
+      "validDays": 30
+    },
+    "defaultRules": {
+      "inactiveDays": 180,
+      "maxRecipients": 50
+    },
+    "defaultSchedule": {
+      "type": "weekly",
+      "time": "10:00",
+      "dayOfWeek": 1
+    },
+    "description": "Gewinnen Sie Kunden zurück, die 6+ Monate nicht mehr da waren. Perfekt für Starter-Tier!",
+    "estimatedConversionRate": 15,
+    "estimatedROI": 350,
+    "icon": "🔄",
+    "name": "Inaktive Kunden zurückgewinnen",
+    "popular": true,
+    "tier": "starter",
+    "updatedAt": "2026-02-20T20:39:12.721Z"
+  },
+  {
+    "_id": "69404f41d910b1b390cb29a0",
+    "type": "birthday",
+    "__v": 0,
+    "active": true,
+    "createdAt": "2025-12-15T18:11:15.216Z",
+    "defaultMessage": {
+      "template": "🎉 Alles Gute zum Geburtstag, {{customerName}}! Feiern Sie mit uns - {{discount}} Geschenk wartet auf Sie bei {{salonName}}! Code: {{discountCode}} - Buchen: {{bookingLink}}",
+      "discountType": "fixed_amount",
+      "discountValue": 25,
+      "validDays": 14
+    },
+    "defaultRules": {
+      "birthdayDaysBefore": 7,
+      "maxRecipients": 100
+    },
+    "defaultSchedule": {
+      "type": "daily",
+      "time": "09:00"
+    },
+    "description": "Automatische Geburtstagsgutscheine 7 Tage vor dem Geburtstag. Erhöht Kundenbindung um 40%!",
+    "estimatedConversionRate": 35,
+    "estimatedROI": 420,
+    "icon": "🎂",
+    "name": "Geburtstags-Überraschung",
+    "popular": true,
+    "tier": "professional",
+    "updatedAt": "2026-02-20T20:39:13.130Z"
+  },
+  {
+    "_id": "69404f42d910b1b390cb29a1",
+    "type": "last_minute",
+    "__v": 0,
+    "active": true,
+    "createdAt": "2025-12-15T18:11:15.371Z",
+    "defaultMessage": {
+      "template": "⚡ LAST-MINUTE bei {{salonName}}! Freier Termin HEUTE/MORGEN mit {{discount}} Rabatt nur für Sie, {{customerName}}! Schnell buchen: {{bookingLink}} Code: {{discountCode}}",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "validDays": 2
+    },
+    "defaultRules": {
+      "targetSegment": "regular",
+      "maxRecipients": 30
+    },
+    "defaultSchedule": {
+      "type": "manual"
+    },
+    "description": "Füllen Sie freie Termine kurzfristig mit Stammkunden. Reduziert Leerlauf um 60%!",
+    "estimatedConversionRate": 25,
+    "estimatedROI": 280,
+    "icon": "⚡",
+    "name": "Last-Minute Slots füllen",
+    "popular": false,
+    "tier": "professional",
+    "updatedAt": "2026-02-20T20:39:13.357Z"
+  },
+  {
+    "_id": "69404f42d910b1b390cb29a2",
+    "type": "upsell",
+    "__v": 0,
+    "active": true,
+    "createdAt": "2025-12-15T18:11:15.788Z",
+    "defaultMessage": {
+      "template": "✨ NEU bei {{salonName}}: [Service-Name]! Als treuer Kunde erhalten Sie {{discount}} Einführungsrabatt, {{customerName}}. Jetzt testen: {{bookingLink}} Code: {{discountCode}}",
+      "discountType": "percentage",
+      "discountValue": 30,
+      "validDays": 30
+    },
+    "defaultRules": {
+      "minBookings": 3,
+      "maxRecipients": 200
+    },
+    "defaultSchedule": {
+      "type": "manual"
+    },
+    "description": "Informieren Sie Bestandskunden über neue Dienstleistungen mit Einführungsrabatt.",
+    "estimatedConversionRate": 22,
+    "estimatedROI": 310,
+    "icon": "✨",
+    "name": "Neue Services bewerben",
+    "popular": false,
+    "tier": "professional",
+    "updatedAt": "2026-02-20T20:39:13.569Z"
+  },
+  {
+    "_id": "69404f42d910b1b390cb29a3",
+    "type": "loyalty",
+    "__v": 0,
+    "active": true,
+    "createdAt": "2025-12-15T18:11:15.914Z",
+    "defaultMessage": {
+      "template": "🥂 VIP-DANKESCHÖN! Sie sind ein geschätzter Stammgast bei {{salonName}}, {{customerName}}! Hier ist Ihr exklusiver {{discount}} Treue-Rabatt: {{discountCode}} - {{bookingLink}}",
+      "discountType": "percentage",
+      "discountValue": 25,
+      "validDays": 60
+    },
+    "defaultRules": {
+      "minBookings": 10,
+      "minSpent": 500,
+      "maxRecipients": 50
+    },
+    "defaultSchedule": {
+      "type": "weekly",
+      "time": "10:00",
+      "dayOfWeek": 3
+    },
+    "description": "Belohnen Sie Ihre besten Kunden (10+ Buchungen) automatisch mit exklusiven Rabatten.",
+    "estimatedConversionRate": 40,
+    "estimatedROI": 450,
+    "icon": "🥂",
+    "name": "VIP Treue-Bonus",
+    "popular": true,
+    "tier": "professional",
+    "updatedAt": "2026-02-20T20:39:13.790Z"
+  },
+  {
+    "_id": "6941cd77d910b1b390cb5005",
+    "type": "referral",
+    "__v": 0,
+    "active": true,
+    "createdAt": "2025-12-16T21:21:59.239Z",
+    "defaultMessage": {
+      "template": "👥 {{customerName}}, Sie sind ein geschätzter Kunde bei {{salonName}}! Empfehlen Sie uns weiter und Sie UND Ihr Freund erhalten {{discount}} Rabatt. Code: {{discountCode}} - {{bookingLink}}",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "validDays": 60
+    },
+    "defaultRules": {
+      "minBookings": 3,
+      "maxRecipients": 100
+    },
+    "defaultSchedule": {
+      "type": "monthly",
+      "time": "10:00"
+    },
+    "description": "Motivieren Sie treue Kunden, Freunde zu werben. Beide erhalten einen Rabatt!",
+    "estimatedConversionRate": 25,
+    "estimatedROI": 380,
+    "icon": "👥",
+    "name": "Freunde werben - Belohnung",
+    "popular": true,
+    "tier": "professional",
+    "updatedAt": "2026-02-20T20:39:13.981Z"
+  }
+]
