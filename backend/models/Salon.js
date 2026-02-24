@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { TRIAL_CONFIG } from '../config/pricing.js';
 
 const emailTemplateSchema = new mongoose.Schema({
   subject: {
@@ -60,6 +61,14 @@ const salonSchema = new mongoose.Schema({
     default: 'hair-salon',
     index: true,
     comment: 'Defines terminology and available features'
+  },
+
+  // Custom business type name (when businessType = 'other')
+  customBusinessTypeName: {
+    type: String,
+    trim: true,
+    default: null,
+    comment: 'Custom business type name for "other" category'
   },
 
   terminology: {
@@ -370,9 +379,65 @@ const salonSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+
+  // ==================== STUDIO SETUP CHECKLIST ====================
+  studioSetupCompleted: {
+    type: Boolean,
+    default: false,
+    comment: 'Whether all 6 studio setup steps are completed'
+  },
+
+  checklistCompletedAt: {
+    type: Date,
+    default: null,
+    comment: 'Timestamp when setup checklist was completed'
+  },
+
+  checklistDismissed: {
+    type: Boolean,
+    default: false,
+    comment: 'Whether user dismissed the checklist widget'
+  },
+
+  widgetConfigured: {
+    type: Boolean,
+    default: false,
+    comment: 'Whether the booking widget has been configured'
+  },
+
+  checklistSteps: {
+    studioInfo: {
+      completed: { type: Boolean, default: false },
+      completedAt: { type: Date, default: null }
+    },
+    address: {
+      completed: { type: Boolean, default: false },
+      completedAt: { type: Date, default: null }
+    },
+    hours: {
+      completed: { type: Boolean, default: false },
+      completedAt: { type: Date, default: null }
+    },
+    services: {
+      completed: { type: Boolean, default: false },
+      completedAt: { type: Date, default: null }
+    },
+    google: {
+      completed: { type: Boolean, default: false },
+      completedAt: { type: Date, default: null }
+    },
+    widget: {
+      completed: { type: Boolean, default: false },
+      completedAt: { type: Date, default: null }
+    }
+  },
+
+  // Keep old field for backward compatibility (will be deprecated)
   onboardingCompleted: {
     type: Boolean,
-    default: false
+    default: false,
+    deprecated: true,
+    comment: 'DEPRECATED: Use studioSetupCompleted instead'
   },
 
   // ==================== BRANDING / CUSTOM STYLING ====================
@@ -802,7 +867,6 @@ salonSchema.pre('save', function(next) {
 
   // Set trial end date if new trial (14-day Enterprise trial)
   if (this.isNew && this.subscription.status === 'trial' && !this.subscription.trialEndsAt) {
-    const { TRIAL_CONFIG } = require('../config/pricing.js');
     const trialDays = TRIAL_CONFIG.durationDays || 14;
 
     // Set trial end date

@@ -44,7 +44,9 @@ export const getSalonInfo = async (req, res) => {
 const ALLOWED_SALON_FIELDS = [
   'name', 'email', 'phone', 'address', 'description', 'openingHours',
   'businessHours', 'googleReviewUrl', 'defaultLanguage', 'timezone',
-  'emailTemplates', 'settings', 'logo', 'cover', 'social'
+  'emailTemplates', 'settings', 'logo', 'cover', 'social',
+  'studioSetupCompleted', 'checklistDismissed', 'widgetConfigured',
+  'checklistSteps', 'checklistCompletedAt', 'onboardingCompleted'
 ];
 
 export const updateSalon = async (req, res) => {
@@ -76,6 +78,11 @@ export const updateSalon = async (req, res) => {
       if (req.body[field] !== undefined) {
         updateData[field] = req.body[field];
       }
+    }
+
+    // Auto-set checklistCompletedAt when studioSetupCompleted becomes true
+    if (updateData.studioSetupCompleted && !salon.studioSetupCompleted) {
+      updateData.checklistCompletedAt = new Date();
     }
 
     // Apply updates

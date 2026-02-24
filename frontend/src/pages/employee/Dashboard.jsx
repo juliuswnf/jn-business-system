@@ -50,7 +50,6 @@ export default function Dashboard() {
           setUpcomingBookings(formattedBookings);
           setStats(prev => ({ ...prev, upcomingCount: formattedBookings.length }));
         }
-      }
 
       // Try to fetch employee stats if available
       try {

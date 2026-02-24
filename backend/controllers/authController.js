@@ -36,7 +36,7 @@ const generateRefreshToken = () => {
 const createRefreshToken = async (userId, deviceInfo = {}) => {
   const token = generateRefreshToken();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-  
+
   // Hash token before saving (required field)
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
@@ -60,7 +60,7 @@ export const register = async (req, res) => {
   try {
     const {
       email, password, firstName, lastName, name, role, phone,
-      companyName, companyAddress, companyCity, companyZip, plan, businessType
+      companyName, companyAddress, companyCity, companyZip, plan, businessType, customBusinessType
     } = req.body;
 
     // Combine firstName + lastName OR use name
@@ -146,8 +146,8 @@ export const register = async (req, res) => {
         'barbershop', 'nail-salon', 'massage-therapy', 'yoga-studio',
         'pilates-studio', 'other'
       ];
-      const selectedBusinessType = businessType && validBusinessTypes.includes(businessType) 
-        ? businessType 
+      const selectedBusinessType = businessType && validBusinessTypes.includes(businessType)
+        ? businessType
         : 'hair-salon'; // Default fallback
 
       salon = await Salon.create({
@@ -157,6 +157,7 @@ export const register = async (req, res) => {
         email: email,
         phone: phone || '',
         businessType: selectedBusinessType,
+        ...(customBusinessType && selectedBusinessType === 'other' && { customBusinessTypeName: customBusinessType }),
         address: {
           street: companyAddress || '',
           city: companyCity || '',
@@ -196,7 +197,7 @@ export const register = async (req, res) => {
 
     // Generate access token (short-lived: 15 minutes)
     const accessToken = generateToken(user._id, '15m');
-    
+
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
@@ -298,7 +299,7 @@ export const login = async (req, res) => {
 
     // Generate access token (short-lived: 15 minutes)
     const accessToken = generateToken(user._id, '15m');
-    
+
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
@@ -604,7 +605,7 @@ export const ceoLogin = async (req, res) => {
 
     // Generate access token (CEO gets longer session: 1 day)
     const accessToken = generateToken(user._id, '1d');
-    
+
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
@@ -718,7 +719,7 @@ export const employeeLogin = async (req, res) => {
 
     // Generate access token (short-lived: 15 minutes)
     const accessToken = generateToken(user._id, '15m');
-    
+
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
@@ -867,7 +868,7 @@ export const changePassword = async (req, res) => {
     const { timingSafeEqual } = await import('../utils/securityHelpers.js');
     const passwordMatch = Buffer.from(newPassword).length === Buffer.from(confirmPassword).length &&
       timingSafeEqual(newPassword, confirmPassword);
-    
+
     if (!passwordMatch) {
       return res.status(400).json({
         success: false,
@@ -927,7 +928,7 @@ export const changePassword = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     const userId = req.user?.id;
-    
+
     // Revoke refresh token from cookie
     const refreshTokenValue = req.cookies?.refreshToken;
     if (refreshTokenValue) {
@@ -1044,7 +1045,7 @@ export const forgotPassword = async (req, res) => {
 
     // Find user - normalize email (schema already has lowercase: true, but be safe)
     const normalizedEmail = email.toLowerCase().trim();
-    
+
     // Validate email format before database query
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(normalizedEmail)) {
@@ -1070,18 +1071,18 @@ export const forgotPassword = async (req, res) => {
         message: 'If this email is registered, a reset link will be sent'
       });
     }
-    
+
     // Find user - schema already enforces lowercase, so direct match should work
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       email: normalizedEmail,
-      isActive: true 
+      isActive: true
     }).maxTimeMS(5000);
-    
+
     // Constant delay regardless of whether user exists (timing attack protection)
     const processingTime = Date.now() - startTime;
     const delay = Math.max(0, 500 - processingTime);
     if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
-    
+
     if (!user) {
       // Don't reveal if email exists (security best practice)
       logger.warn(`?? Password reset requested for non-existent or inactive email: ${normalizedEmail} from IP: ${clientIp}`);
@@ -1103,10 +1104,10 @@ export const forgotPassword = async (req, res) => {
 
     // Validate role match if role is provided
     if (role) {
-      const expectedRoles = role === 'business' 
-        ? ['salon_owner', 'employee', 'ceo'] 
-        : role === 'customer' 
-        ? ['customer'] 
+      const expectedRoles = role === 'business'
+        ? ['salon_owner', 'employee', 'ceo']
+        : role === 'customer'
+        ? ['customer']
         : null;
 
       if (expectedRoles && !expectedRoles.includes(user.role)) {
@@ -1133,7 +1134,7 @@ export const forgotPassword = async (req, res) => {
     try {
       resetToken = user.getPasswordResetToken();
     await user.save();
-      
+
       // Reset attempts on successful token generation
       await user.resetPasswordResetAttempts();
     } catch (tokenError) {
@@ -1162,7 +1163,7 @@ export const forgotPassword = async (req, res) => {
     // Send email with reset link
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     const firstName = verifiedUser.name?.split(' ')[0] || verifiedUser.name || 'dort';
-    
+
     // Validate email format before sending (emailRegex already declared above)
     if (!emailRegex.test(verifiedUser.email)) {
       logger.error(`?? Invalid email format for user ${verifiedUser._id}: ${verifiedUser.email}`);
@@ -1171,7 +1172,7 @@ export const forgotPassword = async (req, res) => {
         message: 'If this email is registered, a reset link will be sent'
       });
     }
-    
+
     try {
       const { sendEmail } = await import('../services/emailService.js');
       await sendEmail({
@@ -1571,7 +1572,7 @@ export const refreshToken = async (req, res) => {
     // ? SECURITY FIX: Use RefreshToken model to verify token
     // RefreshToken is already imported at the top
     const storedToken = await RefreshToken.findByToken(tokenToVerify);
-    
+
     if (!storedToken || !storedToken.isValid()) {
       return res.status(401).json({
         success: false,

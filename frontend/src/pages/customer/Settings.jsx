@@ -57,38 +57,36 @@ export default function Settings() {
       const profileRes = await api.get('/auth/profile');
       if (profileRes.data.success && profileRes.data.user) {
         const profileData = profileRes.data;
-          const user = profileData.user;
-          const nameParts = (user.name || '').split(' ');
-          setProfile({
-            firstName: nameParts[0] || '',
-            lastName: nameParts.slice(1).join(' ') || '',
-            email: user.email || '',
-            phone: user.phone || '',
-            birthDate: user.birthDate || '',
-            gender: user.gender || '',
-            address: user.address || '',
-            city: user.city || '',
-            zipCode: user.zipCode || '',
-            country: user.country || 'Deutschland'
-          });
-        }
+        const user = profileData.user;
+        const nameParts = (user.name || '').split(' ');
+        setProfile({
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          birthDate: user.birthDate || '',
+          gender: user.gender || '',
+          address: user.address || '',
+          city: user.city || '',
+          zipCode: user.zipCode || '',
+          country: user.country || 'Deutschland'
+        });
       }
 
       // Fetch booking history
       const bookingsRes = await api.get('/bookings?limit=20');
       if (bookingsRes.data.success && bookingsRes.data.bookings) {
         const bookingsData = bookingsRes.data;
-          const formattedBookings = bookingsData.bookings.map(b => ({
-            id: b._id,
-            service: b.serviceId?.name || 'Service',
-            date: new Date(b.bookingDate).toLocaleDateString('de-DE'),
-            time: new Date(b.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
-            employee: b.employeeId?.name || 'Mitarbeiter',
-            status: b.status,
-            price: b.totalAmount ? `${b.totalAmount}€` : (b.serviceId?.price ? `${b.serviceId.price}€` : '-')
-          }));
-          setBookingHistory(formattedBookings);
-        }
+        const formattedBookings = bookingsData.bookings.map(b => ({
+          id: b._id,
+          service: b.serviceId?.name || 'Service',
+          date: new Date(b.bookingDate).toLocaleDateString('de-DE'),
+          time: new Date(b.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
+          employee: b.employeeId?.name || 'Mitarbeiter',
+          status: b.status,
+          price: b.totalAmount ? `${b.totalAmount}€` : (b.serviceId?.price ? `${b.serviceId.price}€` : '-')
+        }));
+        setBookingHistory(formattedBookings);
       }
     } catch (error) {
       captureError(error, { context: 'fetchProfile' });

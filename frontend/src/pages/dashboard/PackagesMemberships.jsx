@@ -20,7 +20,7 @@ export default function PackagesMemberships() {
       // Get salonId from user profile instead of decoding token
       const profileRes = await api.get('/auth/profile');
       const salonId = profileRes.data.user?.salonId;
-      
+
       if (!salonId) {
         toast.error('Kein Salon zugeordnet');
         setLoading(false);
@@ -196,12 +196,6 @@ function PackagesTab({ packages }) {
           </div>
         </div>
       )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Inactive Packages */}
       {inactivePackages.length > 0 && (
         <div>

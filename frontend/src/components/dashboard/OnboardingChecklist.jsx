@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Building2, MapPin, Clock, Scissors, Link2, Code, 
-  Check, ChevronRight, X, Sparkles 
+import {
+  Building2, MapPin, Clock, Scissors, Link2, Code,
+  Check, ChevronRight, X, Sparkles
 } from 'lucide-react';
 import { salonAPI, serviceAPI } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
@@ -28,6 +28,7 @@ export default function OnboardingChecklist() {
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [salon, setSalon] = useState(null);
 
   useEffect(() => {
     checkOnboardingStatus();
@@ -40,25 +41,27 @@ export default function OnboardingChecklist() {
         serviceAPI.getAll().catch(() => ({ data: { data: [] } }))
       ]);
 
-      const salon = salonRes.data || {};
+      const salonData = salonRes.data || {};
       const services = servicesRes.data?.data || [];
 
+      setSalon(salonData);
+
       const status = {
-        info: !!(salon.name && salon.email),
-        address: !!(salon.address?.city),
-        hours: !!(salon.openingHours?.length > 0),
+        info: !!(salonData.name && salonData.email),
+        address: !!(salonData.address?.city),
+        hours: !!(salonData.openingHours?.length > 0),
         services: services.length > 0,
-        google: !!salon.googleReviewLink,
-        widget: !!salon.onboardingCompleted,
+        google: !!salonData.googleReviewLink,
+        widget: !!salonData.widgetConfigured,
       };
 
       setChecklist(status);
-      
+
       const completed = Object.values(status).filter(Boolean).length;
       setProgress(Math.round((completed / 6) * 100));
 
-      // If all done or previously dismissed
-      if (completed === 6 || localStorage.getItem('onboardingDismissed') === 'true') {
+      // If all done or dismissed by user via server state
+      if (completed === 6 || salonData.checklistDismissed) {
         setDismissed(true);
       }
     } catch (error) {
@@ -68,9 +71,14 @@ export default function OnboardingChecklist() {
     }
   };
 
-  const handleDismiss = () => {
-    localStorage.setItem('onboardingDismissed', 'true');
-    setDismissed(true);
+  const handleDismiss = async () => {
+    try {
+      await salonAPI.update({ checklistDismissed: true });
+      setDismissed(true);
+    } catch (error) {
+      console.error('Error dismissing checklist:', error);
+      captureError(error, { context: 'dismissChecklist' });
+    }
   };
 
   if (loading || dismissed || progress === 100) {
@@ -93,7 +101,7 @@ export default function OnboardingChecklist() {
             <p className="text-sm text-zinc-400">{completedCount} von 6 Schritten erledigt</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={handleDismiss}
           className="p-1 text-zinc-500 hover:text-zinc-300 transition"
         >
@@ -103,7 +111,7 @@ export default function OnboardingChecklist() {
 
       {/* Progress Bar */}
       <div className="h-2 bg-zinc-800 rounded-full mb-4 overflow-hidden">
-        <div 
+        <div
           className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
@@ -114,14 +122,14 @@ export default function OnboardingChecklist() {
         {CHECKLIST_ITEMS.slice(0, 4).map((item) => {
           const isCompleted = checklist[item.id];
           const Icon = item.icon;
-          
+
           return (
-            <Link 
+            <Link
               key={item.id}
               to={item.link}
               className={`flex items-center justify-between p-3 rounded-xl transition ${
-                isCompleted 
-                  ? 'bg-green-500/10 border border-green-500/20' 
+                isCompleted
+                  ? 'bg-green-500/10 border border-green-500/20'
                   : 'bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600'
               }`}
             >

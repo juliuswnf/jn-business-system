@@ -1,168 +1,100 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
-
-// Import all models
-import User from '../models/User.js';
-import Booking from '../models/Booking.js';
-import AuditLog from '../models/AuditLog.js';
-import Salon from '../models/Salon.js';
-import Service from '../models/Service.js';
-import Customer from '../models/Customer.js';
-import Payment from '../models/Payment.js';
 
 dotenv.config();
 
-/**
- * Database Indexes Creation Script
- * Run this after model changes or before production deployment
- * Command: npm run create:indexes
- */
+// Import all models
+import Booking from '../models/Booking.js';
+import TattooProject from '../models/TattooProject.js';
+import WorkflowProject from '../models/WorkflowProject.js';
+import Customer from '../models/Customer.js';
+import Salon from '../models/Salon.js';
+import User from '../models/User.js';
+import MarketingCampaign from '../models/MarketingCampaign.js';
+import Package from '../models/Package.js';
+import Service from '../models/Service.js';
+import Employee from '../models/Employee.js';
+import Resource from '../models/Resource.js';
+import Waitlist from '../models/Waitlist.js';
+import ConsentForm from '../models/ConsentForm.js';
+import ClinicalNote from '../models/ClinicalNote.js';
+import Payment from '../models/Payment.js';
+import RefreshToken from '../models/RefreshToken.js';
 
-const createIndexes = async () => {
+const connectDB = async () => {
   try {
-    console.log('🔧 Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ Connected to MongoDB');
-
-    console.log('\n📊 Creating indexes...\n');
-
-    // ==================== USER INDEXES ====================
-    console.log('📝 User indexes...');
-    await User.collection.createIndex({ email: 1 }, { unique: true });
-    await User.collection.createIndex({ salon: 1, role: 1 });
-    await User.collection.createIndex({ salon: 1, isActive: 1 });
-    await User.collection.createIndex({ createdAt: -1 });
-    await User.collection.createIndex({ lastLogin: -1 });
-    console.log('   ✅ User indexes created');
-
-    // ==================== BOOKING INDEXES ====================
-    console.log('📝 Booking indexes...');
-    await Booking.collection.createIndex({ salon: 1, date: 1 });
-    await Booking.collection.createIndex({ customer: 1, status: 1 });
-    await Booking.collection.createIndex({ employee: 1, date: 1 });
-    await Booking.collection.createIndex({ status: 1, date: 1 });
-    await Booking.collection.createIndex({ salon: 1, status: 1, date: -1 });
-    await Booking.collection.createIndex({ salon: 1, customer: 1, date: -1 });
-
-    // NO-SHOW-KILLER specific
-    await Booking.collection.createIndex({
-      salon: 1,
-      status: 1,
-      date: 1,
-      noShowKillerEnabled: 1
-    });
-    await Booking.collection.createIndex({
-      date: 1,
-      status: 1
-    }, {
-      partialFilterExpression: { status: 'pending' }
-    });
-    console.log('   ✅ Booking indexes created');
-
-    // ==================== SALON INDEXES ====================
-    console.log('📝 Salon indexes...');
-    await Salon.collection.createIndex({ slug: 1 }, { unique: true });
-    await Salon.collection.createIndex({ industry: 1 });
-    await Salon.collection.createIndex({ 'address.city': 1 });
-    await Salon.collection.createIndex({ isActive: 1, createdAt: -1 });
-    await Salon.collection.createIndex({
-      name: 'text',
-      description: 'text'
-    });
-    console.log('   ✅ Salon indexes created');
-
-    // ==================== SERVICE INDEXES ====================
-    console.log('📝 Service indexes...');
-    await Service.collection.createIndex({ salon: 1, isActive: 1 });
-    await Service.collection.createIndex({ salon: 1, category: 1 });
-    await Service.collection.createIndex({ salon: 1, price: 1 });
-    console.log('   ✅ Service indexes created');
-
-    // ==================== CUSTOMER INDEXES ====================
-    console.log('📝 Customer indexes...');
-    await Customer.collection.createIndex({ email: 1 });
-    await Customer.collection.createIndex({ phone: 1 });
-    await Customer.collection.createIndex({ salon: 1, email: 1 });
-    await Customer.collection.createIndex({ salon: 1, createdAt: -1 });
-    console.log('   ✅ Customer indexes created');
-
-    // ==================== PAYMENT INDEXES ====================
-    console.log('📝 Payment indexes...');
-    await Payment.collection.createIndex({ salon: 1, createdAt: -1 });
-    await Payment.collection.createIndex({ customer: 1, status: 1 });
-    await Payment.collection.createIndex({ booking: 1 });
-    // stripePaymentIntentId (skip if exists - may have sparse: true from previous version)
-    try {
-      await Payment.collection.createIndex({ stripePaymentIntentId: 1 });
-    } catch (err) {
-      if (err.code === 86) {
-        console.log('   ⚠️  stripePaymentIntentId index already exists (skipped)');
-      } else {
-        throw err;
-      }
-    }
-    await Payment.collection.createIndex({ status: 1, createdAt: -1 });
-    console.log('   ✅ Payment indexes created');
-
-    // ==================== AUDIT LOG INDEXES ====================
-    console.log('📝 AuditLog indexes...');
-    await AuditLog.collection.createIndex({ createdAt: -1 });
-    await AuditLog.collection.createIndex({ userId: 1, createdAt: -1 });
-    await AuditLog.collection.createIndex({ action: 1, createdAt: -1 });
-    await AuditLog.collection.createIndex({ category: 1, createdAt: -1 });
-    await AuditLog.collection.createIndex({ resourceType: 1, resourceId: 1 });
-
-    // TTL Index: Auto-delete audit logs after 90 days
-    await AuditLog.collection.createIndex(
-      { createdAt: 1 },
-      { expireAfterSeconds: 7776000 } // 90 days
-    );
-    console.log('   ✅ AuditLog indexes created (with TTL: 90 days)');
-
-    // ==================== COMPOUND INDEXES FOR ANALYTICS ====================
-    console.log('📝 Analytics compound indexes...');
-    await Booking.collection.createIndex({
-      salon: 1,
-      status: 1,
-      date: -1,
-      totalPrice: -1
-    });
-    await Booking.collection.createIndex({
-      employee: 1,
-      date: 1,
-      status: 1
-    });
-    console.log('   ✅ Analytics indexes created');
-
-    console.log('\n✅ All indexes created successfully!');
-    console.log('📊 Index summary:');
-
-    const collections = [
-      'users',
-      'bookings',
-      'salons',
-      'services',
-      'customers',
-      'payments',
-      'auditlogs'
-    ];
-
-    for (const collectionName of collections) {
-      const indexes = await mongoose.connection.db
-        .collection(collectionName)
-        .indexes();
-      console.log(`   ${collectionName}: ${indexes.length} indexes`);
-    }
-
-    console.log('\n🎉 Database optimization complete!');
-    process.exit(0);
-
+    logger.log('✅ Database connected');
   } catch (error) {
-    console.error('❌ Error creating indexes:', error);
-    logger.error('Index creation failed:', error);
+    logger.error('❌ Database connection error:', error.message);
     process.exit(1);
   }
 };
 
-createIndexes();
+const createIndexes = async () => {
+  logger.log('\n🔧 Creating database indexes...\n');
+
+  try {
+    // Booking Indexes
+    await Booking.collection.createIndex({ salonId: 1, deletedAt: 1 });
+    await Booking.collection.createIndex({ customerId: 1, deletedAt: 1 });
+    await Booking.collection.createIndex({ startTime: 1, deletedAt: 1 });
+    logger.log('✅ Booking indexes created');
+
+    // User/Employee Indexes
+    await User.collection.createIndex({ email: 1, deletedAt: 1 }, { sparse: true });
+    await Employee.collection.createIndex({ salonId: 1, deletedAt: 1 });
+    logger.log('✅ User/Employee indexes created');
+
+    // Soft-delete compound indexes
+    await Customer.collection.createIndex({ salonId: 1, deletedAt: 1 });
+    await Service.collection.createIndex({ salonId: 1, deletedAt: 1 });
+    await Package.collection.createIndex({ salonId: 1, deletedAt: 1 });
+    logger.log('✅ Soft-delete indexes created');
+
+    // Payment Indexes
+    await Payment.collection.createIndex({ salonId: 1, createdAt: -1 });
+    await Payment.collection.createIndex({ customerId: 1, createdAt: -1 });
+    logger.log('✅ Payment indexes created');
+
+    // RefreshToken Indexes with TTL
+    await RefreshToken.collection.createIndex(
+      { userId: 1 },
+      { background: true }
+    );
+    await RefreshToken.collection.createIndex(
+      { expiresAt: 1 },
+      { expireAfterSeconds: 0, background: true }
+    );
+    logger.log('✅ RefreshToken indexes created');
+
+    // Marketing Indexes
+    await MarketingCampaign.collection.createIndex({ salonId: 1, deletedAt: 1 });
+    await MarketingCampaign.collection.createIndex({ status: 1, deletedAt: 1 });
+    logger.log('✅ Marketing indexes created');
+
+    // Soft-delete queries optimization
+    await Salon.collection.createIndex({ deletedAt: 1 });
+    await TattooProject.collection.createIndex({ deletedAt: 1 });
+    await WorkflowProject.collection.createIndex({ deletedAt: 1 });
+    logger.log('✅ Soft-delete optimization indexes created');
+
+    logger.log('\n✅ All indexes created successfully!\n');
+  } catch (error) {
+    logger.error('❌ Index creation error:', error.message);
+    throw error;
+  }
+};
+
+const main = async () => {
+  await connectDB();
+  await createIndexes();
+  await mongoose.disconnect();
+  process.exit(0);
+};
+
+main().catch((error) => {
+  logger.error('❌ Fatal error:', error.message);
+  process.exit(1);
+});

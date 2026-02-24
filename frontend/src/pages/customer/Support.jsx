@@ -69,14 +69,12 @@ const Support = () => {
       const res = await api.get(`/support/tickets/${ticketId}`);
       const data = res.data;
       if (data.success) {
-          setSelectedTicket(data.ticket);
-        }
+        setSelectedTicket(data.ticket);
       }
     } catch (err) {
       captureError(err, { context: 'fetchTicketDetails' });
     }
   };
-
   // Add reply to ticket
   const handleAddReply = async (e) => {
     e.preventDefault();
@@ -89,9 +87,8 @@ const Support = () => {
       const res = await api.post(`/support/tickets/${selectedTicket._id}/reply`, { message: newReply });
       const data = res.data;
       if (data.success) {
-          setSelectedTicket(data.ticket);
-          setNewReply('');
-        }
+        setSelectedTicket(data.ticket);
+        setNewReply('');
       }
     } catch (err) {
       captureError(err, { context: 'addReply' });
