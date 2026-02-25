@@ -22,10 +22,14 @@ export const getAllTransactions = async (req, res) => {
       type,
       startDate,
       endDate,
-      page = 1,
+      page: pageQuery = 1,
       limit = 50,
       search
     } = req.query;
+
+    const validatedPage = Math.max(1, parseInt(pageQuery, 10) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
+    const skip = (validatedPage - 1) * validatedLimit;
 
     const query = {};
 
@@ -90,7 +94,7 @@ export const getAllTransactions = async (req, res) => {
         page: validatedPage,
         limit: validatedLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validatedLimit)
       }
     });
   } catch (error) {

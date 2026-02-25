@@ -167,9 +167,9 @@ const checkRedis = async () => {
 
     const { createClient } = await import('redis');
     const testClient = createClient({ url: process.env.REDIS_URL });
-    
+
     const startTime = Date.now();
-    
+
     // Connect and test
     await testClient.connect();
     await testClient.ping();

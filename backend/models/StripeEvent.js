@@ -114,7 +114,7 @@ stripeEventSchema.statics.recordEvent = async function (stripeEventId, eventType
   if (existingEvent) {
     return existingEvent;
   }
-  
+
   // Try to create new event with processed: false
   try {
     const event = new this({

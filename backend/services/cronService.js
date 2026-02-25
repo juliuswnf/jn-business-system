@@ -1,7 +1,6 @@
 import cron from 'node-cron';
 import logger from '../utils/logger.js';
 import Booking from '../models/Booking.js';
-import Salon from '../models/Salon.js';
 import { sendBookingReminder, sendReviewRequest } from './emailService.js';
 import backupService from './backupService.js';
 
@@ -230,43 +229,43 @@ export const initializeCronJobs = () => {
     cron.schedule('15 3 * * *', async () => {
       try {
         logger.info('🧹 Starting payment method cleanup (DSGVO auto-delete)...');
-        
+
         const Customer = (await import('../models/Customer.js')).default;
         const Stripe = (await import('stripe')).default;
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-        
+
         const now = new Date();
-        
+
         // Find customers with payment methods scheduled for deletion
         const customers = await Customer.find({
           'paymentMethods.scheduledDeletionAt': { $lte: now },
           'paymentMethods.deletedAt': null
         });
-        
+
         let deletedCount = 0;
-        
+
         for (const customer of customers) {
           for (const pm of customer.paymentMethods) {
             if (pm.scheduledDeletionAt && pm.scheduledDeletionAt <= now && !pm.deletedAt) {
               try {
                 // Delete from Stripe
                 await stripe.paymentMethods.detach(pm.paymentMethodId);
-                
+
                 // Mark as deleted in database
                 pm.deletedAt = new Date();
                 deletedCount++;
-                
+
                 logger.info(`✅ Deleted payment method ${pm.paymentMethodId} for customer ${customer._id} (DSGVO auto-delete)`);
               } catch (error) {
                 logger.error(`❌ Failed to delete payment method ${pm.paymentMethodId}:`, error);
               }
             }
           }
-          
+
           // Save customer with updated payment methods
           await customer.save();
         }
-        
+
         logger.info(`✅ Payment method cleanup completed: ${deletedCount} payment methods deleted`);
       } catch (error) {
         logger.error('❌ Payment method cleanup error:', error);

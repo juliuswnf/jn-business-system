@@ -2,6 +2,8 @@ import SupportTicket from '../models/SupportTicket.js';
 import Salon from '../models/Salon.js';
 import emailService from '../services/emailService.js';
 import logger from '../utils/logger.js';
+import crypto from 'crypto';
+import { escapeHtml } from '../utils/securityHelpers.js';
 
 /**
  * Customer Support Controller

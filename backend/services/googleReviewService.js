@@ -1,6 +1,7 @@
 import EmailQueue from '../models/EmailQueue.js';
 import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 /**
  * Google Review Service - Automated Review Request Emails

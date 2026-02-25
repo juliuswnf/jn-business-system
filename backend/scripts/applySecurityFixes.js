@@ -2,7 +2,7 @@
 /**
  * SECURITY FIX AUTOMATION SCRIPT
  * Applies Codacy Critical Security Fixes Systematically
- * 
+ *
  * Run: node backend/scripts/applySecurityFixes.js
  */
 
@@ -38,7 +38,7 @@ const fixes = [
   {
     name: 'Fix password comparison timing attack',
     pattern: /if \(password !== confirmPassword\)/g,
-    replacement: "if (!crypto.timingSafeEqual(Buffer.from(password), Buffer.from(confirmPassword)))",
+    replacement: 'if (!crypto.timingSafeEqual(Buffer.from(password), Buffer.from(confirmPassword)))',
     addImport: "import crypto from 'crypto';"
   },
   {

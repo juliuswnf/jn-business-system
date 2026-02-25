@@ -12,6 +12,7 @@ import User from '../models/User.js';
 import Booking from '../models/Booking.js';
 import { sendSMS } from '../services/smsService.js';
 import logger from '../utils/logger.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // Track if worker is running
 let isRunning = false;

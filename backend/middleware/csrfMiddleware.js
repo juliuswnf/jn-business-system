@@ -1,7 +1,7 @@
 /**
  * CSRF Protection Middleware
  * ? SECURITY FIX: Prevents Cross-Site Request Forgery attacks
- * 
+ *
  * Features:
  * - Token generation on login/registration
  * - Token validation for all state-changing operations
@@ -51,7 +51,7 @@ export const generateCSRFToken = (req, res, next) => {
     });
 
     logger.log(`🔐 CSRF token generated for ${req.ip || 'unknown'}`);
-    
+
     if (next) {
       next();
     }

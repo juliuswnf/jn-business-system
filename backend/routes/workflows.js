@@ -1,5 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 import * as workflowController from '../controllers/workflowController.js';
 
 const router = express.Router();
@@ -151,6 +152,7 @@ router.delete(
 router.post(
   '/packages',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
   workflowController.createPackage
 );
@@ -159,6 +161,7 @@ router.post(
 router.get(
   '/packages/:salonId',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin', 'employee'),
   workflowController.getSalonPackages
 );
@@ -167,6 +170,7 @@ router.get(
 router.get(
   '/packages/customer/:customerId',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin', 'employee'),
   workflowController.getCustomerPackages
 );
@@ -175,6 +179,7 @@ router.get(
 router.post(
   '/packages/:id/use',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin', 'employee'),
   workflowController.usePackageCredit
 );
@@ -183,6 +188,7 @@ router.post(
 router.put(
   '/packages/:id',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
   workflowController.updatePackage
 );
@@ -196,6 +202,7 @@ router.put(
 router.post(
   '/memberships',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
   workflowController.createMembership
 );
@@ -204,6 +211,7 @@ router.post(
 router.get(
   '/memberships/:salonId',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
   workflowController.getSalonMemberships
 );
@@ -212,6 +220,7 @@ router.get(
 router.get(
   '/memberships/customer/:customerId',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin', 'employee'),
   workflowController.getCustomerMembership
 );
@@ -220,6 +229,7 @@ router.get(
 router.put(
   '/memberships/:id/cancel',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
   workflowController.cancelMembership
 );
@@ -228,6 +238,7 @@ router.put(
 router.post(
   '/memberships/:id/pause',
   authMiddleware.protect,
+  checkFeatureAccess('servicePackages'),
   authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
   workflowController.pauseMembership
 );

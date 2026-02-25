@@ -316,7 +316,6 @@ export const getSalonDashboard = async (req, res) => {
 
     const planId = (salon.subscription?.planId || '').toLowerCase();
     const isPro = planId.includes('pro');
-    const isStarter = !isPro && salon.subscription?.status !== 'trial';
     const isTrial = salon.subscription?.status === 'trial';
 
     let bookingLimits = null;

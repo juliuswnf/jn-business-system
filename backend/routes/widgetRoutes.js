@@ -11,6 +11,7 @@ import emailService from '../services/emailService.js';
 import logger from '../utils/logger.js';
 import { generateSecurePassword, isValidObjectId } from '../utils/validation.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { tierHasFeature } from '../config/pricing.js';
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ const router = express.Router();
 router.get('/config', authMiddleware.protect, async (req, res) => {
   try {
     let salonId = req.user.salonId;
-    
+
     // If salonId not in user, try to find salon by owner
     if (!salonId && req.user.role === 'salon_owner') {
       const salon = await Salon.findOne({ owner: req.user._id });
@@ -35,7 +36,7 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
         await req.user.save();
       }
     }
-    
+
     if (!salonId) {
       return res.status(404).json({
         success: false,
@@ -45,7 +46,7 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
 
     // Get or create widget
     let widget = await Widget.findOne({ salonId });
-    
+
     if (!widget) {
       // Create default widget if it doesn't exist
       try {
@@ -62,7 +63,9 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
 
     // Get salon info for widget config
     const salon = await Salon.findById(salonId)
-      .select('name slug logo branding businessType');
+      .select('name slug logo branding businessType subscription.tier');
+
+    const hasApiAccess = tierHasFeature(salon?.subscription?.tier || 'starter', 'apiAccess');
 
     return res.status(200).json({
       success: true,
@@ -77,7 +80,11 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
         showLogo: widget.settings?.showLogo !== false,
         selectedServices: widget.settings?.selectedServices || [],
         embedCode: widget.embedCode,
-        apiKey: widget.apiKey
+        apiKey: hasApiAccess ? widget.apiKey : null
+      },
+      permissions: {
+        hasApiAccess,
+        tier: salon?.subscription?.tier || 'starter'
       }
     });
   } catch (error) {
@@ -93,7 +100,7 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
 router.put('/config', authMiddleware.protect, async (req, res) => {
   try {
     let salonId = req.user.salonId;
-    
+
     // If salonId not in user, try to find salon by owner
     if (!salonId && req.user.role === 'salon_owner') {
       const salon = await Salon.findOne({ owner: req.user._id });
@@ -104,7 +111,7 @@ router.put('/config', authMiddleware.protect, async (req, res) => {
         await req.user.save();
       }
     }
-    
+
     if (!salonId) {
       return res.status(404).json({
         success: false,
@@ -114,7 +121,7 @@ router.put('/config', authMiddleware.protect, async (req, res) => {
 
     // Get or create widget
     let widget = await Widget.findOne({ salonId });
-    
+
     if (!widget) {
       try {
         widget = await Widget.createForSalon(salonId, {});

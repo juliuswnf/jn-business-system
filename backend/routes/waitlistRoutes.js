@@ -4,6 +4,29 @@ import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+const isPrivilegedRole = (role) => ['ceo', 'admin'].includes(role);
+
+const hasSalonAccess = (req, salonId) => {
+  if (isPrivilegedRole(req.user?.role)) {
+    return true;
+  }
+
+  return req.user?.salonId?.toString() === salonId?.toString();
+};
+
+const canAccessWaitlistEntry = (req, waitlistEntry) => {
+  if (isPrivilegedRole(req.user?.role)) {
+    return true;
+  }
+
+  if (req.user?.salonId?.toString() === waitlistEntry?.salonId?.toString()) {
+    return true;
+  }
+
+  const userCustomerId = req.user?.customerId || req.user?.id || req.user?._id;
+  return req.user?.role === 'customer' && waitlistEntry?.customerId?.toString() === userCustomerId?.toString();
+};
+
 /**
  * @route   POST /api/waitlist
  * @desc    Join waitlist for a preferred time slot
@@ -101,7 +124,12 @@ router.get('/:salonId', authMiddleware.protect, async (req, res) => {
       });
     }
 
-    // TODO: Add authorization check (user must own salon)
+    if (!hasSalonAccess(req, salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
 
     const waitlist = await Waitlist.find({ salonId, status: 'active' })
       .populate('customerId', 'firstName lastName phone email')
@@ -203,7 +231,12 @@ router.put('/:id', authMiddleware.protect, async (req, res) => {
       });
     }
 
-    // TODO: Add authorization check (user must be customer or salon owner)
+    if (!canAccessWaitlistEntry(req, waitlistEntry)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - You are not allowed to update this waitlist entry'
+      });
+    }
 
     // Update fields
     if (preferredDate) waitlistEntry.preferredDate = preferredDate;
@@ -251,7 +284,12 @@ router.delete('/:id', authMiddleware.protect, async (req, res) => {
       });
     }
 
-    // TODO: Add authorization check (user must be customer or salon owner)
+    if (!canAccessWaitlistEntry(req, waitlistEntry)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - You are not allowed to remove this waitlist entry'
+      });
+    }
 
     // Mark as removed
     waitlistEntry.status = 'removed';

@@ -2,6 +2,7 @@
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 import { generateConsentPDF } from '../utils/pdfGenerator.js';
+import { validateUrl } from '../utils/securityHelpers.js';
 
 /**
  * Consent Form Controller
@@ -370,11 +371,10 @@ export const getSalonConsents = async (req, res) => {
       success: true,
       consents,
       pagination: {
-        page: parseInt(page),
-        limit: validatedLimit,
         page: validatedPage,
+        limit: validatedLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validatedLimit)
       }
     });
   } catch (error) {

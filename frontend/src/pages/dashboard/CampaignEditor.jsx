@@ -90,10 +90,7 @@ const CampaignEditor = () => {
   const loadPreview = async () => {
     try {
       // ? SECURITY FIX: Use central api instance
-      const response = await api.get(
-        `${API_BASE_URL}/marketing/campaigns/${id}/preview`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.get(`/marketing/campaigns/${id}/preview`);
       setPreview(response.data.data);
       toast.success(`${response.data.data.totalRecipients} Empfänger gefunden`);
     } catch (error) {

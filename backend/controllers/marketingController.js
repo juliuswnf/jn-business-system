@@ -385,7 +385,7 @@ export const trackClick = async (req, res) => {
     if (!salon || !salon.slug) {
       return res.redirect(`${process.env.FRONTEND_URL}/404`);
     }
-    
+
     // SECURITY: Validate redirect URL to prevent open redirect attacks
     const { validateUrl } = await import('../utils/securityHelpers.js');
     try {

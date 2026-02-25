@@ -5,10 +5,6 @@
 
 import crypto from 'crypto';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // ==================== CRYPTO FIXES ====================
 
@@ -68,7 +64,7 @@ export const sanitizeMongoQuery = (input) => {
     if (key.startsWith('$') || key.startsWith('_') || key === '__proto__' || key === 'constructor') {
       continue;
     }
-    
+
     if (typeof value === 'object' && value !== null) {
       sanitized[key] = sanitizeMongoQuery(value);
     } else {
@@ -105,7 +101,7 @@ export const escapeHtml = (unsafe) => {
   if (typeof unsafe !== 'string') {
     return String(unsafe);
   }
-  
+
   return unsafe
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -137,16 +133,16 @@ export const safeHtmlTemplate = (template, data) => {
 export const sanitizeFilePath = (userPath, baseDir) => {
   // Normalize to prevent ../../../etc/passwd
   const normalized = path.normalize(userPath);
-  
+
   // Resolve to absolute path
   const resolved = path.resolve(baseDir, normalized);
-  
+
   // Ensure it's within baseDir
   const relative = path.relative(baseDir, resolved);
   if (relative.startsWith('..') || path.isAbsolute(relative)) {
     throw new Error('Invalid file path: Path traversal detected');
   }
-  
+
   return resolved;
 };
 
@@ -157,12 +153,12 @@ export const sanitizeFilePath = (userPath, baseDir) => {
 export const safePathJoin = (baseDir, ...parts) => {
   const joined = path.join(baseDir, ...parts);
   const normalized = path.normalize(joined);
-  
+
   // Ensure result is within baseDir
   if (!normalized.startsWith(baseDir)) {
     throw new Error('Invalid file path: Attempted directory traversal');
   }
-  
+
   return normalized;
 };
 
@@ -175,24 +171,24 @@ export const safePathJoin = (baseDir, ...parts) => {
 export const validateUrl = (url, allowedDomains = []) => {
   try {
     const parsed = new URL(url);
-    
+
     // Block dangerous protocols
     const allowedProtocols = ['http:', 'https:'];
     if (!allowedProtocols.includes(parsed.protocol)) {
       throw new Error('Invalid protocol');
     }
-    
+
     // Check allowed domains if specified
     if (allowedDomains.length > 0) {
-      const isAllowed = allowedDomains.some(domain => 
+      const isAllowed = allowedDomains.some(domain =>
         parsed.hostname === domain || parsed.hostname.endsWith(`.${domain}`)
       );
-      
+
       if (!isAllowed) {
         throw new Error('Domain not allowed');
       }
     }
-    
+
     return parsed.href;
   } catch (error) {
     throw new Error(`Invalid URL: ${error.message}`);
@@ -223,14 +219,14 @@ export const timingSafeEqual = (a, b) => {
   if (typeof a !== 'string' || typeof b !== 'string') {
     return false;
   }
-  
+
   if (a.length !== b.length) {
     return false;
   }
-  
+
   const bufA = Buffer.from(a);
   const bufB = Buffer.from(b);
-  
+
   return crypto.timingSafeEqual(bufA, bufB);
 };
 
@@ -243,20 +239,20 @@ export const timingSafeEqual = (a, b) => {
 export const safeObjectGet = (obj, path) => {
   const keys = Array.isArray(path) ? path : path.split('.');
   let current = obj;
-  
+
   for (const key of keys) {
     // Block dangerous keys
     if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
       return undefined;
     }
-    
+
     if (current === null || current === undefined) {
       return undefined;
     }
-    
+
     current = current[key];
   }
-  
+
   return current;
 };
 
@@ -265,14 +261,14 @@ export const safeObjectGet = (obj, path) => {
  */
 export const safeMerge = (target, source) => {
   const result = { ...target };
-  
+
   for (const [key, value] of Object.entries(source)) {
     if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
       continue;
     }
     result[key] = value;
   }
-  
+
   return result;
 };
 

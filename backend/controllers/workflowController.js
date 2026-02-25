@@ -5,6 +5,7 @@ import Consent from '../models/Consent.js';
 import Package from '../models/Package.js';
 import Membership from '../models/Membership.js';
 import Booking from '../models/Booking.js';
+import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -35,13 +36,62 @@ export const getAvailableIndustries = async (req, res) => {
 export const enableWorkflow = async (req, res) => {
   try {
     const { industry, features } = req.body;
-    const salonId = req.user.salonId;
+    const salonId = req.user.salonId || req.body.salonId;
 
     if (!industry) {
       return res.status(400).json({
         success: false,
         message: 'Industry is required'
       });
+    }
+
+    if (!salonId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Salon ID is required'
+      });
+    }
+
+    const salon = await Salon.findById(salonId)
+      .select('subscription.tier subscription.status businessName')
+      .lean();
+
+    if (!salon) {
+      return res.status(404).json({
+        success: false,
+        message: 'Salon not found'
+      });
+    }
+
+    const tier = salon.subscription?.tier || 'starter';
+
+    if (tier === 'starter') {
+      return res.status(403).json({
+        success: false,
+        message: 'Branchen-Workflows sind ab dem Professional-Tarif verfügbar.',
+        code: 'WORKFLOW_FEATURE_NOT_AVAILABLE',
+        currentTier: tier,
+        requiredTier: 'professional',
+        upgradeUrl: '/pricing'
+      });
+    }
+
+    const existingWorkflow = await IndustryWorkflow.findOne({ salonId, industry }).lean();
+    const isAlreadyEnabled = existingWorkflow?.enabled === true;
+
+    if (tier === 'professional' && !isAlreadyEnabled) {
+      const enabledCount = await IndustryWorkflow.countDocuments({ salonId, enabled: true });
+
+      if (enabledCount >= 1) {
+        return res.status(403).json({
+          success: false,
+          message: 'Im Professional-Tarif kann nur 1 Branchen-Workflow gleichzeitig aktiv sein.',
+          code: 'WORKFLOW_LIMIT_REACHED',
+          currentTier: tier,
+          maxActiveWorkflows: 1,
+          upgradeUrl: '/pricing'
+        });
+      }
     }
 
     const workflow = await IndustryWorkflow.enableWorkflow(salonId, industry, features);

@@ -7,7 +7,7 @@ import {
   setupSEPA,
   createInvoice,
   convertTrialToPaid,
-  getSubscriptionStatus,
+  getSubscriptionStatus
 } from '../controllers/subscriptionManagementController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 

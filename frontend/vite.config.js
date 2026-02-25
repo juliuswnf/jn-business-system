@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  
+
   // Support CommonJS modules
   resolve: {
     alias: {
@@ -89,25 +89,6 @@ export default defineConfig({
       },
     },
   },
-
-  // Optimize dependencies
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      'axios',
-      'hoist-non-react-statics',
-    ],
-    exclude: ['@sentry/react'], // Lazy loaded
-    esbuildOptions: {
-      // Support CommonJS modules
-      define: {
-        global: 'globalThis',
-      },
-    },
-  },
-
 
   css: {
     postcss: './postcss.config.js',

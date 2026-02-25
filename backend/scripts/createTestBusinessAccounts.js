@@ -18,7 +18,7 @@ const BUSINESS_TYPES = {
   barbershop: 'barbershop',
   beauty: 'beauty-salon',
   nails: 'nail-salon',
-  petgrooming: 'other'
+  other: 'other'
 };
 
 // Test account configuration
@@ -66,10 +66,10 @@ const TEST_ACCOUNTS = [
     name: 'Test Nagelstudio'
   },
   {
-    key: 'petgrooming',
-    label: 'PET GROOMING',
-    email: 'test-petgrooming@jnbusiness.de',
-    name: 'Test Hundepflege'
+    key: 'other',
+    label: 'OTHER',
+    email: 'test-other@jnbusiness.de',
+    name: 'Test Sonstige Branche'
   }
 ];
 
@@ -158,6 +158,7 @@ const createTestBusinessAccounts = async () => {
           name: account.name,
           slug: salonSlug,
           businessType: BUSINESS_TYPES[account.key],
+          ...(account.key === 'other' ? { customBusinessTypeName: 'Pet Grooming / Sonstige' } : {}),
           email: account.email,
           owner: user._id,
           phone: PHONE,

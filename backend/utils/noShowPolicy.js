@@ -29,14 +29,14 @@ Ihre Kreditkartendaten werden verschlüsselt über Stripe gespeichert und nach 9
 DURCHSETZUNG
 Durch die Buchung akzeptieren Sie diese Richtlinie. Die Gebühr wird automatisch abgebucht, wenn Sie nicht erscheinen.
     `.trim(),
-    
+
     checkboxText: 'Ich akzeptiere die No-Show-Gebühr von €15 bei Nichterscheinen und habe die Richtlinie gelesen.',
-    
+
     shortText: 'Bei Nichterscheinen wird eine Gebühr von €15,00 automatisch von Ihrer Kreditkarte abgebucht. Sie können kostenlos stornieren, wenn Sie dies mindestens 24 Stunden vorher tun.',
-    
+
     title: 'No-Show-Gebühr Richtlinie'
   },
-  
+
   en: {
     fullTerms: `
 NO-SHOW FEE POLICY
@@ -62,11 +62,11 @@ Your credit card data is encrypted and stored via Stripe and will be automatical
 ENFORCEMENT
 By booking, you accept this policy. The fee will be automatically charged if you do not appear.
     `.trim(),
-    
+
     checkboxText: 'I accept the No-Show fee of €15 for no-shows and have read the policy.',
-    
+
     shortText: 'In case of no-show, a fee of €15.00 will be automatically charged to your credit card. You can cancel free of charge if you do so at least 24 hours in advance.',
-    
+
     title: 'No-Show Fee Policy'
   }
 };
@@ -89,7 +89,7 @@ export const getPolicy = (language = 'de') => {
 export const generateDisputeEvidence = (booking, salon) => {
   const bookingDate = new Date(booking.bookingDate);
   const cancellationDeadline = new Date(bookingDate.getTime() - 24 * 60 * 60 * 1000);
-  
+
   return `
 DISPUTE EVIDENCE - NO-SHOW FEE
 

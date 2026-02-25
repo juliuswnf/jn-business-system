@@ -1,5 +1,6 @@
 ﻿import express from 'express';
-import { authenticateToken, authorize } from '../middleware/authMiddleware.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 // ? SECURITY FIX: Use centralized file upload middleware
 import { upload, validateImageDimensions, handleUploadError } from '../middleware/fileUploadMiddleware.js';
 import {
@@ -39,8 +40,9 @@ const router = express.Router();
 // Get all BAAs
 router.get(
   '/baas',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   getBaas
 );
 
@@ -48,8 +50,9 @@ router.get(
 // ? SECURITY FIX: Uses centralized file upload validation
 router.post(
   '/baas',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   upload.single('document'),
   handleUploadError,
   async (req, res, next) => {
@@ -81,24 +84,27 @@ router.post(
 // Update BAA
 router.patch(
   '/baas/:id',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   updateBaa
 );
 
 // Renew BAA
 router.post(
   '/baas/:id/renew',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   renewBaa
 );
 
 // Terminate BAA
 router.delete(
   '/baas/:id',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   terminateBaa
 );
 
@@ -107,8 +113,9 @@ router.delete(
 // Get overall compliance status
 router.get(
   '/status',
-  authenticateToken,
-  authorize(['ceo', 'admin', 'manager']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin', 'manager'),
   getComplianceStatus
 );
 
@@ -117,16 +124,18 @@ router.get(
 // Get patient audit trail
 router.get(
   '/audit/patient/:customerId',
-  authenticateToken,
-  authorize(['ceo', 'admin', 'provider']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin', 'provider'),
   getPatientAuditTrail
 );
 
 // Generate compliance report
 router.get(
   '/audit/report/:salonId',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   generateComplianceReport
 );
 
@@ -135,16 +144,18 @@ router.get(
 // Manual key rotation (emergency use)
 router.post(
   '/encryption/rotate',
-  authenticateToken,
-  authorize(['ceo']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo'),
   manualKeyRotation
 );
 
 // Get key rotation status
 router.get(
   '/encryption/status',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   getRotationStatus
 );
 
@@ -153,21 +164,21 @@ router.get(
 // Export customer data
 router.get(
   '/data-export/:customerId',
-  authenticateToken,
+  authMiddleware.protect,
   exportCustomerData
 );
 
 // Request data deletion
 router.post(
   '/data-deletion/:customerId',
-  authenticateToken,
+  authMiddleware.protect,
   requestDataDeletion
 );
 
 // Get export history
 router.get(
   '/data-export-history/:customerId',
-  authenticateToken,
+  authMiddleware.protect,
   getExportHistory
 );
 
@@ -176,8 +187,9 @@ router.get(
 // Get breach incidents
 router.get(
   '/breaches',
-  authenticateToken,
-  authorize(['ceo', 'admin']),
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'admin'),
   getBreachIncidents
 );
 

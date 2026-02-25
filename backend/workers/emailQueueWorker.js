@@ -21,7 +21,7 @@ import alertingService from '../services/alertingService.js';
 const isTransientError = (error) => {
   const errorMessage = error.message?.toLowerCase() || '';
   const errorCode = error.code?.toLowerCase() || '';
-  
+
   // Transient error patterns
   const transientPatterns = [
     'timeout',
@@ -40,7 +40,7 @@ const isTransientError = (error) => {
     '504',
     'econnreset'
   ];
-  
+
   // Permanent error patterns
   const permanentPatterns = [
     'invalid email',
@@ -55,17 +55,17 @@ const isTransientError = (error) => {
     'bounced',
     'blacklisted'
   ];
-  
+
   // Check for permanent errors first
   if (permanentPatterns.some(pattern => errorMessage.includes(pattern) || errorCode.includes(pattern))) {
     return false;
   }
-  
+
   // Check for transient errors
   if (transientPatterns.some(pattern => errorMessage.includes(pattern) || errorCode.includes(pattern))) {
     return true;
   }
-  
+
   // Default: assume transient (can retry)
   return true;
 };
@@ -87,17 +87,17 @@ const processEmailQueue = async () => {
       ],
       attempts: { $lt: 3 }
     }).limit(50); // Process in batches
-    
+
     if (pendingEmails.length === 0) {
       return;
     }
-    
+
     logger.log(`?? Processing ${pendingEmails.length} pending emails...`);
-    
+
     for (const queueItem of pendingEmails) {
       await processEmailQueueItem(queueItem);
     }
-    
+
     logger.log(`? Finished processing email queue - ${pendingEmails.length} emails processed`);
   } catch (error) {
     logger.error('? Error processing email queue:', error);
@@ -111,11 +111,11 @@ const processEmailQueue = async () => {
 const processEmailQueueItem = async (queueItem) => {
   try {
     logger.log(`?? Processing email: ${queueItem._id} | Type: ${queueItem.type} | To: ${queueItem.to || 'N/A'}`);
-    
+
     // If no bookingId, treat as direct email (notification/custom)
     if (!queueItem.bookingId) {
       logger.log(`?? Direct email (no booking) - sending to: ${queueItem.to}`);
-      
+
       // Send direct email
       const result = await emailService.sendEmail({
         to: queueItem.to,
@@ -123,17 +123,17 @@ const processEmailQueueItem = async (queueItem) => {
         body: queueItem.body,
         html: queueItem.html || queueItem.body.replace(/\n/g, '<br>')
       });
-      
+
       // Mark as sent
       queueItem.status = 'sent';
       queueItem.sentAt = new Date();
       queueItem.attempts = (queueItem.attempts || 0) + 1;
       await queueItem.save();
-      
+
       logger.log(`? Email sent successfully: ${queueItem._id} | MessageID: ${result?.messageId || 'N/A'}`);
       return;
     }
-    
+
     // Get booking with related data
     const booking = await Booking.findById(queueItem.bookingId)
       .populate('salonId')
@@ -190,17 +190,17 @@ const processEmailQueueItem = async (queueItem) => {
     queueItem.sentAt = new Date();
     queueItem.attempts = (queueItem.attempts || 0) + 1;
     await queueItem.save();
-    
+
     logger.log(`? Email sent successfully: ${queueItem._id} | To: ${booking.customerEmail} | MessageID: ${result?.messageId || 'N/A'}`);
-    
+
     // Log successful send (with required fields)
     try {
       await EmailLog.create({
         companyId: salon._id,
         recipientEmail: booking.customerEmail,
         subject: emailData.subject,
-        emailType: queueItem.type === 'reminder' ? 'booking-reminder' : 
-                   queueItem.type === 'review' ? 'review-request' : 
+        emailType: queueItem.type === 'reminder' ? 'booking-reminder' :
+                   queueItem.type === 'review' ? 'review-request' :
                    queueItem.type === 'confirmation' ? 'booking-confirmation' : 'general',
         status: 'sent',
         sentAt: new Date(),
@@ -211,15 +211,15 @@ const processEmailQueueItem = async (queueItem) => {
       // Non-blocking
       logger.warn(`??  Failed to log email: ${logError.message}`);
     }
-    
+
     logger.log(`?? Sent ${queueItem.type} email (booking: ${booking._id})`);
   } catch (error) {
     logger.error(`? Failed to send email ${queueItem._id}:`, error.message);
     logger.error(`   Error stack: ${error.stack}`);
-    
+
     // ? SECURITY FIX: Determine if error is transient or permanent
     const isTransient = isTransientError(error);
-    
+
     // Increment retry counter
     queueItem.attempts = (queueItem.attempts || 0) + 1;
     queueItem.retryCount = (queueItem.retryCount || 0) + 1;
@@ -230,13 +230,13 @@ const processEmailQueueItem = async (queueItem) => {
       code: error.code || 'UNKNOWN',
       isTransient
     };
-    
+
     // If permanent error or max retries reached, mark as failed
     if (!isTransient || queueItem.attempts >= queueItem.maxAttempts) {
       queueItem.status = 'failed';
       queueItem.nextRetryAt = null;
       logger.error(`?? Email ${queueItem._id} failed after ${queueItem.attempts} attempts - ${isTransient ? 'MAX RETRIES REACHED' : 'PERMANENT FAILURE'}`);
-      
+
       // ? SECURITY FIX: Alert for critical emails that failed
       const criticalTypes = ['confirmation', 'payment_receipt', 'booking_confirmation'];
       if (criticalTypes.includes(queueItem.type)) {
@@ -257,7 +257,7 @@ const processEmailQueueItem = async (queueItem) => {
           logger.error('Failed to send alert for email failure:', alertError);
         }
       }
-      
+
       // Log failed send (with required fields, non-blocking)
       try {
         await EmailLog.create({
@@ -276,7 +276,7 @@ const processEmailQueueItem = async (queueItem) => {
       }
     } else {
       // ? SECURITY FIX: Schedule retry with exponential backoff (1min, 5min, 15min)
-      const backoffMinutes = queueItem.attempts === 1 ? 1 : 
+      const backoffMinutes = queueItem.attempts === 1 ? 1 :
                             queueItem.attempts === 2 ? 5 : 15;
       queueItem.nextRetryAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
       queueItem.status = 'pending'; // Keep as pending for retry
@@ -404,7 +404,7 @@ const processEmailQueueSafe = async () => {
  */
 const startWorker = () => {
   logger.log('?? Starting email queue worker...');
-  
+
   // ? HIGH FIX #9: Run immediately on startup (don't wait 1 minute)
   processEmailQueueSafe();
 

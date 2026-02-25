@@ -24,9 +24,9 @@ router.post('/create-account', securityMiddleware.validateCSRFToken, async (req,
     const salon = await Salon.findOne({ owner: req.user._id });
 
     if (!salon) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Salon nicht gefunden' 
+      return res.status(404).json({
+        success: false,
+        message: 'Salon nicht gefunden'
       });
     }
 
@@ -48,9 +48,9 @@ router.post('/create-account', securityMiddleware.validateCSRFToken, async (req,
     });
   } catch (error) {
     logger.error('❌ Create Stripe Connect Account Error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || 'Fehler beim Erstellen des Stripe-Kontos' 
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Fehler beim Erstellen des Stripe-Kontos'
     });
   }
 });
@@ -94,9 +94,9 @@ router.get('/account-status', async (req, res) => {
     });
   } catch (error) {
     logger.error('❌ Get Account Status Error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || 'Fehler beim Abrufen des Kontostatus' 
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Fehler beim Abrufen des Kontostatus'
     });
   }
 });
@@ -110,9 +110,9 @@ router.post('/refresh-onboarding', securityMiddleware.validateCSRFToken, async (
     const salon = await Salon.findOne({ owner: req.user._id });
 
     if (!salon || !salon.stripe?.connectedAccountId) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Kein Stripe-Konto gefunden' 
+      return res.status(404).json({
+        success: false,
+        message: 'Kein Stripe-Konto gefunden'
       });
     }
 
@@ -126,9 +126,9 @@ router.post('/refresh-onboarding', securityMiddleware.validateCSRFToken, async (
     });
   } catch (error) {
     logger.error('❌ Refresh Onboarding Error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || 'Fehler beim Erstellen des Onboarding-Links' 
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Fehler beim Erstellen des Onboarding-Links'
     });
   }
 });

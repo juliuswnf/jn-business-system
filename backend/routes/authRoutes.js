@@ -1,6 +1,7 @@
 ﻿import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import ceoMiddleware from '../middleware/ceoMiddleware.js';
+import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 import authController from '../controllers/authController.js';
 import {
   authLimiter,
@@ -65,19 +66,19 @@ router.post('/send-verification-email', authMiddleware.protect, emailLimiter, au
 // ==================== 2FA ROUTES (Protected) ====================
 
 // Enable 2FA - Returns QR code and secret
-router.post('/2fa/enable', authMiddleware.protect, authController.enable2FA);
+router.post('/2fa/enable', authMiddleware.protect, checkFeatureAccess('twoFactorAuth'), authController.enable2FA);
 
 // Verify 2FA - Confirms setup or verifies login
-router.post('/2fa/verify', authMiddleware.protect, authController.verify2FA);
+router.post('/2fa/verify', authMiddleware.protect, checkFeatureAccess('twoFactorAuth'), authController.verify2FA);
 
 // Disable 2FA - Requires password
-router.post('/2fa/disable', authMiddleware.protect, authController.disable2FA);
+router.post('/2fa/disable', authMiddleware.protect, checkFeatureAccess('twoFactorAuth'), authController.disable2FA);
 
 // Get 2FA Status
-router.get('/2fa/status', authMiddleware.protect, authController.get2FAStatus);
+router.get('/2fa/status', authMiddleware.protect, checkFeatureAccess('twoFactorAuth'), authController.get2FAStatus);
 
 // Regenerate Backup Codes
-router.post('/2fa/regenerate-backup-codes', authMiddleware.protect, authController.regenerateBackupCodes);
+router.post('/2fa/regenerate-backup-codes', authMiddleware.protect, checkFeatureAccess('twoFactorAuth'), authController.regenerateBackupCodes);
 
 // ==================== CEO-ONLY ROUTES ====================
 

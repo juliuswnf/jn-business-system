@@ -176,7 +176,7 @@ export default function OnboardingWizard() {
           await salonAPI.update({ openingHours });
           break;
 
-        case 4:
+        case 4: {
           const validServices = services.filter(s => s.name && s.name.trim() && s.price > 0);
           if (validServices.length === 0) {
             showNotification('Füge mindestens einen Service mit Name und Preis hinzu', 'error');
@@ -206,9 +206,10 @@ export default function OnboardingWizard() {
             return;
           }
           break;
+        }
 
         case 5:
-          await salonAPI.update({ googleReviewLink });
+          await salonAPI.update({ googleReviewUrl: googleReviewLink });
           break;
 
         case 6:

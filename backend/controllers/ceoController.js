@@ -878,7 +878,7 @@ export const getAllCustomers = async (req, res) => {
     const validatedPage = Math.max(1, parseInt(page) || 1);
     const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 20)); // Max 100 items
     const skip = (validatedPage - 1) * validatedLimit;
-    
+
     const total = await Salon.countDocuments(filter);
 
     const customers = await Salon.find(filter)
@@ -1043,7 +1043,7 @@ export const getAllUsers = async (req, res) => {
     const validatedPage = Math.max(1, parseInt(page) || 1);
     const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 20)); // Max 100 items
     const skip = (validatedPage - 1) * validatedLimit;
-    
+
     const total = await User.countDocuments(filter);
 
     const users = await User.find(filter).lean().maxTimeMS(5000)

@@ -3,7 +3,7 @@ import ProgressEntry from '../models/ProgressEntry.js';
 import ClinicalNote from '../models/ClinicalNote.js';
 import Package from '../models/Package.js';
 import ConsentForm from '../models/ConsentForm.js';
-import Portfolio from '../models/Portfolio.js';
+import ArtistPortfolio from '../models/ArtistPortfolio.js';
 import { decrypt } from '../services/keyRotationService.js';
 import logger from '../utils/logger.js';
 import archiver from 'archiver';
@@ -113,8 +113,8 @@ async function gatherCustomerData(customerId) {
       ConsentForm.find({ customerId })
         .lean(),
 
-      // Portfolio (if customer photos)
-      Portfolio.find({ customerId })
+      // Portfolio (best-effort): customer linkage is optional depending on studio setup
+      ArtistPortfolio.find({ tags: { $in: [String(customerId)] } })
         .populate('artistId', 'firstName lastName')
         .lean()
     ]);

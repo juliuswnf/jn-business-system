@@ -6,7 +6,7 @@ import logger from '../utils/logger.js';
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import LifecycleEmail from '../models/LifecycleEmail.js';
-import { isValidEmail, validatePassword, sanitizeErrorMessage } from '../utils/validation.js';
+import { isValidEmail, validatePassword } from '../utils/validation.js';
 import { generateCSRFToken } from '../middleware/securityMiddleware.js';
 
 /**
@@ -40,7 +40,7 @@ const createRefreshToken = async (userId, deviceInfo = {}) => {
   // Hash token before saving (required field)
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
-  const refreshToken = await RefreshToken.create({
+  await RefreshToken.create({
     userId,
     token,
     tokenHash, // ✅ FIX: Set tokenHash manually before create
@@ -1141,7 +1141,7 @@ export const forgotPassword = async (req, res) => {
       // Handle account lock error
       if (tokenError.message.includes('locked')) {
         const minutesLeft = Math.ceil((user.passwordResetLockUntil - Date.now()) / (1000 * 60));
-        logger.warn(`🔒 ${tokenError.message} for email: ${normalizedEmail} from IP: ${clientIp}`);
+        logger.warn(`🔒 ${tokenError.message} (${minutesLeft}m left) for email: ${normalizedEmail} from IP: ${clientIp}`);
         return res.status(200).json({
           success: true,
           message: 'If this email is registered, a reset link will be sent'

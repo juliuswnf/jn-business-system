@@ -55,7 +55,6 @@ const CustomerDashboard = () => {
 
             setUpcomingBookings(upcoming);
             setPastBookings(past);
-          }
         }
       } catch (error) {
         // Error handled by UI state

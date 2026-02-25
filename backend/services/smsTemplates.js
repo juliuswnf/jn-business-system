@@ -3,6 +3,7 @@
  *
  * Branchen-spezifische SMS-Templates für verschiedene Workflows
  */
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 export const SMS_TEMPLATES = {
   // ==================== STANDARD BOOKING ====================
@@ -288,8 +289,6 @@ Ohne Bestätigung wird der Termin storniert.
 Du hast deinen letzten Termin verpasst.
 
 Bei 3 No-Shows müssen wir leider:
-- Vorauszahlung verlangen
-- Terminbuchung einschränken
 
 Verständnis? 🙏
 

@@ -24,22 +24,22 @@ export default function StudioDashboard() {
   const { showNotification } = useNotification();
 
   // Conditional routing based on business type
-  if (businessType === 'tattoo') {
+  if (businessType === 'tattoo-piercing') {
     return <TattooStudioDashboard />;
   }
-  if (businessType === 'medical') {
+  if (businessType === 'medical-aesthetics') {
     return <MedicalSpaDashboard />;
   }
-  if (businessType === 'wellness') {
+  if (businessType === 'spa-wellness') {
     return <WellnessDashboard />;
   }
   if (businessType === 'barbershop') {
     return <BarberDashboard />;
   }
-  if (businessType === 'beauty') {
+  if (businessType === 'beauty-salon') {
     return <BeautyDashboard />;
   }
-  if (businessType === 'nails') {
+  if (businessType === 'nail-salon') {
     return <NailsDashboard />;
   }
   if (businessType === 'petgrooming') {

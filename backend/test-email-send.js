@@ -5,20 +5,19 @@
 
 import 'dotenv/config';
 import emailService from './services/emailService.js';
-import logger from './utils/logger.js';
 
 const testEmail = async () => {
   try {
     console.log('🧪 Testing Email Service...\n');
-    
+
     // Test recipient (change this to your email)
     const testRecipient = process.env.TEST_EMAIL || 'julius.wagenfeldt@gmail.com';
-    
+
     console.log(`📧 Sending test email to: ${testRecipient}`);
     console.log(`📤 SMTP Host: ${process.env.EMAIL_HOST}`);
     console.log(`🔑 SMTP User: ${process.env.EMAIL_USER}`);
     console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL}\n`);
-    
+
     // Test 1: Simple Text Email
     console.log('✅ Test 1: Simple Text Email');
     const result1 = await emailService.sendEmail({
@@ -29,26 +28,26 @@ const testEmail = async () => {
     });
     console.log(`   Message ID: ${result1.messageId}`);
     console.log('   ✅ SUCCESS\n');
-    
+
     // Test 2: HTML Email (Welcome Template)
     console.log('✅ Test 2: HTML Welcome Email');
     const result2 = await emailService.sendWelcomeEmail(
-      { 
-        email: testRecipient, 
-        name: 'Julius Test' 
+      {
+        email: testRecipient,
+        name: 'Julius Test'
       },
-      { 
+      {
         name: 'Test Salon'
       }
     );
     console.log(`   Success: ${result2.success}`);
     console.log('   ✅ SUCCESS\n');
-    
+
     // Test 3: Password Reset Email (from authController pattern)
     console.log('✅ Test 3: Password Reset Email');
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=TEST_TOKEN_12345`;
     const firstName = 'Julius';
-    
+
     const result3 = await emailService.sendEmail({
       to: testRecipient,
       subject: '🔒 Passwort zurücksetzen - JN Business System',
@@ -101,11 +100,11 @@ const testEmail = async () => {
     });
     console.log(`   Message ID: ${result3.messageId}`);
     console.log('   ✅ SUCCESS\n');
-    
+
     console.log('🎉 ALL EMAIL TESTS PASSED!');
     console.log('\n📬 Check your inbox:', testRecipient);
     console.log('   (Don\'t forget to check spam folder)\n');
-    
+
     process.exit(0);
   } catch (error) {
     console.error('❌ EMAIL TEST FAILED:', error.message);

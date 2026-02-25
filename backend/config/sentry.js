@@ -10,7 +10,7 @@ import logger from '../utils/logger.js';
 export const initSentry = (app) => {
   // Enable Sentry in production OR if explicitly enabled in development
   const sentryEnabled = (process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true') && process.env.SENTRY_DSN;
-  
+
   if (sentryEnabled) {
     try {
       Sentry.init({
@@ -37,7 +37,7 @@ export const initSentry = (app) => {
         ],
 
         // Don't send sensitive data
-        beforeSend(event, hint) {
+        beforeSend(event, _hint) {
           // Remove sensitive headers
           if (event.request?.headers) {
             delete event.request.headers.authorization;

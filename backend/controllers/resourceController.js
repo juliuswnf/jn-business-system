@@ -100,7 +100,6 @@ export const getSalonResources = async (req, res) => {
 export const getResourceById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id;
     const userRole = req.user?.role;
 
     // Validate ObjectId

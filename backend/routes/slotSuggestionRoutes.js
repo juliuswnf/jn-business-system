@@ -5,6 +5,16 @@ import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+const isPrivilegedRole = (role) => ['ceo', 'admin'].includes(role);
+
+const hasSalonAccess = (req, salonId) => {
+  if (isPrivilegedRole(req.user?.role)) {
+    return true;
+  }
+
+  return req.user?.salonId?.toString() === salonId?.toString();
+};
+
 /**
  * @route   POST /api/slot-suggestions/accept/:id
  * @desc    Customer accepts a slot suggestion and creates booking
@@ -193,7 +203,12 @@ router.get('/:salonId', authMiddleware.protect, async (req, res) => {
     const { salonId } = req.params;
     const { status, days = 7 } = req.query;
 
-    // TODO: Add authorization check (user must own salon)
+    if (!hasSalonAccess(req, salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
 
     // Build query
     const query = { salonId };
@@ -239,7 +254,12 @@ router.get('/urgent/:salonId', authMiddleware.protect, async (req, res) => {
   try {
     const { salonId } = req.params;
 
-    // TODO: Add authorization check (user must own salon)
+    if (!hasSalonAccess(req, salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
 
     // Find urgent suggestions (expiring within 1 hour)
     const urgentSuggestions = await SlotSuggestion.findUrgent(salonId, 60);

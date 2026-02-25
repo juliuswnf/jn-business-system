@@ -237,7 +237,7 @@ export const validateCSRFToken = (req, res, next) => {
   }
 
   // Remove token after use (one-time use for sensitive operations)
-  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method) && 
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method) &&
       (req.path.includes('/auth/') || req.path.includes('/payment/'))) {
     csrfTokens.delete(token);
   }

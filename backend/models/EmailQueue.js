@@ -160,7 +160,7 @@ emailQueueSchema.methods.isReadyToSend = function() {
   const isScheduled = this.scheduledFor <= now;
   const isRetryReady = !this.nextRetryAt || this.nextRetryAt <= now;
   const hasAttemptsLeft = this.attempts < this.maxAttempts;
-  
+
   return this.status === 'pending' &&
          isScheduled &&
          isRetryReady &&

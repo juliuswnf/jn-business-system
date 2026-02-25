@@ -71,13 +71,13 @@ export const handleStripeWebhook = async (req, res) => {
       // If event already exists (duplicate webhook call), get existing record
       if (error.code === 11000 || error.message?.includes('duplicate')) {
         stripeEventRecord = await StripeEvent.findOne({ stripeEventId: event.id });
-        
+
         // If already processed, return immediately
         if (stripeEventRecord?.status === 'processed') {
           logger.log(`⏭️ Event ${event.id} already processed, skipping...`);
           return res.status(200).json({ received: true, duplicate: true });
         }
-        
+
         // If pending but exists, another request is processing it - return immediately
         if (stripeEventRecord?.status === 'pending') {
           logger.log(`⏭️ Event ${event.id} is being processed by another request, skipping...`);
@@ -87,7 +87,7 @@ export const handleStripeWebhook = async (req, res) => {
         throw error;
       }
     }
-    
+
     // If we didn't create the event (it already existed), don't process it
     if (!stripeEventRecord || stripeEventRecord.status !== 'pending') {
       logger.log(`⏭️ Event ${event.id} already exists, skipping...`);

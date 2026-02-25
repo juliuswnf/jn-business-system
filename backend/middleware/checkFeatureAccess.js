@@ -2,6 +2,14 @@ import { tierHasFeature, getRequiredTierForFeature, compareTiers } from '../conf
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 
+const isActiveSubscriptionStatus = (status) => {
+  return ['active', 'trialing', 'trial'].includes(status);
+};
+
+const isCeoWithoutSalonContext = (req, salonId) => {
+  return req.user?.role === 'ceo' && !salonId;
+};
+
 /**
  * Feature Access Middleware
  * Checks if salon's subscription tier has access to requested feature
@@ -16,6 +24,14 @@ export const checkFeatureAccess = (featureName, _options = {}) => {
     try {
       // Get salon from database
       const salonId = req.user.salonId || req.body.salonId || req.params.salonId;
+
+      if (isCeoWithoutSalonContext(req, salonId)) {
+        req.subscription = {
+          tier: 'enterprise',
+          status: 'active'
+        };
+        return next();
+      }
 
       if (!salonId) {
         return res.status(400).json({
@@ -42,7 +58,7 @@ export const checkFeatureAccess = (featureName, _options = {}) => {
       const subscriptionStatus = salon.subscription?.status || 'inactive';
 
       // Check if subscription is active
-      if (subscriptionStatus !== 'active' && subscriptionStatus !== 'trialing') {
+      if (!isActiveSubscriptionStatus(subscriptionStatus)) {
         return res.status(403).json({
           success: false,
           error: 'Subscription inactive',
@@ -117,6 +133,14 @@ export const checkAnyFeatureAccess = (featureNames = [], _options = {}) => {
     try {
       const salonId = req.user.salonId || req.body.salonId || req.params.salonId;
 
+      if (isCeoWithoutSalonContext(req, salonId)) {
+        req.subscription = {
+          tier: 'enterprise',
+          status: 'active'
+        };
+        return next();
+      }
+
       if (!salonId) {
         return res.status(400).json({
           success: false,
@@ -140,7 +164,7 @@ export const checkAnyFeatureAccess = (featureNames = [], _options = {}) => {
       const currentTier = salon.subscription?.tier || 'starter';
       const subscriptionStatus = salon.subscription?.status || 'inactive';
 
-      if (subscriptionStatus !== 'active' && subscriptionStatus !== 'trialing') {
+      if (!isActiveSubscriptionStatus(subscriptionStatus)) {
         return res.status(403).json({
           success: false,
           error: 'Subscription inactive',
@@ -185,6 +209,14 @@ export const requireActiveSubscription = async (req, res, next) => {
   try {
     const salonId = req.user.salonId;
 
+    if (isCeoWithoutSalonContext(req, salonId)) {
+      req.subscription = {
+        tier: 'enterprise',
+        status: 'active'
+      };
+      return next();
+    }
+
     if (!salonId) {
       return res.status(400).json({
         success: false,
@@ -205,7 +237,7 @@ export const requireActiveSubscription = async (req, res, next) => {
 
     const status = salon.subscription?.status;
 
-    if (status !== 'active' && status !== 'trialing') {
+    if (!isActiveSubscriptionStatus(status)) {
       return res.status(403).json({
         success: false,
         error: 'Active subscription required',
@@ -234,6 +266,21 @@ export const requireMinimumTier = (minimumTier) => {
   return async (req, res, next) => {
     try {
       const salonId = req.user.salonId;
+
+      if (isCeoWithoutSalonContext(req, salonId)) {
+        req.subscription = {
+          tier: 'enterprise',
+          status: 'active'
+        };
+        return next();
+      }
+
+      if (!salonId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Salon ID required'
+        });
+      }
 
       const salon = await Salon.findById(salonId)
         .select('subscription businessName')
@@ -310,6 +357,15 @@ export const softFeatureGate = (featureName) => {
   return async (req, res, next) => {
     try {
       const salonId = req.user.salonId;
+
+      if (isCeoWithoutSalonContext(req, salonId)) {
+        return next();
+      }
+
+      if (!salonId) {
+        return next();
+      }
+
       const salon = await Salon.findById(salonId).select('subscription').lean();
 
       if (!salon) {

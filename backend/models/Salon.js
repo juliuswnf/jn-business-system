@@ -676,11 +676,6 @@ salonSchema.methods.getRemainingBookings = function() {
     return Infinity;
   }
 
-  // Calculate bookings this month
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-
   // Note: This would need to query Booking model to get actual count
   // For now, return the limit (implement booking tracking separately)
   return tierConfig.limits.bookingsPerMonth;

@@ -40,6 +40,9 @@ export const PRICING_TIERS = {
       emailNotifications: true,
       smsNotifications: false, // ? No SMS
 
+      // Security
+      twoFactorAuth: false,
+
       // Payments
       stripeIntegration: true,
 
@@ -105,6 +108,9 @@ export const PRICING_TIERS = {
       publicSalonPage: true,
       emailNotifications: true,
       smsNotifications: false, // ? Still no SMS in Professional
+
+      // Security
+      twoFactorAuth: true,
       stripeIntegration: true,
       basicReports: true,
 
@@ -130,8 +136,8 @@ export const PRICING_TIERS = {
       apiAccess: false,
       webhooks: false,
       hipaaCompliance: false,
-      auditLogs: false,
-      teamPermissions: false
+      auditLogs: true,
+      teamPermissions: true
     }
   },
 
@@ -179,6 +185,9 @@ export const PRICING_TIERS = {
       publicSalonPage: true,
       emailNotifications: true,
       smsNotifications: true, // ? SMS only in Enterprise
+
+      // Security
+      twoFactorAuth: true,
       stripeIntegration: true,
       basicReports: true,
       advancedAnalytics: true,
@@ -294,6 +303,7 @@ export const FEATURE_NAMES = {
   publicSalonPage: 'Public Booking Page',
   emailNotifications: 'Email Notifications',
   smsNotifications: 'SMS Notifications',
+  twoFactorAuth: 'Two-Factor Authentication (2FA)',
   stripeIntegration: 'Stripe Payment Integration',
   basicReports: 'Basic Reports',
   advancedAnalytics: 'Advanced Analytics',

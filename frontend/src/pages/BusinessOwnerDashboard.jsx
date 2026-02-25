@@ -4,6 +4,7 @@ import SMSUsageWidget from '../components/SMSUsageWidget';
 import { api } from '../utils/api';
 
 const BusinessOwnerDashboard = () => {
+  const user = JSON.parse(localStorage.getItem('jnUser') || localStorage.getItem('user') || '{}');
   const [todaysBookings, setTodaysBookings] = useState([]);
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [services, setServices] = useState([]);

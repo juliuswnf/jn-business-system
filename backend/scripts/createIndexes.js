@@ -15,10 +15,6 @@ import MarketingCampaign from '../models/MarketingCampaign.js';
 import Package from '../models/Package.js';
 import Service from '../models/Service.js';
 import Employee from '../models/Employee.js';
-import Resource from '../models/Resource.js';
-import Waitlist from '../models/Waitlist.js';
-import ConsentForm from '../models/ConsentForm.js';
-import ClinicalNote from '../models/ClinicalNote.js';
 import Payment from '../models/Payment.js';
 import RefreshToken from '../models/RefreshToken.js';
 

@@ -70,12 +70,14 @@ router.post('/', mutationLimiter, async (req, res) => {
 
 // ? HIGH FIX #10: Update service with rate limiter
 router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, res) => {
+  let updateDataKeys = [];
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
 
     // Prevent changing salonId - extract and discard it from the update
     // eslint-disable-next-line no-unused-vars
     const { salonId, ...updateData } = req.body;
+    updateDataKeys = Object.keys(updateData);
 
     // ? OPTIMISTIC LOCKING - load, check version, update, save
     const service = await Service.findById(req.params.id);
@@ -108,19 +110,19 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
         message: 'Conflict - Service was modified by another user. Please refresh and try again.'
       });
     }
-    
+
     // Log the full error for debugging
     logger.error('Service Update Error:', {
       error: error.message,
       stack: error.stack,
-      updateData: Object.keys(updateData),
+      updateData: updateDataKeys,
       serviceId: req.params.id
     });
-    
+
     // Return more detailed error message
     const errorMessage = error.message || 'Failed to update service';
-    return res.status(400).json({ 
-      success: false, 
+    return res.status(400).json({
+      success: false,
       message: errorMessage,
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });

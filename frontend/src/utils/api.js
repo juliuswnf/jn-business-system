@@ -755,7 +755,7 @@ export const ceoAPI = {
   startAllServices: () => api.post('/ceo/system/start-all'),
   stopAllServices: () => api.post('/ceo/system/stop-all'),
   // Settings
-  getFeatureFlags: () => api.get('/ceo/settings/features'),
+  getSettingsFeatureFlags: () => api.get('/ceo/settings/features'),
   toggleFeature: (featureName, enabled) => api.post('/ceo/settings/features/toggle', { featureName, enabled }),
   getSettings: () => api.get('/ceo/settings'),
   updateSettings: (data) => api.put('/ceo/settings', data),

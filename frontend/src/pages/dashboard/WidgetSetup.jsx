@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Copy, Check, Code, Palette, Type, Image, Eye } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
 import { widgetAPI, serviceAPI, salonAPI } from '../../utils/api';
@@ -94,6 +95,15 @@ export default function WidgetSetup() {
         <p className="text-slate-400 text-sm md:text-base">
           Konfiguriere dein Buchungs-Widget und bette es in deine Website ein
         </p>
+        <div className="mt-4">
+          <Link
+            to="/dashboard/widget/live-preview"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition"
+          >
+            <Eye className="w-4 h-4" />
+            Live Preview auf separater Seite öffnen
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
