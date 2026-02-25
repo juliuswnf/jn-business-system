@@ -69,7 +69,7 @@ if (process.env.SENTRY_DSN) {
       dsn: process.env.SENTRY_DSN,
       environment: process.env.NODE_ENV || 'development',
       tracesSampleRate: isProduction ? 0.1 : 1.0,
-      integrations: [],
+      integrations: []
     });
     winstonLogger.info('Sentry initialized for error tracking');
   }).catch(() => {

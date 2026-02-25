@@ -90,7 +90,7 @@ export const isValidEmail = (email) => {
 };
 
 export const isValidPhone = (phone) => {
-  const regex = /^\+?[0-9\s\-\(\)]{7,20}$/;
+  const regex = /^\+?[0-9\s\-()]{7,20}$/;
   return regex.test(phone);
 };
 

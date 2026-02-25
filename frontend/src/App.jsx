@@ -44,6 +44,7 @@ const Services = lazy(() => import('./pages/dashboard/Services'));
 const Employees = lazy(() => import('./pages/dashboard/Employees'));
 const Customers = lazy(() => import('./pages/company/Customers'));
 const WidgetSetup = lazy(() => import('./pages/dashboard/WidgetSetup'));
+const WidgetLivePreview = lazy(() => import('./pages/dashboard/WidgetLivePreview'));
 const Settings = lazy(() => import('./pages/dashboard/Settings'));
 const BrandingSettings = lazy(() => import('./pages/dashboard/BrandingSettings'));
 const MultiLocationDashboard = lazy(() => import('./pages/dashboard/MultiLocationDashboard'));
@@ -408,6 +409,16 @@ function App() {
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <DashboardLayout>
                 <LazyPage><WidgetSetup /></LazyPage>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/widget/live-preview"
+          element={
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
+              <DashboardLayout>
+                <LazyPage><WidgetLivePreview /></LazyPage>
               </DashboardLayout>
             </ProtectedRoute>
           }

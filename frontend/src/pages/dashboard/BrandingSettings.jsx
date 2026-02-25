@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNotification } from '../../hooks/useNotification';
+import { api } from '../../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -28,8 +29,6 @@ export default function BrandingSettings() {
   useEffect(() => {
     const fetchBranding = async () => {
       try {
-        // ? SECURITY FIX: Use central api instance
-        const { api } = await import('../../utils/api');
         const res = await api.get('/branding');
 
         if (res.data) {
@@ -87,7 +86,7 @@ export default function BrandingSettings() {
       });
       const data = res.data;
 
-      if (res.ok && data.success) {
+      if (data.success) {
         setBranding(prev => ({ ...prev, logo: data.logoUrl }));
         showNotification('Logo hochgeladen', 'success');
       } else {

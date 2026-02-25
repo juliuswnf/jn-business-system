@@ -420,7 +420,7 @@ export const createBillingPortalSession = async (salon, returnUrl) => {
 export const getOrCreateBookingCustomer = async (email, name, phone, salonId) => {
   try {
     const stripe = getStripe();
-    
+
     // Search for existing customer by email
     const existingCustomers = await stripe.customers.list({
       email: email.toLowerCase(),
@@ -461,7 +461,7 @@ export const getOrCreateBookingCustomer = async (email, name, phone, salonId) =>
 export const attachPaymentMethodToCustomer = async (customerId, paymentMethodId) => {
   try {
     const stripe = getStripe();
-    
+
     // Attach payment method to customer
     await stripe.paymentMethods.attach(paymentMethodId, {
       customer: customerId
@@ -494,7 +494,7 @@ export const attachPaymentMethodToCustomer = async (customerId, paymentMethodId)
 export const chargeNoShowFee = async (customerId, paymentMethodId, amount, description, metadata = {}) => {
   try {
     const stripe = getStripe();
-    
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
       currency: 'eur',
@@ -525,7 +525,7 @@ export const chargeNoShowFee = async (customerId, paymentMethodId, amount, descr
 export const refundNoShowFee = async (paymentIntentId) => {
   try {
     const stripe = getStripe();
-    
+
     const refund = await stripe.refunds.create({
       payment_intent: paymentIntentId,
       reason: 'requested_by_customer'

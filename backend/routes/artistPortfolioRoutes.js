@@ -1,6 +1,7 @@
 ﻿import express from 'express';
 import multer from 'multer';
 import path from 'path';
+import crypto from 'crypto';
 import {
   uploadPortfolioItem,
   getPublicPortfolio,
@@ -12,6 +13,7 @@ import {
   incrementLikes
 } from '../controllers/artistPortfolioController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 
 const { protect } = authMiddleware;
 
@@ -35,7 +37,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const upload = multer({
   storage,
-  limits: { 
+  limits: {
     fileSize: MAX_FILE_SIZE,
     files: 1 // Only one file per request
   },
@@ -65,7 +67,7 @@ const upload = multer({
 
 // Create/Upload portfolio item (Protected - Artist only)
 // ? SECURITY FIX: Uses centralized file upload validation with Sharp dimension check
-router.post('/upload', protect, upload.single('image'), async (req, res, next) => {
+router.post('/upload', protect, checkFeatureAccess('portfolioManagement'), upload.single('image'), async (req, res, next) => {
   try {
     // ? SECURITY FIX: Validate image dimensions with Sharp
     if (req.file) {
@@ -97,13 +99,13 @@ router.get('/salon/:salonId', getPublicPortfolio);
 router.get('/artist/:artistId', getArtistPortfolio);
 
 // Update portfolio item (Protected - Artist only)
-router.patch('/:id', protect, updatePortfolioItem);
+router.patch('/:id', protect, checkFeatureAccess('portfolioManagement'), updatePortfolioItem);
 
 // Delete portfolio item (Protected - Artist only)
-router.delete('/:id', protect, deletePortfolioItem);
+router.delete('/:id', protect, checkFeatureAccess('portfolioManagement'), deletePortfolioItem);
 
 // Toggle featured status (Protected - Artist only)
-router.patch('/:id/feature', protect, toggleFeatured);
+router.patch('/:id/feature', protect, checkFeatureAccess('portfolioManagement'), toggleFeatured);
 
 // Increment view count (Public)
 router.post('/:id/view', incrementViews);

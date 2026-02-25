@@ -1,4 +1,4 @@
-import React from 'React';
+import React from 'react';
 import { PawPrint, Zap, AlertCircle } from 'lucide-react';
 
 export default function PetGroomingDashboard() {

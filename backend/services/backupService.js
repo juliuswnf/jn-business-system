@@ -193,13 +193,18 @@ const cleanupOldBackups = async () => {
       createdAt: { $lt: new Date(now.getTime() - (RETENTION_DAYS + 1) * 24 * 60 * 60 * 1000) }
     });
 
+    const markedRecordsCount = deletedRecords.modifiedCount || 0;
     const totalDeleted = deletedFilesCount + actuallyDeleted.deletedCount;
 
     if (totalDeleted > 0) {
-      logger.log(`? Cleaned up ${deletedFilesCount} old backup files and ${actuallyDeleted.deletedCount} database records`);
+      logger.log(`? Cleaned up ${deletedFilesCount} old backup files, marked ${markedRecordsCount} records, and removed ${actuallyDeleted.deletedCount} database records`);
     }
 
-    return { deletedFilesCount, deletedRecordsCount: actuallyDeleted.deletedCount };
+    return {
+      deletedFilesCount,
+      markedRecordsCount,
+      deletedRecordsCount: actuallyDeleted.deletedCount
+    };
   } catch (error) {
     logger.error('? Backup cleanup failed:', error);
     throw error;
@@ -304,7 +309,7 @@ const runBackupJob = async () => {
     return result;
   } catch (error) {
     logger.error('? Backup job failed:', error);
-    
+
     // ? SECURITY FIX: Mark backup as failed in database if record exists
     if (error.backupId) {
       await Backup.findByIdAndUpdate(error.backupId, {
@@ -313,7 +318,7 @@ const runBackupJob = async () => {
         completedAt: new Date()
       }).catch(err => logger.error('Failed to update backup record:', err));
     }
-    
+
     throw error;
   }
 };

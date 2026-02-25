@@ -72,7 +72,7 @@ import pricingRoutes from './routes/pricing.js';
 
 // Customer Support Routes
 import supportRoutes from './routes/supportRoutes.js';
-import securityRoutes from "./routes/securityRoutes.js";
+import securityRoutes from './routes/securityRoutes.js';
 
 // CRM Routes
 import crmRoutes from './routes/crmRoutes.js';
@@ -348,10 +348,10 @@ app.use('/api/v1/workflows', workflowRoutes); // Workflow Management (Multi-Indu
 
 // Pricing Wizard Routes
 // Stripe Connect Routes
-app.use("/api/v1/stripe-connect", authMiddleware.protect, stripeConnectRoutes);
+app.use('/api/v1/stripe-connect', authMiddleware.protect, stripeConnectRoutes);
 
 // Security Monitoring Routes
-app.use("/api/v1/security", authMiddleware.protect, securityRoutes);
+app.use('/api/v1/security', authMiddleware.protect, securityRoutes);
 app.use('/api/v1/pricing-wizard', pricingWizardRoutes); // Intelligent Tier Recommendation (Public + Analytics)
 
 // ==================== 404 HANDLER (BEFORE ERROR HANDLER) ====================

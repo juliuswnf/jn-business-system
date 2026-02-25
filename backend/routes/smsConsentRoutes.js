@@ -4,6 +4,16 @@ import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+const isPrivilegedRole = (role) => ['ceo', 'admin'].includes(role);
+
+const hasSalonAccess = (req, salonId) => {
+  if (isPrivilegedRole(req.user?.role)) {
+    return true;
+  }
+
+  return req.user?.salonId?.toString() === salonId?.toString();
+};
+
 /**
  * @route   POST /api/sms-consent/opt-in
  * @desc    Customer opts in for SMS notifications (GDPR compliant)
@@ -170,7 +180,12 @@ router.get('/salon/:salonId', authMiddleware.protect, async (req, res) => {
   try {
     const { salonId } = req.params;
 
-    // TODO: Add authorization check (user must own salon)
+    if (!hasSalonAccess(req, salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
 
     const consents = await SMSConsent.find({ salonId })
       .populate('customerId', 'firstName lastName email phone')

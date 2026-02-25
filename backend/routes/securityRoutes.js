@@ -1,13 +1,14 @@
 /**
  * Security Monitoring Routes
  * Provides endpoints for security metrics and monitoring
- * 
+ *
  * Access: CEO/Admin only
  */
 
 import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import ceoMiddleware from '../middleware/ceoMiddleware.js';
+import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 import { getSecurityMetrics, isSuspiciousIP } from '../middleware/securityMonitoringMiddleware.js';
 import AuditLog from '../models/AuditLog.js';
 import logger from '../utils/logger.js';
@@ -17,6 +18,7 @@ const router = express.Router();
 // All routes require CEO/Admin access
 router.use(authMiddleware.protect);
 router.use(ceoMiddleware.checkCEO);
+router.use(checkFeatureAccess('auditLogs'));
 
 /**
  * GET /api/security/metrics

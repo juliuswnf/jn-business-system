@@ -69,11 +69,10 @@ export const getAuditLogs = async (req, res) => {
       success: true,
       logs,
       pagination: {
-        page: parseInt(page),
-        limit: validatedLimit,
         page: validatedPage,
+        limit: validatedLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validatedLimit)
       }
     });
   } catch (error) {

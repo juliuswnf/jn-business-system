@@ -4,6 +4,8 @@ import UserMenu from '../../components/common/UserMenu';
 import { useNotification } from '../../context/NotificationContext';
 import { api } from '../../utils/api';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const CEOSettings = () => {
   const [activeSection, setActiveSection] = useState('profile');
   const [loading, setLoading] = useState(false);

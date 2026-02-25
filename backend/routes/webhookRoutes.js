@@ -1,6 +1,8 @@
 import express from 'express';
 import SMSLog from '../models/SMSLog.js';
 import SMSProviderFactory from '../services/smsProviders/SMSProviderFactory.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -129,9 +131,9 @@ router.post('/messagebird', async (req, res) => {
 /**
  * @route   GET /api/webhooks/test
  * @desc    Test endpoint to verify webhook infrastructure is working
- * @access  Public
+ * @access  Protected (Enterprise webhooks feature)
  */
-router.get('/test', (req, res) => {
+router.get('/test', authMiddleware.protect, checkFeatureAccess('webhooks'), (req, res) => {
   const activeProvider = SMSProviderFactory.getProvider();
 
   res.status(200).json({

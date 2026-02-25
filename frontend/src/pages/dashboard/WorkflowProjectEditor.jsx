@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+import { api } from '../../utils/api';
 
 /**
  * Workflow Project Editor
@@ -47,9 +45,7 @@ export default function WorkflowProjectEditor() {
   const fetchCustomers = async () => {
     try {
       // ? SECURITY FIX: Use central api instance
-      const res = await api.get('/customers', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/customers');
       if (res.data.success) setCustomers(res.data.customers || res.data.data || []);
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -59,9 +55,7 @@ export default function WorkflowProjectEditor() {
   const fetchEmployees = async () => {
     try {
       // ? SECURITY FIX: Use central api instance
-      const res = await api.get('/employees', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/employees');
       if (res.data.success) setEmployees(res.data.employees || res.data.data || []);
     } catch (error) {
       console.error('Error fetching employees:', error);

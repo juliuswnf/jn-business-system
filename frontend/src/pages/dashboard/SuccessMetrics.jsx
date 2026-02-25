@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { captureError } from '../../utils/errorTracking';
+import { api } from '../../utils/api';
 import {
   TrendingUp,
   TrendingDown,

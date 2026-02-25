@@ -97,14 +97,14 @@ const getErrorMessage = (errorCode) => {
 const formatErrorResponse = (error, statusCode = 500) => {
   // Sanitize error message to prevent information leakage
   let safeMessage = 'Ein Fehler ist aufgetreten';
-  
+
   // Only expose specific error messages in development
   if (process.env.NODE_ENV === 'development') {
     safeMessage = error.message || safeMessage;
   } else {
     // In production, only expose safe error messages
-    if (error.message && !error.message.includes('password') && 
-        !error.message.includes('token') && 
+    if (error.message && !error.message.includes('password') &&
+        !error.message.includes('token') &&
         !error.message.includes('secret') &&
         !error.message.includes('key') &&
         !error.message.includes('api') &&

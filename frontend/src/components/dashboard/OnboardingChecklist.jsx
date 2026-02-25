@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import {
   Building2, MapPin, Clock, Scissors, Link2, Code,
@@ -17,6 +18,7 @@ const CHECKLIST_ITEMS = [
 ];
 
 export default function OnboardingChecklist() {
+  const location = useLocation();
   const [checklist, setChecklist] = useState({
     info: false,
     address: false,
@@ -28,41 +30,70 @@ export default function OnboardingChecklist() {
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [salon, setSalon] = useState(null);
 
   useEffect(() => {
     checkOnboardingStatus();
-  }, []);
+  }, [location.pathname]);
+
+  const hasConfiguredBusinessHours = (businessHours) => {
+    if (!businessHours || typeof businessHours !== 'object') return false;
+
+    const days = Object.values(businessHours);
+    return days.some((day) => {
+      if (!day || typeof day !== 'object') return false;
+      if (day.closed === true) return false;
+      return Boolean(day.open && day.close);
+    });
+  };
+
+  const normalizeServices = (servicesRes) => {
+    const payload = servicesRes?.data;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.services)) return payload.services;
+    if (Array.isArray(payload)) return payload;
+    return [];
+  };
 
   const checkOnboardingStatus = async () => {
     try {
       const [salonRes, servicesRes] = await Promise.all([
-        salonAPI.getInfo().catch(() => ({ data: {} })),
-        serviceAPI.getAll().catch(() => ({ data: { data: [] } }))
+        salonAPI.getInfo(true).catch(() => ({ data: {} })),
+        serviceAPI.getAll(null, true).catch(() => ({ data: { data: [] } }))
       ]);
 
-      const salonData = salonRes.data || {};
-      const services = servicesRes.data?.data || [];
-
-      setSalon(salonData);
+      const salonData = salonRes?.data?.salon || salonRes?.data || {};
+      const services = normalizeServices(servicesRes);
 
       const status = {
         info: !!(salonData.name && salonData.email),
         address: !!(salonData.address?.city),
-        hours: !!(salonData.openingHours?.length > 0),
+        hours: hasConfiguredBusinessHours(salonData.businessHours),
         services: services.length > 0,
-        google: !!salonData.googleReviewLink,
-        widget: !!salonData.widgetConfigured,
+        google: !!(salonData.googleReviewUrl || salonData.googleReviewLink),
+        widget: !!(salonData.widgetConfigured || salonData.checklistSteps?.widget?.completed),
       };
 
       setChecklist(status);
 
+      const total = CHECKLIST_ITEMS.length;
       const completed = Object.values(status).filter(Boolean).length;
-      setProgress(Math.round((completed / 6) * 100));
+      const isCompleted = completed === total;
+
+      setProgress(Math.round((completed / total) * 100));
+
+      if (isCompleted && !salonData.studioSetupCompleted) {
+        await salonAPI.update({
+          studioSetupCompleted: true,
+          checklistCompletedAt: new Date().toISOString(),
+          checklistDismissed: false
+        }).catch(() => null);
+      }
 
       // If all done or dismissed by user via server state
-      if (completed === 6 || salonData.checklistDismissed) {
+      if (isCompleted || salonData.studioSetupCompleted || salonData.checklistCompletedAt || salonData.checklistDismissed) {
         setDismissed(true);
+      } else {
+        setDismissed(false);
       }
     } catch (error) {
       captureError(error, { context: 'checkOnboarding' });
@@ -119,7 +150,7 @@ export default function OnboardingChecklist() {
 
       {/* Checklist Items */}
       <div className="space-y-2">
-        {CHECKLIST_ITEMS.slice(0, 4).map((item) => {
+        {CHECKLIST_ITEMS.map((item) => {
           const isCompleted = checklist[item.id];
           const Icon = item.icon;
 

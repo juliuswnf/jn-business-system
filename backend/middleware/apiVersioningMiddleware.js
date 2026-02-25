@@ -37,13 +37,13 @@ export const apiVersioningMiddleware = (req, res, next) => {
   // Note: req.path is read-only, so we manipulate req.url instead
   const originalPath = req.path;
   const versionedPath = originalPath.replace('/api/', '/api/v1/');
-  
+
   // Preserve query string if present
   const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
-  
+
   // Update req.url - Express will recalculate req.path from this
   req.url = versionedPath + queryString;
-  
+
   // Also update req.baseUrl if needed (for sub-routers)
   if (req.baseUrl && req.baseUrl.startsWith('/api/') && !req.baseUrl.startsWith('/api/v')) {
     req.baseUrl = req.baseUrl.replace('/api/', '/api/v1/');

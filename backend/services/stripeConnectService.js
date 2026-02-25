@@ -6,7 +6,6 @@
 
 import Stripe from 'stripe';
 import logger from '../utils/logger.js';
-import Salon from '../models/Salon.js';
 
 // Lazy initialization of Stripe (after dotenv is loaded)
 let stripe = null;
@@ -29,7 +28,7 @@ const getStripe = () => {
 export const createConnectedAccount = async (salon, salonOwner) => {
   try {
     const stripe = getStripe();
-    
+
     const account = await stripe.accounts.create({
       type: 'express', // Express Account (simpler onboarding)
       country: 'DE',
@@ -77,7 +76,7 @@ export const createAccountLink = async (accountId) => {
   try {
     const stripe = getStripe();
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    
+
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
       refresh_url: `${frontendUrl}/dashboard/settings/stripe/refresh`,
@@ -123,7 +122,7 @@ export const checkAccountStatus = async (accountId) => {
 export const chargeNoShowFeeConnect = async (booking, salon) => {
   try {
     const stripe = getStripe();
-    
+
     if (!salon.stripe?.connectedAccountId) {
       throw new Error('Salon has no connected Stripe account');
     }
@@ -198,7 +197,7 @@ export const chargeNoShowFeeConnect = async (booking, salon) => {
 export const refundNoShowFee = async (chargeId, amount) => {
   try {
     const stripe = getStripe();
-    
+
     const refund = await stripe.refunds.create({
       payment_intent: chargeId,
       amount: amount,

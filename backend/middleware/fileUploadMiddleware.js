@@ -7,7 +7,7 @@ import logger from '../utils/logger.js';
 /**
  * ? SECURITY FIX: File Upload Validation
  * Prevents malicious file uploads, validates type, size, and dimensions
- * 
+ *
  * Features:
  * - MIME type validation
  * - File extension whitelist
@@ -53,8 +53,6 @@ const storage = multer.diskStorage({
     // Generate unique filename (prevent path traversal)
     const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
     const ext = path.extname(file.originalname).toLowerCase();
-    // Sanitize original filename
-    const safeOriginalName = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g, '_');
     cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
   }
 });
@@ -109,7 +107,7 @@ export const upload = multer({
 /**
  * ? SECURITY FIX: Validate image dimensions and format using Sharp
  * Prevents image bombs (extremely large images that consume memory)
- * 
+ *
  * @param {string} filePath - Path to uploaded file
  * @returns {Promise<Object>} Validation result with dimensions
  */
@@ -177,23 +175,23 @@ export const validateImageDimensions = async (filePath) => {
 export const validateFileWithSharp = async (filePath) => {
   try {
     const sharp = (await import('sharp')).default;
-    
+
     // Try to read metadata - if it fails, file is not a valid image
     await sharp(filePath).metadata();
-    
+
     return { valid: true };
   } catch (error) {
     if (error.code === 'MODULE_NOT_FOUND') {
       return { valid: true, skipped: true };
     }
-    
+
     // File is not a valid image - delete it
     try {
       fs.unlinkSync(filePath);
     } catch (unlinkError) {
       logger.error('Failed to delete invalid file:', unlinkError);
     }
-    
+
     throw new Error('File is not a valid image');
   }
 };

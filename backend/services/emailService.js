@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import EmailQueue from '../models/EmailQueue.js';
 import EmailLog from '../models/EmailLog.js';
 import logger from '../utils/logger.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';
 
 /**
  * Email Service - Send transactional emails
@@ -115,14 +116,14 @@ export const sendBookingConfirmation = async (booking) => {
     // Get email template
     const template = salon.getEmailTemplate?.('confirmation', bookingSnapshot.language);
     const firstName = bookingSnapshot.customerName?.split(' ')[0] || bookingSnapshot.customerName || 'dort';
-    
+
     // Format date and time
     const bookingDate = new Date(bookingSnapshot.bookingDate);
-    const dateStr = bookingDate.toLocaleDateString(bookingSnapshot.language === 'de' ? 'de-DE' : 'en-US', { 
+    const dateStr = bookingDate.toLocaleDateString(bookingSnapshot.language === 'de' ? 'de-DE' : 'en-US', {
       weekday: 'long',
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
     const timeStr = bookingDate.toLocaleTimeString(bookingSnapshot.language === 'de' ? 'de-DE' : 'en-US', {
       hour: '2-digit',
@@ -135,11 +136,11 @@ export const sendBookingConfirmation = async (booking) => {
       : '';
 
     // Default subject and body if template not found
-    const subject = template 
+    const subject = template
       ? replacePlaceholders(template.subject, { salon_name: salon.name, customer_name: bookingSnapshot.customerName })
       : `✅ Buchungsbestätigung - ${salon.name}`;
 
-    const body = template 
+    const body = template
       ? replacePlaceholders(template.body, {
           salon_name: salon.name,
           customer_name: bookingSnapshot.customerName,
@@ -473,7 +474,7 @@ const replacePlaceholders = (text, data) => {
 
 // ==================== SEND WELCOME/ONBOARDING EMAIL ====================
 
-export const sendWelcomeEmail = async (user, salon) => {
+export const sendWelcomeEmail = async (user, _salon) => {
   try {
     const dashboardUrl = process.env.FRONTEND_URL || 'https://app.jn-business-system.de';
     const firstName = user.name?.split(' ')[0] || user.name || 'dort';

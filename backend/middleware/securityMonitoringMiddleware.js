@@ -1,7 +1,7 @@
 /**
  * Security Monitoring Middleware
  * Tracks security events for monitoring and alerting
- * 
+ *
  * Features:
  * - Failed login attempts
  * - Suspicious activity detection
@@ -76,14 +76,14 @@ export const trackSecurityEvent = async (event) => {
     // Real-time tracking for alerting
     const key = `${type}:${ipAddress}`;
     const now = Date.now();
-    
+
     if (!securityEvents.has(key)) {
       securityEvents.set(key, []);
     }
-    
+
     const events = securityEvents.get(key);
     events.push(now);
-    
+
     // Keep only events from last window
     const recentEvents = events.filter(time => now - time < CONFIG.SUSPICIOUS_ACTIVITY_WINDOW);
     securityEvents.set(key, recentEvents);
@@ -216,7 +216,7 @@ export const getSecurityMetrics = () => {
  */
 export const trackFailedLogin = (req, res, next) => {
   const originalJson = res.json.bind(res);
-  
+
   res.json = function(data) {
     // Check if this was a failed login
     if (req.path.includes('/login') && data.success === false && data.message?.includes('Invalid')) {
@@ -228,10 +228,10 @@ export const trackFailedLogin = (req, res, next) => {
         severity: 'medium'
       });
     }
-    
+
     return originalJson(data);
   };
-  
+
   next();
 };
 
@@ -240,7 +240,7 @@ export const trackFailedLogin = (req, res, next) => {
  */
 export const trackUnauthorizedAccess = (req, res, next) => {
   const originalStatus = res.status.bind(res);
-  
+
   res.status = function(code) {
     if (code === 403 || code === 401) {
       trackSecurityEvent({
@@ -256,10 +256,10 @@ export const trackUnauthorizedAccess = (req, res, next) => {
         severity: 'high'
       });
     }
-    
+
     return originalStatus(code);
   };
-  
+
   next();
 };
 

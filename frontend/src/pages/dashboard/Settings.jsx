@@ -129,7 +129,7 @@ export default function Settings() {
 
       {isMobile && (
         <div className="mb-4 px-4 py-3 rounded-2xl bg-yellow-500/10 text-yellow-600 border border-yellow-200 text-sm">
-          Einige Einstellungen (z. B. Integrationen oder No-Show-Killer) sind nur am Desktop verfügbar.
+          Einige Einstellungen (z. B. Integrationen oder No-Show-Killer) sind nur am Desktop verfügbar.
         </div>
       )}
 
