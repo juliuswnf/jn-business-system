@@ -59,10 +59,6 @@ export const getAllTransactions = async (req, res) => {
       ];
     }
 
-    const validatedPage = Math.max(1, parseInt(page) || 1);
-    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 50));
-    const skip = (validatedPage - 1) * validatedLimit;
-
     const transactions = await Payment.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
