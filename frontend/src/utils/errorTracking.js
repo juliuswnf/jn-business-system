@@ -57,7 +57,6 @@ export const initErrorTracking = async () => {
       sentryInitialized = true;
       // Error tracking initialized
     } catch (error) {
-      console.warn('[ErrorTracking] Sentry not available:', error.message);
     }
   }
 };
@@ -82,7 +81,6 @@ export const captureError = (error, context = {}) => {
 
   // Log to console in development
   if (import.meta.env.DEV) {
-    console.error('[ErrorTracking]', error, context);
   }
 
   // Send to Sentry if available

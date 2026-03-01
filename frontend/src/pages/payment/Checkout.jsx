@@ -57,17 +57,17 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
   };
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+    <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-8">
       <h2 className="text-2xl font-bold mb-6">Checkout</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Amount */}
         <div>
           <label className="block text-sm font-medium mb-2">Amount</label>
-          <div className="text-3xl font-bold text-white">
+          <div className="text-3xl font-bold text-zinc-900">
             ${formData.amount}
           </div>
-          <p className="text-gray-200 text-sm mt-1">per month</p>
+          <p className="text-zinc-700 text-sm mt-1">per month</p>
         </div>
 
         {/* Service Type */}
@@ -77,7 +77,7 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
             name="serviceType"
             value={formData.serviceType}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:border-zinc-500 focus:outline-none"
+            className="w-full px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-900 focus:border-zinc-500 focus:outline-none"
           >
             <option value="subscription">Monthly Subscription</option>
             <option value="single">Single Payment</option>
@@ -95,7 +95,7 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
             onChange={handleChange}
             required
             placeholder="John Doe"
-            className="w-full px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-400 focus:border-zinc-500 focus:outline-none"
+            className="w-full px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none"
           />
         </div>
 
@@ -109,13 +109,13 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
             onChange={handleChange}
             required
             placeholder="john@example.com"
-            className="w-full px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-400 focus:border-zinc-500 focus:outline-none"
+            className="w-full px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none"
           />
         </div>
 
         {/* Security Note */}
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-          <p className="text-sm text-gray-100">
+        <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4">
+          <p className="text-sm text-zinc-900">
             Ihre Zahlungsdaten sind sicher und verschlüsselt
           </p>
         </div>
@@ -129,7 +129,7 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
           {isSubmitting ? 'Processing...' : `Pay $${formData.amount}`}
         </button>
 
-        <p className="text-xs text-gray-200 text-center">
+        <p className="text-xs text-zinc-700 text-center">
           By clicking pay, you agree to our terms and conditions
         </p>
       </form>

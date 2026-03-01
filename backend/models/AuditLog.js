@@ -1,4 +1,5 @@
 ﻿import mongoose from 'mongoose';
+import logger from '../utils/logger.js';
 
 /**
  * Audit Log Model
@@ -101,7 +102,7 @@ auditLogSchema.statics.logAction = async function(data) {
   try {
     return await this.create(data);
   } catch (error) {
-    console.error('AuditLog Error:', error);
+    logger.error('AuditLog Error:', error);
     return null;
   }
 };

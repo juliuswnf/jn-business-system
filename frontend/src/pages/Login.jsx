@@ -19,16 +19,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="max-w-md w-full space-y-8 p-8 bg-zinc-900 border border-zinc-800 rounded-xl">
+    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4">
+      <div className="max-w-md w-full space-y-8 p-8 bg-zinc-50 border border-zinc-200 rounded-xl">
         <div className="text-center">
           <h1
-            className="text-3xl font-bold text-white mb-2 cursor-default select-none"
+            className="text-3xl font-bold text-zinc-900 mb-2 cursor-default select-none"
             onClick={handleLogoClick}
           >
             Willkommen bei JN Business System
           </h1>
-          <p className="text-gray-200">
+          <p className="text-zinc-700">
             Business Management für alle Branchen
           </p>
         </div>
@@ -43,22 +43,22 @@ const Login = () => {
 
           <Link
             to="/login/business"
-            className="block w-full px-6 py-4 border border-zinc-700 text-center font-medium rounded-lg text-white hover:bg-zinc-800 transition"
+            className="block w-full px-6 py-4 border border-zinc-200 text-center font-medium rounded-lg text-zinc-900 hover:bg-zinc-100 transition"
           >
             Unternehmens-Login
           </Link>
 
           <Link
             to="/login/employee"
-            className="block w-full px-6 py-4 border border-zinc-700 text-center font-medium rounded-lg text-gray-200 hover:bg-zinc-800 hover:text-white transition"
+            className="block w-full px-6 py-4 border border-zinc-200 text-center font-medium rounded-lg text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition"
           >
             Mitarbeiter Login
           </Link>
         </div>
 
-        <div className="text-center text-sm text-gray-500">
+        <div className="text-center text-sm text-zinc-400">
           <p>
-            Kein Account? <Link to="/register" className="text-white hover:underline">Jetzt registrieren</Link>
+            Kein Account? <Link to="/register" className="text-zinc-900 hover:underline">Jetzt registrieren</Link>
           </p>
         </div>
       </div>

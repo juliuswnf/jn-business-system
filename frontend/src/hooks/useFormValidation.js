@@ -86,7 +86,6 @@ export const useFormValidation = (initialValues, onSubmit) => {
     try {
       await onSubmit(values);
     } catch (error) {
-      console.error('Form submission error:', error);
     } finally {
       setIsSubmitting(false);
     }

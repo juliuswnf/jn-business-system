@@ -1,5 +1,5 @@
 import React, { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
@@ -122,7 +122,6 @@ const LazyPage = ({ children }) => (
  */
 const KeyboardShortcuts = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const handleKeyPress = (e) => {

@@ -47,7 +47,6 @@ const TattooProjectEditor = () => {
       const res = await api.get('/customers');
       if (res.data.success) setCustomers(res.data.customers);
     } catch (error) {
-      console.error('Error fetching customers:', error);
     }
   };
 
@@ -58,7 +57,6 @@ const TattooProjectEditor = () => {
       const res = await api.get('/employees');
       if (res.data.success) setEmployees(res.data.employees);
     } catch (error) {
-      console.error('Error fetching employees:', error);
     }
   };
 
@@ -85,7 +83,6 @@ const TattooProjectEditor = () => {
         });
       }
     } catch (error) {
-      console.error('Error fetching project:', error);
       toast.error('Fehler beim Laden des Projekts');
     }
   };
@@ -113,7 +110,6 @@ const TattooProjectEditor = () => {
         toast.error(data.error || 'Fehler beim Speichern');
       }
     } catch (error) {
-      console.error('Error saving project:', error);
       toast.error('Netzwerkfehler');
     } finally {
       setLoading(false);
@@ -159,7 +155,7 @@ const TattooProjectEditor = () => {
                   required
                   value={formData.customerId}
                   onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 >
                   <option value="">Kunde wählen...</option>
                   {customers.map((customer) => (
@@ -177,7 +173,7 @@ const TattooProjectEditor = () => {
                 <select
                   value={formData.artistId}
                   onChange={(e) => setFormData({ ...formData, artistId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 >
                   <option value="">Artist wählen...</option>
                   {employees.map((emp) => (
@@ -199,7 +195,7 @@ const TattooProjectEditor = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="z.B. Japanischer Drache Rücken"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
               />
             </div>
 
@@ -211,7 +207,7 @@ const TattooProjectEditor = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
               />
             </div>
 
@@ -225,7 +221,7 @@ const TattooProjectEditor = () => {
                   value={formData.style}
                   onChange={(e) => setFormData({ ...formData, style: e.target.value })}
                   placeholder="z.B. Japanese, Blackwork"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 />
               </div>
 
@@ -239,7 +235,7 @@ const TattooProjectEditor = () => {
                   value={formData.bodyPart}
                   onChange={(e) => setFormData({ ...formData, bodyPart: e.target.value })}
                   placeholder="z.B. Rücken, Arm"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 />
               </div>
 
@@ -251,7 +247,7 @@ const TattooProjectEditor = () => {
                   required
                   value={formData.size}
                   onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 >
                   <option value="small">Klein</option>
                   <option value="medium">Mittel</option>
@@ -272,7 +268,7 @@ const TattooProjectEditor = () => {
                   min="1"
                   value={formData.totalSessions}
                   onChange={(e) => setFormData({ ...formData, totalSessions: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 />
               </div>
 
@@ -286,7 +282,7 @@ const TattooProjectEditor = () => {
                   step="0.5"
                   value={formData.estimatedDuration}
                   onChange={(e) => setFormData({ ...formData, estimatedDuration: parseFloat(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 />
               </div>
 
@@ -300,7 +296,7 @@ const TattooProjectEditor = () => {
                   step="0.01"
                   value={formData.estimatedPrice}
                   onChange={(e) => setFormData({ ...formData, estimatedPrice: parseFloat(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                 />
               </div>
             </div>
@@ -316,7 +312,7 @@ const TattooProjectEditor = () => {
                   value={checklistItem}
                   onChange={(e) => setChecklistItem(e.target.value)}
                   placeholder="z.B. Snacks, Wasser, Locker Kleidung"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
                 />
                 <button
@@ -357,7 +353,7 @@ const TattooProjectEditor = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                className="px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
               >
                 {loading ? 'Speichere...' : (isEdit ? 'Aktualisieren' : 'Erstellen')}
               </button>

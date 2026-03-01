@@ -124,7 +124,7 @@ export const upgradeSubscription = async (req, res) => {
       proratedAmount: result.proratedAmount / 100 // Convert to euros
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error upgrading subscription:', error);
+    logger.error('[Subscription Controller] Error upgrading subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to upgrade subscription',
@@ -197,7 +197,7 @@ export const downgradeSubscription = async (req, res) => {
         : null
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error downgrading subscription:', error);
+    logger.error('[Subscription Controller] Error downgrading subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to downgrade subscription',
@@ -226,7 +226,7 @@ export const cancelSubscription = async (req, res) => {
         : 'Subscription will be canceled at the end of the billing period'
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error canceling subscription:', error);
+    logger.error('[Subscription Controller] Error canceling subscription:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to cancel subscription',
@@ -276,7 +276,7 @@ export const setupSEPA = async (req, res) => {
       message: 'SEPA Direct Debit setup initiated'
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error setting up SEPA:', error);
+    logger.error('[Subscription Controller] Error setting up SEPA:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to setup SEPA',
@@ -326,7 +326,7 @@ export const createInvoice = async (req, res) => {
       message: 'Invoice created and sent successfully'
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error creating invoice:', error);
+    logger.error('[Subscription Controller] Error creating invoice:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create invoice',
@@ -360,7 +360,7 @@ export const convertTrialToPaid = async (req, res) => {
       message: 'Trial converted to paid subscription successfully'
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error converting trial:', error);
+    logger.error('[Subscription Controller] Error converting trial:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to convert trial',
@@ -399,7 +399,7 @@ export const getSubscriptionStatus = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[Subscription Controller] Error getting subscription status:', error);
+    logger.error('[Subscription Controller] Error getting subscription status:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get subscription status',

@@ -56,9 +56,9 @@ const BookingFlow = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium text-gray-900">{service.name}</p>
-                      <p className="text-gray-600">{service.price}€, {service.duration} Min.</p>
+                      <p className="text-zinc-500">{service.price}€, {service.duration} Min.</p>
                     </div>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button className="px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700">
                       Auswählen
                     </button>
                   </div>
@@ -149,7 +149,7 @@ const BookingFlow = () => {
               </div>
               <button
                 onClick={handleSubmit}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-6 py-3 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700"
               >
                 Buchung abschließen
               </button>
@@ -161,10 +161,10 @@ const BookingFlow = () => {
         {step === 5 && (
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Buchung bestätigt</h2>
-            <p className="text-gray-600">Ihr Termin wurde erfolgreich gebucht. Sie erhalten eine Bestätigungs-Email.</p>
+            <p className="text-zinc-500">Ihr Termin wurde erfolgreich gebucht. Sie erhalten eine Bestätigungs-Email.</p>
             <Link
               to="/customer/dashboard"
-              className="mt-4 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+              className="mt-4 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-zinc-900 bg-blue-600 hover:bg-blue-700 transition-colors"
             >
               Zu meinem Dashboard
             </Link>

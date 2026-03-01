@@ -31,7 +31,7 @@ const DashboardLayout = ({
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-white">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex">
         <Sidebar isOpen={sidebarOpen} />
@@ -40,7 +40,7 @@ const DashboardLayout = ({
       {/* Mobile Sidebar Overlay */}
       {mobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 md:hidden z-40"
+          className="fixed inset-0 bg-white bg-opacity-50 md:hidden z-40"
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}

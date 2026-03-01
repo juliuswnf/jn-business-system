@@ -77,8 +77,8 @@ export default function PaymentMethodStep({
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold text-white mb-2">Kreditkarte hinterlegen</h2>
-      <p className="text-gray-400 mb-6">
+      <h2 className="text-2xl font-bold text-zinc-900 mb-2">Kreditkarte hinterlegen</h2>
+      <p className="text-zinc-500 mb-6">
         Fast fertig! Hinterlegen Sie Ihre Kreditkarte für No-Show-Schutz.
       </p>
 
@@ -87,8 +87,8 @@ export default function PaymentMethodStep({
           <FiInfo className="text-blue-400 mt-0.5" size={20} />
           <div>
             <p className="font-medium text-blue-400 mb-2">Warum ist das nötig?</p>
-            <ul className="text-sm text-gray-300 space-y-1">
-              <li>✓ Ihre Karte wird <strong className="text-white">NICHT belastet</strong></li>
+            <ul className="text-sm text-zinc-600 space-y-1">
+              <li>✓ Ihre Karte wird <strong className="text-zinc-900">NICHT belastet</strong></li>
               <li>✓ Nur bei Nichterscheinen: €{feeAmount} Gebühr</li>
               <li>✓ 100% sicher über Stripe verschlüsselt</li>
               <li>✓ Wenn Sie zu Ihrem Termin erscheinen, wird nichts abgebucht</li>
@@ -101,13 +101,13 @@ export default function PaymentMethodStep({
         
         {/* Card Element */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-zinc-600 mb-2">
             Kreditkarte
           </label>
-          <div className="border border-zinc-700 rounded-lg p-4 bg-zinc-800">
+          <div className="border border-zinc-200 rounded-lg p-4 bg-zinc-50">
             <CardElement options={CARD_ELEMENT_OPTIONS} />
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-zinc-400 mt-2">
             Ihre Kartendaten werden sicher von Stripe verarbeitet. Wir haben keinen Zugriff auf Ihre vollständigen Kartendaten.
           </p>
         </div>
@@ -119,10 +119,10 @@ export default function PaymentMethodStep({
               type="checkbox"
               checked={policyAccepted}
               onChange={(e) => setPolicyAccepted(e.target.checked)}
-              className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-zinc-900 cursor-pointer transition-colors mt-0.5"
+              className="w-5 h-5 rounded border-zinc-200 bg-zinc-50 text-indigo-600 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-0 focus:ring-offset-zinc-900 cursor-pointer transition-colors mt-0.5"
               required
             />
-            <span className="text-sm text-gray-300 flex-1">
+            <span className="text-sm text-zinc-600 flex-1">
               Ich akzeptiere die{' '}
               <button
                 type="button"
@@ -136,35 +136,35 @@ export default function PaymentMethodStep({
           </label>
 
           {showPolicy && (
-            <div className="bg-zinc-800 rounded-lg p-4 text-sm max-h-64 overflow-y-auto border border-zinc-700">
-              <h4 className="font-semibold text-white mb-2">NO-SHOW-GEBÜHR RICHTLINIE</h4>
+            <div className="bg-zinc-50 rounded-lg p-4 text-sm max-h-64 overflow-y-auto border border-zinc-200">
+              <h4 className="font-semibold text-zinc-900 mb-2">NO-SHOW-GEBÜHR RICHTLINIE</h4>
               
-              <h5 className="font-medium mt-3 mb-1 text-gray-300">1. DEFINITION</h5>
-              <p className="text-gray-400">
+              <h5 className="font-medium mt-3 mb-1 text-zinc-600">1. DEFINITION</h5>
+              <p className="text-zinc-500">
                 Ein "No-Show" liegt vor, wenn Sie nicht zu Ihrem gebuchten Termin erscheinen 
                 und diesen nicht mindestens 24 Stunden vorher storniert haben.
               </p>
 
-              <h5 className="font-medium mt-3 mb-1 text-gray-300">2. GEBÜHR</h5>
-              <p className="text-gray-400">
+              <h5 className="font-medium mt-3 mb-1 text-zinc-600">2. GEBÜHR</h5>
+              <p className="text-zinc-500">
                 Bei einem No-Show wird automatisch eine Gebühr von €{feeAmount} von Ihrer 
                 hinterlegten Kreditkarte abgebucht.
               </p>
 
-              <h5 className="font-medium mt-3 mb-1 text-gray-300">3. ZAHLUNGSMETHODE</h5>
-              <p className="text-gray-400">
+              <h5 className="font-medium mt-3 mb-1 text-zinc-600">3. ZAHLUNGSMETHODE</h5>
+              <p className="text-zinc-500">
                 Sie verpflichten sich, eine gültige Kreditkarte bei der Buchung zu hinterlegen. 
                 Diese wird nur im Falle eines No-Shows belastet.
               </p>
 
-              <h5 className="font-medium mt-3 mb-1 text-gray-300">4. STORNIERUNG</h5>
-              <p className="text-gray-400">
+              <h5 className="font-medium mt-3 mb-1 text-zinc-600">4. STORNIERUNG</h5>
+              <p className="text-zinc-500">
                 Sie können Ihren Termin bis 24 Stunden vorher kostenlos stornieren. 
                 Bei späterer Stornierung kann eine Gebühr anfallen.
               </p>
 
-              <h5 className="font-medium mt-3 mb-1 text-gray-300">5. DATENSCHUTZ</h5>
-              <p className="text-gray-400">
+              <h5 className="font-medium mt-3 mb-1 text-zinc-600">5. DATENSCHUTZ</h5>
+              <p className="text-zinc-500">
                 Ihre Kreditkartendaten werden verschlüsselt über Stripe gespeichert und nach 90 Tagen automatisch gelöscht (DSGVO-konform).
               </p>
             </div>
@@ -188,7 +188,7 @@ export default function PaymentMethodStep({
               type="button"
               onClick={onBack}
               disabled={processing || loading}
-              className="flex-1 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-zinc-50 hover:bg-zinc-100 text-zinc-900 rounded-lg font-medium transition disabled:opacity-50"
             >
               Zurück
             </button>
@@ -196,7 +196,7 @@ export default function PaymentMethodStep({
           <button
             type="submit"
             disabled={!stripe || !policyAccepted || processing || loading}
-            className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-zinc-900 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {processing ? 'Wird verarbeitet...' : 'Weiter'}
           </button>

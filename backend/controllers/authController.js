@@ -60,7 +60,7 @@ export const register = async (req, res) => {
   try {
     const {
       email, password, firstName, lastName, name, role, phone,
-      companyName, companyAddress, companyCity, companyZip, plan, businessType, customBusinessType
+      companyName, companyAddress, companyCity, companyZip, plan, businessType
     } = req.body;
 
     // Combine firstName + lastName OR use name
@@ -157,7 +157,6 @@ export const register = async (req, res) => {
         email: email,
         phone: phone || '',
         businessType: selectedBusinessType,
-        ...(customBusinessType && selectedBusinessType === 'other' && { customBusinessTypeName: customBusinessType }),
         address: {
           street: companyAddress || '',
           city: companyCity || '',
@@ -1140,8 +1139,7 @@ export const forgotPassword = async (req, res) => {
     } catch (tokenError) {
       // Handle account lock error
       if (tokenError.message.includes('locked')) {
-        const minutesLeft = Math.ceil((user.passwordResetLockUntil - Date.now()) / (1000 * 60));
-        logger.warn(`🔒 ${tokenError.message} (${minutesLeft}m left) for email: ${normalizedEmail} from IP: ${clientIp}`);
+        logger.warn(`🔒 ${tokenError.message} for email: ${normalizedEmail} from IP: ${clientIp}`);
         return res.status(200).json({
           success: true,
           message: 'If this email is registered, a reset link will be sent'

@@ -146,7 +146,7 @@ const CampaignEditor = () => {
             <h1 className="text-3xl font-bold text-gray-900">
               {id ? 'Campaign bearbeiten' : 'Neue Campaign'}
             </h1>
-            <p className="text-gray-600">Konfiguriere deine Marketing-Kampagne</p>
+            <p className="text-zinc-500">Konfiguriere deine Marketing-Kampagne</p>
           </div>
         </div>
         <div className="flex gap-3">
@@ -162,7 +162,7 @@ const CampaignEditor = () => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Speichert...' : 'Speichern'}
@@ -280,7 +280,7 @@ const CampaignEditor = () => {
               rows={4}
               maxLength={320}
             />
-            <div className="text-xs text-gray-500 mb-4">
+            <div className="text-xs text-zinc-400 mb-4">
               Variablen: {'{{customerName}}'}, {'{{salonName}}'}, {'{{discount}}'}, {'{{discountCode}}'}, {'{{bookingLink}}'}, {'{{validDays}}'}
             </div>
 
@@ -370,7 +370,7 @@ const CampaignEditor = () => {
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white rounded-lg shadow-lg p-6 sticky top-6"
+              className="bg-white rounded-lg shadow-sm p-6 sticky top-6"
             >
               <h3 className="text-lg font-semibold mb-4">📊 Vorschau</h3>
 
@@ -393,7 +393,7 @@ const CampaignEditor = () => {
                   <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-700 border border-gray-200">
                     {preview.sampleMessage}
                   </div>
-                  <div className="text-xs text-gray-500 mt-2 text-right">
+                  <div className="text-xs text-zinc-400 mt-2 text-right">
                     {preview.sampleMessage.length} / 320 Zeichen
                   </div>
                 </div>
@@ -406,7 +406,7 @@ const CampaignEditor = () => {
                   </h4>
                   <div className="space-y-2">
                     {preview.recipients.map((r, i) => (
-                      <div key={i} className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                      <div key={i} className="text-xs text-zinc-500 bg-gray-50 p-2 rounded">
                         {r.name} ({r.phoneNumber})
                       </div>
                     ))}
@@ -486,7 +486,7 @@ const Slider = ({ label, value, onChange, min, max, step, unit = '' }) => (
       onChange={(e) => onChange(Number(e.target.value))}
       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
     />
-    <div className="flex justify-between text-xs text-gray-500 mt-1">
+    <div className="flex justify-between text-xs text-zinc-400 mt-1">
       <span>{min}{unit}</span>
       <span>{max}{unit}</span>
     </div>
@@ -498,7 +498,7 @@ const PreviewStat = ({ icon, label, value }) => (
   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
     <div className="flex items-center gap-3">
       <div className="text-blue-600">{icon}</div>
-      <span className="text-sm text-gray-600">{label}</span>
+      <span className="text-sm text-zinc-500">{label}</span>
     </div>
     <span className="text-lg font-semibold text-gray-900">{value}</span>
   </div>

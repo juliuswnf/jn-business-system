@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Building2, MapPin, Clock, Scissors, Link2, Code,
+import { 
+  Building2, MapPin, Clock, Scissors, Link2, Code, 
   Check, ChevronRight, ChevronLeft, Loader2, Copy, ExternalLink
 } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
@@ -79,10 +79,10 @@ export default function OnboardingWizard() {
     try {
       setLoading(true);
       const response = await salonAPI.getInfo().catch(() => null);
-
+      
       if (response?.data) {
         const salon = response.data;
-
+        
         setStudioInfo({
           name: salon.name || '',
           email: salon.email || '',
@@ -124,7 +124,6 @@ export default function OnboardingWizard() {
         })));
       }
     } catch (error) {
-      console.error('Load error:', error);
     } finally {
       setLoading(false);
     }
@@ -156,10 +155,10 @@ export default function OnboardingWizard() {
             setSaving(false);
             return;
           }
-          await salonAPI.update({
-            name: studioInfo.name,
-            email: studioInfo.email,
-            phone: studioInfo.phone
+          await salonAPI.update({ 
+            name: studioInfo.name, 
+            email: studioInfo.email, 
+            phone: studioInfo.phone 
           });
           break;
 
@@ -200,7 +199,6 @@ export default function OnboardingWizard() {
               }
             }
           } catch (serviceError) {
-            console.error('Service save error:', serviceError);
             showNotification('Fehler beim Speichern der Services: ' + (serviceError.response?.data?.message || serviceError.message), 'error');
             setSaving(false);
             return;
@@ -209,16 +207,12 @@ export default function OnboardingWizard() {
         }
 
         case 5:
-          await salonAPI.update({ googleReviewUrl: googleReviewLink });
+          await salonAPI.update({ googleReviewLink });
           break;
 
         case 6:
           // Complete onboarding
-          await salonAPI.update({
-            studioSetupCompleted: true,
-            'checklistSteps.widget.completed': true,
-            'checklistSteps.widget.completedAt': new Date()
-          });
+          await salonAPI.update({ onboardingCompleted: true });
           showNotification('Onboarding abgeschlossen! Dein Studio ist bereit.', 'success');
           navigate('/dashboard');
           return;
@@ -227,7 +221,6 @@ export default function OnboardingWizard() {
       setCurrentStep(prev => Math.min(prev + 1, 6));
       showNotification('Gespeichert!', 'success');
     } catch (error) {
-      console.error('Save error:', error);
       showNotification('Fehler beim Speichern', 'error');
     } finally {
       setSaving(false);
@@ -247,7 +240,7 @@ export default function OnboardingWizard() {
   };
 
   const updateService = (index, field, value) => {
-    setServices(prev => prev.map((s, i) =>
+    setServices(prev => prev.map((s, i) => 
       i === index ? { ...s, [field]: value } : s
     ));
   };
@@ -264,39 +257,39 @@ export default function OnboardingWizard() {
   };
 
   const updateHours = (index, field, value) => {
-    setOpeningHours(prev => prev.map((h, i) =>
+    setOpeningHours(prev => prev.map((h, i) => 
       i === index ? { ...h, [field]: value } : h
     ));
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       {/* Progress Bar */}
-      <div className="bg-zinc-900 border-b border-zinc-800">
+      <div className="bg-zinc-50 border-b border-zinc-200">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold">Studio einrichten</h1>
             <span className="text-sm text-zinc-400">Schritt {currentStep} von 6</span>
           </div>
-
+          
           {/* Step Indicators */}
           <div className="flex gap-2">
             {STEPS.map((step) => (
-              <div
+              <div 
                 key={step.id}
                 className={`flex-1 h-2 rounded-full transition-all ${
-                  step.id < currentStep
-                    ? 'bg-green-500'
-                    : step.id === currentStep
-                    ? 'bg-white'
+                  step.id < currentStep 
+                    ? 'bg-green-500' 
+                    : step.id === currentStep 
+                    ? 'bg-white' 
                     : 'bg-zinc-700'
                 }`}
               />
@@ -309,7 +302,7 @@ export default function OnboardingWizard() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Step Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-zinc-50 flex items-center justify-center mx-auto mb-4">
             {React.createElement(STEPS[currentStep - 1].icon, { className: 'w-8 h-8 text-white' })}
           </div>
           <h2 className="text-2xl font-bold mb-2">{STEPS[currentStep - 1].title}</h2>
@@ -317,8 +310,8 @@ export default function OnboardingWizard() {
         </div>
 
         {/* Step Content */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8">
-
+        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 mb-8">
+          
           {/* Step 1: Studio Info */}
           {currentStep === 1 && (
             <div className="space-y-4">
@@ -331,7 +324,7 @@ export default function OnboardingWizard() {
                   value={studioInfo.name}
                   onChange={(e) => setStudioInfo(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="z.B. Hairstyle Studio München"
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-white"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-white"
                 />
               </div>
               <div>
@@ -343,7 +336,7 @@ export default function OnboardingWizard() {
                   value={studioInfo.email}
                   onChange={(e) => setStudioInfo(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="kontakt@deinstudio.de"
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-white"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-white"
                 />
               </div>
               <div>
@@ -355,7 +348,7 @@ export default function OnboardingWizard() {
                   value={studioInfo.phone}
                   onChange={(e) => setStudioInfo(prev => ({ ...prev, phone: e.target.value }))}
                   placeholder="+49 89 123456"
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-white"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-white"
                 />
               </div>
             </div>
@@ -373,7 +366,7 @@ export default function OnboardingWizard() {
                   value={address.street}
                   onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
                   placeholder="Musterstraße 123"
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-white"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-white"
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
@@ -386,7 +379,7 @@ export default function OnboardingWizard() {
                     value={address.zip}
                     onChange={(e) => setAddress(prev => ({ ...prev, zip: e.target.value }))}
                     placeholder="80331"
-                    className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-white"
+                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-white"
                   />
                 </div>
                 <div className="col-span-2">
@@ -398,7 +391,7 @@ export default function OnboardingWizard() {
                     value={address.city}
                     onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
                     placeholder="München"
-                    className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-white"
+                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-white"
                   />
                 </div>
               </div>
@@ -411,7 +404,7 @@ export default function OnboardingWizard() {
               {openingHours.map((hours, index) => (
                 <div key={hours.day} className="flex items-center gap-4 py-2">
                   <span className="w-28 text-sm text-zinc-300">{hours.day}</span>
-
+                  
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -428,14 +421,14 @@ export default function OnboardingWizard() {
                         type="time"
                         value={hours.open}
                         onChange={(e) => updateHours(index, 'open', e.target.value)}
-                        className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm"
+                        className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
                       />
                       <span className="text-zinc-500">-</span>
                       <input
                         type="time"
                         value={hours.close}
                         onChange={(e) => updateHours(index, 'close', e.target.value)}
-                        className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm"
+                        className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
                       />
                     </>
                   )}
@@ -450,7 +443,7 @@ export default function OnboardingWizard() {
               {/* Quick Template */}
               <button
                 onClick={useTemplate}
-                className="w-full px-4 py-3 border border-dashed border-zinc-600 rounded-xl text-zinc-400 hover:text-white hover:border-zinc-500 transition text-sm"
+                className="w-full px-4 py-3 border border-dashed border-zinc-200 rounded-xl text-zinc-400 hover:text-zinc-900 hover:border-zinc-500 transition text-sm"
               >
                 Beispiel-Services verwenden
               </button>
@@ -463,14 +456,14 @@ export default function OnboardingWizard() {
                     value={service.name}
                     onChange={(e) => updateService(index, 'name', e.target.value)}
                     placeholder="Service Name"
-                    className="col-span-5 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm"
+                    className="col-span-5 px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
                   />
                   <div className="col-span-3 flex items-center gap-1">
                     <input
                       type="number"
                       value={service.duration}
                       onChange={(e) => updateService(index, 'duration', parseInt(e.target.value) || 0)}
-                      className="w-16 px-2 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm text-center"
+                      className="w-16 px-2 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm text-center"
                     />
                     <span className="text-xs text-zinc-500">min</span>
                   </div>
@@ -479,13 +472,13 @@ export default function OnboardingWizard() {
                       type="number"
                       value={service.price}
                       onChange={(e) => updateService(index, 'price', parseFloat(e.target.value) || 0)}
-                      className="w-16 px-2 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm text-center"
+                      className="w-16 px-2 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm text-center"
                     />
                     <span className="text-xs text-zinc-500">€</span>
                   </div>
                   <button
                     onClick={() => removeService(index)}
-                    className="col-span-1 text-zinc-500 hover:text-red-400"
+                    className="col-span-1 text-zinc-500 hover:text-red-600"
                   >
                     ×
                   </button>
@@ -494,7 +487,7 @@ export default function OnboardingWizard() {
 
               <button
                 onClick={addService}
-                className="w-full px-4 py-3 border border-dashed border-zinc-700 rounded-xl text-zinc-400 hover:text-white hover:border-zinc-500 transition"
+                className="w-full px-4 py-3 border border-dashed border-zinc-200 rounded-xl text-zinc-400 hover:text-zinc-900 hover:border-zinc-500 transition"
               >
                 + Service hinzufügen
               </button>
@@ -504,10 +497,10 @@ export default function OnboardingWizard() {
           {/* Step 5: Google Reviews */}
           {currentStep === 5 && (
             <div className="space-y-4">
-              <div className="bg-zinc-800 rounded-xl p-4 mb-4">
-                <h4 className="font-medium text-white mb-2">Wozu der Google Review Link?</h4>
+              <div className="bg-zinc-50 rounded-xl p-4 mb-4">
+                <h4 className="font-medium text-zinc-900 mb-2">Wozu der Google Review Link?</h4>
                 <p className="text-sm text-zinc-400">
-                  Nach jedem Termin senden wir automatisch eine E-Mail mit deinem Review-Link.
+                  Nach jedem Termin senden wir automatisch eine E-Mail mit deinem Review-Link. 
                   Das erhöht deine Google-Bewertungen erheblich!
                 </p>
               </div>
@@ -521,13 +514,13 @@ export default function OnboardingWizard() {
                   value={googleReviewLink}
                   onChange={(e) => setGoogleReviewLink(e.target.value)}
                   placeholder="https://g.page/r/..."
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-white"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-white"
                 />
               </div>
 
-              <a
-                href="https://support.google.com/business/answer/7035772"
-                target="_blank"
+              <a 
+                href="https://support.google.com/business/answer/7035772" 
+                target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
               >
@@ -541,29 +534,29 @@ export default function OnboardingWizard() {
           {currentStep === 6 && (
             <div className="space-y-4">
               <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-4">
-                <h4 className="font-medium text-green-400 mb-2">Fast geschafft!</h4>
+                <h4 className="font-medium text-green-600 mb-2">Fast geschafft!</h4>
                 <p className="text-sm text-zinc-300">
                   Kopiere diesen Code und füge ihn in deine Website ein, wo das Buchungsformular erscheinen soll.
                 </p>
               </div>
 
               <div className="relative">
-                <pre className="bg-zinc-800 rounded-xl p-4 text-sm text-zinc-300 overflow-x-auto">
+                <pre className="bg-zinc-50 rounded-xl p-4 text-sm text-zinc-300 overflow-x-auto">
                   {widgetCode || `<!-- JN Booking Widget -->
 <div id="jn-booking-widget" data-salon="${salonSlug || 'dein-studio'}"></div>
 <script src="${window.location.origin}/widget.js" async></script>`}
                 </pre>
                 <button
                   onClick={copyWidgetCode}
-                  className="absolute top-3 right-3 p-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition"
+                  className="absolute top-3 right-3 p-2 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition"
                 >
-                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                  {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
 
-              <div className="bg-zinc-800 rounded-xl p-4">
-                <h4 className="font-medium text-white mb-2">Deine Buchungs-URL:</h4>
-                <a
+              <div className="bg-zinc-50 rounded-xl p-4">
+                <h4 className="font-medium text-zinc-900 mb-2">Deine Buchungs-URL:</h4>
+                <a 
                   href={`/s/${salonSlug || 'dein-studio'}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -581,7 +574,7 @@ export default function OnboardingWizard() {
           <button
             onClick={handleBack}
             disabled={currentStep === 1}
-            className="flex items-center gap-2 px-6 py-3 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+            className="flex items-center gap-2 px-6 py-3 text-zinc-400 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
           >
             <ChevronLeft className="w-5 h-5" />
             Zurück

@@ -96,8 +96,8 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-none max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-start">
@@ -204,7 +204,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
                 type="checkbox"
                 checked={confirmed}
                 onChange={(e) => setConfirmed(e.target.checked)}
-                className="mt-1 mr-3 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                className="mt-1 mr-3 h-5 w-5 text-indigo-600 focus:ring-zinc-900 border-gray-300 rounded"
               />
               <span className="text-sm text-gray-700">
                 Ich habe verstanden, dass ich die oben aufgeführten Features verlieren werde und
@@ -241,7 +241,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
             <button
               onClick={handleDowngrade}
               disabled={!confirmed || loading}
-              className={`flex-1 py-3 px-6 rounded-lg font-semibold text-white transition-all ${
+              className={`flex-1 py-3 px-6 rounded-lg font-semibold text-zinc-900 transition-all ${
                 !confirmed || loading
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-red-600 hover:bg-red-700'

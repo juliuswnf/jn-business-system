@@ -53,12 +53,12 @@ const CustomerProfile = () => {
   return (
     <DashboardLayout title="My Profile" breadcrumbs={[{ label: 'Profile', path: '/customer/profile' }]}>
       <div className="max-w-2xl">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-lg shadow-sm p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-zinc-900 rounded-lg transition"
             >
               <FiEdit2 size={20} />
               {isEditing ? 'Cancel' : 'Edit'}

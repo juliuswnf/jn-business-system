@@ -5,11 +5,11 @@ export default function ServerError() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="text-7xl font-bold text-red-500 mb-4">500</div>
-        <h1 className="text-3xl font-bold mb-4 text-white">Server-Fehler</h1>
-        <p className="text-gray-200 mb-8">
+        <h1 className="text-3xl font-bold mb-4 text-zinc-900">Server-Fehler</h1>
+        <p className="text-zinc-700 mb-8">
           Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie später erneut.
         </p>
         <button

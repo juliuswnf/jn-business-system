@@ -2,6 +2,7 @@ import express from 'express';
 import SlotSuggestion from '../models/SlotSuggestion.js';
 import Booking from '../models/Booking.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -124,7 +125,7 @@ router.post('/accept/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error accepting slot suggestion:', error);
+    logger.error('Error accepting slot suggestion:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to accept slot suggestion',
@@ -169,7 +170,7 @@ router.post('/reject/:id', async (req, res) => {
     try {
       await suggestion.notifyNextCustomer();
     } catch (notifyError) {
-      console.error('Failed to notify next customer:', notifyError);
+      logger.error('Failed to notify next customer:', notifyError);
       // Continue even if notification fails
     }
 
@@ -184,7 +185,7 @@ router.post('/reject/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error rejecting slot suggestion:', error);
+    logger.error('Error rejecting slot suggestion:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to reject slot suggestion',
@@ -236,7 +237,7 @@ router.get('/:salonId', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching slot suggestions:', error);
+    logger.error('Error fetching slot suggestions:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch slot suggestions',
@@ -271,7 +272,7 @@ router.get('/urgent/:salonId', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching urgent slot suggestions:', error);
+    logger.error('Error fetching urgent slot suggestions:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch urgent slot suggestions',

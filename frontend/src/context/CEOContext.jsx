@@ -30,7 +30,6 @@ export const CEOProvider = ({ children }) => {
     } catch (err) {
       const errorMessage = err.response?.data?.error?.message || 'Failed to fetch dashboard';
       setError(errorMessage);
-      console.error('Dashboard error:', errorMessage);
       return null;
     } finally {
       setIsLoading(false);
@@ -52,7 +51,6 @@ export const CEOProvider = ({ children }) => {
     } catch (err) {
       const errorMessage = err.response?.data?.error?.message || 'Failed to fetch analytics';
       setError(errorMessage);
-      console.error('Analytics error:', errorMessage);
       return null;
     } finally {
       setIsLoading(false);
@@ -75,7 +73,6 @@ export const CEOProvider = ({ children }) => {
     } catch (err) {
       const errorMessage = err.response?.data?.error?.message || 'Failed to generate report';
       setError(errorMessage);
-      console.error('Report error:', errorMessage);
       return null;
     } finally {
       setIsLoading(false);
@@ -101,7 +98,6 @@ export const CEOProvider = ({ children }) => {
 
       return { success: true };
     } catch (err) {
-      console.error('Export error:', err);
       return { success: false };
     }
   }, []);

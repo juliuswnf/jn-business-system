@@ -35,7 +35,6 @@ export default function Workflows() {
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching workflows:', error);
       toast.error('Fehler beim Laden der Workflows');
       setLoading(false);
     }
@@ -49,7 +48,6 @@ export default function Workflows() {
       toast.success('Workflow aktiviert!');
       fetchData();
     } catch (error) {
-      console.error('Error enabling workflow:', error);
       toast.error(error.response?.data?.message || 'Fehler beim Aktivieren');
     }
   };
@@ -69,7 +67,7 @@ export default function Workflows() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Branchen-Workflows</h1>
+        <h1 className="text-3xl font-bold text-zinc-900 mb-2">Branchen-Workflows</h1>
         <p className="text-zinc-400">
           Aktiviere branchenspezifische Features für dein Business
         </p>
@@ -78,13 +76,13 @@ export default function Workflows() {
       {/* Active Workflows */}
       {activeWorkflows.length > 0 && (
         <div className="mb-8">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
-            <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
+            <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
               <div className="flex items-center gap-3">
                 <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="font-semibold text-white">Aktive Workflows ({activeWorkflows.length})</span>
+                <span className="font-semibold text-zinc-900">Aktive Workflows ({activeWorkflows.length})</span>
               </div>
             </div>
             <div className="p-6">
@@ -94,7 +92,7 @@ export default function Workflows() {
                     key={workflow._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-zinc-950 border-2 border-green-500/50 rounded-lg p-4"
+                    className="bg-zinc-50 border-2 border-green-500/50 rounded-lg p-4"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-2xl">{workflow.icon}</span>
@@ -102,15 +100,15 @@ export default function Workflows() {
                         Aktiv
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">
+                    <h3 className="text-lg font-semibold text-zinc-900 mb-2">
                       {workflow.displayName}
                     </h3>
-                    <p className="text-sm text-gray-400 mb-3">
+                    <p className="text-sm text-zinc-500 mb-3">
                       {workflow.description}
                     </p>
-                    <div className="bg-zinc-900 rounded-lg p-3 space-y-1">
+                    <div className="bg-zinc-50 rounded-lg p-3 space-y-1">
                       {workflow.features.slice(0, 3).map((feature) => (
-                        <div key={feature} className="flex items-center gap-2 text-gray-300 text-xs">
+                        <div key={feature} className="flex items-center gap-2 text-zinc-600 text-xs">
                           <svg className="w-3 h-3 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
@@ -128,13 +126,13 @@ export default function Workflows() {
 
       {/* Available Workflows */}
       <div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
-          <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
+          <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
             <div className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span className="font-semibold text-white">Verfügbare Workflows</span>
+              <span className="font-semibold text-zinc-900">Verfügbare Workflows</span>
             </div>
           </div>
           <div className="p-6">
@@ -147,22 +145,22 @@ export default function Workflows() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ scale: 1.02 }}
-                    className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 hover:border-cyan-500/30 transition cursor-pointer"
+                    className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 hover:border-cyan-500/30 transition cursor-pointer"
                   >
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-zinc-900 border border-zinc-800 rounded flex items-center justify-center">
+                      <div className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded flex items-center justify-center">
                         <span className="text-2xl">{industry.icon}</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-white">{industry.name}</h3>
-                        <p className="text-sm text-gray-400">{industry.description}</p>
+                        <h3 className="font-semibold text-zinc-900">{industry.name}</h3>
+                        <p className="text-sm text-zinc-500">{industry.description}</p>
                       </div>
                     </div>
 
                     <div className="mb-4">
-                      <div className="bg-zinc-900 rounded-lg p-3 space-y-1">
+                      <div className="bg-zinc-50 rounded-lg p-3 space-y-1">
                         {industry.defaultFeatures.slice(0, 3).map((feature) => (
-                          <div key={feature} className="flex items-center gap-2 text-gray-300 text-xs">
+                          <div key={feature} className="flex items-center gap-2 text-zinc-600 text-xs">
                             <svg className="w-3 h-3 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>

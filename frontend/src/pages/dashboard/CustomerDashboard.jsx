@@ -23,7 +23,6 @@ const CustomerDashboard = () => {
         const res = await bookingAPI.getMine({ limit: 100 });
         setBookings(res.data?.bookings || []);
       } catch (e) {
-        if (import.meta.env.DEV) console.error('Error fetching bookings:', e);
         showNotification(formatError(e) || 'Fehler beim Laden der Termine', 'error');
         setBookings([]);
       } finally {
@@ -59,32 +58,32 @@ const CustomerDashboard = () => {
           </div>
         </Link>
 
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
+        <div className="bg-zinc-50 border border-zinc-200 p-6 rounded-xl">
           <div className="flex items-center gap-3 mb-2">
-            <Calendar className="text-gray-300" size={24} />
-            <h3 className="font-semibold text-white">Kommende Termine</h3>
+            <Calendar className="text-zinc-600" size={24} />
+            <h3 className="font-semibold text-zinc-900">Kommende Termine</h3>
           </div>
-          <p className="text-3xl font-bold text-white">{bookings.filter(b => new Date(b.bookingDate) > new Date()).length}</p>
+          <p className="text-3xl font-bold text-zinc-900">{bookings.filter(b => new Date(b.bookingDate) > new Date()).length}</p>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
+        <div className="bg-zinc-50 border border-zinc-200 p-6 rounded-xl">
           <div className="flex items-center gap-3 mb-2">
-            <Clock className="text-gray-300" size={24} />
-            <h3 className="font-semibold text-white">Vergangene Termine</h3>
+            <Clock className="text-zinc-600" size={24} />
+            <h3 className="font-semibold text-zinc-900">Vergangene Termine</h3>
           </div>
-          <p className="text-3xl font-bold text-white">{bookings.filter(b => new Date(b.bookingDate) <= new Date()).length}</p>
+          <p className="text-3xl font-bold text-zinc-900">{bookings.filter(b => new Date(b.bookingDate) <= new Date()).length}</p>
         </div>
       </div>
 
       {/* Upcoming Bookings */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-white">Ihre Termine</h2>
+      <div className="bg-white border border-zinc-200 rounded-xl p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4 text-zinc-900">Ihre Termine</h2>
 
         {bookings.length === 0 ? (
           <div className="text-center py-12">
-            <Calendar className="mx-auto text-gray-600 mb-4" size={48} />
-            <h3 className="text-lg font-medium text-gray-300 mb-2">Keine Termine gefunden</h3>
-            <p className="text-gray-600 mb-6">Sie haben noch keine Termine gebucht.</p>
+            <Calendar className="mx-auto text-zinc-500 mb-4" size={48} />
+            <h3 className="text-lg font-medium text-zinc-600 mb-2">Keine Termine gefunden</h3>
+            <p className="text-zinc-500 mb-6">Sie haben noch keine Termine gebucht.</p>
             <Link
               to="/customer/booking"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-100 transition"
@@ -98,23 +97,23 @@ const CustomerDashboard = () => {
             {bookings.map((booking) => (
               <div
                 key={booking._id}
-                className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                className="flex items-center justify-between p-4 bg-zinc-50/50 rounded-lg"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-zinc-700/50 rounded-lg flex items-center justify-center">
-                    <Calendar className="text-white" size={24} />
+                  <div className="w-12 h-12 bg-zinc-100 rounded-lg flex items-center justify-center">
+                    <Calendar className="text-zinc-900" size={24} />
                   </div>
                   <div>
-                    <h4 className="font-medium text-white">{booking.serviceId?.name || 'Service'}</h4>
-                    <p className="text-sm text-gray-300">
+                    <h4 className="font-medium text-zinc-900">{booking.serviceId?.name || 'Service'}</h4>
+                    <p className="text-sm text-zinc-600">
                       {new Date(booking.bookingDate).toLocaleDateString('de-DE')} um{' '}
                       {new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="text-gray-600" size={16} />
-                  <span className="text-sm text-gray-300">{booking.status || '-'}</span>
+                  <MapPin className="text-zinc-500" size={16} />
+                  <span className="text-sm text-zinc-600">{booking.status || '-'}</span>
                 </div>
               </div>
             ))}
@@ -123,23 +122,23 @@ const CustomerDashboard = () => {
       </div>
 
       {/* Account Info */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4 text-white">Kontoinformationen</h2>
+      <div className="bg-white border border-zinc-200 rounded-xl p-6">
+        <h2 className="text-xl font-semibold mb-4 text-zinc-900">Kontoinformationen</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center gap-3 p-4 bg-gray-800/50 rounded-lg">
-            <User className="text-gray-300" size={20} />
+          <div className="flex items-center gap-3 p-4 bg-zinc-50/50 rounded-lg">
+            <User className="text-zinc-600" size={20} />
             <div>
-              <p className="text-sm text-gray-300">Name</p>
-              <p className="font-medium text-white">{user?.name || '-'}</p>
+              <p className="text-sm text-zinc-600">Name</p>
+              <p className="font-medium text-zinc-900">{user?.name || '-'}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-4 bg-gray-800/50 rounded-lg">
-            <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-3 p-4 bg-zinc-50/50 rounded-lg">
+            <svg className="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             <div>
-              <p className="text-sm text-gray-300">E-Mail</p>
-              <p className="font-medium text-white">{user?.email || '-'}</p>
+              <p className="text-sm text-zinc-600">E-Mail</p>
+              <p className="font-medium text-zinc-900">{user?.email || '-'}</p>
             </div>
           </div>
         </div>

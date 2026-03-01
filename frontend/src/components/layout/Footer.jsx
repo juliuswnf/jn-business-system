@@ -7,53 +7,53 @@ const Footer = () => {
   const { user } = useAuth();
 
   return (
-    <footer className="bg-black border-t border-gray-800 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-white border-t border-zinc-100 text-zinc-500">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-white flex items-center justify-center">
-                <span className="font-bold text-black">JN</span>
+              <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
+                <span className="font-bold text-zinc-900 text-sm">JN</span>
               </div>
               <div>
-                <h3 className="text-white font-semibold">JN Business System</h3>
-                <p className="text-gray-300 text-xs">Terminbuchungen leicht gemacht</p>
+                <h3 className="text-zinc-900 font-semibold text-sm">JN Business System</h3>
+                <p className="text-zinc-400 text-xs">Terminbuchungen leicht gemacht</p>
               </div>
             </Link>
           </div>
 
           {/* Navigation */}
           <div>
-            <h4 className="text-white font-medium mb-4">Navigation</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className="text-zinc-900 font-medium text-sm mb-4">Navigation</h4>
+            <ul className="space-y-2.5 text-sm">
               <li>
-                <Link to="/" className="text-gray-400 hover:text-white transition">
+                <Link to="/" className="text-zinc-400 hover:text-zinc-900 transition">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/salons" className="text-gray-400 hover:text-white transition">
+                <Link to="/salons" className="text-zinc-400 hover:text-zinc-900 transition">
                   Anbieter
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="text-gray-400 hover:text-white transition">
+                <Link to="/pricing" className="text-zinc-400 hover:text-zinc-900 transition">
                   Preise
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-gray-400 hover:text-white transition">
+                <Link to="/faq" className="text-zinc-400 hover:text-zinc-900 transition">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/login" className="text-gray-400 hover:text-white transition">
+                <Link to="/login" className="text-zinc-400 hover:text-zinc-900 transition">
                   Anmelden
                 </Link>
               </li>
               <li>
-                <Link to="/login/business" className="text-gray-400 hover:text-white transition">
+                <Link to="/login/business" className="text-zinc-400 hover:text-zinc-900 transition">
                   Registrieren
                 </Link>
               </li>
@@ -63,25 +63,25 @@ const Footer = () => {
           {/* Produkt - nur für Business User */}
           {user && (user.role === 'salon_owner' || user.role === 'employee' || user.role === 'ceo') && (
             <div>
-              <h4 className="text-white font-medium mb-4">Für Unternehmen</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-zinc-900 font-medium text-sm mb-4">Für Unternehmen</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li>
-                  <Link to="/dashboard" className="text-gray-400 hover:text-white transition">
+                  <Link to="/dashboard" className="text-zinc-400 hover:text-zinc-900 transition">
                     Dashboard
                   </Link>
                 </li>
                 <li>
-                  <Link to="/dashboard/bookings" className="text-gray-400 hover:text-white transition">
+                  <Link to="/dashboard/bookings" className="text-zinc-400 hover:text-zinc-900 transition">
                     Termine
                   </Link>
                 </li>
                 <li>
-                  <Link to="/dashboard/services" className="text-gray-400 hover:text-white transition">
+                  <Link to="/dashboard/services" className="text-zinc-400 hover:text-zinc-900 transition">
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link to="/dashboard/widget" className="text-gray-400 hover:text-white transition">
+                  <Link to="/dashboard/widget" className="text-zinc-400 hover:text-zinc-900 transition">
                     Widget
                   </Link>
                 </li>
@@ -92,20 +92,20 @@ const Footer = () => {
           {/* Für Kunden */}
           {user && user.role === 'customer' && (
             <div>
-              <h4 className="text-white font-medium mb-4">Mein Konto</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-zinc-900 font-medium text-sm mb-4">Mein Konto</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li>
-                  <Link to="/customer/dashboard" className="text-gray-400 hover:text-white transition">
+                  <Link to="/customer/dashboard" className="text-zinc-400 hover:text-zinc-900 transition">
                     Meine Termine
                   </Link>
                 </li>
                 <li>
-                  <Link to="/customer/booking" className="text-gray-400 hover:text-white transition">
+                  <Link to="/customer/booking" className="text-zinc-400 hover:text-zinc-900 transition">
                     Neuer Termin
                   </Link>
                 </li>
                 <li>
-                  <Link to="/salons" className="text-gray-400 hover:text-white transition">
+                  <Link to="/salons" className="text-zinc-400 hover:text-zinc-900 transition">
                     Anbieter finden
                   </Link>
                 </li>
@@ -116,20 +116,20 @@ const Footer = () => {
           {/* Für nicht-angemeldete User */}
           {!user && (
             <div>
-              <h4 className="text-white font-medium mb-4">Für Unternehmen</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-zinc-900 font-medium text-sm mb-4">Für Unternehmen</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li>
-                  <Link to="/demo" className="text-gray-400 hover:text-white transition">
+                  <Link to="/demo" className="text-zinc-400 hover:text-zinc-900 transition">
                     Demo ansehen
                   </Link>
                 </li>
                 <li>
-                  <Link to="/pricing" className="text-gray-400 hover:text-white transition">
+                  <Link to="/pricing" className="text-zinc-400 hover:text-zinc-900 transition">
                     Preise
                   </Link>
                 </li>
                 <li>
-                  <Link to="/login/business" className="text-gray-400 hover:text-white transition">
+                  <Link to="/login/business" className="text-zinc-400 hover:text-zinc-900 transition">
                     Jetzt starten
                   </Link>
                 </li>
@@ -139,20 +139,20 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h4 className="text-white font-medium mb-4">Rechtliches</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className="text-zinc-900 font-medium text-sm mb-4">Rechtliches</h4>
+            <ul className="space-y-2.5 text-sm">
               <li>
-                <Link to="/impressum" className="text-gray-400 hover:text-white transition">
+                <Link to="/impressum" className="text-zinc-400 hover:text-zinc-900 transition">
                   Impressum
                 </Link>
               </li>
               <li>
-                <Link to="/datenschutz" className="text-gray-400 hover:text-white transition">
+                <Link to="/datenschutz" className="text-zinc-400 hover:text-zinc-900 transition">
                   Datenschutz
                 </Link>
               </li>
               <li>
-                <Link to="/agb" className="text-gray-400 hover:text-white transition">
+                <Link to="/agb" className="text-zinc-400 hover:text-zinc-900 transition">
                   AGB
                 </Link>
               </li>
@@ -161,16 +161,16 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row md:justify-between gap-4">
-          <p className="text-sm text-gray-300">
+        <div className="mt-14 pt-8 border-t border-zinc-100 flex flex-col md:flex-row md:justify-between gap-4">
+          <p className="text-sm text-zinc-400">
             © {currentYear} JN Business System. Alle Rechte vorbehalten.
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <a
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition"
+              className="text-zinc-300 hover:text-zinc-900 transition"
               aria-label="Folge uns auf Instagram"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -181,7 +181,7 @@ const Footer = () => {
               href="https://linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition"
+              className="text-zinc-300 hover:text-zinc-900 transition"
               aria-label="Verbinde dich mit uns auf LinkedIn"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -190,7 +190,7 @@ const Footer = () => {
             </a>
             <a
               href="mailto:info@jn-business-system.de"
-              className="text-gray-300 hover:text-white transition"
+              className="text-zinc-300 hover:text-zinc-900 transition"
               aria-label="Kontaktiere uns per E-Mail"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

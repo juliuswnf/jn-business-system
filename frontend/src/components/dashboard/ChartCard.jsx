@@ -21,11 +21,11 @@ const ChartCard = ({
   className = ''
 }) => {
   return (
-    <div className={`bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden ${className}`}>
+    <div className={`bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+      <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          <h3 className="text-lg font-semibold text-zinc-900">{title}</h3>
           
           {/* Actions */}
           <div className="flex items-center gap-2">
@@ -33,7 +33,7 @@ const ChartCard = ({
               <button
                 onClick={onRefresh}
                 disabled={loading}
-                className="p-2 hover:bg-zinc-700 rounded transition disabled:opacity-50 text-gray-400 hover:text-white"
+                className="p-2 hover:bg-zinc-100 rounded transition disabled:opacity-50 text-zinc-500 hover:text-zinc-900"
                 title="Refresh"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,7 +45,7 @@ const ChartCard = ({
             {onMore && (
               <button
                 onClick={onMore}
-                className="p-2 hover:bg-zinc-700 rounded transition text-gray-400 hover:text-white"
+                className="p-2 hover:bg-zinc-100 rounded transition text-zinc-500 hover:text-zinc-900"
                 title="More options"
               >
                 <FiMoreVertical size={20} />
@@ -58,7 +58,7 @@ const ChartCard = ({
       {/* Content */}
       <div className="relative p-6">
         {loading && (
-          <div className="absolute inset-0 bg-zinc-900 bg-opacity-50 flex items-center justify-center rounded z-10">
+          <div className="absolute inset-0 bg-zinc-50 bg-opacity-50 flex items-center justify-center rounded z-10">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
           </div>
         )}

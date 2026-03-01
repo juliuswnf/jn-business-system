@@ -45,7 +45,6 @@ import authRoutes from './routes/authRoutes.js';
 import salonRoutes from './routes/salonRoutes.js';
 import publicBookingRoutes from './routes/publicBookingRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
-import stripeConnectRoutes from './routes/stripeConnectRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import subscriptionManagementRoutes from './routes/subscriptionManagement.js';
@@ -106,7 +105,7 @@ import stripeWebhookController from './controllers/stripeWebhookController.js';
 
 // Initialize Express App
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const ENVIRONMENT = process.env.NODE_ENV || 'development';
 
 /**

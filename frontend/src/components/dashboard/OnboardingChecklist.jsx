@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import {
-  Building2, MapPin, Clock, Scissors, Link2, Code,
-  Check, ChevronRight, X, Sparkles
+import { 
+  Building2, MapPin, Clock, Scissors, Link2, Code, 
+  Check, ChevronRight, X, Sparkles 
 } from 'lucide-react';
 import { salonAPI, serviceAPI } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
@@ -18,7 +17,6 @@ const CHECKLIST_ITEMS = [
 ];
 
 export default function OnboardingChecklist() {
-  const location = useLocation();
   const [checklist, setChecklist] = useState({
     info: false,
     address: false,
@@ -33,67 +31,35 @@ export default function OnboardingChecklist() {
 
   useEffect(() => {
     checkOnboardingStatus();
-  }, [location.pathname]);
-
-  const hasConfiguredBusinessHours = (businessHours) => {
-    if (!businessHours || typeof businessHours !== 'object') return false;
-
-    const days = Object.values(businessHours);
-    return days.some((day) => {
-      if (!day || typeof day !== 'object') return false;
-      if (day.closed === true) return false;
-      return Boolean(day.open && day.close);
-    });
-  };
-
-  const normalizeServices = (servicesRes) => {
-    const payload = servicesRes?.data;
-    if (Array.isArray(payload?.data)) return payload.data;
-    if (Array.isArray(payload?.services)) return payload.services;
-    if (Array.isArray(payload)) return payload;
-    return [];
-  };
+  }, []);
 
   const checkOnboardingStatus = async () => {
     try {
       const [salonRes, servicesRes] = await Promise.all([
-        salonAPI.getInfo(true).catch(() => ({ data: {} })),
-        serviceAPI.getAll(null, true).catch(() => ({ data: { data: [] } }))
+        salonAPI.getInfo().catch(() => ({ data: {} })),
+        serviceAPI.getAll().catch(() => ({ data: { data: [] } }))
       ]);
 
-      const salonData = salonRes?.data?.salon || salonRes?.data || {};
-      const services = normalizeServices(servicesRes);
+      const salon = salonRes.data || {};
+      const services = servicesRes.data?.data || [];
 
       const status = {
-        info: !!(salonData.name && salonData.email),
-        address: !!(salonData.address?.city),
-        hours: hasConfiguredBusinessHours(salonData.businessHours),
+        info: !!(salon.name && salon.email),
+        address: !!(salon.address?.city),
+        hours: !!(salon.openingHours?.length > 0),
         services: services.length > 0,
-        google: !!(salonData.googleReviewUrl || salonData.googleReviewLink),
-        widget: !!(salonData.widgetConfigured || salonData.checklistSteps?.widget?.completed),
+        google: !!salon.googleReviewLink,
+        widget: !!salon.onboardingCompleted,
       };
 
       setChecklist(status);
-
-      const total = CHECKLIST_ITEMS.length;
+      
       const completed = Object.values(status).filter(Boolean).length;
-      const isCompleted = completed === total;
+      setProgress(Math.round((completed / 6) * 100));
 
-      setProgress(Math.round((completed / total) * 100));
-
-      if (isCompleted && !salonData.studioSetupCompleted) {
-        await salonAPI.update({
-          studioSetupCompleted: true,
-          checklistCompletedAt: new Date().toISOString(),
-          checklistDismissed: false
-        }).catch(() => null);
-      }
-
-      // If all done or dismissed by user via server state
-      if (isCompleted || salonData.studioSetupCompleted || salonData.checklistCompletedAt || salonData.checklistDismissed) {
+      // If all done or previously dismissed
+      if (completed === 6 || localStorage.getItem('onboardingDismissed') === 'true') {
         setDismissed(true);
-      } else {
-        setDismissed(false);
       }
     } catch (error) {
       captureError(error, { context: 'checkOnboarding' });
@@ -102,14 +68,9 @@ export default function OnboardingChecklist() {
     }
   };
 
-  const handleDismiss = async () => {
-    try {
-      await salonAPI.update({ checklistDismissed: true });
-      setDismissed(true);
-    } catch (error) {
-      console.error('Error dismissing checklist:', error);
-      captureError(error, { context: 'dismissChecklist' });
-    }
+  const handleDismiss = () => {
+    localStorage.setItem('onboardingDismissed', 'true');
+    setDismissed(true);
   };
 
   if (loading || dismissed || progress === 100) {
@@ -125,14 +86,14 @@ export default function OnboardingChecklist() {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-indigo-400" />
+            <Sparkles className="w-5 h-5 text-zinc-900" />
           </div>
           <div>
-            <h3 className="font-semibold text-white">Studio einrichten</h3>
+            <h3 className="font-semibold text-zinc-900">Studio einrichten</h3>
             <p className="text-sm text-zinc-400">{completedCount} von 6 Schritten erledigt</p>
           </div>
         </div>
-        <button
+        <button 
           onClick={handleDismiss}
           className="p-1 text-zinc-500 hover:text-zinc-300 transition"
         >
@@ -141,8 +102,8 @@ export default function OnboardingChecklist() {
       </div>
 
       {/* Progress Bar */}
-      <div className="h-2 bg-zinc-800 rounded-full mb-4 overflow-hidden">
-        <div
+      <div className="h-2 bg-zinc-50 rounded-full mb-4 overflow-hidden">
+        <div 
           className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
@@ -150,18 +111,18 @@ export default function OnboardingChecklist() {
 
       {/* Checklist Items */}
       <div className="space-y-2">
-        {CHECKLIST_ITEMS.map((item) => {
+        {CHECKLIST_ITEMS.slice(0, 4).map((item) => {
           const isCompleted = checklist[item.id];
           const Icon = item.icon;
-
+          
           return (
-            <Link
+            <Link 
               key={item.id}
               to={item.link}
               className={`flex items-center justify-between p-3 rounded-xl transition ${
-                isCompleted
-                  ? 'bg-green-500/10 border border-green-500/20'
-                  : 'bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600'
+                isCompleted 
+                  ? 'bg-green-500/10 border border-green-500/20' 
+                  : 'bg-zinc-50/50 border border-zinc-200 hover:border-zinc-200'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -174,7 +135,7 @@ export default function OnboardingChecklist() {
                     <Icon className="w-4 h-4 text-zinc-400" />
                   )}
                 </div>
-                <span className={`text-sm ${isCompleted ? 'text-green-400 line-through' : 'text-white'}`}>
+                <span className={`text-sm ${isCompleted ? 'text-green-400 line-through' : 'text-zinc-900'}`}>
                   {item.label}
                 </span>
               </div>
@@ -190,7 +151,7 @@ export default function OnboardingChecklist() {
       {remainingItems.length > 0 && (
         <Link
           to="/onboarding"
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white font-medium transition"
+          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-zinc-900 font-medium transition"
         >
           Weiter einrichten
           <ChevronRight className="w-4 h-4" />

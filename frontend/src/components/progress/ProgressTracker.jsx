@@ -84,7 +84,7 @@ export default function ProgressTracker({ customerId, trainerId }) {
         </div>
         <button
           onClick={() => setShowAddEntry(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-zinc-900 rounded-lg hover:bg-blue-600 transition-colors"
         >
           <Upload className="w-5 h-5" />
           <span>Log Progress</span>
@@ -128,7 +128,7 @@ export default function ProgressTracker({ customerId, trainerId }) {
       )}
 
       {/* Chart Section */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         {/* Metric Selector */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900">Progress Charts</h2>
@@ -181,7 +181,7 @@ export default function ProgressTracker({ customerId, trainerId }) {
       </div>
 
       {/* Photo Comparison */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900 flex items-center">
             <Camera className="w-6 h-6 mr-2 text-blue-500" />
@@ -203,7 +203,7 @@ export default function ProgressTracker({ customerId, trainerId }) {
       </div>
 
       {/* Progress Entries Timeline */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
+      <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Progress Timeline</h2>
         <ProgressTimeline entries={progressData} />
       </div>
@@ -223,7 +223,7 @@ function SummaryCard({ title, value, unit, trend, icon: Icon, color }) {
   const TrendIcon = trend === 'down' ? TrendingDown : TrendingUp;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-100">
+    <div className="bg-white rounded-xl shadow-sm p-6 border-2 border-gray-100">
       <div className="flex items-center justify-between mb-4">
         <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center`}>
           <Icon className="w-6 h-6 text-white" />
@@ -235,7 +235,7 @@ function SummaryCard({ title, value, unit, trend, icon: Icon, color }) {
       <h3 className="text-sm text-gray-600 mb-1">{title}</h3>
       <div className="flex items-baseline">
         <span className="text-3xl font-bold text-gray-900">{Math.abs(value)}</span>
-        <span className="ml-2 text-gray-500">{unit}</span>
+        <span className="ml-2 text-zinc-400">{unit}</span>
       </div>
     </div>
   );
@@ -393,8 +393,8 @@ function PhotoGallery({ entries }) {
 
   if (entriesWithPhotos.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <Camera className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+      <div className="text-center py-8 text-zinc-400">
+        <Camera className="w-16 h-16 mx-auto mb-4 text-zinc-600" />
         <p>No progress photos yet</p>
       </div>
     );
@@ -404,14 +404,14 @@ function PhotoGallery({ entries }) {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {entriesWithPhotos.map((entry) => (
         entry.photos.map((photo, idx) => (
-          <div key={`${entry._id}-${idx}`} className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+          <div key={`${entry._id}-${idx}`} className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-none transition-shadow">
             <img
               src={photo.url}
               alt={`Progress ${photo.type}`}
               className="w-full h-full object-cover"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-              <p className="text-white text-sm font-medium">{photo.type}</p>
+              <p className="text-zinc-900 text-sm font-medium">{photo.type}</p>
               <p className="text-white/80 text-xs">
                 {new Date(entry.entryDate).toLocaleDateString()}
               </p>
@@ -439,7 +439,7 @@ function PhotoComparison({ entries }) {
 
   if (entriesWithPhotos.length < 2) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-zinc-400">
         <p>Need at least 2 progress photos to compare</p>
       </div>
     );
@@ -458,7 +458,7 @@ function PhotoComparison({ entries }) {
             </p>
           </div>
           {entry.photos.map((photo, photoIdx) => (
-            <div key={photoIdx} className="aspect-square rounded-lg overflow-hidden shadow-lg">
+            <div key={photoIdx} className="aspect-square rounded-lg overflow-hidden shadow-sm">
               <img
                 src={photo.url}
                 alt={`${photo.type}`}
@@ -476,7 +476,7 @@ function PhotoComparison({ entries }) {
 function ProgressTimeline({ entries }) {
   if (entries.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-zinc-400">
         <p>No progress entries yet</p>
       </div>
     );
@@ -501,7 +501,7 @@ function ProgressTimeline({ entries }) {
                     day: 'numeric'
                   })}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-zinc-400">
                   by {entry.trainerId?.name || 'Trainer'}
                 </p>
               </div>
@@ -514,19 +514,19 @@ function ProgressTimeline({ entries }) {
             <div className="grid grid-cols-3 gap-4 mb-3">
               {entry.weight && (
                 <div>
-                  <p className="text-xs text-gray-500">Weight</p>
+                  <p className="text-xs text-zinc-400">Weight</p>
                   <p className="font-semibold text-gray-900">{entry.weight} kg</p>
                 </div>
               )}
               {entry.bodyFatPercentage && (
                 <div>
-                  <p className="text-xs text-gray-500">Body Fat</p>
+                  <p className="text-xs text-zinc-400">Body Fat</p>
                   <p className="font-semibold text-gray-900">{entry.bodyFatPercentage}%</p>
                 </div>
               )}
               {entry.muscleMass && (
                 <div>
-                  <p className="text-xs text-gray-500">Muscle Mass</p>
+                  <p className="text-xs text-zinc-400">Muscle Mass</p>
                   <p className="font-semibold text-gray-900">{entry.muscleMass} kg</p>
                 </div>
               )}

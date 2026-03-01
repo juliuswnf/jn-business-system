@@ -11,7 +11,7 @@ const Widget = ({ salonSlug }) => {
       {!showBooking ? (
         <button
           onClick={() => setShowBooking(true)}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-6 py-3 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700"
         >
           Jetzt buchen
         </button>

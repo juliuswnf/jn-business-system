@@ -84,7 +84,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
         className={`
-          relative p-8 rounded-2xl border-4 shadow-2xl mb-8
+          relative p-8 rounded-2xl border-4 shadow-none mb-8
           ${getTierColor(recommendation.recommendedTier)}
         `}
       >
@@ -171,7 +171,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           whileTap={{ scale: 0.98 }}
           onClick={() => handleSelectTier(recommendation.recommendedTier)}
           disabled={loading}
-          className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-zinc-900 font-bold rounded-xl shadow-sm hover:shadow-none transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Wird geladen...' : `${recommendation.tierDetails.name.toUpperCase()} WÄHLEN`}
         </motion.button>
@@ -198,7 +198,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
                   className="relative p-6 rounded-xl border-2 border-green-500 bg-green-50"
                 >
                   <div className="absolute top-2 right-2">
-                    <span className="text-xs font-semibold bg-green-600 text-white px-2 py-1 rounded">
+                    <span className="text-xs font-semibold bg-green-600 text-zinc-900 px-2 py-1 rounded">
                       EMPFOHLEN
                     </span>
                   </div>

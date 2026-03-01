@@ -1,6 +1,8 @@
 ﻿import mongoose from 'mongoose';
 import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 
+const PHONE_REGEX = /^\+?[0-9\s().-]{7,20}$/;
+
 const bookingSchema = new mongoose.Schema(
   {
     // ==================== Salon Reference ====================
@@ -176,7 +178,8 @@ const bookingSchema = new mongoose.Schema(
     customerPhone: {
       type: String,
       trim: true,
-      default: null
+      default: null,
+      match: [PHONE_REGEX, 'Valid phone number required']
     },
 
     // Optional: Link to Customer account if they create one later
@@ -531,6 +534,7 @@ bookingSchema.index({ deletedAt: 1 }); // For soft delete queries
 bookingSchema.index({ customerId: 1, bookingDate: -1 }); // ? Customer booking history (descending)
 bookingSchema.index({ salonId: 1, createdAt: -1 }); // ? Recent bookings per salon
 bookingSchema.index({ paymentStatus: 1, bookingDate: 1 }); // ? Payment tracking
+bookingSchema.index({ salonId: 1, customerId: 1, bookingDate: -1 });
 
 // ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
 

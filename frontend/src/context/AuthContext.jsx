@@ -50,7 +50,6 @@ export const AuthProvider = ({ children }) => {
         
         // Only log if it's not an expected 401 (user not logged in)
         if (!isExpected401 && err.response?.status !== 401) {
-          console.error('Auth initialization error:', err);
         }
       } finally {
         if (isMounted) {

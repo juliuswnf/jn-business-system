@@ -1,238 +1,225 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Scissors,
-  Sparkles,
-  Heart,
-  Droplet,
-  Zap,
-  Palette,
-  Briefcase,
-  PawPrint,
-  Check
+import { 
+  Scissors, 
+  Sparkles, 
+  Flower2, 
+  Syringe, 
+  Dumbbell, 
+  Heart, 
+  CircleDot,
+  PaintBrush,
+  Hand,
+  Waves,
+  Activity,
+  Layers,
+  Building
 } from 'lucide-react';
 
 const BUSINESS_TYPES = [
   {
-    id: 'salon',
-    name: 'Friseursalon',
+    id: 'hair-salon',
+    name: 'Hair Salon',
     icon: Scissors,
-    description: 'Haarschnitte/Styling',
-    color: 'pink-500'
+    color: 'from-purple-500 to-pink-500',
+    features: ['Online Booking', 'Staff Management', 'Payment Processing', 'Customer Reviews'],
+    terminology: { service: 'Service', staff: 'Stylist', appointment: 'Appointment' }
   },
   {
-    id: 'tattoo',
-    name: 'Tattoo-Studio',
+    id: 'beauty-salon',
+    name: 'Beauty Salon',
     icon: Sparkles,
-    description: 'Tattoo-Services',
-    color: 'purple-500'
+    color: 'from-pink-500 to-rose-500',
+    features: ['Multi-Service Bookings', 'Product Sales', 'Loyalty Programs', 'Gift Cards'],
+    terminology: { service: 'Treatment', staff: 'Beautician', appointment: 'Appointment' }
   },
   {
-    id: 'medical',
-    name: 'Medical Spa',
+    id: 'spa-wellness',
+    name: 'Spa & Wellness',
+    icon: Flower2,
+    color: 'from-green-500 to-teal-500',
+    features: ['Room Management', 'Package Deals', 'Membership Plans', 'Retail Integration'],
+    terminology: { service: 'Treatment', staff: 'Therapist', appointment: 'Session' }
+  },
+  {
+    id: 'tattoo-piercing',
+    name: 'Tattoo & Piercing',
+    icon: PaintBrush,
+    color: 'from-slate-600 to-slate-800',
+    features: ['Portfolio Showcase', 'Custom Design Requests', 'Consent Forms', 'Aftercare Instructions'],
+    terminology: { service: 'Tattoo/Piercing', staff: 'Artist', appointment: 'Session' }
+  },
+  {
+    id: 'medical-aesthetics',
+    name: 'Medical Aesthetics',
+    icon: Syringe,
+    color: 'from-blue-500 to-indigo-500',
+    features: ['HIPAA Compliance', 'Clinical Notes', 'Medical History', 'Encrypted Records', 'Consent Management'],
+    terminology: { service: 'Treatment', staff: 'Practitioner', appointment: 'Consultation' }
+  },
+  {
+    id: 'personal-training',
+    name: 'Personal Training',
+    icon: Dumbbell,
+    color: 'from-orange-500 to-red-500',
+    features: ['Progress Tracking', 'Session Packages', 'Performance Metrics', 'Photo Documentation', 'Video Sessions'],
+    terminology: { service: 'Session', staff: 'Trainer', appointment: 'Training' }
+  },
+  {
+    id: 'physiotherapy',
+    name: 'Physiotherapy',
     icon: Heart,
-    description: 'Botox/Fillers',
-    color: 'red-500'
-  },
-  {
-    id: 'wellness',
-    name: 'Wellness-Spa',
-    icon: Droplet,
-    description: 'Massagen',
-    color: 'cyan-500'
+    color: 'from-red-500 to-pink-500',
+    features: ['HIPAA Compliance', 'Treatment Plans', 'Progress Tracking', 'Clinical Notes', 'Insurance Integration'],
+    terminology: { service: 'Treatment', staff: 'Physiotherapist', appointment: 'Session' }
   },
   {
     id: 'barbershop',
     name: 'Barbershop',
-    icon: Zap,
-    description: 'Herrenhaare',
-    color: 'amber-500'
+    icon: Scissors,
+    color: 'from-gray-700 to-gray-900',
+    features: ['Walk-in Queue', 'Membership Plans', 'Product Sales', 'Loyalty Rewards'],
+    terminology: { service: 'Service', staff: 'Barber', appointment: 'Appointment' }
   },
   {
-    id: 'beauty',
-    name: 'Beauty Studio',
-    icon: Palette,
-    description: 'Kosmetik',
-    color: 'fuchsia-500'
+    id: 'nail-salon',
+    name: 'Nail Salon',
+    icon: Hand,
+    color: 'from-fuchsia-500 to-pink-500',
+    features: ['Multi-Service Combos', 'Design Gallery', 'Product Retail', 'Membership Discounts'],
+    terminology: { service: 'Service', staff: 'Nail Technician', appointment: 'Appointment' }
   },
   {
-    id: 'nails',
-    name: 'Nagelstudio',
-    icon: Briefcase,
-    description: 'Nagelpflege',
-    color: 'lime-500'
+    id: 'massage-therapy',
+    name: 'Massage Therapy',
+    icon: Waves,
+    color: 'from-teal-500 to-cyan-500',
+    features: ['Room Scheduling', 'Package Deals', 'Membership Plans', 'Aromatherapy Options'],
+    terminology: { service: 'Massage', staff: 'Therapist', appointment: 'Session' }
   },
   {
-    id: 'petgrooming',
-    name: 'Pet Grooming',
-    icon: PawPrint,
-    description: 'Tierpflege',
-    color: 'orange-400'
+    id: 'yoga-studio',
+    name: 'Yoga Studio',
+    icon: Activity,
+    color: 'from-purple-500 to-indigo-500',
+    features: ['Class Scheduling', 'Multi-Session Packages', 'Membership Management', 'Video Classes'],
+    terminology: { service: 'Class', staff: 'Instructor', appointment: 'Class' }
+  },
+  {
+    id: 'pilates-studio',
+    name: 'Pilates Studio',
+    icon: Layers,
+    color: 'from-indigo-500 to-blue-500',
+    features: ['Equipment Booking', 'Class Packages', 'Progress Tracking', 'Private Sessions'],
+    terminology: { service: 'Class', staff: 'Instructor', appointment: 'Session' }
+  },
+  {
+    id: 'other',
+    name: 'Other Service Business',
+    icon: Building,
+    color: 'from-gray-500 to-gray-700',
+    features: ['Flexible Configuration', 'Custom Terminology', 'All Core Features'],
+    terminology: { service: 'Service', staff: 'Staff', appointment: 'Appointment' }
   }
 ];
 
-const colorMap = {
-  'pink-500': 'bg-pink-500',
-  'purple-500': 'bg-purple-500',
-  'red-500': 'bg-red-500',
-  'cyan-500': 'bg-cyan-500',
-  'amber-500': 'bg-amber-500',
-  'fuchsia-500': 'bg-fuchsia-500',
-  'lime-500': 'bg-lime-500',
-  'orange-400': 'bg-orange-400'
-};
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: 'easeOut'
-    }
-  }
-};
-
-export default function BusinessTypeSelector({ onSelect, selectedType, selected }) {
+export default function BusinessTypeSelector({ onSelect, selectedType }) {
   const [hoveredType, setHoveredType] = useState(null);
-  // Accept both 'selected' and 'selectedType' for compatibility
-  const activeSelection = selected || selectedType;
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-12">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Welche Branche betreiben Sie?
-          </h1>
-          <p className="text-lg text-gray-400">
-            Wählen Sie Ihren Business-Typ, um Ihr Erlebnis anzupassen
-          </p>
-        </motion.div>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-zinc-900 mb-4">
+          Welche Branche betreiben Sie?
+        </h1>
+        <p className="text-xl text-zinc-500">
+          Wählen Sie Ihre Branche, um Ihr Erlebnis anzupassen
+        </p>
+      </div>
 
-        {/* Business Type Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {BUSINESS_TYPES.map((type, index) => {
-            const Icon = type.icon;
-            const isSelected = activeSelection === type.id;
-            const bgColor = colorMap[type.color];
+      {/* Business Type Container - Like Preview */}
+      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
+        <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <span className="font-semibold text-zinc-900">Ihre Branche wählen</span>
+          </div>
+        </div>
 
-            return (
-              <motion.button
-                key={type.id}
-                variants={itemVariants}
-                onClick={() => onSelect(type.id)}
-                onMouseEnter={() => setHoveredType(type.id)}
-                onMouseLeave={() => setHoveredType(null)}
-                className="relative group"
-              >
-                {/* Background gradient on hover */}
-                {isSelected && (
-                  <motion.div
-                    layoutId="selectedBackground"
-                    className={`absolute inset-0 rounded-xl ${bgColor} opacity-10 blur-xl`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.1 }}
-                    exit={{ opacity: 0 }}
-                  />
-                )}
+        <div className="p-6">
+          {/* Business Type Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {BUSINESS_TYPES.map((type) => {
+              const Icon = type.icon;
+              const isSelected = selectedType === type.id;
 
-                {/* Card */}
-                <motion.div
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.98 }}
+              return (
+                <button
+                  key={type.id}
+                  onClick={() => onSelect(type)}
+                  onMouseEnter={() => setHoveredType(type.id)}
+                  onMouseLeave={() => setHoveredType(null)}
                   className={`
-                    relative h-full rounded-xl p-6 backdrop-blur-sm transition-all duration-300
-                    ${isSelected
-                      ? `border-2 border-${type.color} bg-slate-800/50`
-                      : 'border border-slate-700 bg-slate-800/30 hover:bg-slate-800/50 hover:border-slate-600'
+                    bg-white border rounded-lg p-4 transition cursor-pointer text-left
+                    ${isSelected 
+                      ? 'border-cyan-500/50 hover:border-cyan-500/70' 
+                      : 'border-zinc-200 hover:bg-zinc-50 hover:border-cyan-500/30'
                     }
                   `}
                 >
-                  {/* Icon Container */}
-                  <motion.div
-                    className={`
-                      w-16 h-16 rounded-lg flex items-center justify-center mb-4 mx-auto
-                      transition-all duration-300
+                  <div className="flex items-center gap-3">
+                    <div className={`
+                      w-10 h-10 rounded flex items-center justify-center flex-shrink-0
                       ${isSelected
-                        ? `${bgColor} text-white shadow-lg shadow-${type.color}/50`
-                        : `bg-slate-700/50 text-gray-300 group-hover:bg-slate-600/50`
+                        ? 'bg-cyan-500/10 border border-cyan-500/30'
+                        : 'bg-zinc-50 border border-zinc-200'
                       }
-                    `}
-                    whileHover={{ rotate: 5 }}
-                  >
-                    <Icon size={28} />
-                  </motion.div>
-
-                  {/* Content */}
-                  <div className="text-center mb-4">
-                    <h3 className="text-lg font-semibold text-white mb-1">
-                      {type.name}
-                    </h3>
-                    <p className="text-sm text-gray-400">
-                      {type.description}
-                    </p>
+                    `}>
+                      <Icon className={`w-5 h-5 ${isSelected ? 'text-cyan-500' : 'text-zinc-500'}`} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-zinc-900">{type.name}</div>
+                      <div className="text-sm text-zinc-500 mt-1">
+                        {type.features.slice(0, 2).join(', ')}
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <svg className="w-5 h-5 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
                   </div>
+                </button>
+              );
+            })}
+          </div>
 
-                  {/* Checkmark */}
-                  {isSelected && (
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ duration: 0.4, ease: 'backOut' }}
-                      className={`
-                        absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center
-                        ${bgColor} text-white shadow-lg
-                      `}
-                    >
-                      <Check size={16} strokeWidth={3} />
-                    </motion.div>
-                  )}
-                </motion.div>
-              </motion.button>
-            );
-          })}
-        </motion.div>
-
-        {/* Selection Summary */}
-        {activeSelection && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="mt-12 text-center"
-          >
-            <p className="text-gray-400">
-              Sie haben folgendes ausgewählt:{' '}
-              <span className="font-semibold text-white">
-                {BUSINESS_TYPES.find(t => t.id === activeSelection)?.name}
-              </span>
-            </p>
-          </motion.div>
-        )}
+          {/* Feature Preview (if type selected) */}
+          {selectedType && (
+            <div className="mt-6 bg-white border border-cyan-500/30 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <svg className="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="text-lg font-semibold text-zinc-900">
+                  Features für {BUSINESS_TYPES.find(t => t.id === selectedType)?.name}
+                </h3>
+              </div>
+              <div className="bg-zinc-50 rounded-lg p-3 space-y-2">
+                {BUSINESS_TYPES.find(t => t.id === selectedType)?.features.map((feature, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-zinc-600 text-sm">
+                    <svg className="w-4 h-4 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

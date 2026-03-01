@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+const PHONE_REGEX = /^\+?[0-9\s().-]{7,20}$/;
+
 /**
  * Customer Model
  * Represents customers/clients of salons
@@ -48,7 +50,8 @@ const customerSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      match: [PHONE_REGEX, 'Valid phone number required']
     },
 
     dateOfBirth: {
@@ -235,6 +238,7 @@ customerSchema.index({ salonId: 1, phone: 1 });
 customerSchema.index({ salonId: 1, lastName: 1, firstName: 1 });
 customerSchema.index({ salonId: 1, status: 1 });
 customerSchema.index({ salonId: 1, vipStatus: 1 });
+customerSchema.index({ salonId: 1, createdAt: -1 });
 
 // ==================== VIRTUALS ====================
 

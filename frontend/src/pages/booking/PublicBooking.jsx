@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useNotification } from '../../hooks/useNotification';
 import { FiInfo } from 'react-icons/fi';
@@ -9,7 +9,11 @@ import { Elements } from '@stripe/react-stripe-js';
 import PaymentMethodStep from '../../components/Booking/PaymentMethodStep';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const defaultTimeSlots = [
+  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00', '17:30'
+];
 
 /**
  * PUBLIC BOOKING - Ohne Anmeldung
@@ -28,7 +32,7 @@ export default function PublicBooking() {
 
   const currentPathWithQuery = `${location.pathname}${location.search || ''}`;
 
-  const getPrefillFromUser = () => {
+  const getPrefillFromUser = useCallback(() => {
     if (!isAuthenticated || !user) return {};
 
     const fullNameFromParts = `${user.firstName || ''} ${user.lastName || ''}`.trim();
@@ -41,7 +45,9 @@ export default function PublicBooking() {
       customerEmail: email,
       customerPhone: phone,
     };
-  };
+  }, [isAuthenticated, user]);
+
+  const prefillData = useMemo(() => getPrefillFromUser(), [getPrefillFromUser]);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -52,10 +58,14 @@ export default function PublicBooking() {
   const [bookedSlots, setBookedSlots] = useState([]);
   // Step 0 = Service, 1 = Zeit, 2 = Daten, 3 = Übersicht
   const [bookingStep, setBookingStep] = useState(0);
+  const stripePromise = useMemo(() => {
+    if (bookingStep < 3) return null;
+    return loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  }, [bookingStep]);
   const [bookingData, setBookingData] = useState({
-    customerName: getPrefillFromUser().customerName || '',
-    customerEmail: getPrefillFromUser().customerEmail || '',
-    customerPhone: getPrefillFromUser().customerPhone || '',
+    customerName: prefillData.customerName || '',
+    customerEmail: prefillData.customerEmail || '',
+    customerPhone: prefillData.customerPhone || '',
     service: '',
     serviceId: '',
     date: '',
@@ -64,8 +74,8 @@ export default function PublicBooking() {
     employeeId: '',
   });
   const [paymentMethodId, setPaymentMethodId] = useState(null);
-  const [noShowKillerEnabled, setNoShowKillerEnabled] = useState(false);
-  const [noShowFeeAmount, setNoShowFeeAmount] = useState(15);
+  const [noShowKillerEnabled] = useState(false);
+  const [noShowFeeAmount] = useState(15);
 
   const { showNotification } = useNotification();
 
@@ -82,14 +92,7 @@ export default function PublicBooking() {
       customerEmail: prev.customerEmail || prefill.customerEmail || '',
       customerPhone: prev.customerPhone || prefill.customerPhone || '',
     }));
-  }, [isAuthenticated, user]);
-
-  // Default time slots (fallback)
-  const defaultTimeSlots = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-    '16:00', '16:30', '17:00', '17:30'
-  ];
+  }, [getPrefillFromUser, isAuthenticated, user]);
 
   // Fetch salon data on mount
   useEffect(() => {
@@ -131,7 +134,7 @@ export default function PublicBooking() {
         }
       }
     } catch (error) {
-      console.error('Error fetching salon data:', error);
+      showNotification('Salon-Daten konnten nicht geladen werden', 'error');
     } finally {
       setLoading(false);
     }
@@ -263,7 +266,6 @@ export default function PublicBooking() {
         showNotification(data.message || 'Fehler beim Buchen', 'error');
       }
     } catch (error) {
-      console.error('Booking error:', error);
       showNotification('Fehler beim Buchen des Termins', 'error');
     } finally {
       setSubmitting(false);
@@ -272,10 +274,10 @@ export default function PublicBooking() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="text-gray-300 mt-4">Lade Buchungsoptionen...</p>
+          <p className="text-zinc-600 mt-4">Lade Buchungsoptionen...</p>
         </div>
       </div>
     );
@@ -283,9 +285,9 @@ export default function PublicBooking() {
 
   if (!salonSlug) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-400">Kein Salon angegeben. Bitte verwenden Sie einen gültigen Buchungslink.</p>
+          <p className="text-red-600">Kein Salon angegeben. Bitte verwenden Sie einen gültigen Buchungslink.</p>
         </div>
       </div>
     );
@@ -355,10 +357,10 @@ export default function PublicBooking() {
         <div className="order-1">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Datum wählen *</p>
+              <p className="text-sm text-zinc-400">Datum wählen *</p>
               <h3 className="text-lg md:text-xl font-semibold">Kalender</h3>
             </div>
-            <span className="text-xs text-gray-400">{salonInfo?.name || 'Salon'}</span>
+            <span className="text-xs text-zinc-500">{salonInfo?.name || 'Salon'}</span>
           </div>
           {isMobile ? (
             <input
@@ -388,7 +390,7 @@ export default function PublicBooking() {
                   >
                     <span className="text-xs uppercase tracking-wider">{dayName}</span>
                     <span className="text-lg font-bold">{dayNum}</span>
-                    <span className="text-xs text-gray-500">{monthName}</span>
+                    <span className="text-xs text-zinc-400">{monthName}</span>
                   </button>
                 );
               })}
@@ -398,7 +400,7 @@ export default function PublicBooking() {
 
         <div className="order-2">
           <div className="mb-4">
-            <p className="text-sm text-gray-500">Zeit auswählen *</p>
+            <p className="text-sm text-zinc-400">Zeit auswählen *</p>
             <h3 className="text-lg md:text-xl font-semibold">Verfügbare Slots</h3>
           </div>
           <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 max-h-96 overflow-y-auto">
@@ -412,7 +414,7 @@ export default function PublicBooking() {
                   disabled={isBooked}
                   className={`
                     rounded-2xl px-3 py-2 text-sm md:text-base transition
-                    ${isBooked ? 'bg-gray-200 text-gray-400 line-through' : ''}
+                    ${isBooked ? 'bg-gray-200 text-zinc-500 line-through' : ''}
                     ${isSelected && !isBooked ? 'bg-blue-600 text-white' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-blue-500'}
                   `}
                 >
@@ -450,7 +452,7 @@ export default function PublicBooking() {
           (bookingStep === 2 && (!bookingData.customerName || !bookingData.customerEmail || !bookingData.customerPhone)) ||
           submitting
         }
-        className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed touch-manipulation"
+        className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl bg-blue-600 text-zinc-900 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed touch-manipulation"
       >
         {bookingStep === 3 ? (submitting ? 'Wird gebucht...' : 'Termin buchen') : 'Weiter'}
       </button>
@@ -472,11 +474,11 @@ export default function PublicBooking() {
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base md:text-lg font-semibold">{service.name}</h3>
-              <span className="text-sm text-gray-500">{service.duration}</span>
+              <span className="text-sm text-zinc-400">{service.duration}</span>
             </div>
-            <p className="text-sm text-gray-600 mb-4">{service.description || 'Beschreibung folgt'}</p>
+            <p className="text-sm text-zinc-500 mb-4">{service.description || 'Beschreibung folgt'}</p>
             <div className="flex items-center justify-between text-sm md:text-base">
-              <span className="text-gray-500">Dauer</span>
+              <span className="text-zinc-400">Dauer</span>
               <span className="font-semibold text-blue-600">{service.price}</span>
             </div>
           </button>
@@ -488,20 +490,20 @@ export default function PublicBooking() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-6 md:px-8 md:py-10 lg:px-12 lg:py-12 text-gray-900">
       <div className="w-full mx-auto max-w-full md:max-w-4xl space-y-6">
-        <header className="bg-black text-white rounded-2xl border border-zinc-800 shadow-lg p-6 md:p-8 flex flex-col gap-4">
+        <header className="bg-white text-zinc-900 rounded-2xl border border-zinc-200 shadow-sm p-6 md:p-8 flex flex-col gap-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-blue-300">Öffentlicher Termin</p>
               <h1 className="text-3xl font-bold">Neuen Termin buchen</h1>
-              <p className="text-sm text-gray-300 mt-1">Wähle deinen Wunsch-Salon und buche in wenigen Schritten.</p>
+              <p className="text-sm text-zinc-600 mt-1">Wähle deinen Wunsch-Salon und buche in wenigen Schritten.</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-400">Ausgewählter Salon</p>
+              <p className="text-sm text-zinc-500">Ausgewählter Salon</p>
               <p className="text-lg font-semibold">{salonInfo?.name || 'Salon'}</p>
             </div>
           </div>
           {!isAuthenticated && (
-            <div className="bg-zinc-900 bg-opacity-70 border border-zinc-800 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row gap-3">
+            <div className="bg-zinc-50 bg-opacity-70 border border-zinc-200 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row gap-3">
               <Link
                 to={`/login?redirect=${encodeURIComponent(currentPathWithQuery)}`}
                 className="flex-1 text-center px-4 py-3 bg-white text-black rounded-full font-semibold hover:bg-gray-100 touch-manipulation"
@@ -514,7 +516,7 @@ export default function PublicBooking() {
                   const el = document.getElementById('booking-start');
                   el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="flex-1 text-center px-4 py-3 border border-zinc-700 text-white rounded-full font-semibold hover:bg-zinc-900 touch-manipulation"
+                className="flex-1 text-center px-4 py-3 border border-zinc-200 text-zinc-900 rounded-full font-semibold hover:bg-zinc-100 touch-manipulation"
               >
                 Ohne Anmeldung fortfahren
               </button>
@@ -528,15 +530,15 @@ export default function PublicBooking() {
           {bookingStep === 0 && (
             <div className="space-y-8">
               <div className="space-y-2">
-                <p className="text-sm text-gray-500">Salon</p>
+                <p className="text-sm text-zinc-400">Salon</p>
                 <h2 className="text-2xl font-semibold">{salonInfo?.name || 'Salon'}</h2>
-                <p className="text-sm text-gray-500">{salonInfo?.address?.street || 'Adresse folgt'}</p>
+                <p className="text-sm text-zinc-400">{salonInfo?.address?.street || 'Adresse folgt'}</p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold">Welcher Service interessiert dich?</h3>
-                  <span className="text-sm text-gray-500">{services.length} Services verfügbar</span>
+                  <span className="text-sm text-zinc-400">{services.length} Services verfügbar</span>
                 </div>
                 <ServiceGrid />
               </div>
@@ -545,7 +547,7 @@ export default function PublicBooking() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold">Bevorzugter Mitarbeiter (optional)</h3>
-                    <span className="text-sm text-gray-500">({employees.length} verfügbar)</span>
+                    <span className="text-sm text-zinc-400">({employees.length} verfügbar)</span>
                   </div>
                   <div className="space-y-2">
                     {employees.map(emp => (
@@ -557,7 +559,7 @@ export default function PublicBooking() {
                         }`}
                       >
                         <span className="font-medium">{emp.name}</span>
-                        <span className="text-sm text-gray-500">{emp.rating ? emp.rating.toFixed(1) : '⭐'}</span>
+                        <span className="text-sm text-zinc-400">{emp.rating ? emp.rating.toFixed(1) : '⭐'}</span>
                       </button>
                     ))}
                   </div>
@@ -570,7 +572,7 @@ export default function PublicBooking() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Service</p>
+                  <p className="text-sm text-zinc-400">Service</p>
                   <h2 className="text-2xl font-bold">{bookingData.service || 'Bitte wählen'}</h2>
                 </div>
                 <button
@@ -588,14 +590,14 @@ export default function PublicBooking() {
           {bookingStep === 2 && (
             <div className="space-y-6">
               <div>
-                <p className="text-sm text-gray-500">Termin</p>
+                <p className="text-sm text-zinc-400">Termin</p>
                 <h2 className="text-2xl font-bold">
                   {bookingData.date ? `${new Date(bookingData.date).toLocaleDateString('de-DE')} um ${bookingData.time}` : 'Datum & Uhrzeit auswählen'}
                 </h2>
               </div>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-600">Vollständiger Name *</label>
+                  <label className="block mb-2 text-sm font-medium text-zinc-500">Vollständiger Name *</label>
                   <input
                     type="text"
                     name="customerName"
@@ -606,7 +608,7 @@ export default function PublicBooking() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-600">E-Mail Adresse *</label>
+                  <label className="block mb-2 text-sm font-medium text-zinc-500">E-Mail Adresse *</label>
                   <input
                     type="email"
                     name="customerEmail"
@@ -618,7 +620,7 @@ export default function PublicBooking() {
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-600">Telefonnummer *</label>
+                <label className="block mb-2 text-sm font-medium text-zinc-500">Telefonnummer *</label>
                 <input
                   type="tel"
                   name="customerPhone"
@@ -639,35 +641,36 @@ export default function PublicBooking() {
           {bookingStep === 3 && (
             <div className="space-y-6">
               <div>
-                <p className="text-sm text-gray-500">Dein Termin</p>
+                <p className="text-sm text-zinc-400">Dein Termin</p>
                 <h2 className="text-2xl font-bold">Übersicht & Zahlung</h2>
               </div>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
-                  <p className="text-sm text-gray-500">Salon</p>
+                  <p className="text-sm text-zinc-400">Salon</p>
                   <p className="font-semibold">{salonInfo?.name || 'Salon'}</p>
                 </div>
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
-                  <p className="text-sm text-gray-500">Service</p>
+                  <p className="text-sm text-zinc-400">Service</p>
                   <p className="font-semibold">{bookingData.service}</p>
-                  <p className="text-sm text-gray-500">Mitarbeiter</p>
+                  <p className="text-sm text-zinc-400">Mitarbeiter</p>
                   <p className="font-semibold">{bookingData.employee || 'Wird zugewiesen'}</p>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
-                <p className="text-sm text-gray-500">Kontaktdaten</p>
+                <p className="text-sm text-zinc-400">Kontaktdaten</p>
                 <p className="font-semibold">{bookingData.customerName}</p>
-                <p className="text-sm text-gray-500">{bookingData.customerEmail}</p>
-                <p className="text-sm text-gray-500">{bookingData.customerPhone}</p>
+                <p className="text-sm text-zinc-400">{bookingData.customerEmail}</p>
+                <p className="text-sm text-zinc-400">{bookingData.customerPhone}</p>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
-                <p className="text-sm text-gray-500">Termin</p>
+                <p className="text-sm text-zinc-400">Termin</p>
                 <p className="font-semibold">
                   {bookingData.date ? `${new Date(bookingData.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}` : '-'}{' '}
                   um {bookingData.time || '-'} Uhr
                 </p>
               </div>
-              <Elements stripe={stripePromise}>
+              {stripePromise && (
+                <Elements stripe={stripePromise}>
                 <PaymentMethodStep
                   onComplete={(methodId) => setPaymentMethodId(methodId)}
                   onBack={() => setBookingStep(2)}
@@ -675,7 +678,8 @@ export default function PublicBooking() {
                   loading={submitting}
                   salonName={salonInfo?.name}
                 />
-              </Elements>
+                </Elements>
+              )}
               <BookingActions />
             </div>
           )}

@@ -15,14 +15,14 @@ const TwoFAVerify = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-primary text-white flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="rounded-lg bg-zinc-900 border border-zinc-800 p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Ungültige Sitzung</h2>
-            <p className="text-gray-400 mb-6">Bitte melden Sie sich erneut an.</p>
+          <div className="rounded-lg bg-zinc-50 border border-zinc-200 p-8 text-center">
+            <h2 className="text-2xl font-bold text-zinc-900 mb-4">Ungültige Sitzung</h2>
+            <p className="text-zinc-500 mb-6">Bitte melden Sie sich erneut an.</p>
             <Link
               to="/login"
-              className="inline-block px-8 py-3 rounded-lg bg-accent hover:bg-accent-light text-primary font-semibold transition"
+              className="inline-block px-8 py-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-semibold transition"
             >
               Back to Login
             </Link>
@@ -62,18 +62,18 @@ const TwoFAVerify = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="rounded-lg bg-zinc-900 border border-zinc-800 p-8">
+        <div className="rounded-lg bg-zinc-50 border border-zinc-200 p-8">
           <div className="text-5xl text-center mb-4"></div>
-          <h1 className="text-2xl font-bold text-white mb-2 text-center">Two-Factor Authentication</h1>
-          <p className="text-gray-400 text-center mb-8">
+          <h1 className="text-2xl font-bold text-zinc-900 mb-2 text-center">Two-Factor Authentication</h1>
+          <p className="text-zinc-500 text-center mb-8">
             Enter the code from your authenticator app
           </p>
           
           <form onSubmit={handleVerify} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-sm font-semibold text-zinc-900 mb-2">
                 {useBackupCode ? 'Backup Code' : 'Authentication Code'}
               </label>
               <input
@@ -82,7 +82,7 @@ const TwoFAVerify = () => {
                 onChange={(e) => setCode(e.target.value)}
                 placeholder={useBackupCode ? 'xxxx-xxxx-xxxx' : '000000'}
                 maxLength={useBackupCode ? 14 : 6}
-                className="w-full px-4 py-3 rounded-lg bg-primary/50 border border-accent/20 hover:border-accent/40 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder:text-slate-350"
+                className="w-full px-4 py-3 rounded-lg bg-zinc-50 border border-zinc-200 hover:border-zinc-300 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 text-zinc-900 placeholder:text-zinc-400"
                 required
                 autoFocus
               />
@@ -91,13 +91,13 @@ const TwoFAVerify = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-accent hover:bg-accent-light text-primary font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 shadow-lg shadow-accent/30"
+              className="w-full py-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 shadow-sm shadow-zinc-200"
             >
               {loading ? '⏳ Verifying...' : '✓ Verify'}
             </button>
           </form>
 
-          <div className="mt-8 text-center text-sm text-slate-350 border-t border-accent/10 pt-8 space-y-3">
+          <div className="mt-8 text-center text-sm text-zinc-400 border-t border-zinc-200 pt-8 space-y-3">
             <button
               onClick={() => {
                 setUseBackupCode(!useBackupCode);

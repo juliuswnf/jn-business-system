@@ -10,30 +10,30 @@ const AuthLayout = ({
   subtitle = ''
 }) => {
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center p-4">
       {/* Content */}
       <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-zinc-900 tracking-tight mb-2">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-gray-400">
+            <p className="text-zinc-500">
               {subtitle}
             </p>
           )}
         </div>
 
         {/* Form Container */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8">
+        <div className="border border-zinc-200 rounded-xl p-8">
           {children}
         </div>
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} JN Business System
+          <p className="text-zinc-400 text-sm">
+            &copy; {new Date().getFullYear()} JN Business System
           </p>
         </div>
       </div>

@@ -117,7 +117,7 @@ export default function BAAManagement() {
         </div>
         <button
           onClick={() => setShowUploadModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Upload className="w-5 h-5" />
           Upload BAA
@@ -224,8 +224,8 @@ export default function BAAManagement() {
 
         <div className="divide-y divide-gray-200">
           {baas.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <div className="p-12 text-center text-zinc-400">
+              <FileText className="w-12 h-12 mx-auto mb-4 text-zinc-500" />
               <p>No BAAs uploaded yet</p>
               <button
                 onClick={() => setShowUploadModal(true)}
@@ -286,7 +286,7 @@ export default function BAAManagement() {
                     {(baa.status === 'expiring_soon' || baa.status === 'expired') && (
                       <button
                         onClick={() => handleRenewBaa(baa._id)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                        className="px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors text-sm"
                       >
                         Renew BAA
                       </button>
@@ -301,8 +301,8 @@ export default function BAAManagement() {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-none max-w-md w-full p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Upload BAA Document</h3>
             
             <form onSubmit={handleUploadBaa} className="space-y-4">
@@ -385,7 +385,7 @@ export default function BAAManagement() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Upload BAA
                 </button>
@@ -405,7 +405,7 @@ function ChecklistItem({ label, completed }) {
   return (
     <div className="flex items-center gap-3">
       <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-        completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+        completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-zinc-500'
       }`}>
         {completed ? (
           <CheckCircle className="w-4 h-4" />

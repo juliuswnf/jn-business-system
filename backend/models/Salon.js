@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import { TRIAL_CONFIG } from '../config/pricing.js';
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const PHONE_REGEX = /^\+?[0-9\s().-]{7,20}$/;
+
 const emailTemplateSchema = new mongoose.Schema({
   subject: {
     type: String,
@@ -118,11 +121,13 @@ const salonSchema = new mongoose.Schema({
     type: String,
     required: true,
     lowercase: true,
-    trim: true
+    trim: true,
+    match: [EMAIL_REGEX, 'Valid email required']
   },
   phone: {
     type: String,
-    trim: true
+    trim: true,
+    match: [PHONE_REGEX, 'Valid phone number required']
   },
   address: {
     street: String,
@@ -518,6 +523,7 @@ salonSchema.index({ isActive: 1 });
 salonSchema.index({ deletedAt: 1 }); // For soft delete queries
 salonSchema.index({ owner: 1, isActive: 1 }); // ? Compound index for owner's active salons
 salonSchema.index({ owner: 1, deletedAt: 1 }); // ? Compound index for owner's non-deleted salons
+salonSchema.index({ email: 1, isActive: 1 });
 
 // ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
 

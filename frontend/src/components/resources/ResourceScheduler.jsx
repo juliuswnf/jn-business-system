@@ -186,7 +186,7 @@ export default function ResourceScheduler() {
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             Book Resource
@@ -304,8 +304,8 @@ export default function ResourceScheduler() {
 
           <div className="space-y-3">
             {getResourceBookings(selectedResource).length === 0 ? (
-              <div className="py-12 text-center text-gray-500">
-                <CalendarIcon className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <div className="py-12 text-center text-zinc-400">
+                <CalendarIcon className="w-12 h-12 mx-auto mb-4 text-zinc-500" />
                 <p>No bookings for this resource on {selectedDate}</p>
               </div>
             ) : (
@@ -362,8 +362,8 @@ export default function ResourceScheduler() {
 
       {/* Add Booking Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-none max-w-md w-full p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Book Resource</h3>
             
             <form onSubmit={handleCreateBooking} className="space-y-4">
@@ -460,7 +460,7 @@ export default function ResourceScheduler() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Book Resource
                 </button>
@@ -472,8 +472,8 @@ export default function ResourceScheduler() {
 
       {/* Maintenance Modal */}
       {showMaintenanceModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-none max-w-md w-full p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Schedule Maintenance</h3>
             
             <form onSubmit={handleScheduleMaintenance} className="space-y-4">
@@ -556,7 +556,7 @@ export default function ResourceScheduler() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-orange-600 text-zinc-900 rounded-lg hover:bg-orange-700 transition-colors"
                 >
                   Schedule
                 </button>

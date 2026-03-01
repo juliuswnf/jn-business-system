@@ -38,10 +38,10 @@ export default function SMSUsageWidget() {
 
   if (loading) {
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 animate-pulse">
-        <div className="h-6 bg-zinc-800 rounded w-1/2 mb-4"></div>
-        <div className="h-4 bg-zinc-800 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-zinc-800 rounded w-1/2"></div>
+      <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6 animate-pulse">
+        <div className="h-6 bg-zinc-50 rounded w-1/2 mb-4"></div>
+        <div className="h-4 bg-zinc-50 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-zinc-50 rounded w-1/2"></div>
       </div>
     );
   }
@@ -100,9 +100,9 @@ export default function SMSUsageWidget() {
             <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
-            <h3 className="text-lg font-semibold text-white">SMS-Kontingent</h3>
+            <h3 className="text-lg font-semibold text-zinc-900">SMS-Kontingent</h3>
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-zinc-500">
             Reset am {resetDateFormatted}
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function SMSUsageWidget() {
             <span className={`text-3xl font-bold ${textColor}`}>
               {smsUsage.used}
             </span>
-            <span className="text-gray-400 text-lg ml-1">/ {smsUsage.limit}</span>
+            <span className="text-zinc-500 text-lg ml-1">/ {smsUsage.limit}</span>
           </div>
           <span className={`text-sm font-medium ${textColor}`}>
             {percentUsed}%
@@ -128,7 +128,7 @@ export default function SMSUsageWidget() {
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-zinc-800 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-zinc-50 rounded-full h-3 overflow-hidden">
           <div
             className={`h-full ${progressColor} transition-all duration-500 ease-out`}
             style={{ width: `${Math.min(percentUsed, 100)}%` }}
@@ -136,7 +136,7 @@ export default function SMSUsageWidget() {
         </div>
 
         {/* Remaining SMS */}
-        <p className="text-sm text-gray-400 mt-2">
+        <p className="text-sm text-zinc-500 mt-2">
           {smsUsage.remaining > 0 ? (
             <>
               <span className={textColor}>{smsUsage.remaining} SMS</span> verbleibend
@@ -158,7 +158,7 @@ export default function SMSUsageWidget() {
               <p className="text-sm text-red-400 font-medium mb-1">
                 Limit überschritten
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-zinc-500">
                 Überschreitungskosten: €{smsUsage.overageCost.toFixed(2)}
               </p>
             </div>
@@ -186,14 +186,14 @@ export default function SMSUsageWidget() {
         {smsUsage.used > smsUsage.limit && (
           <Link
             to="/settings/sms"
-            className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition text-center"
+            className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-zinc-900 text-sm font-medium rounded-lg transition text-center"
           >
             Extra SMS kaufen
           </Link>
         )}
         <Link
           to="/settings/sms"
-          className={`px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-medium rounded-lg transition text-center ${
+          className={`px-4 py-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-900 text-sm font-medium rounded-lg transition text-center ${
             smsUsage.used > smsUsage.limit ? '' : 'flex-1'
           }`}
         >
@@ -202,23 +202,23 @@ export default function SMSUsageWidget() {
       </div>
 
       {/* Additional Info */}
-      <div className="mt-4 pt-4 border-t border-zinc-800">
-        <div className="grid grid-cols-2 gap-4 text-xs text-gray-400">
+      <div className="mt-4 pt-4 border-t border-zinc-200">
+        <div className="grid grid-cols-2 gap-4 text-xs text-zinc-500">
           <div>
-            <span className="block text-gray-500">Team-Größe</span>
+            <span className="block text-zinc-400">Team-Größe</span>
             <span className="text-white font-medium">{smsUsage.staffCount} Mitarbeiter</span>
           </div>
           <div>
-            <span className="block text-gray-500">Nächster Reset</span>
+            <span className="block text-zinc-400">Nächster Reset</span>
             <span className="text-white font-medium">{resetDateFormatted}</span>
           </div>
         </div>
       </div>
 
       {/* Help Text */}
-      <div className="mt-4 p-3 bg-zinc-800/50 rounded-lg">
-        <p className="text-xs text-gray-400">
-          💡 <strong className="text-white">Tipp:</strong> SMS-Limit skaliert automatisch mit Team-Größe:
+      <div className="mt-4 p-3 bg-zinc-50/50 rounded-lg">
+        <p className="text-xs text-zinc-500">
+          💡 <strong className="text-zinc-900">Tipp:</strong> SMS-Limit skaliert automatisch mit Team-Größe:
           {' '}500 Basis + 50 pro Mitarbeiter (ab 6 Mitarbeitern).
         </p>
       </div>

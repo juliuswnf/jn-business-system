@@ -38,7 +38,6 @@ export default function WorkflowProjects() {
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching projects:', error);
       toast.error('Fehler beim Laden der Projekte');
       setLoading(false);
     }
@@ -53,17 +52,16 @@ export default function WorkflowProjects() {
       toast.success('Projekt gelöscht');
       fetchData();
     } catch (error) {
-      console.error('Error deleting project:', error);
       toast.error('Fehler beim Löschen');
     }
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      draft: 'bg-zinc-800 text-zinc-300',
+      draft: 'bg-zinc-50 text-zinc-300',
       active: 'bg-blue-500/20 text-blue-400',
-      completed: 'bg-green-500/20 text-green-400',
-      cancelled: 'bg-red-500/20 text-red-400'
+      completed: 'bg-green-500/20 text-green-600',
+      cancelled: 'bg-red-500/20 text-red-600'
     };
     return colors[status] || colors.draft;
   };
@@ -95,14 +93,14 @@ export default function WorkflowProjects() {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Projekte</h1>
+          <h1 className="text-3xl font-bold text-zinc-900 mb-2">Projekte</h1>
           <p className="text-zinc-400">
             Verwalte alle branchenspezifischen Projekte
           </p>
         </div>
         <button
           onClick={() => navigate('/dashboard/workflow-projects/new')}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 text-zinc-900 px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           + Neues Projekt
         </button>
@@ -115,43 +113,43 @@ export default function WorkflowProjects() {
             title="Gesamt"
             value={stats.total}
             icon={<BarChart3 className="w-6 h-6 text-cyan-400" />}
-            color="bg-zinc-900 border-zinc-800"
+            color="bg-zinc-50 border-zinc-200"
           />
           <StatCard
             title="Aktiv"
             value={stats.active}
             icon={<RefreshCw className="w-6 h-6 text-cyan-400" />}
-            color="bg-zinc-900 border-zinc-800"
+            color="bg-zinc-50 border-zinc-200"
           />
           <StatCard
             title="Abgeschlossen"
             value={stats.completed}
-            icon={<CheckCircle className="w-6 h-6 text-green-400" />}
-            color="bg-zinc-900 border-zinc-800"
+            icon={<CheckCircle className="w-6 h-6 text-green-600" />}
+            color="bg-zinc-50 border-zinc-200"
           />
           <StatCard
             title="Ø Fortschritt"
             value={`${stats.averageProgress}%`}
             icon={<TrendingUp className="w-6 h-6 text-cyan-400" />}
-            color="bg-zinc-900 border-zinc-800"
+            color="bg-zinc-50 border-zinc-200"
           />
           <StatCard
             title="Umsatz"
             value={`€${stats.totalRevenue.toLocaleString()}`}
-            icon={<DollarSign className="w-6 h-6 text-green-400" />}
-            color="bg-zinc-900 border-zinc-800"
+            icon={<DollarSign className="w-6 h-6 text-green-600" />}
+            color="bg-zinc-50 border-zinc-200"
           />
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden mb-6">
-        <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden mb-6">
+        <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
           <div className="flex items-center gap-3">
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            <span className="font-semibold text-white">Filter</span>
+            <span className="font-semibold text-zinc-900">Filter</span>
           </div>
         </div>
         <div className="p-6">
@@ -161,12 +159,12 @@ export default function WorkflowProjects() {
               placeholder="Suche nach Name, Kunde..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
             <select
               value={filters.industry}
               onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             >
               <option value="">Alle Branchen</option>
               <option value="tattoo">🎨 Tattoo</option>
@@ -180,7 +178,7 @@ export default function WorkflowProjects() {
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             >
               <option value="">Alle Status</option>
               <option value="draft">Entwurf</option>
@@ -194,19 +192,19 @@ export default function WorkflowProjects() {
 
       {/* Projects Table */}
       {projects.length === 0 ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-12 text-center">
+        <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-12 text-center">
           <p className="text-zinc-400 mb-4">Noch keine Projekte vorhanden</p>
           <button
             onClick={() => navigate('/dashboard/workflow-projects/new')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-zinc-900 px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Erstes Projekt erstellen
           </button>
         </div>
       ) : (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-zinc-800">
-            <thead className="bg-zinc-800">
+        <div className="bg-zinc-50 border border-zinc-200 rounded-lg overflow-hidden">
+          <table className="min-w-full divide-y divide-zinc-200">
+            <thead className="bg-zinc-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-300 uppercase">
                   Projekt
@@ -231,19 +229,19 @@ export default function WorkflowProjects() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-zinc-900 divide-y divide-zinc-800">
+            <tbody className="bg-zinc-50 divide-y divide-zinc-200">
               {(projects || []).map((project) => (
                 <motion.tr
                   key={project._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="hover:bg-zinc-800"
+                  className="hover:bg-zinc-100"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <span className="text-2xl mr-3">{getIndustryIcon(project.industry)}</span>
                       <div>
-                        <div className="text-sm font-medium text-white">{project.name}</div>
+                        <div className="text-sm font-medium text-zinc-900">{project.name}</div>
                         {project.description && (
                           <div className="text-sm text-zinc-400 truncate max-w-xs">
                             {project.description}
@@ -253,7 +251,7 @@ export default function WorkflowProjects() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-white">
+                    <div className="text-sm text-zinc-900">
                       {project.customerId?.firstName} {project.customerId?.lastName}
                     </div>
                     <div className="text-sm text-zinc-400">{project.customerId?.phone}</div>
@@ -263,7 +261,7 @@ export default function WorkflowProjects() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-full bg-zinc-800 rounded-full h-2 mr-2">
+                      <div className="w-full bg-zinc-50 rounded-full h-2 mr-2">
                         <div
                           className="bg-blue-600 h-2 rounded-full"
                           style={{ width: `${project.progress}%` }}
@@ -273,7 +271,7 @@ export default function WorkflowProjects() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-white">
+                    <span className="text-sm text-zinc-900">
                       {project.completedSessions}/{project.totalSessions}
                     </span>
                   </td>
@@ -292,13 +290,13 @@ export default function WorkflowProjects() {
                       </button>
                       <button
                         onClick={() => navigate(`/dashboard/workflow-projects/${project._id}/edit`)}
-                        className="text-yellow-400 hover:text-yellow-300"
+                        className="text-yellow-600 hover:text-yellow-600"
                       >
                         Bearbeiten
                       </button>
                       <button
                         onClick={() => handleDeleteProject(project._id)}
-                        className="text-red-400 hover:text-red-300"
+                        className="text-red-600 hover:text-red-600"
                       >
                         Löschen
                       </button>
@@ -319,12 +317,12 @@ function StatCard({ title, value, icon, color }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`border rounded-lg p-4 ${color || 'bg-zinc-900 border-zinc-800'}`}
+      className={`border rounded-lg p-4 ${color || 'bg-zinc-50 border-zinc-200'}`}
     >
       <div className="flex items-center justify-between mb-2">
         {icon}
       </div>
-      <div className="text-2xl font-bold text-white">{value}</div>
+      <div className="text-2xl font-bold text-zinc-900">{value}</div>
       <div className="text-sm text-zinc-400">{title}</div>
     </motion.div>
   );

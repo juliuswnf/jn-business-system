@@ -94,19 +94,19 @@ export default function CustomerRegister() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Kundenkonto erstellen</h1>
-          <p className="text-gray-400">Registriere dich, um Termine zu buchen</p>
+          <p className="text-zinc-500">Registriere dich, um Termine zu buchen</p>
         </div>
 
         {/* Form Container */}
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-8">
+        <div className="bg-white rounded-xl border border-zinc-200 p-8">
           {/* Error Message */}
           {apiError && (
-            <div className="mb-6 p-4 rounded-lg bg-red-600/10 border border-red-600/30 text-red-400 text-sm">
+            <div className="mb-6 p-4 rounded-lg bg-red-600/10 border border-red-600/30 text-red-600 text-sm">
               {apiError}
             </div>
           )}
@@ -115,70 +115,70 @@ export default function CustomerRegister() {
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Vorname</label>
+                <label className="block text-sm font-medium text-zinc-600 mb-2">Vorname</label>
                 <input
                   type="text"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
                   placeholder="Max"
-                  className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    errors.firstName ? 'border-red-500' : 'border-gray-700'
+                  className={`w-full px-4 py-3 bg-zinc-50 border rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent ${
+                    errors.firstName ? 'border-red-500' : 'border-zinc-200'
                   }`}
                 />
-                {errors.firstName && <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>}
+                {errors.firstName && <p className="text-red-600 text-xs mt-1">{errors.firstName}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Nachname</label>
+                <label className="block text-sm font-medium text-zinc-600 mb-2">Nachname</label>
                 <input
                   type="text"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Mustermann"
-                  className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    errors.lastName ? 'border-red-500' : 'border-gray-700'
+                  className={`w-full px-4 py-3 bg-zinc-50 border rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent ${
+                    errors.lastName ? 'border-red-500' : 'border-zinc-200'
                   }`}
                 />
-                {errors.lastName && <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>}
+                {errors.lastName && <p className="text-red-600 text-xs mt-1">{errors.lastName}</p>}
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">E-Mail</label>
+              <label className="block text-sm font-medium text-zinc-600 mb-2">E-Mail</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="ihre@email.de"
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                  errors.email ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-zinc-50 border rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent ${
+                  errors.email ? 'border-red-500' : 'border-zinc-200'
                 }`}
               />
-              {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-600 text-xs mt-1">{errors.email}</p>}
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Telefon</label>
+              <label className="block text-sm font-medium text-zinc-600 mb-2">Telefon</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+49 123 456789"
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                  errors.phone ? 'border-red-500' : 'border-gray-700'
+                className={`w-full px-4 py-3 bg-zinc-50 border rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent ${
+                  errors.phone ? 'border-red-500' : 'border-zinc-200'
                 }`}
               />
-              {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-red-600 text-xs mt-1">{errors.phone}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Passwort</label>
+              <label className="block text-sm font-medium text-zinc-600 mb-2">Passwort</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -186,24 +186,24 @@ export default function CustomerRegister() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Mind. 8 Zeichen"
-                  className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    errors.password ? 'border-red-500' : 'border-gray-700'
+                  className={`w-full px-4 py-3 bg-zinc-50 border rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent ${
+                    errors.password ? 'border-red-500' : 'border-zinc-200'
                   }`}
                 />
                 <button 
                   type="button" 
                   onClick={() => setShowPassword(!showPassword)} 
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm hover:text-zinc-900"
                 >
                   {showPassword ? 'Verstecken' : 'Anzeigen'}
                 </button>
               </div>
-              {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-600 text-xs mt-1">{errors.password}</p>}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Passwort bestätigen</label>
+              <label className="block text-sm font-medium text-zinc-600 mb-2">Passwort bestätigen</label>
               <div className="relative">
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -211,20 +211,20 @@ export default function CustomerRegister() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Passwort wiederholen"
-                  className={`w-full px-4 py-3 pr-10 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    errors.confirmPassword ? 'border-red-500' : 'border-gray-700'
+                  className={`w-full px-4 py-3 pr-10 bg-zinc-50 border rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent ${
+                    errors.confirmPassword ? 'border-red-500' : 'border-zinc-200'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm hover:text-zinc-900 transition-colors"
                   aria-label={showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
                 >
                   {showConfirmPassword ? 'Verstecken' : 'Anzeigen'}
                 </button>
               </div>
-              {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="text-red-600 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
 
             {/* Terms */}
@@ -234,17 +234,17 @@ export default function CustomerRegister() {
                 name="agreeToTerms"
                 checked={formData.agreeToTerms}
                 onChange={handleChange}
-                className="mt-1 w-4 h-4 rounded bg-gray-800 border-gray-700 text-indigo-500 focus:ring-indigo-500"
+                className="mt-1 w-4 h-4 rounded bg-zinc-50 border-zinc-200 text-zinc-900 focus:ring-zinc-900"
               />
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-zinc-500">
                 Ich stimme den{' '}
-                <Link to="/agb" className="text-white hover:text-indigo-400">AGB</Link>{' '}
+                <Link to="/agb" className="text-zinc-900 hover:text-zinc-900">AGB</Link>{' '}
                 und der{' '}
-                <Link to="/datenschutz" className="text-white hover:text-indigo-400">Datenschutzerklärung</Link>{' '}
+                <Link to="/datenschutz" className="text-zinc-900 hover:text-zinc-900">Datenschutzerklärung</Link>{' '}
                 zu.
               </span>
             </label>
-            {errors.agreeToTerms && <p className="text-red-400 text-xs">{errors.agreeToTerms}</p>}
+            {errors.agreeToTerms && <p className="text-red-600 text-xs">{errors.agreeToTerms}</p>}
 
             {/* Submit Button */}
             <button 
@@ -259,16 +259,16 @@ export default function CustomerRegister() {
 
         {/* Sign In Link */}
         <div className="mt-6 text-center">
-          <p className="text-gray-400">
+          <p className="text-zinc-500">
             Bereits registriert?{' '}
-            <Link to="/login/customer" className="text-white font-medium hover:text-gray-300">
+            <Link to="/login/customer" className="text-zinc-900 font-medium hover:text-zinc-600">
               Hier anmelden
             </Link>
           </p>
         </div>
 
         <div className="mt-4 text-center">
-          <Link to="/login" className="text-sm text-gray-500 hover:text-gray-300">
+          <Link to="/login" className="text-sm text-zinc-400 hover:text-zinc-600">
             ← Zurück zur Auswahl
           </Link>
         </div>

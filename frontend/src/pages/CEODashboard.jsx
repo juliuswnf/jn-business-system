@@ -161,11 +161,11 @@ const CEODashboard = () => {
     if (error) {
       return (
         <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
-          <div className="flex items-center justify-center gap-2 text-red-400 text-xl mb-2">
+          <div className="flex items-center justify-center gap-2 text-red-600 text-xl mb-2">
             <ErrorIcon />
             <span>Fehler</span>
           </div>
-          <p className="text-gray-400">{error}</p>
+          <p className="text-zinc-500">{error}</p>
         </div>
       );
     }
@@ -187,18 +187,18 @@ const CEODashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="min-h-screen bg-white text-zinc-900 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
+      <aside className="w-64 bg-white border-r border-zinc-200 flex flex-col">
         {/* Logo */}
-        <div className="p-6 border-b border-gray-800">
+        <div className="p-6 border-b border-zinc-200">
           <Link to="/" className="flex items-center gap-3" aria-label="Zurück zur Startseite - JN Business System">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CEO</span>
+              <span className="text-zinc-900 font-bold text-sm">CEO</span>
             </div>
             <div>
-              <span className="text-white font-semibold block">JN Business System</span>
-              <span className="text-xs text-gray-200">CEO Portal</span>
+              <span className="text-zinc-900 font-semibold block">JN Business System</span>
+              <span className="text-xs text-zinc-700">CEO Portal</span>
             </div>
           </Link>
         </div>
@@ -213,13 +213,13 @@ const CEODashboard = () => {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
                     activeTab === item.id
                       ? 'bg-gradient-to-r from-red-500/20 to-orange-500/20 text-white border-l-2 border-red-500'
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                      : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'
                   }`}
                 >
                   <item.icon />
                   <span className="flex-1">{item.label}</span>
                   {item.badge > 0 && (
-                    <span className="px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+                    <span className="px-2 py-0.5 bg-red-500 text-zinc-900 text-xs rounded-full">
                       {item.badge}
                     </span>
                   )}
@@ -230,14 +230,14 @@ const CEODashboard = () => {
         </nav>
 
         {/* User Info */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center gap-3 px-4 py-3 bg-gray-800/50 rounded-lg">
-            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold">
+        <div className="p-4 border-t border-zinc-200">
+          <div className="flex items-center gap-3 px-4 py-3 bg-zinc-50/50 rounded-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center text-zinc-900 font-semibold">
               J
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-white">Julius</p>
-              <p className="text-xs text-gray-200">CEO</p>
+              <p className="text-sm font-medium text-zinc-900">Julius</p>
+              <p className="text-xs text-zinc-700">CEO</p>
             </div>
           </div>
         </div>
@@ -246,20 +246,20 @@ const CEODashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-gray-900/50 border-b border-gray-800 px-6 py-4">
+        <header className="bg-white/50 border-b border-zinc-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-zinc-900">
                 {navItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
               </h1>
-              <p className="text-gray-200 text-sm mt-1">
+              <p className="text-zinc-700 text-sm mt-1">
                 Willkommen im CEO Control Center
               </p>
             </div>
             <div className="flex items-center gap-3">
               {/* Quick Tools Dropdown */}
               <div className="relative group">
-                <button className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-gray-800 border border-gray-700 hover:border-gray-600">
+                <button className="flex items-center gap-2 px-3 py-2 text-zinc-500 hover:text-zinc-900 transition rounded-lg hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
                   </svg>
@@ -268,53 +268,53 @@ const CEODashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                <div className="absolute right-0 top-full mt-1 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="absolute right-0 top-full mt-1 w-56 bg-zinc-50 border border-zinc-200 rounded-lg shadow-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                   <div className="py-2">
-                    <Link to="/ceo/analytics" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Analytics - Detaillierte Statistiken ansehen">
+                    <Link to="/ceo/analytics" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Analytics - Detaillierte Statistiken ansehen">
                       <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
                       <span className="text-sm">Analytics</span>
                     </Link>
-                    <Link to="/ceo/email-campaigns" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="E-Mail-Kampagnen verwalten">
-                      <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <Link to="/ceo/email-campaigns" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="E-Mail-Kampagnen verwalten">
+                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span className="text-sm">E-Mail Kampagnen</span>
                     </Link>
-                    <Link to="/ceo/payments" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Zahlungen und Transaktionen">
-                      <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <Link to="/ceo/payments" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Zahlungen und Transaktionen">
+                      <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="text-sm">Payments</span>
                     </Link>
-                    <div className="border-t border-gray-700 my-2"></div>
-                    <Link to="/ceo/support" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Support-Tickets bearbeiten">
+                    <div className="border-t border-zinc-200 my-2"></div>
+                    <Link to="/ceo/support" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Support-Tickets bearbeiten">
                       <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                       <span className="text-sm">Support Tickets</span>
                     </Link>
-                    <Link to="/ceo/audit-log" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Audit-Log - Systemaktivitäten einsehen">
+                    <Link to="/ceo/audit-log" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Audit-Log - Systemaktivitäten einsehen">
                       <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       <span className="text-sm">Audit Log</span>
                     </Link>
-                    <Link to="/ceo/lifecycle-emails" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Lifecycle-E-Mails konfigurieren">
+                    <Link to="/ceo/lifecycle-emails" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Lifecycle-E-Mails konfigurieren">
                       <svg className="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span className="text-sm">Lifecycle E-Mails</span>
                     </Link>
-                    <div className="border-t border-gray-700 my-2"></div>
-                    <Link to="/ceo/feature-flags" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Feature-Flags aktivieren oder deaktivieren">
+                    <div className="border-t border-zinc-200 my-2"></div>
+                    <Link to="/ceo/feature-flags" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Feature-Flags aktivieren oder deaktivieren">
                       <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
                       </svg>
                       <span className="text-sm">Feature Flags</span>
                     </Link>
-                    <Link to="/ceo/backups" className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition" aria-label="Backups verwalten und wiederherstellen">
+                    <Link to="/ceo/backups" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Backups verwalten und wiederherstellen">
                       <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                       </svg>
@@ -326,7 +326,7 @@ const CEODashboard = () => {
 
               <Link
                 to="/ceo/settings"
-                className="p-2 text-gray-400 hover:text-white transition rounded-lg hover:bg-gray-800"
+                className="p-2 text-zinc-500 hover:text-zinc-900 transition rounded-lg hover:bg-zinc-100"
                 title="Einstellungen"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,7 +334,7 @@ const CEODashboard = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </Link>
-              <span className="flex items-center gap-1.5 text-red-400 text-sm font-medium px-3 py-1 bg-red-500/10 rounded-full border border-red-500/20">
+              <span className="flex items-center gap-1.5 text-red-600 text-sm font-medium px-3 py-1 bg-red-500/10 rounded-full border border-red-500/20">
                 <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                 </svg>
@@ -374,17 +374,17 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
       {unresolvedErrors > 0 && (
         <div className="bg-gradient-to-r from-red-900/40 to-red-800/20 border border-red-500/40 rounded-2xl p-5 flex items-center gap-5">
           <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center">
-            <svg className="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
           <div className="flex-1">
-            <h3 className="font-bold text-red-300 text-lg">System-Alarme</h3>
-            <p className="text-red-200/70 text-sm">{unresolvedErrors} ungelöste {unresolvedErrors === 1 ? 'Meldung erfordert' : 'Meldungen erfordern'} Ihre Aufmerksamkeit</p>
+            <h3 className="font-bold text-red-600 text-lg">System-Alarme</h3>
+            <p className="text-red-600/70 text-sm">{unresolvedErrors} ungelöste {unresolvedErrors === 1 ? 'Meldung erfordert' : 'Meldungen erfordern'} Ihre Aufmerksamkeit</p>
           </div>
           <button
             onClick={() => setActiveTab('errors')}
-            className="px-5 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition shadow-lg shadow-red-500/20"
+            className="px-5 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition shadow-sm shadow-red-500/20"
           >
             Jetzt prüfen
           </button>
@@ -399,10 +399,10 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
             <div>
               <p className="text-emerald-300/80 text-sm font-medium uppercase tracking-wider mb-2">Monatlicher Umsatz</p>
               <div className="flex items-baseline gap-3">
-                <span className="text-6xl font-black text-white">€{stats.totalRevenue.toLocaleString('de-DE')}</span>
+                <span className="text-6xl font-black text-zinc-900">€{stats.totalRevenue.toLocaleString('de-DE')}</span>
                 <span className="text-emerald-400 text-lg font-medium">/ Monat</span>
               </div>
-              <p className="text-gray-200 text-sm mt-3">
+              <p className="text-zinc-700 text-sm mt-3">
                 {stats.starterAbos} Starter × €29 + {stats.proAbos} Pro × €69
               </p>
             </div>
@@ -412,8 +412,8 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
                 <span className="text-emerald-300/70 text-sm ml-2">Zahlende Kunden</span>
               </div>
               <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                <span className="text-white font-bold text-lg">€{avgRevenue}</span>
-                <span className="text-gray-400 text-sm ml-2">Ø pro Kunde</span>
+                <span className="text-zinc-900 font-bold text-lg">€{avgRevenue}</span>
+                <span className="text-zinc-500 text-sm ml-2">Ø pro Kunde</span>
               </div>
             </div>
           </div>
@@ -432,7 +432,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               </svg>
             </div>
             <p className="text-blue-300/80 text-xs font-medium uppercase tracking-wider">Gesamt Kunden</p>
-            <p className="text-4xl font-black text-white mt-1">{stats.totalCustomers}</p>
+            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.totalCustomers}</p>
             <p className="text-blue-400/60 text-xs mt-2">Registrierte Unternehmen</p>
           </div>
         </div>
@@ -447,7 +447,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               </svg>
             </div>
             <p className="text-violet-300/80 text-xs font-medium uppercase tracking-wider">Starter</p>
-            <p className="text-4xl font-black text-white mt-1">{stats.starterAbos}</p>
+            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.starterAbos}</p>
             <p className="text-violet-400/60 text-xs mt-2">€{stats.starterAbos * 29}/Monat</p>
           </div>
         </div>
@@ -462,7 +462,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               </svg>
             </div>
             <p className="text-amber-300/80 text-xs font-medium uppercase tracking-wider">Pro</p>
-            <p className="text-4xl font-black text-white mt-1">{stats.proAbos}</p>
+            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.proAbos}</p>
             <p className="text-amber-400/60 text-xs mt-2">€{stats.proAbos * 69}/Monat</p>
           </div>
         </div>
@@ -477,7 +477,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               </svg>
             </div>
             <p className="text-cyan-300/80 text-xs font-medium uppercase tracking-wider">Trial</p>
-            <p className="text-4xl font-black text-white mt-1">{stats.trialAbos}</p>
+            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.trialAbos}</p>
             <p className="text-cyan-400/60 text-xs mt-2">In Testphase</p>
           </div>
         </div>
@@ -486,43 +486,43 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
       {/* Bottom Row - Metrics + System Status */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Conversion Rate */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6">
+        <div className="bg-white/80 border border-zinc-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-gray-200 text-sm font-medium">Conversion Rate</p>
+            <p className="text-zinc-700 text-sm font-medium">Conversion Rate</p>
             <div className="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
           </div>
-          <p className="text-4xl font-black text-white">{conversionRate}%</p>
-          <div className="mt-3 h-2 bg-gray-800 rounded-full overflow-hidden">
+          <p className="text-4xl font-black text-zinc-900">{conversionRate}%</p>
+          <div className="mt-3 h-2 bg-zinc-50 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-1000"
               style={{ width: `${conversionRate}%` }}
             ></div>
           </div>
-          <p className="text-gray-200 text-xs mt-2">Trial → Zahlender Kunde</p>
+          <p className="text-zinc-700 text-xs mt-2">Trial → Zahlender Kunde</p>
         </div>
 
         {/* Avg Revenue */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6">
+        <div className="bg-white/80 border border-zinc-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-gray-200 text-sm font-medium">Ø Umsatz pro Kunde</p>
+            <p className="text-zinc-700 text-sm font-medium">Ø Umsatz pro Kunde</p>
             <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
-          <p className="text-4xl font-black text-white">€{avgRevenue}</p>
-          <p className="text-gray-200 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
+          <p className="text-4xl font-black text-zinc-900">€{avgRevenue}</p>
+          <p className="text-zinc-700 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
         </div>
 
         {/* System Status */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6">
+        <div className="bg-white/80 border border-zinc-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-gray-200 text-sm font-medium">System Status</p>
+            <p className="text-zinc-700 text-sm font-medium">System Status</p>
             <div className="flex items-center gap-2">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -530,8 +530,8 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               </span>
             </div>
           </div>
-          <p className="text-4xl font-black text-green-400">Online</p>
-          <p className="text-gray-200 text-xs mt-3">Alle Dienste aktiv</p>
+          <p className="text-4xl font-black text-green-600">Online</p>
+          <p className="text-zinc-700 text-xs mt-3">Alle Dienste aktiv</p>
         </div>
       </div>
     </div>
@@ -548,14 +548,14 @@ const StatCard = ({ title, value, iconType, color, subtitle }) => {
 
   const textColors = {
     blue: 'text-blue-400',
-    green: 'text-green-400',
+    green: 'text-green-600',
     purple: 'text-purple-400',
     orange: 'text-orange-400',
   };
 
   const iconColors = {
     blue: 'text-blue-400/60',
-    green: 'text-green-400/60',
+    green: 'text-green-600/60',
     purple: 'text-purple-400/60',
     orange: 'text-orange-400/60',
   };
@@ -596,9 +596,9 @@ const StatCard = ({ title, value, iconType, color, subtitle }) => {
     <div className={`bg-gradient-to-br ${colors[color]} border rounded-xl p-5`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-gray-200 text-sm">{title}</p>
+          <p className="text-zinc-700 text-sm">{title}</p>
           <p className={`text-3xl font-bold ${textColors[color]} mt-1`}>{value}</p>
-          <p className="text-gray-200 text-xs mt-1">{subtitle}</p>
+          <p className="text-zinc-700 text-xs mt-1">{subtitle}</p>
         </div>
         {renderIcon()}
       </div>
@@ -649,17 +649,17 @@ const ErrorsTab = ({ errors, onResolve }) => {
         {/* Header with Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
-            <h2 className="text-xl font-semibold text-white">System Fehlermeldungen</h2>
-            <p className="text-gray-200 text-sm">Überwachen Sie alle Fehler und Warnungen</p>
+            <h2 className="text-xl font-semibold text-zinc-900">System Fehlermeldungen</h2>
+            <p className="text-zinc-700 text-sm">Überwachen Sie alle Fehler und Warnungen</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
               { key: 'all', label: 'Alle' },
               { key: 'unresolved', label: 'Offen' },
-              { key: 'critical', label: 'Kritisch', color: 'text-red-400' },
+              { key: 'critical', label: 'Kritisch', color: 'text-red-600' },
               { key: 'errors', label: 'Fehler', color: 'text-orange-400' },
-              { key: 'warnings', label: 'Warnungen', color: 'text-yellow-400' },
-              { key: 'resolved', label: 'Gelöst', color: 'text-green-400' },
+              { key: 'warnings', label: 'Warnungen', color: 'text-yellow-600' },
+              { key: 'resolved', label: 'Gelöst', color: 'text-green-600' },
             ].map((f) => (
               <button
                 key={f.key}
@@ -667,7 +667,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   filter === f.key
                     ? 'bg-white text-black'
-                    : `bg-gray-800/50 ${f.color || 'text-gray-400'} hover:bg-gray-800`
+                    : `bg-zinc-50/50 ${f.color || 'text-zinc-500'} hover:bg-zinc-100`
                 }`}
               >
                 {f.label}
@@ -678,14 +678,14 @@ const ErrorsTab = ({ errors, onResolve }) => {
 
         {/* Error List */}
         {filteredErrors.length === 0 ? (
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-12 text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white">Keine Fehler</h3>
-            <p className="text-gray-200 mt-2">
+            <h3 className="text-xl font-semibold text-zinc-900">Keine Fehler</h3>
+            <p className="text-zinc-700 mt-2">
               {filter === 'all' ? 'Alle Systeme laufen einwandfrei' : 'Keine Ergebnisse für diesen Filter'}
             </p>
           </div>
@@ -695,11 +695,11 @@ const ErrorsTab = ({ errors, onResolve }) => {
               <div
                 key={error.id}
                 onClick={() => setSelectedError(selectedError?.id === error.id ? null : error)}
-                className={`bg-gray-900/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-900 ${
+                className={`bg-white/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-white ${
                   selectedError?.id === error.id ? 'ring-2 ring-indigo-500' : ''
                 } ${
                   error.resolved
-                    ? 'border-gray-800 opacity-60'
+                    ? 'border-zinc-200 opacity-60'
                     : error.type === 'critical'
                     ? 'border-red-500/50'
                     : error.type === 'error'
@@ -720,11 +720,11 @@ const ErrorsTab = ({ errors, onResolve }) => {
                     }`}
                   >
                     {error.resolved ? (
-                      <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
-                      <svg className={`w-5 h-5 ${error.type === 'critical' ? 'text-red-400' : error.type === 'error' ? 'text-orange-400' : 'text-yellow-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${error.type === 'critical' ? 'text-red-600' : error.type === 'error' ? 'text-orange-400' : 'text-yellow-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     )}
@@ -732,10 +732,10 @@ const ErrorsTab = ({ errors, onResolve }) => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className={`font-medium ${error.resolved ? 'text-gray-500' : 'text-white'}`}>
+                        <p className={`font-medium ${error.resolved ? 'text-zinc-400' : 'text-zinc-900'}`}>
                           {error.message}
                         </p>
-                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-500">
+                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-zinc-400">
                           <span>{formatTimestamp(error.timestamp)}</span>
                           {error.source && <span className="capitalize">• {error.source}</span>}
                           {error.salon && <span>• {error.salon.name}</span>}
@@ -743,12 +743,12 @@ const ErrorsTab = ({ errors, onResolve }) => {
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
                         error.resolved
-                          ? 'bg-green-500/20 text-green-400'
+                          ? 'bg-green-500/20 text-green-600'
                           : error.type === 'critical'
-                          ? 'bg-red-500/20 text-red-400'
+                          ? 'bg-red-500/20 text-red-600'
                           : error.type === 'error'
                           ? 'bg-orange-500/20 text-orange-400'
-                          : 'bg-yellow-500/20 text-yellow-400'
+                          : 'bg-yellow-500/20 text-yellow-600'
                       }`}>
                         {error.resolved ? 'Gelöst' : error.type === 'critical' ? 'Kritisch' : error.type === 'error' ? 'Fehler' : 'Warnung'}
                       </span>
@@ -764,19 +764,19 @@ const ErrorsTab = ({ errors, onResolve }) => {
       {/* Sidebar */}
       <div className="space-y-4">
         {/* Status Overview */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-200 uppercase tracking-wider mb-4">Status Übersicht</h3>
+        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+          <h3 className="text-sm font-medium text-zinc-700 uppercase tracking-wider mb-4">Status Übersicht</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <span className="text-red-400 font-medium">Kritisch</span>
+                <span className="text-red-600 font-medium">Kritisch</span>
               </div>
-              <span className="text-2xl font-bold text-red-400">{criticalCount}</span>
+              <span className="text-2xl font-bold text-red-600">{criticalCount}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
               <div className="flex items-center gap-3">
@@ -792,51 +792,51 @@ const ErrorsTab = ({ errors, onResolve }) => {
             <div className="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span className="text-yellow-400 font-medium">Warnungen</span>
+                <span className="text-yellow-600 font-medium">Warnungen</span>
               </div>
-              <span className="text-2xl font-bold text-yellow-400">{warningCount}</span>
+              <span className="text-2xl font-bold text-yellow-600">{warningCount}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span className="text-green-400 font-medium">Gelöst</span>
+                <span className="text-green-600 font-medium">Gelöst</span>
               </div>
-              <span className="text-2xl font-bold text-green-400">{resolvedCount}</span>
+              <span className="text-2xl font-bold text-green-600">{resolvedCount}</span>
             </div>
           </div>
         </div>
 
         {/* Selected Error Details */}
         {selectedError && (
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-gray-200 uppercase tracking-wider mb-4">Details</h3>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+            <h3 className="text-sm font-medium text-zinc-700 uppercase tracking-wider mb-4">Details</h3>
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-gray-200">Nachricht</p>
-                <p className="text-white text-sm mt-1">{selectedError.message}</p>
+                <p className="text-xs text-zinc-700">Nachricht</p>
+                <p className="text-zinc-900 text-sm mt-1">{selectedError.message}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-200">Zeitpunkt</p>
-                <p className="text-white text-sm mt-1">{formatTimestamp(selectedError.timestamp)}</p>
+                <p className="text-xs text-zinc-700">Zeitpunkt</p>
+                <p className="text-zinc-900 text-sm mt-1">{formatTimestamp(selectedError.timestamp)}</p>
               </div>
               {selectedError.source && (
                 <div>
-                  <p className="text-xs text-gray-500">Quelle</p>
-                  <p className="text-white text-sm mt-1 capitalize">{selectedError.source}</p>
+                  <p className="text-xs text-zinc-400">Quelle</p>
+                  <p className="text-zinc-900 text-sm mt-1 capitalize">{selectedError.source}</p>
                 </div>
               )}
               {selectedError.stack && (
                 <div>
-                  <p className="text-xs text-gray-500">Stack Trace</p>
-                  <pre className="mt-1 p-2 bg-black/50 rounded-lg text-xs text-gray-400 overflow-x-auto">
+                  <p className="text-xs text-zinc-400">Stack Trace</p>
+                  <pre className="mt-1 p-2 bg-white/50 rounded-lg text-xs text-zinc-500 overflow-x-auto">
                     {selectedError.stack}
                   </pre>
                 </div>
@@ -844,7 +844,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
               {!selectedError.resolved && (
                 <button
                   onClick={() => handleResolve(selectedError.id)}
-                  className="w-full mt-2 px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition"
+                  className="w-full mt-2 px-4 py-2 bg-green-500 text-zinc-900 rounded-lg font-medium hover:bg-green-600 transition"
                 >
                   Als gelöst markieren
                 </button>
@@ -855,13 +855,13 @@ const ErrorsTab = ({ errors, onResolve }) => {
 
         {/* Quick Actions */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-200 uppercase tracking-wider mb-3">Schnellaktionen</h3>
+          <h3 className="text-sm font-medium text-zinc-700 uppercase tracking-wider mb-3">Schnellaktionen</h3>
           <div className="space-y-2">
             <button
               onClick={() => {
                 errors.filter(e => !e.resolved).forEach(e => handleResolve(e.id));
               }}
-              className="w-full px-4 py-2 bg-green-500/10 text-green-400 rounded-lg text-sm font-medium hover:bg-green-500/20 transition text-left flex items-center gap-2"
+              className="w-full px-4 py-2 bg-green-500/10 text-green-600 rounded-lg text-sm font-medium hover:bg-green-500/20 transition text-left flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -922,13 +922,13 @@ const CustomersTab = ({ customers }) => {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
-            <h2 className="text-xl font-semibold text-white">Kunden</h2>
-            <p className="text-gray-200 text-sm">Alle Unternehmen die JN Business System nutzen</p>
+            <h2 className="text-xl font-semibold text-zinc-900">Kunden</h2>
+            <p className="text-zinc-700 text-sm">Alle Unternehmen die JN Business System nutzen</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
               { key: 'all', label: 'Alle' },
-              { key: 'active', label: 'Aktiv', color: 'text-green-400' },
+              { key: 'active', label: 'Aktiv', color: 'text-green-600' },
               { key: 'trial', label: 'Trial', color: 'text-orange-400' },
               { key: 'starter', label: 'Starter', color: 'text-blue-400' },
               { key: 'pro', label: 'Pro', color: 'text-purple-400' },
@@ -939,7 +939,7 @@ const CustomersTab = ({ customers }) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   filter === f.key
                     ? 'bg-white text-black'
-                    : `bg-gray-800/50 ${f.color || 'text-gray-400'} hover:bg-gray-800`
+                    : `bg-zinc-50/50 ${f.color || 'text-zinc-500'} hover:bg-zinc-100`
                 }`}
               >
                 {f.label}
@@ -950,7 +950,7 @@ const CustomersTab = ({ customers }) => {
 
         {/* Search */}
         <div className="relative">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -958,20 +958,20 @@ const CustomersTab = ({ customers }) => {
             placeholder="Suche nach Name oder Email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition"
+            className="w-full pl-12 pr-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 transition"
           />
         </div>
 
         {/* Customer List */}
         {filteredCustomers.length === 0 ? (
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-zinc-50 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white">Keine Kunden gefunden</h3>
-            <p className="text-gray-500 mt-2">
+            <h3 className="text-xl font-semibold text-zinc-900">Keine Kunden gefunden</h3>
+            <p className="text-zinc-400 mt-2">
               {customers.length === 0 ? 'Es gibt noch keine registrierten Unternehmen.' : 'Keine Ergebnisse für diese Filterkriterien.'}
             </p>
           </div>
@@ -981,17 +981,17 @@ const CustomersTab = ({ customers }) => {
               <div
                 key={customer.id}
                 onClick={() => setSelectedCustomer(selectedCustomer?.id === customer.id ? null : customer)}
-                className={`bg-gray-900/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-900 ${
-                  selectedCustomer?.id === customer.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-gray-800'
+                className={`bg-white/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-white ${
+                  selectedCustomer?.id === customer.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-zinc-200'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg flex-shrink-0">
                     {customer.name?.charAt(0) || '?'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
-                      <h4 className="font-semibold text-white truncate">{customer.name || 'Unbekannt'}</h4>
+                      <h4 className="font-semibold text-zinc-900 truncate">{customer.name || 'Unbekannt'}</h4>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         customer.plan === 'pro'
                           ? 'bg-purple-500/20 text-purple-400'
@@ -1000,19 +1000,19 @@ const CustomersTab = ({ customers }) => {
                         {customer.plan === 'pro' ? 'Pro' : 'Starter'}
                       </span>
                     </div>
-                    <p className="text-gray-500 text-sm truncate">{customer.email || '-'}</p>
+                    <p className="text-zinc-400 text-sm truncate">{customer.email || '-'}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                       customer.status === 'active'
-                        ? 'bg-green-500/20 text-green-400'
+                        ? 'bg-green-500/20 text-green-600'
                         : customer.status === 'trial'
                         ? 'bg-orange-500/20 text-orange-400'
-                        : 'bg-gray-500/20 text-gray-400'
+                        : 'bg-gray-500/20 text-zinc-500'
                     }`}>
                       {customer.status === 'active' ? 'Aktiv' : customer.status === 'trial' ? 'Trial' : 'Inaktiv'}
                     </span>
-                    <p className="text-gray-600 text-xs mt-1">seit {formatDate(customer.since)}</p>
+                    <p className="text-zinc-500 text-xs mt-1">seit {formatDate(customer.since)}</p>
                   </div>
                 </div>
               </div>
@@ -1024,12 +1024,12 @@ const CustomersTab = ({ customers }) => {
       {/* Sidebar */}
       <div className="space-y-4">
         {/* Stats */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Übersicht</h3>
+        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Übersicht</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-green-400">{activeCount}</p>
-              <p className="text-xs text-green-400/70">Aktiv</p>
+              <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+              <p className="text-xs text-green-600/70">Aktiv</p>
             </div>
             <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-orange-400">{trialCount}</p>
@@ -1048,47 +1048,47 @@ const CustomersTab = ({ customers }) => {
 
         {/* Selected Customer Details */}
         {selectedCustomer && (
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Kundendetails</h3>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+            <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Kundendetails</h3>
             <div className="text-center mb-4">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-2xl">
                 {selectedCustomer.name?.charAt(0) || '?'}
               </div>
-              <h4 className="font-semibold text-white mt-3">{selectedCustomer.name}</h4>
-              <p className="text-gray-500 text-sm">{selectedCustomer.email}</p>
+              <h4 className="font-semibold text-zinc-900 mt-3">{selectedCustomer.name}</h4>
+              <p className="text-zinc-400 text-sm">{selectedCustomer.email}</p>
             </div>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-500">Plan</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-400">Plan</span>
                 <span className={selectedCustomer.plan === 'pro' ? 'text-purple-400' : 'text-blue-400'}>
                   {selectedCustomer.plan === 'pro' ? 'Pro' : 'Starter'}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-500">Status</span>
-                <span className={selectedCustomer.status === 'active' ? 'text-green-400' : 'text-orange-400'}>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-400">Status</span>
+                <span className={selectedCustomer.status === 'active' ? 'text-green-600' : 'text-orange-400'}>
                   {selectedCustomer.status === 'active' ? 'Aktiv' : 'Trial'}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-500">Kunde seit</span>
-                <span className="text-white">{formatDate(selectedCustomer.since)}</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-400">Kunde seit</span>
+                <span className="text-zinc-900">{formatDate(selectedCustomer.since)}</span>
               </div>
               {selectedCustomer.phone && (
-                <div className="flex justify-between py-2 border-b border-gray-800">
-                  <span className="text-gray-500">Telefon</span>
-                  <span className="text-white">{selectedCustomer.phone}</span>
+                <div className="flex justify-between py-2 border-b border-zinc-200">
+                  <span className="text-zinc-400">Telefon</span>
+                  <span className="text-zinc-900">{selectedCustomer.phone}</span>
                 </div>
               )}
             </div>
             <div className="mt-4 space-y-2">
-              <button className="w-full px-4 py-2 bg-indigo-500/10 text-indigo-400 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition flex items-center justify-center gap-2">
+              <button className="w-full px-4 py-2 bg-indigo-500/10 text-zinc-900 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition flex items-center justify-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
                 Bearbeiten
               </button>
-              <button className="w-full px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-700 transition flex items-center justify-center gap-2">
+              <button className="w-full px-4 py-2 bg-zinc-50 text-zinc-500 rounded-lg text-sm font-medium hover:bg-zinc-100 transition flex items-center justify-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
@@ -1100,15 +1100,15 @@ const CustomersTab = ({ customers }) => {
 
         {/* Conversion Funnel */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Conversion</h3>
+          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-3">Conversion</h3>
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-gray-400 text-sm">Trial → Aktiv</span>
-              <span className="text-green-400 font-semibold">
+              <span className="text-zinc-500 text-sm">Trial → Aktiv</span>
+              <span className="text-green-600 font-semibold">
                 {trialCount > 0 ? Math.round((activeCount / (activeCount + trialCount)) * 100) : 0}%
               </span>
             </div>
-            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-2 bg-zinc-50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
                 style={{ width: `${trialCount > 0 ? (activeCount / (activeCount + trialCount)) * 100 : 0}%` }}
@@ -1117,12 +1117,12 @@ const CustomersTab = ({ customers }) => {
           </div>
           <div className="mt-4 space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-gray-400 text-sm">Starter → Pro</span>
+              <span className="text-zinc-500 text-sm">Starter → Pro</span>
               <span className="text-purple-400 font-semibold">
                 {starterCount > 0 ? Math.round((proCount / (starterCount + proCount)) * 100) : 0}%
               </span>
             </div>
-            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-2 bg-zinc-50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-purple-500 to-pink-400 rounded-full"
                 style={{ width: `${starterCount > 0 ? (proCount / (starterCount + proCount)) * 100 : 0}%` }}
@@ -1168,15 +1168,15 @@ const SubscriptionsTab = ({ subscriptions }) => {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
-            <h2 className="text-xl font-semibold text-white">Abonnements</h2>
-            <p className="text-gray-500 text-sm">Alle laufenden Subscriptions verwalten</p>
+            <h2 className="text-xl font-semibold text-zinc-900">Abonnements</h2>
+            <p className="text-zinc-400 text-sm">Alle laufenden Subscriptions verwalten</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
               { key: 'all', label: 'Alle' },
-              { key: 'active', label: 'Aktiv', color: 'text-green-400' },
+              { key: 'active', label: 'Aktiv', color: 'text-green-600' },
               { key: 'trial', label: 'Trial', color: 'text-orange-400' },
-              { key: 'cancelled', label: 'Gekündigt', color: 'text-red-400' },
+              { key: 'cancelled', label: 'Gekündigt', color: 'text-red-600' },
             ].map((f) => (
               <button
                 key={f.key}
@@ -1184,7 +1184,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   filter === f.key
                     ? 'bg-white text-black'
-                    : `bg-gray-800/50 ${f.color || 'text-gray-400'} hover:bg-gray-800`
+                    : `bg-zinc-50/50 ${f.color || 'text-zinc-500'} hover:bg-zinc-100`
                 }`}
               >
                 {f.label}
@@ -1195,14 +1195,14 @@ const SubscriptionsTab = ({ subscriptions }) => {
 
         {/* Subscription List */}
         {filteredSubs.length === 0 ? (
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-zinc-50 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white">Keine Abonnements</h3>
-            <p className="text-gray-500 mt-2">
+            <h3 className="text-xl font-semibold text-zinc-900">Keine Abonnements</h3>
+            <p className="text-zinc-400 mt-2">
               {subscriptions.length === 0 ? 'Es gibt noch keine aktiven Abonnements.' : 'Keine Ergebnisse für diesen Filter.'}
             </p>
           </div>
@@ -1212,8 +1212,8 @@ const SubscriptionsTab = ({ subscriptions }) => {
               <div
                 key={sub.id}
                 onClick={() => setSelectedSub(selectedSub?.id === sub.id ? null : sub)}
-                className={`bg-gray-900/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-900 ${
-                  selectedSub?.id === sub.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-gray-800'
+                className={`bg-white/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-white ${
+                  selectedSub?.id === sub.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-zinc-200'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -1228,7 +1228,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white">{sub.customer || 'Unbekannt'}</h4>
+                      <h4 className="font-semibold text-zinc-900">{sub.customer || 'Unbekannt'}</h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                           sub.plan === 'Pro'
@@ -1237,22 +1237,22 @@ const SubscriptionsTab = ({ subscriptions }) => {
                         }`}>
                           {sub.plan}
                         </span>
-                        <span className="text-gray-500 text-sm">•</span>
-                        <span className="text-gray-500 text-sm">seit {formatDate(sub.startDate)}</span>
+                        <span className="text-zinc-400 text-sm">•</span>
+                        <span className="text-zinc-400 text-sm">seit {formatDate(sub.startDate)}</span>
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`text-lg font-bold ${sub.amount > 0 ? 'text-green-400' : 'text-gray-500'}`}>
+                    <p className={`text-lg font-bold ${sub.amount > 0 ? 'text-green-600' : 'text-zinc-400'}`}>
                       {sub.amount > 0 ? `€${sub.amount}` : '€0'}
-                      <span className="text-xs font-normal text-gray-500">/Mo</span>
+                      <span className="text-xs font-normal text-zinc-400">/Mo</span>
                     </p>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       sub.status === 'active'
-                        ? 'bg-green-500/20 text-green-400'
+                        ? 'bg-green-500/20 text-green-600'
                         : sub.status === 'trial'
                         ? 'bg-orange-500/20 text-orange-400'
-                        : 'bg-red-500/20 text-red-400'
+                        : 'bg-red-500/20 text-red-600'
                     }`}>
                       {sub.status === 'active' ? 'Aktiv' : sub.status === 'trial' ? 'Trial' : 'Gekündigt'}
                     </span>
@@ -1268,77 +1268,77 @@ const SubscriptionsTab = ({ subscriptions }) => {
       <div className="space-y-4">
         {/* Revenue Stats */}
         <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Umsatz</h3>
+          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Umsatz</h3>
           <div className="text-center">
-            <p className="text-4xl font-bold text-green-400">€{totalMRR}</p>
-            <p className="text-green-400/70 text-sm">Monatlicher Umsatz (MRR)</p>
+            <p className="text-4xl font-bold text-green-600">€{totalMRR}</p>
+            <p className="text-green-600/70 text-sm">Monatlicher Umsatz (MRR)</p>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-4">
-            <div className="bg-black/30 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-white">{activeCount}</p>
-              <p className="text-xs text-gray-500">Zahlend</p>
+            <div className="bg-white/30 rounded-lg p-3 text-center">
+              <p className="text-xl font-bold text-zinc-900">{activeCount}</p>
+              <p className="text-xs text-zinc-400">Zahlend</p>
             </div>
-            <div className="bg-black/30 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-white">€{avgRevenue}</p>
-              <p className="text-xs text-gray-500">Ø/Kunde</p>
+            <div className="bg-white/30 rounded-lg p-3 text-center">
+              <p className="text-xl font-bold text-zinc-900">€{avgRevenue}</p>
+              <p className="text-xs text-zinc-400">Ø/Kunde</p>
             </div>
           </div>
         </div>
 
         {/* Status Distribution */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Status</h3>
+        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Status</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-gray-400 text-sm">Aktiv</span>
+                <span className="text-zinc-500 text-sm">Aktiv</span>
               </div>
-              <span className="text-white font-semibold">{activeCount}</span>
+              <span className="text-zinc-900 font-semibold">{activeCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                <span className="text-gray-400 text-sm">Trial</span>
+                <span className="text-zinc-500 text-sm">Trial</span>
               </div>
-              <span className="text-white font-semibold">{trialCount}</span>
+              <span className="text-zinc-900 font-semibold">{trialCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-gray-500"></div>
-                <span className="text-gray-400 text-sm">Total</span>
+                <span className="text-zinc-500 text-sm">Total</span>
               </div>
-              <span className="text-white font-semibold">{subscriptions.length}</span>
+              <span className="text-zinc-900 font-semibold">{subscriptions.length}</span>
             </div>
           </div>
         </div>
 
         {/* Selected Subscription */}
         {selectedSub && (
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Details</h3>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+            <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Details</h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-500">Kunde</span>
-                <span className="text-white">{selectedSub.customer}</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-400">Kunde</span>
+                <span className="text-zinc-900">{selectedSub.customer}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-500">Plan</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-400">Plan</span>
                 <span className={selectedSub.plan === 'Pro' ? 'text-purple-400' : 'text-blue-400'}>
                   {selectedSub.plan}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-500">Betrag</span>
-                <span className="text-green-400">€{selectedSub.amount}/Mo</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-400">Betrag</span>
+                <span className="text-green-600">€{selectedSub.amount}/Mo</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-500">Start</span>
-                <span className="text-white">{formatDate(selectedSub.startDate)}</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-400">Start</span>
+                <span className="text-zinc-900">{formatDate(selectedSub.startDate)}</span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-gray-500">Nächste Abrechnung</span>
-                <span className="text-white">{formatDate(selectedSub.nextBilling)}</span>
+                <span className="text-zinc-400">Nächste Abrechnung</span>
+                <span className="text-zinc-900">{formatDate(selectedSub.nextBilling)}</span>
               </div>
             </div>
           </div>
@@ -1346,14 +1346,14 @@ const SubscriptionsTab = ({ subscriptions }) => {
 
         {/* Projections */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Prognose</h3>
+          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-3">Prognose</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-gray-400 text-sm">ARR (Jährlich)</span>
-              <span className="text-indigo-400 font-bold">€{totalMRR * 12}</span>
+              <span className="text-zinc-500 text-sm">ARR (Jährlich)</span>
+              <span className="text-zinc-900 font-bold">€{totalMRR * 12}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-400 text-sm">Bei +10 Kunden/Mo</span>
+              <span className="text-zinc-500 text-sm">Bei +10 Kunden/Mo</span>
               <span className="text-purple-400 font-bold">€{(totalMRR + (avgRevenue * 10)) * 12}</span>
             </div>
           </div>
@@ -1577,7 +1577,7 @@ const SystemControlTab = () => {
 
   // Get type icon - returns SVG element
   const getTypeIcon = (type) => {
-    const iconClass = "w-6 h-6 text-gray-400";
+    const iconClass = "w-6 h-6 text-zinc-500";
     switch (type) {
       case 'database':
         return (
@@ -1613,8 +1613,8 @@ const SystemControlTab = () => {
         {/* Header Actions */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white">Services</h2>
-            <p className="text-gray-500 text-sm">Alle System-Komponenten im Überblick</p>
+            <h2 className="text-xl font-bold text-zinc-900">Services</h2>
+            <p className="text-zinc-400 text-sm">Alle System-Komponenten im Überblick</p>
           </div>
           <div className="flex gap-3">
             <button
@@ -1622,7 +1622,7 @@ const SystemControlTab = () => {
               disabled={allStarting || allStopping}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition ${
                 allStarting
-                  ? 'bg-green-500/20 text-green-400 cursor-wait'
+                  ? 'bg-green-500/20 text-green-600 cursor-wait'
                   : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700'
               }`}
             >
@@ -1638,8 +1638,8 @@ const SystemControlTab = () => {
               disabled={allStarting || allStopping}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition ${
                 allStopping
-                  ? 'bg-red-500/20 text-red-400 cursor-wait'
-                  : 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20'
+                  ? 'bg-red-500/20 text-red-600 cursor-wait'
+                  : 'bg-red-500/10 text-red-600 border border-red-500/30 hover:bg-red-500/20'
               }`}
             >
               {allStopping ? (
@@ -1661,22 +1661,22 @@ const SystemControlTab = () => {
             return (
               <div
                 key={service.id}
-                className={`bg-gray-900/50 border rounded-xl p-5 transition-all ${
+                className={`bg-white/50 border rounded-xl p-5 transition-all ${
                   isRunning
-                    ? 'border-green-500/30 shadow-lg shadow-green-500/10'
-                    : 'border-gray-800 hover:border-gray-700'
+                    ? 'border-green-500/30 shadow-sm shadow-green-500/10'
+                    : 'border-zinc-200 hover:border-zinc-200'
                 }`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      isRunning ? 'bg-green-500/20' : 'bg-gray-800'
+                      isRunning ? 'bg-green-500/20' : 'bg-zinc-50'
                     }`}>
                       {getTypeIcon(service.type)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">{service.name}</h3>
-                      <p className="text-gray-500 text-sm">{service.description}</p>
+                      <h3 className="font-semibold text-zinc-900">{service.name}</h3>
+                      <p className="text-zinc-400 text-sm">{service.description}</p>
                     </div>
                   </div>
                 </div>
@@ -1685,9 +1685,9 @@ const SystemControlTab = () => {
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${getStatusColor(service.status)}`}></div>
-                      <span className="text-sm text-gray-400">{getStatusText(service.status)}</span>
+                      <span className="text-sm text-zinc-500">{getStatusText(service.status)}</span>
                     </div>
-                    <span className="text-xs text-gray-600 font-mono">:{service.port}</span>
+                    <span className="text-xs text-zinc-500 font-mono">:{service.port}</span>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -1695,10 +1695,10 @@ const SystemControlTab = () => {
                       disabled={actionLoading[service.id] || isRunning}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1 ${
                         isRunning
-                          ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                          ? 'bg-zinc-50 text-zinc-500 cursor-not-allowed'
                           : actionLoading[service.id] === 'starting'
-                          ? 'bg-green-500/20 text-green-400 cursor-wait'
-                          : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
+                          ? 'bg-green-500/20 text-green-600 cursor-wait'
+                          : 'bg-green-500/10 text-green-600 hover:bg-green-500/20'
                       }`}
                     >
                       {actionLoading[service.id] === 'starting' ? (
@@ -1712,10 +1712,10 @@ const SystemControlTab = () => {
                       disabled={actionLoading[service.id] || isStopped}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1 ${
                         isStopped
-                          ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                          ? 'bg-zinc-50 text-zinc-500 cursor-not-allowed'
                           : actionLoading[service.id] === 'stopping'
-                          ? 'bg-red-500/20 text-red-400 cursor-wait'
-                          : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                          ? 'bg-red-500/20 text-red-600 cursor-wait'
+                          : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
                       }`}
                     >
                       {actionLoading[service.id] === 'stopping' ? (
@@ -1726,7 +1726,7 @@ const SystemControlTab = () => {
                     </button>
                     <button
                       onClick={() => checkServiceStatus(service.id)}
-                      className="px-2 py-1.5 rounded-lg text-sm bg-gray-800 text-gray-400 hover:text-white transition"
+                      className="px-2 py-1.5 rounded-lg text-sm bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition"
                       title="Status aktualisieren"
                     >
                       <RefreshIcon />
@@ -1739,24 +1739,24 @@ const SystemControlTab = () => {
         </div>
 
         {/* System Logs */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
+        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <h3 className="font-semibold text-white">System Logs</h3>
+              <h3 className="font-semibold text-zinc-900">System Logs</h3>
             </div>
             <button
               onClick={() => setLogs([])}
-              className="text-xs text-gray-500 hover:text-gray-400 px-2 py-1 rounded hover:bg-gray-800"
+              className="text-xs text-zinc-400 hover:text-zinc-500 px-2 py-1 rounded hover:bg-zinc-100"
             >
               Leeren
             </button>
           </div>
-          <div className="bg-black rounded-xl p-4 h-56 overflow-y-auto font-mono text-xs scrollbar-thin">
+          <div className="bg-white rounded-xl p-4 h-56 overflow-y-auto font-mono text-xs scrollbar-thin">
             {logs.length === 0 ? (
-              <div className="text-gray-600 flex items-center justify-center h-full">
+              <div className="text-zinc-500 flex items-center justify-center h-full">
                 <div className="text-center">
                   <svg className="w-8 h-8 mx-auto mb-2 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -1769,12 +1769,12 @@ const SystemControlTab = () => {
                 <div
                   key={index}
                   className={`py-1.5 border-b border-gray-900 last:border-0 ${
-                    log.type === 'error' ? 'text-red-400' :
-                    log.type === 'success' ? 'text-green-400' :
-                    'text-gray-400'
+                    log.type === 'error' ? 'text-red-600' :
+                    log.type === 'success' ? 'text-green-600' :
+                    'text-zinc-500'
                   }`}
                 >
-                  <span className="text-gray-600">[{log.timestamp}]</span> {log.message}
+                  <span className="text-zinc-500">[{log.timestamp}]</span> {log.message}
                 </div>
               ))
             )}
@@ -1785,24 +1785,24 @@ const SystemControlTab = () => {
       {/* Sidebar */}
       <div className="space-y-6">
         {/* System Status Overview */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-          <h3 className="font-semibold text-white mb-4">System Status</h3>
+        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+          <h3 className="font-semibold text-zinc-900 mb-4">System Status</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-              <span className="text-gray-400">Aktive Services</span>
-              <span className="text-xl font-bold text-green-400">
+            <div className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
+              <span className="text-zinc-500">Aktive Services</span>
+              <span className="text-xl font-bold text-green-600">
                 {services.filter(s => s.status === 'running').length}/{services.length}
               </span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-              <span className="text-gray-400">Gestoppt</span>
-              <span className="text-xl font-bold text-red-400">
+            <div className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
+              <span className="text-zinc-500">Gestoppt</span>
+              <span className="text-xl font-bold text-red-600">
                 {services.filter(s => s.status === 'stopped').length}
               </span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-              <span className="text-gray-400">Unbekannt</span>
-              <span className="text-xl font-bold text-gray-400">
+            <div className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
+              <span className="text-zinc-500">Unbekannt</span>
+              <span className="text-xl font-bold text-zinc-500">
                 {services.filter(s => s.status === 'unknown').length}
               </span>
             </div>
@@ -1811,12 +1811,12 @@ const SystemControlTab = () => {
           {/* Health Bar */}
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-gray-500">System Health</span>
-              <span className="text-white font-medium">
+              <span className="text-zinc-400">System Health</span>
+              <span className="text-zinc-900 font-medium">
                 {Math.round((services.filter(s => s.status === 'running').length / services.length) * 100)}%
               </span>
             </div>
-            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-2 bg-zinc-50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
                 style={{ width: `${(services.filter(s => s.status === 'running').length / services.length) * 100}%` }}
@@ -1827,7 +1827,7 @@ const SystemControlTab = () => {
 
         {/* Quick Actions */}
         <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5">
-          <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+          <h3 className="font-semibold text-zinc-900 mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -1836,7 +1836,7 @@ const SystemControlTab = () => {
           <div className="space-y-2">
             <button
               onClick={() => window.open('http://localhost:3000', '_blank')}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-black/30 rounded-lg text-left hover:bg-black/50 transition group"
+              className="w-full flex items-center gap-3 px-4 py-3 bg-white/30 rounded-lg text-left hover:bg-white/50 transition group"
             >
               <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1844,27 +1844,27 @@ const SystemControlTab = () => {
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-white text-sm font-medium">Frontend öffnen</p>
-                <p className="text-gray-500 text-xs">localhost:3000</p>
+                <p className="text-zinc-900 text-sm font-medium">Frontend öffnen</p>
+                <p className="text-zinc-400 text-xs">localhost:3000</p>
               </div>
-              <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-zinc-500 group-hover:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </button>
             <button
               onClick={() => window.open('http://localhost:5000/api/health', '_blank')}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-black/30 rounded-lg text-left hover:bg-black/50 transition group"
+              className="w-full flex items-center gap-3 px-4 py-3 bg-white/30 rounded-lg text-left hover:bg-white/50 transition group"
             >
               <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-white text-sm font-medium">Backend Health</p>
-                <p className="text-gray-500 text-xs">API Status prüfen</p>
+                <p className="text-zinc-900 text-sm font-medium">Backend Health</p>
+                <p className="text-zinc-400 text-xs">API Status prüfen</p>
               </div>
-              <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-zinc-500 group-hover:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </button>
@@ -1872,8 +1872,8 @@ const SystemControlTab = () => {
         </div>
 
         {/* Startup Order Info */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
-          <h3 className="font-semibold text-white mb-4">Startup-Reihenfolge</h3>
+        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+          <h3 className="font-semibold text-zinc-900 mb-4">Startup-Reihenfolge</h3>
           <div className="space-y-3">
             {[
               { step: 1, name: 'MongoDB', desc: 'Datenbank', color: 'green' },
@@ -1886,8 +1886,8 @@ const SystemControlTab = () => {
                   {item.step}
                 </div>
                 <div>
-                  <p className="text-white text-sm font-medium">{item.name}</p>
-                  <p className="text-gray-500 text-xs">{item.desc}</p>
+                  <p className="text-zinc-900 text-sm font-medium">{item.name}</p>
+                  <p className="text-zinc-400 text-xs">{item.desc}</p>
                 </div>
               </div>
             ))}
