@@ -90,7 +90,6 @@ export default function StudioDashboard() {
       const bookings = bookingsResponse.data?.data || bookingsResponse.data?.bookings || [];
       setRecentBookings(bookings.slice(0, 5));
     } catch (error) {
-      console.error('Dashboard fetch error:', error);
       showNotification('Fehler beim Laden der Dashboard-Daten', 'error');
     } finally {
       setLoading(false);
@@ -100,8 +99,8 @@ export default function StudioDashboard() {
   if (loading) return <LoadingSpinner />;
   const statCards = [
     { title: 'Heute', value: stats.todayBookings, icon: <Calendar className="w-5 h-5 text-blue-400" /> },
-    { title: 'Diese Woche', value: stats.weekBookings, icon: <Users className="w-5 h-5 text-green-400" /> },
-    { title: 'Bewertung', value: stats.avgRating.toFixed(1), icon: <Star className="w-5 h-5 text-yellow-400" /> },
+    { title: 'Diese Woche', value: stats.weekBookings, icon: <Users className="w-5 h-5 text-green-600" /> },
+    { title: 'Bewertung', value: stats.avgRating.toFixed(1), icon: <Star className="w-5 h-5 text-yellow-600" /> },
     { title: 'Services', value: stats.activeServices, icon: <Briefcase className="w-5 h-5 text-purple-400" /> }
   ];
 
@@ -119,7 +118,7 @@ export default function StudioDashboard() {
                   ? 'Buchungslimit erreicht!'
                   : `${bookingLimits.remaining} Buchungen verbleibend`}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-zinc-400">
                 {bookingLimits.used} / {bookingLimits.limit} ({bookingLimits.planType === 'trial' ? 'Testphase' : 'Plan'})
               </p>
             </div>
@@ -131,18 +130,18 @@ export default function StudioDashboard() {
       )}
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-white">Willkommen, {studioName}</h1>
-        <p className="text-sm text-gray-400">Hier ist deine mobile Übersicht.</p>
+        <h1 className="text-2xl font-bold text-zinc-900">Willkommen, {studioName}</h1>
+        <p className="text-sm text-zinc-500">Hier ist deine mobile Übersicht.</p>
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {statCards.map((card) => (
-          <div key={card.title} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col gap-2">
+          <div key={card.title} className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">{card.title}</span>
+              <span className="text-sm text-zinc-400">{card.title}</span>
               {card.icon}
             </div>
-            <p className="text-2xl font-semibold text-white">{card.value}</p>
+            <p className="text-2xl font-semibold text-zinc-900">{card.value}</p>
           </div>
         ))}
       </div>
@@ -151,7 +150,7 @@ export default function StudioDashboard() {
         <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Heutige Termine</h2>
-            <p className="text-xs text-gray-500">{recentBookings.length} neue Buchungen</p>
+            <p className="text-xs text-zinc-400">{recentBookings.length} neue Buchungen</p>
           </div>
           <Link to="/dashboard/bookings" className="text-sm text-blue-600 hover:underline flex items-center gap-1">
             Alle anzeigen <ArrowRight className="w-4 h-4" />
@@ -159,7 +158,7 @@ export default function StudioDashboard() {
         </div>
         <div className="p-4 space-y-3">
           {recentBookings.length === 0 ? (
-            <div className="text-sm text-gray-500 text-center py-6">Noch keine Buchungen.</div>
+            <div className="text-sm text-zinc-400 text-center py-6">Noch keine Buchungen.</div>
           ) : isMobile ? (
             recentBookings.slice(0, 4).map((booking) => (
               <MobileBookingCard key={booking._id} booking={booking} onUpdate={fetchDashboardData} />
@@ -168,18 +167,18 @@ export default function StudioDashboard() {
             recentBookings.map((booking) => (
               <div
                 key={booking._id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-800"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-zinc-50 border border-zinc-200"
               >
                 <div>
-                  <p className="font-semibold text-white">{booking.customerName}</p>
-                  <p className="text-sm text-gray-400">{booking.serviceName || booking.service?.name || 'Service'}</p>
+                  <p className="font-semibold text-zinc-900">{booking.customerName}</p>
+                  <p className="text-sm text-zinc-500">{booking.serviceName || booking.service?.name || 'Service'}</p>
                 </div>
                 <div className="text-right">
-                  <p className="flex items-center gap-1 text-sm text-gray-300">
-                    <Clock className="w-3 h-3 text-gray-400" />
+                  <p className="flex items-center gap-1 text-sm text-zinc-600">
+                    <Clock className="w-3 h-3 text-zinc-500" />
                     {new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-zinc-400">
                     {new Date(booking.bookingDate).toLocaleDateString('de-DE')}
                   </p>
                 </div>
@@ -191,25 +190,25 @@ export default function StudioDashboard() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-white">Schnellaktionen</h2>
+        <h2 className="text-lg font-semibold text-zinc-900">Schnellaktionen</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { title: 'Neuer Service', link: '/dashboard/services', icon: <Plus className="w-5 h-5 text-blue-400" /> },
-            { title: 'Mitarbeiter', link: '/dashboard/employees', icon: <Users className="w-5 h-5 text-green-400" /> },
+            { title: 'Mitarbeiter', link: '/dashboard/employees', icon: <Users className="w-5 h-5 text-green-600" /> },
             { title: 'Widget', link: '/dashboard/widget', icon: <Briefcase className="w-5 h-5 text-purple-400" /> },
-            { title: 'Einstellungen', link: '/dashboard/settings', icon: <Settings className="w-5 h-5 text-yellow-400" /> }
+            { title: 'Einstellungen', link: '/dashboard/settings', icon: <Settings className="w-5 h-5 text-yellow-600" /> }
           ].map((action) => (
             <Link
               key={action.title}
               to={action.link}
-              className="flex items-center gap-3 p-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition group"
+              className="flex items-center gap-3 p-4 rounded-lg bg-zinc-50 hover:bg-zinc-100 transition group"
             >
-              <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-zinc-50 flex items-center justify-center">
                 {action.icon}
               </div>
               <div>
-                <p className="font-medium text-white">{action.title}</p>
-                <p className="text-xs text-gray-400">Kurzlink</p>
+                <p className="font-medium text-zinc-900">{action.title}</p>
+                <p className="text-xs text-zinc-500">Kurzlink</p>
               </div>
             </Link>
           ))}
@@ -223,10 +222,10 @@ export default function StudioDashboard() {
 
 function getStatusBadge(status) {
   const badges = {
-    confirmed: { text: 'Bestätigt', bg: 'bg-green-500/20 text-green-400' },
-    pending: { text: 'Ausstehend', bg: 'bg-yellow-500/20 text-yellow-400' },
+    confirmed: { text: 'Bestätigt', bg: 'bg-green-500/20 text-green-600' },
+    pending: { text: 'Ausstehend', bg: 'bg-yellow-500/20 text-yellow-600' },
     completed: { text: 'Abgeschlossen', bg: 'bg-blue-500/20 text-blue-400' },
-    cancelled: { text: 'Storniert', bg: 'bg-red-500/20 text-red-400' },
+    cancelled: { text: 'Storniert', bg: 'bg-red-500/20 text-red-600' },
     no_show: { text: 'Nicht erschienen', bg: 'bg-orange-500/20 text-orange-400' }
   };
   const badge = badges[status] || badges.pending;

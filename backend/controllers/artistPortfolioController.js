@@ -78,7 +78,7 @@ export const uploadPortfolioItem = async (req, res) => {
       portfolioItem
     });
   } catch (error) {
-    console.error('Error uploading portfolio item:', error);
+    logger.error('Error uploading portfolio item:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -121,7 +121,7 @@ export const getPublicPortfolio = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching portfolio:', error);
+    logger.error('Error fetching portfolio:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -145,7 +145,7 @@ export const getArtistPortfolio = async (req, res) => {
       portfolioItems
     });
   } catch (error) {
-    console.error('Error fetching artist portfolio:', error);
+    logger.error('Error fetching artist portfolio:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -184,7 +184,7 @@ export const updatePortfolioItem = async (req, res) => {
       portfolioItem
     });
   } catch (error) {
-    console.error('Error updating portfolio item:', error);
+    logger.error('Error updating portfolio item:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -225,7 +225,7 @@ export const deletePortfolioItem = async (req, res) => {
       message: 'Portfolio item deleted'
     });
   } catch (error) {
-    console.error('Error deleting portfolio item:', error);
+    logger.error('Error deleting portfolio item:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -255,7 +255,7 @@ export const toggleFeatured = async (req, res) => {
       featured: portfolioItem.featured
     });
   } catch (error) {
-    console.error('Error toggling featured:', error);
+    logger.error('Error toggling featured:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -271,7 +271,7 @@ export const incrementViews = async (req, res) => {
 
     return res.json({ success: true });
   } catch (error) {
-    console.error('Error incrementing views:', error);
+    logger.error('Error incrementing views:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -292,7 +292,7 @@ export const incrementLikes = async (req, res) => {
       likes: portfolioItem.likes
     });
   } catch (error) {
-    console.error('Error incrementing likes:', error);
+    logger.error('Error incrementing likes:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

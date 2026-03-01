@@ -36,7 +36,6 @@ const LifecycleEmails = () => {
         setError('Failed to load lifecycle email stats');
       }
     } catch (err) {
-      console.error('Lifecycle email stats error:', err);
       setError(err.response?.data?.message || 'Failed to load stats');
     } finally {
       setLoading(false);
@@ -99,13 +98,13 @@ const LifecycleEmails = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Lifecycle E-Mails</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-zinc-500 mt-1">
             Automatisierte Trial-Nurturing E-Mails für Conversion-Optimierung
           </p>
         </div>
         <button
           onClick={fetchStats}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
         >
           <RefreshCcw className="w-4 h-4" />
           Aktualisieren
@@ -121,7 +120,7 @@ const LifecycleEmails = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats?.stats?.total || 0}</p>
-              <p className="text-sm text-gray-500">Gesamt geplant</p>
+              <p className="text-sm text-zinc-400">Gesamt geplant</p>
             </div>
           </div>
         </div>
@@ -133,7 +132,7 @@ const LifecycleEmails = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats?.stats?.sent || 0}</p>
-              <p className="text-sm text-gray-500">Gesendet</p>
+              <p className="text-sm text-zinc-400">Gesendet</p>
             </div>
           </div>
         </div>
@@ -145,7 +144,7 @@ const LifecycleEmails = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats?.stats?.pending || 0}</p>
-              <p className="text-sm text-gray-500">Ausstehend</p>
+              <p className="text-sm text-zinc-400">Ausstehend</p>
             </div>
           </div>
         </div>
@@ -157,7 +156,7 @@ const LifecycleEmails = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats?.stats?.failed || 0}</p>
-              <p className="text-sm text-gray-500">Fehlgeschlagen</p>
+              <p className="text-sm text-zinc-400">Fehlgeschlagen</p>
             </div>
           </div>
         </div>
@@ -169,7 +168,7 @@ const LifecycleEmails = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats?.stats?.sendRate || 0}%</p>
-              <p className="text-sm text-gray-500">Senderate</p>
+              <p className="text-sm text-zinc-400">Senderate</p>
             </div>
           </div>
         </div>
@@ -184,12 +183,12 @@ const LifecycleEmails = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">E-Mail Typ</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Gesendet</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Gesamt</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Senderate</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Conversions</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Conv. Rate</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">E-Mail Typ</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Gesendet</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Gesamt</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Senderate</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Conversions</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Conv. Rate</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -201,7 +200,7 @@ const LifecycleEmails = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center text-gray-900 font-medium">{email.sent}</td>
-                  <td className="px-6 py-4 text-center text-gray-500">{email.total}</td>
+                  <td className="px-6 py-4 text-center text-zinc-400">{email.total}</td>
                   <td className="px-6 py-4 text-center">
                     <span className={`font-medium ${email.sendRate >= 80 ? 'text-green-600' : email.sendRate >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
                       {email.sendRate}%
@@ -209,7 +208,7 @@ const LifecycleEmails = () => {
                   </td>
                   <td className="px-6 py-4 text-center text-gray-900 font-medium">{email.conversions}</td>
                   <td className="px-6 py-4 text-center">
-                    <span className={`font-medium ${email.conversionRate >= 10 ? 'text-green-600' : email.conversionRate >= 5 ? 'text-yellow-600' : 'text-gray-600'}`}>
+                    <span className={`font-medium ${email.conversionRate >= 10 ? 'text-green-600' : email.conversionRate >= 5 ? 'text-yellow-600' : 'text-zinc-500'}`}>
                       {email.conversionRate}%
                     </span>
                   </td>
@@ -229,7 +228,7 @@ const LifecycleEmails = () => {
           </div>
           <div className="max-h-[400px] overflow-y-auto">
             {stats?.recentlySent?.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
+              <div className="p-6 text-center text-zinc-400">
                 Noch keine E-Mails gesendet
               </div>
             ) : (
@@ -244,9 +243,9 @@ const LifecycleEmails = () => {
                         <p className="mt-1 text-sm font-medium text-gray-900 truncate">
                           {email.salon}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">{email.user}</p>
+                        <p className="text-xs text-zinc-400 truncate">{email.user}</p>
                       </div>
-                      <div className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                      <div className="text-xs text-zinc-500 whitespace-nowrap ml-2">
                         {email.sentAt ? new Date(email.sentAt).toLocaleDateString('de-DE', {
                           day: '2-digit',
                           month: '2-digit',
@@ -270,7 +269,7 @@ const LifecycleEmails = () => {
           </div>
           <div className="max-h-[400px] overflow-y-auto">
             {stats?.upcoming?.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
+              <div className="p-6 text-center text-zinc-400">
                 Keine E-Mails geplant
               </div>
             ) : (
@@ -285,9 +284,9 @@ const LifecycleEmails = () => {
                         <p className="mt-1 text-sm font-medium text-gray-900 truncate">
                           {email.salon}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">{email.user}</p>
+                        <p className="text-xs text-zinc-400 truncate">{email.user}</p>
                       </div>
-                      <div className="text-xs text-gray-400 whitespace-nowrap ml-2 flex items-center gap-1">
+                      <div className="text-xs text-zinc-500 whitespace-nowrap ml-2 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {email.scheduledFor ? new Date(email.scheduledFor).toLocaleDateString('de-DE', {
                           day: '2-digit',

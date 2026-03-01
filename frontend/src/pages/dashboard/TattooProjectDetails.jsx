@@ -35,7 +35,6 @@ const TattooProjectDetails = () => {
         toast.error(data.error || 'Fehler beim Laden');
       }
     } catch (error) {
-      console.error('Error fetching project:', error);
       toast.error('Netzwerkfehler');
     } finally {
       setLoading(false);
@@ -56,20 +55,19 @@ const TattooProjectDetails = () => {
         toast.error(data.error || 'Fehler');
       }
     } catch (error) {
-      console.error('Error completing session:', error);
       toast.error('Netzwerkfehler');
     }
   };
 
   if (loading) {
     return <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-      <div className="text-gray-600">Lädt Projekt...</div>
+      <div className="text-zinc-500">Lädt Projekt...</div>
     </div>;
   }
 
   if (!project) {
     return <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-      <div className="text-gray-600">Projekt nicht gefunden</div>
+      <div className="text-zinc-500">Projekt nicht gefunden</div>
     </div>;
   }
 
@@ -81,16 +79,16 @@ const TattooProjectDetails = () => {
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-gray-600 mt-1">{project.bodyPart} • {project.style}</p>
+              <p className="text-zinc-500 mt-1">{project.bodyPart} • {project.style}</p>
               <div className="flex items-center gap-4 mt-4">
                 <div>
-                  <span className="text-sm text-gray-500">Kunde:</span>
+                  <span className="text-sm text-zinc-400">Kunde:</span>
                   <span className="ml-2 font-medium">
                     {project.customerId?.firstName} {project.customerId?.lastName}
                   </span>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Artist:</span>
+                  <span className="text-sm text-zinc-400">Artist:</span>
                   <span className="ml-2 font-medium">
                     {project.artistId ? `${project.artistId.firstName} ${project.artistId.lastName}` : '-'}
                   </span>
@@ -125,28 +123,28 @@ const TattooProjectDetails = () => {
                   <span className="text-2xl font-bold text-gray-900">{project.progress}%</span>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mt-2">Fortschritt</p>
+              <p className="text-sm text-zinc-500 mt-2">Fortschritt</p>
             </div>
           </div>
 
           {/* Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t">
             <div>
-              <p className="text-sm text-gray-500">Sessions</p>
+              <p className="text-sm text-zinc-400">Sessions</p>
               <p className="text-xl md:text-2xl font-bold text-gray-900">
                 {project.completedSessions}/{project.totalSessions}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Geschätzt</p>
+              <p className="text-sm text-zinc-400">Geschätzt</p>
               <p className="text-2xl font-bold text-gray-900">€{(project.estimatedPrice / 100).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Tatsächlich</p>
+              <p className="text-sm text-zinc-400">Tatsächlich</p>
               <p className="text-2xl font-bold text-green-600">€{(project.actualPrice / 100).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Status</p>
+              <p className="text-sm text-zinc-400">Status</p>
               <p className="text-lg font-bold text-gray-900 capitalize">{project.status.replace('_', ' ')}</p>
             </div>
           </div>
@@ -157,7 +155,7 @@ const TattooProjectDetails = () => {
           <h2 className="text-xl font-bold text-gray-900 mb-4">📅 Sessions Timeline</h2>
 
           {sessions.length === 0 ? (
-            <p className="text-gray-500">Keine Sessions geplant. Erstelle die erste Session!</p>
+            <p className="text-zinc-400">Keine Sessions geplant. Erstelle die erste Session!</p>
           ) : (
             <div className="space-y-4">
               {sessions.map((session, index) => (
@@ -173,7 +171,7 @@ const TattooProjectDetails = () => {
 
           <Link
             to={`/dashboard/tattoo/sessions/new?projectId=${id}`}
-            className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
           >
             + Neue Session planen
           </Link>
@@ -185,7 +183,7 @@ const TattooProjectDetails = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {sessions.flatMap(session => session.photos || []).length === 0 ? (
-              <p className="text-gray-500 col-span-4">Keine Fotos hochgeladen</p>
+              <p className="text-zinc-400 col-span-4">Keine Fotos hochgeladen</p>
             ) : (
               sessions.flatMap(session =>
                 (session.photos || []).map((photo, idx) => (
@@ -195,7 +193,7 @@ const TattooProjectDetails = () => {
                       alt={`Session ${session.sessionNumber}`}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2">
+                    <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-50 text-zinc-900 text-xs p-2">
                       Session {session.sessionNumber}
                     </div>
                   </div>
@@ -210,7 +208,7 @@ const TattooProjectDetails = () => {
           <h2 className="text-xl font-bold text-gray-900 mb-4">📝 Einverständniserklärungen</h2>
 
           {consents.length === 0 ? (
-            <p className="text-gray-500">Keine Consents vorhanden</p>
+            <p className="text-zinc-400">Keine Consents vorhanden</p>
           ) : (
             <div className="space-y-2">
               {consents.map(consent => (
@@ -224,7 +222,7 @@ const TattooProjectDetails = () => {
                     </span>
                   </div>
                   {consent.signedAt && (
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-zinc-400">
                       Unterschrieben: {new Date(consent.signedAt).toLocaleDateString('de-DE')}
                     </span>
                   )}
@@ -261,7 +259,7 @@ const SessionCard = ({ session, isLast, onComplete }) => {
       <div className="flex flex-col items-center">
         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
           session.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'
-        } text-white font-bold`}>
+        } text-zinc-900 font-bold`}>
           {session.sessionNumber}
         </div>
         {!isLast && <div className="w-0.5 h-12 bg-gray-300" />}
@@ -271,9 +269,9 @@ const SessionCard = ({ session, isLast, onComplete }) => {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium text-gray-900">Session {session.sessionNumber}</h3>
-            {session.phase && <p className="text-sm text-gray-600">{session.phase}</p>}
+            {session.phase && <p className="text-sm text-zinc-500">{session.phase}</p>}
             {session.scheduledDate && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-zinc-400 mt-1">
                 {new Date(session.scheduledDate).toLocaleDateString('de-DE', {
                   day: '2-digit',
                   month: 'short',
@@ -290,13 +288,13 @@ const SessionCard = ({ session, isLast, onComplete }) => {
         </div>
 
         {session.notes && (
-          <p className="text-sm text-gray-600 mt-2">{session.notes}</p>
+          <p className="text-sm text-zinc-500 mt-2">{session.notes}</p>
         )}
 
         {session.status === 'scheduled' && (
           <button
             onClick={onComplete}
-            className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+            className="mt-2 text-sm text-zinc-900 hover:text-indigo-800 font-medium"
           >
             Session abschließen →
           </button>
@@ -312,7 +310,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
   const [notes, setNotes] = useState('');
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -331,7 +329,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
               max="100"
               value={progress}
               onChange={(e) => setProgress(parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
             />
           </div>
 
@@ -344,7 +342,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Was wurde gemacht? Wie lief die Session?"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
             />
           </div>
         </div>
@@ -358,7 +356,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
           </button>
           <button
             onClick={() => onComplete(session._id, progress, notes)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="px-4 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
           >
             Abschließen
           </button>

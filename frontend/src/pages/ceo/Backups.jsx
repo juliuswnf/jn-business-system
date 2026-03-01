@@ -31,7 +31,6 @@ const Backups = () => {
         setStats({ total: 0, completed: 0, totalSize: 0 });
       }
     } catch (err) {
-      console.error('Error fetching backups:', err);
       // Only show error for server errors, not 404 (no data)
       if (err.response?.status >= 500) {
         showMessage('Server-Fehler beim Laden der Backups', 'error');
@@ -48,7 +47,6 @@ const Backups = () => {
         setSchedule(res.data.schedule);
       }
     } catch (err) {
-      console.error('Error fetching schedule:', err);
     }
   };
 
@@ -74,7 +72,6 @@ const Backups = () => {
         showMessage(res.data?.message || 'Unbekannter Fehler', 'error');
       }
     } catch (err) {
-      console.error('Error creating backup:', err);
       const errorMsg = err.response?.data?.message || err.message || 'Fehler beim Erstellen des Backups';
       showMessage(errorMsg, 'error');
     } finally {
@@ -94,7 +91,6 @@ const Backups = () => {
         showMessage('Backup-Wiederherstellung gestartet', 'success');
       }
     } catch (err) {
-      console.error('Error restoring backup:', err);
       showMessage('Fehler bei der Wiederherstellung', 'error');
     } finally {
       setRestoring(null);
@@ -111,7 +107,6 @@ const Backups = () => {
         fetchBackups();
       }
     } catch (err) {
-      console.error('Error deleting backup:', err);
       showMessage('Fehler beim Löschen', 'error');
     }
   };
@@ -127,7 +122,6 @@ const Backups = () => {
       link.click();
       link.remove();
     } catch (err) {
-      console.error('Error downloading backup:', err);
       showMessage('Fehler beim Download', 'error');
     }
   };
@@ -141,7 +135,6 @@ const Backups = () => {
         showMessage('Backup-Zeitplan aktualisiert', 'success');
       }
     } catch (err) {
-      console.error('Error updating schedule:', err);
       showMessage('Fehler beim Speichern des Zeitplans', 'error');
     }
   };
@@ -163,10 +156,10 @@ const Backups = () => {
 
   const getStatusBadge = (status) => {
     const styles = {
-      completed: 'bg-green-500/20 text-green-400',
+      completed: 'bg-green-500/20 text-green-600',
       in_progress: 'bg-blue-500/20 text-blue-400',
-      pending: 'bg-yellow-500/20 text-yellow-400',
-      failed: 'bg-red-500/20 text-red-400'
+      pending: 'bg-yellow-500/20 text-yellow-600',
+      failed: 'bg-red-500/20 text-red-600'
     };
     const labels = {
       completed: 'Abgeschlossen',
@@ -174,20 +167,20 @@ const Backups = () => {
       pending: 'Ausstehend',
       failed: 'Fehlgeschlagen'
     };
-    return <span className={`px-2 py-1 rounded text-xs font-medium ${styles[status] || 'bg-gray-500/20 text-gray-400'}`}>{labels[status] || status}</span>;
+    return <span className={`px-2 py-1 rounded text-xs font-medium ${styles[status] || 'bg-gray-500/20 text-zinc-500'}`}>{labels[status] || status}</span>;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      <header className="border-b border-gray-800 bg-black/80 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-white">
+      <header className="border-b border-zinc-200 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/ceo/dashboard" className="flex items-center gap-3">
@@ -197,12 +190,12 @@ const Backups = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-lg font-bold text-white">Datenbank Backups</h1>
-                <p className="text-xs text-gray-500">Sicherung & Wiederherstellung</p>
+                <h1 className="text-lg font-bold text-zinc-900">Datenbank Backups</h1>
+                <p className="text-xs text-zinc-400">Sicherung & Wiederherstellung</p>
               </div>
             </Link>
             <div className="flex items-center gap-4">
-              <button onClick={() => setShowScheduleModal(true)} className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition flex items-center gap-2">
+              <button onClick={() => setShowScheduleModal(true)} className="px-4 py-2 bg-zinc-50 text-zinc-900 rounded-lg hover:bg-zinc-100 transition flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -231,51 +224,51 @@ const Backups = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {message && (
-          <div className={`mb-6 p-4 rounded-lg ${message.type === 'error' ? 'bg-red-500/20 border border-red-500/50 text-red-400' : 'bg-green-500/20 border border-green-500/50 text-green-400'}`}>
+          <div className={`mb-6 p-4 rounded-lg ${message.type === 'error' ? 'bg-red-500/20 border border-red-500/50 text-red-600' : 'bg-green-500/20 border border-green-500/50 text-green-600'}`}>
             {message.text}
           </div>
         )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Gesamt Backups</p>
-            <p className="text-3xl font-bold text-white">{stats.total}</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Gesamt Backups</p>
+            <p className="text-3xl font-bold text-zinc-900">{stats.total}</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Erfolgreich</p>
-            <p className="text-3xl font-bold text-green-400">{stats.completed}</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Erfolgreich</p>
+            <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Speicherverbrauch</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Speicherverbrauch</p>
             <p className="text-3xl font-bold text-cyan-400">{formatSize(stats.totalSize)}</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Nächstes Backup</p>
-            <p className="text-xl font-bold text-white">{schedule?.enabled ? schedule.time : 'Deaktiviert'}</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Nächstes Backup</p>
+            <p className="text-xl font-bold text-zinc-900">{schedule?.enabled ? schedule.time : 'Deaktiviert'}</p>
           </div>
         </div>
 
         {/* Backup List */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-gray-800">
-            <h3 className="font-semibold text-white">Alle Backups</h3>
+        <div className="bg-white/50 border border-zinc-200 rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-zinc-200">
+            <h3 className="font-semibold text-zinc-900">Alle Backups</h3>
           </div>
           
           {backups.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-zinc-400">
               <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
               </svg>
               <p>Noch keine Backups vorhanden</p>
-              <button onClick={createBackup} className="mt-4 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition">
+              <button onClick={createBackup} className="mt-4 px-4 py-2 bg-cyan-500 text-zinc-900 rounded-lg hover:bg-cyan-600 transition">
                 Erstes Backup erstellen
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-gray-800">
+            <div className="divide-y divide-zinc-200">
               {backups.map((backup) => (
-                <div key={backup._id} className="p-4 hover:bg-gray-800/30 transition">
+                <div key={backup._id} className="p-4 hover:bg-zinc-100/30 transition">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${backup.type === 'manual' ? 'bg-blue-500/20' : 'bg-green-500/20'}`}>
@@ -285,14 +278,14 @@ const Backups = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         ) : (
-                          <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         )}
                       </div>
                       <div>
-                        <p className="text-white font-medium">{backup.name}</p>
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-zinc-900 font-medium">{backup.name}</p>
+                        <p className="text-zinc-400 text-sm">
                           {formatDate(backup.createdAt)} • {backup.sizeFormatted || formatSize(backup.size)}
                           {backup.duration && ` • ${backup.duration}s`}
                         </p>
@@ -303,12 +296,12 @@ const Backups = () => {
                       <div className="flex items-center gap-2">
                         {backup.status === 'completed' && (
                           <>
-                            <button onClick={() => downloadBackup(backup._id, backup.name)} className="p-2 text-gray-400 hover:text-white transition" title="Download">
+                            <button onClick={() => downloadBackup(backup._id, backup.name)} className="p-2 text-zinc-500 hover:text-zinc-900 transition" title="Download">
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                               </svg>
                             </button>
-                            <button onClick={() => restoreBackup(backup._id)} disabled={restoring === backup._id} className="p-2 text-yellow-400 hover:text-yellow-300 transition disabled:opacity-50" title="Wiederherstellen">
+                            <button onClick={() => restoreBackup(backup._id)} disabled={restoring === backup._id} className="p-2 text-yellow-600 hover:text-yellow-600 transition disabled:opacity-50" title="Wiederherstellen">
                               {restoring === backup._id ? (
                                 <div className="w-5 h-5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
                               ) : (
@@ -319,7 +312,7 @@ const Backups = () => {
                             </button>
                           </>
                         )}
-                        <button onClick={() => deleteBackup(backup._id)} className="p-2 text-red-400 hover:text-red-300 transition" title="Löschen">
+                        <button onClick={() => deleteBackup(backup._id)} className="p-2 text-red-600 hover:text-red-600 transition" title="Löschen">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
@@ -330,7 +323,7 @@ const Backups = () => {
                   {backup.collections && backup.collections.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2">
                       {backup.collections.map((col, idx) => (
-                        <span key={idx} className="px-2 py-1 bg-gray-800 rounded text-xs text-gray-400">
+                        <span key={idx} className="px-2 py-1 bg-zinc-50 rounded text-xs text-zinc-500">
                           {col.name}: {col.documentCount}
                         </span>
                       ))}
@@ -345,30 +338,30 @@ const Backups = () => {
 
       {/* Schedule Modal */}
       {showScheduleModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6">
-            <h3 className="text-xl font-bold text-white mb-6">Backup-Zeitplan</h3>
+        <div className="fixed inset-0 bg-white/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-zinc-200 rounded-2xl w-full max-w-md p-6">
+            <h3 className="text-xl font-bold text-zinc-900 mb-6">Backup-Zeitplan</h3>
             <div className="space-y-4">
               <label className="flex items-center gap-3">
                 <input type="checkbox" checked={schedule?.enabled} onChange={(e) => setSchedule({...schedule, enabled: e.target.checked})} className="w-5 h-5 rounded" />
-                <span className="text-white">Automatische Backups aktiviert</span>
+                <span className="text-zinc-900">Automatische Backups aktiviert</span>
               </label>
               <div>
-                <label className="block text-gray-400 text-sm mb-2">Häufigkeit</label>
-                <select value={schedule?.frequency || 'daily'} onChange={(e) => setSchedule({...schedule, frequency: e.target.value})} className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                <label className="block text-zinc-500 text-sm mb-2">Häufigkeit</label>
+                <select value={schedule?.frequency || 'daily'} onChange={(e) => setSchedule({...schedule, frequency: e.target.value})} className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900">
                   <option value="daily">Täglich</option>
                   <option value="weekly">Wöchentlich</option>
                   <option value="monthly">Monatlich</option>
                 </select>
               </div>
               <div>
-                <label className="block text-gray-400 text-sm mb-2">Uhrzeit</label>
-                <input type="time" value={schedule?.time || '03:00'} onChange={(e) => setSchedule({...schedule, time: e.target.value})} className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" />
+                <label className="block text-zinc-500 text-sm mb-2">Uhrzeit</label>
+                <input type="time" value={schedule?.time || '03:00'} onChange={(e) => setSchedule({...schedule, time: e.target.value})} className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900" />
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowScheduleModal(false)} className="flex-1 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition">Abbrechen</button>
-              <button onClick={() => updateSchedule(schedule)} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition">Speichern</button>
+              <button onClick={() => setShowScheduleModal(false)} className="flex-1 px-4 py-2 bg-zinc-50 text-zinc-900 rounded-lg hover:bg-zinc-100 transition">Abbrechen</button>
+              <button onClick={() => updateSchedule(schedule)} className="flex-1 px-4 py-2 bg-cyan-500 text-zinc-900 rounded-lg hover:bg-cyan-600 transition">Speichern</button>
             </div>
           </div>
         </div>

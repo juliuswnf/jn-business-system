@@ -5,11 +5,13 @@
   "type": "module",
   "main": "backend/server.js",
   "scripts": {
-    "dev": "nodemon backend/server.js",
-    "start": "node backend/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint backend --ext .js,.cjs",
-    "lint:fix": "eslint backend --ext .js,.cjs --fix",
+    "dev": "npm --prefix backend run dev",
+    "start": "npm --prefix backend run start",
+    "test": "npm --prefix backend run test",
+    "lint": "npm --prefix backend run lint",
+    "lint:fix": "npm --prefix backend run lint:fix",
+    "lint:all": "npm run lint && npm --prefix frontend run lint",
+    "build": "npm --prefix frontend run build",
     "format": "powershell -Command \"Get-ChildItem -Recurse -Filter '*.js' backend | Where-Object { $_.FullName -notmatch 'node_modules' } | ForEach-Object { $content = Get-Content $_.FullName -Raw; $content = $content -replace ' +\\r?\\n', '`n'; $utf8NoBom = New-Object System.Text.UTF8Encoding $false; [System.IO.File]::WriteAllText($_.FullName, $content, $utf8NoBom) }\""
   },
   "dependencies": {

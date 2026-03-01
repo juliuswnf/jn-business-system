@@ -3,9 +3,9 @@ const http = require('http');
 async function testLogin() {
   const { authenticator } = require('otplib');
   const token = authenticator.generate('JBSWY3DPEHPK3PXP');
-  
+
   console.log('Testing CEO login with 2FA code:', token);
-  
+
   const data = JSON.stringify({
     email: 'julius@jn-automation.de',
     password: 'CEO@12345',

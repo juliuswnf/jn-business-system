@@ -136,14 +136,14 @@ const FAQ = () => {
         keywords="FAQ, Häufige Fragen, Buchungssystem Hilfe, Support"
         url="/faq"
       />
-    <div className="min-h-screen bg-black text-white py-12">
+    <div className="min-h-screen bg-white text-zinc-900 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-zinc-900 mb-4">
             Häufig gestellte Fragen
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-zinc-600">
             Alles, was Sie über JN Business System wissen müssen
           </p>
         </div>
@@ -151,7 +151,7 @@ const FAQ = () => {
         {/* FAQ Sections */}
         {faqs.map((section, sectionIndex) => (
           <div key={sectionIndex} className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-2xl font-bold text-zinc-900 mb-6">
               {section.category}
             </h2>
             <div className="space-y-4">
@@ -162,23 +162,23 @@ const FAQ = () => {
                 return (
                   <div
                     key={index}
-                    className="bg-zinc-900 rounded-lg shadow-sm border border-zinc-800 overflow-hidden"
+                    className="bg-zinc-50 rounded-lg shadow-sm border border-zinc-200 overflow-hidden"
                   >
                     <button
                       onClick={() => toggleFAQ(globalIndex)}
-                      className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-zinc-800 transition-colors"
+                      className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-zinc-100 transition-colors"
                     >
-                      <span className="font-semibold text-white pr-8">
+                      <span className="font-semibold text-zinc-900 pr-8">
                         {faq.question}
                       </span>
                       {isOpen ? (
-                        <ChevronUpIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                        <ChevronUpIcon className="h-5 w-5 text-zinc-500 flex-shrink-0" />
                       ) : (
-                        <ChevronDownIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                        <ChevronDownIcon className="h-5 w-5 text-zinc-500 flex-shrink-0" />
                       )}
                     </button>
                     {isOpen && (
-                      <div className="px-6 pb-4 text-gray-300">
+                      <div className="px-6 pb-4 text-zinc-600">
                         {faq.answer}
                       </div>
                     )}
@@ -190,23 +190,23 @@ const FAQ = () => {
         ))}
 
         {/* Contact CTA */}
-        <div className="bg-zinc-900 rounded-lg p-8 text-center mt-12 border border-zinc-800">
-          <h3 className="text-2xl font-bold text-white mb-4">
+        <div className="bg-zinc-50 rounded-lg p-8 text-center mt-12 border border-zinc-200">
+          <h3 className="text-2xl font-bold text-zinc-900 mb-4">
             Noch Fragen?
           </h3>
-          <p className="text-gray-300 mb-6">
+          <p className="text-zinc-600 mb-6">
             Unser Support-Team hilft Ihnen gerne weiter.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:support@jn-business-system.de"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+              className="bg-zinc-200 hover:bg-zinc-300 text-zinc-900 font-medium py-3 px-6 rounded-lg border border-zinc-300 transition-colors"
             >
               E-Mail schreiben
             </a>
             <a
               href="/demo"
-              className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium py-3 px-6 rounded-lg border-2 border-zinc-700 transition-colors"
+              className="bg-zinc-200 hover:bg-zinc-300 text-zinc-900 font-medium py-3 px-6 rounded-lg border border-zinc-300 transition-colors"
             >
               Demo buchen
             </a>

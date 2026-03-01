@@ -90,12 +90,12 @@ function PackageList({ packages, onSelect }) {
         {packages.map((pkg) => (
           <div
             key={pkg._id}
-            className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-200 hover:border-blue-500"
+            className="relative bg-white rounded-2xl shadow-sm hover:shadow-none transition-all duration-300 overflow-hidden border-2 border-gray-200 hover:border-blue-500"
           >
             {/* Most Popular Badge */}
             {pkg.soldCount > 50 && (
               <div className="absolute top-4 right-4">
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-zinc-900 px-4 py-1 rounded-full text-sm font-bold">
                   Most Popular
                 </div>
               </div>
@@ -123,7 +123,7 @@ function PackageList({ packages, onSelect }) {
                   <span className="text-4xl font-bold text-gray-900">
                     {pkg.currency === 'EUR' ? '€' : '$'}{pkg.price}
                   </span>
-                  <span className="ml-2 text-gray-500">
+                  <span className="ml-2 text-zinc-400">
                     / {pkg.totalSessions} sessions
                   </span>
                 </div>
@@ -162,14 +162,14 @@ function PackageList({ packages, onSelect }) {
               {/* CTA Button */}
               <button
                 onClick={() => onSelect(pkg)}
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-sm hover:shadow-none"
               >
                 Purchase Package
               </button>
 
               {/* Stats */}
               {pkg.soldCount > 0 && (
-                <div className="mt-4 text-center text-sm text-gray-500">
+                <div className="mt-4 text-center text-sm text-zinc-400">
                   {pkg.soldCount} {pkg.soldCount === 1 ? 'person has' : 'people have'} purchased
                 </div>
               )}
@@ -181,9 +181,9 @@ function PackageList({ packages, onSelect }) {
       {/* No Packages */}
       {packages.length === 0 && (
         <div className="text-center py-16">
-          <PackageIcon className="w-24 h-24 text-gray-300 mx-auto mb-4" />
+          <PackageIcon className="w-24 h-24 text-zinc-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-700 mb-2">No packages available</h3>
-          <p className="text-gray-500">Check back later for training packages</p>
+          <p className="text-zinc-400">Check back later for training packages</p>
         </div>
       )}
     </div>
@@ -257,7 +257,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
     return (
       <div className="max-w-2xl mx-auto text-center py-16">
         <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check className="w-12 h-12 text-white" />
+          <Check className="w-12 h-12 text-zinc-900" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h2>
         <p className="text-xl text-gray-600 mb-8">
@@ -267,7 +267,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
           <p className="text-gray-700">
             You now have <span className="font-bold text-blue-600">{pkg.totalSessions} sessions</span> available
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-zinc-400 mt-2">
             Valid until {new Date(Date.now() + pkg.validityPeriod * 24 * 60 * 60 * 1000).toLocaleDateString()}
           </p>
         </div>
@@ -318,7 +318,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
       </div>
 
       {/* Payment Form */}
-      <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="bg-white rounded-2xl shadow-none p-8">
         <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
           <CreditCard className="w-6 h-6 mr-2 text-blue-500" />
           Payment Details
@@ -362,11 +362,11 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
             type="submit"
             disabled={!stripe || loading}
             className={`
-              w-full py-4 rounded-xl font-semibold text-white text-lg
+              w-full py-4 rounded-xl font-semibold text-zinc-900 text-lg
               transition-all duration-300
               ${loading || !stripe
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl'
+                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-sm hover:shadow-none'
               }
             `}
           >
@@ -384,7 +384,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
           </button>
 
           {/* Security Notice */}
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <div className="mt-6 text-center text-sm text-zinc-400">
             <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>

@@ -23,15 +23,15 @@ const MainLayout = ({ children, requiredRole = null }) => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
-      {/* Sidebar (dark) */}
+    <div className="min-h-screen bg-white text-zinc-900 flex">
+      {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col transition-all">
         <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
 
-        <main className="flex-1 overflow-y-auto px-6 py-8 lg:px-10">
+        <main className="flex-1 overflow-y-auto px-6 py-8 lg:px-10 bg-white">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

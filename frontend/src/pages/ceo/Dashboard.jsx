@@ -35,28 +35,28 @@ export default function Dashboard() {
   const COLORS = ['#a855f7', '#ec4899', '#06b6d4', '#f97316', '#8b5cf6'];
 
   const StatCard = ({ icon, label, value, trend, color }) => (
-    <div className="rounded-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] transition">
+    <div className="rounded-2xl bg-gradient-to-br from-white to-black border border-zinc-200 p-6 hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] transition">
       <div className="flex items-start justify-between mb-4">
         <div className={`text-2xl p-3 rounded-lg ${color} bg-opacity-20`}>{icon}</div>
         {trend !== undefined && (
-          <span className={`text-sm font-semibold px-2 py-1 rounded ${trend > 0 ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
+          <span className={`text-sm font-semibold px-2 py-1 rounded ${trend > 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
             {trend > 0 ? '▲' : '▼'} {Math.abs(trend)}%
           </span>
         )}
       </div>
-      <p className="text-gray-400 text-sm mb-1">{label}</p>
-      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-zinc-500 text-sm mb-1">{label}</p>
+      <p className="text-2xl font-bold text-zinc-900">{value}</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       {/* Header */}
-      <div className="border-b border-gray-800 sticky top-0 z-40 bg-black bg-opacity-80 backdrop-blur-md">
+      <div className="border-b border-zinc-200 sticky top-0 z-40 bg-white bg-opacity-80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-1">Geschäftsübersicht</h1>
-            <p className="text-gray-400 text-sm">Willkommen zurück — Ihre Kennzahlen im Überblick.</p>
+            <p className="text-zinc-500 text-sm">Willkommen zurück — Ihre Kennzahlen im Überblick.</p>
           </div>
           <button className="px-6 py-3 rounded-full bg-white text-black font-semibold hover:opacity-95 transition shadow-md">
             Bericht exportieren
@@ -94,7 +94,7 @@ export default function Dashboard() {
         {/* Charts Section */}
         <div className="grid lg:grid-cols-3 gap-6 mb-12">
           {/* Revenue & Bookings Chart */}
-          <div className="lg:col-span-2 rounded-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6">
+          <div className="lg:col-span-2 rounded-2xl bg-gradient-to-br from-white to-black border border-zinc-200 p-6">
             <h2 className="text-xl font-bold mb-6">Revenue & Bookings Trend</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={chartData}>
@@ -113,7 +113,7 @@ export default function Dashboard() {
           </div>
 
           {/* Service Distribution Pie Chart */}
-          <div className="rounded-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6">
+          <div className="rounded-2xl bg-gradient-to-br from-white to-black border border-zinc-200 p-6">
             <h2 className="text-xl font-bold mb-6">Verteilung nach Leistung</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -141,7 +141,7 @@ export default function Dashboard() {
                 <div key={idx} className="flex items-center justify-between text-sm">
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS[idx] }}></div>
-                    <span className="text-gray-400">{item.name}</span>
+                    <span className="text-zinc-500">{item.name}</span>
                   </div>
                   <span className="font-semibold">{item.value}%</span>
                 </div>
@@ -151,7 +151,7 @@ export default function Dashboard() {
         </div>
 
         {/* Revenue Trend Line Chart */}
-        <div className="rounded-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 mb-12">
+        <div className="rounded-2xl bg-gradient-to-br from-white to-black border border-zinc-200 p-6 mb-12">
           <h2 className="text-xl font-bold mb-6">Umsatzentwicklung</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
@@ -200,7 +200,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="mt-12 rounded-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6">
+        <div className="mt-12 rounded-2xl bg-gradient-to-br from-white to-black border border-zinc-200 p-6">
           <h2 className="text-xl font-bold mb-6">Recent Activity</h2>
           <div className="space-y-4">
             {[
@@ -210,12 +210,12 @@ export default function Dashboard() {
               { action: 'Schicht geplant (Mitarbeiter)', time: 'vor 1 Tag', icon: <FiClock /> },
               { action: 'Bewertung veröffentlicht — 5 Sterne', time: 'vor 2 Tagen', icon: <FiBarChart /> },
             ].map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between p-4 rounded-lg bg-gray-800 bg-opacity-50 hover:bg-opacity-100 transition">
+              <div key={idx} className="flex items-center justify-between p-4 rounded-lg bg-zinc-50 bg-opacity-50 hover:bg-opacity-100 transition">
                 <div className="flex items-center">
                   <span className="text-2xl mr-4">{item.icon}</span>
-                  <p className="text-white">{item.action}</p>
+                  <p className="text-zinc-900">{item.action}</p>
                 </div>
-                <span className="text-gray-400 text-sm">{item.time}</span>
+                <span className="text-zinc-500 text-sm">{item.time}</span>
               </div>
             ))}
           </div>

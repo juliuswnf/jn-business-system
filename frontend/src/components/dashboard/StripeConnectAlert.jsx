@@ -19,7 +19,6 @@ export default function StripeConnectAlert() {
       const res = await api.get('/stripe-connect/account-status');
       setAccountStatus(res.data);
     } catch (error) {
-      console.error('Failed to check Stripe status:', error);
     } finally {
       setLoading(false);
     }
@@ -59,11 +58,11 @@ export default function StripeConnectAlert() {
                 Stripe-Konto verbinden erforderlich
               </h3>
             </div>
-            <p className="text-sm text-gray-300 mb-3">
+            <p className="text-sm text-zinc-600 mb-3">
               Um No-Show-Gebühren zu erhalten, verbinden Sie Ihr Stripe-Konto.
               Die Einrichtung dauert nur 2-3 Minuten.
             </p>
-            <ul className="text-sm text-gray-400 space-y-1 mb-3">
+            <ul className="text-sm text-zinc-500 space-y-1 mb-3">
               <li>✓ Direkte Auszahlungen auf Ihr Bankkonto</li>
               <li>✓ Automatische No-Show-Gebühren-Abrechnung</li>
               <li>✓ 100% sicher über Stripe</li>
@@ -71,7 +70,7 @@ export default function StripeConnectAlert() {
           </div>
           <button
             onClick={handleConnectStripe}
-            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition whitespace-nowrap"
+            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-zinc-900 rounded-lg font-medium transition whitespace-nowrap"
           >
             Jetzt verbinden
           </button>
@@ -92,14 +91,14 @@ export default function StripeConnectAlert() {
                 Stripe-Einrichtung unvollständig
               </h3>
             </div>
-            <p className="text-sm text-gray-300 mb-3">
+            <p className="text-sm text-zinc-600 mb-3">
               Ihre Stripe-Kontoanmeldung ist noch nicht abgeschlossen.
               Schließen Sie die Einrichtung ab, um No-Show-Gebühren zu erhalten.
             </p>
           </div>
           <button
             onClick={handleRefreshOnboarding}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition whitespace-nowrap"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-zinc-900 rounded-lg font-medium transition whitespace-nowrap"
           >
             Einrichtung fortsetzen
           </button>

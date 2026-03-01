@@ -70,14 +70,14 @@ router.post('/', mutationLimiter, async (req, res) => {
 
 // ? HIGH FIX #10: Update service with rate limiter
 router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, res) => {
-  let updateDataKeys = [];
+  let updateData = {};
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
 
     // Prevent changing salonId - extract and discard it from the update
     // eslint-disable-next-line no-unused-vars
-    const { salonId, ...updateData } = req.body;
-    updateDataKeys = Object.keys(updateData);
+    const { salonId, ...safeUpdateData } = req.body;
+    updateData = safeUpdateData;
 
     // ? OPTIMISTIC LOCKING - load, check version, update, save
     const service = await Service.findById(req.params.id);
@@ -115,7 +115,7 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
     logger.error('Service Update Error:', {
       error: error.message,
       stack: error.stack,
-      updateData: updateDataKeys,
+      updateData: Object.keys(updateData),
       serviceId: req.params.id
     });
 

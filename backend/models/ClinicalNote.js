@@ -1,6 +1,7 @@
 ﻿import mongoose from 'mongoose';
 import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 import crypto from 'crypto';
+import logger from '../utils/logger.js';
 
 /**
  * Clinical Notes Model
@@ -228,7 +229,7 @@ clinicalNoteSchema.post('findOne', async function(doc) {
       resourceId: doc._id,
       userId: this.getOptions().accessedBy,
       timestamp: new Date()
-    }).catch(err => console.error('Audit log failed:', err));
+    }).catch(err => logger.error('Audit log failed:', err));
   }
 });
 

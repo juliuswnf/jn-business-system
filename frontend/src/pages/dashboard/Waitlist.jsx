@@ -37,7 +37,6 @@ export default function Waitlist() {
       setWaitlist(response.data.waitlist || []);
       setStats(response.data.stats || {});
     } catch (error) {
-      console.error('Error fetching waitlist:', error);
       toast.error('Fehler beim Laden der Warteliste');
     } finally {
       setLoading(false);
@@ -65,7 +64,6 @@ export default function Waitlist() {
       toast.success('Eintrag gelöscht');
       fetchWaitlist();
     } catch (error) {
-      console.error('Error deleting waitlist entry:', error);
       toast.error('Fehler beim Löschen');
     }
   };
@@ -75,14 +73,14 @@ export default function Waitlist() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Warteliste</h1>
+          <h1 className="text-3xl font-bold text-zinc-900">Warteliste</h1>
           <p className="text-zinc-400 mt-1">
             Kunden, die auf freie Termine warten
           </p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+          className="bg-blue-600 hover:bg-blue-700 text-zinc-900 px-4 py-2 rounded-lg transition"
         >
           + Kunde hinzufügen
         </button>
@@ -90,12 +88,12 @@ export default function Waitlist() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-zinc-900 p-4 rounded-lg border border-zinc-800">
+        <div className="bg-zinc-50 p-4 rounded-lg border border-zinc-200">
           <div className="flex items-center gap-2 text-zinc-400 mb-1">
             <Users size={16} />
             <span className="text-sm">Gesamt</span>
           </div>
-          <p className="text-2xl font-bold text-white">{stats.total}</p>
+          <p className="text-2xl font-bold text-zinc-900">{stats.total}</p>
         </div>
         <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg">
           <div className="flex items-center gap-2 text-red-500 mb-1">
@@ -129,7 +127,7 @@ export default function Waitlist() {
             className={`px-4 py-2 rounded-lg transition ${
               filter === status
                 ? 'bg-blue-600 text-white'
-                : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                : 'bg-zinc-50 text-zinc-400 hover:bg-zinc-100'
             }`}
           >
             {status === 'active' && 'Aktiv'}
@@ -147,9 +145,9 @@ export default function Waitlist() {
           Keine Einträge in der Warteliste
         </div>
       ) : (
-        <div className="bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden">
+        <div className="bg-zinc-50 rounded-lg border border-zinc-200 overflow-hidden">
           <table className="w-full">
-            <thead className="bg-zinc-800">
+            <thead className="bg-zinc-50">
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Kunde</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Service</th>
@@ -160,17 +158,17 @@ export default function Waitlist() {
                 <th className="text-right px-4 py-3 text-sm font-medium text-zinc-400">Aktionen</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800">
+            <tbody className="divide-y divide-zinc-200">
               {waitlist.map((entry) => (
                 <motion.tr
                   key={entry._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="hover:bg-zinc-800/50 transition"
+                  className="hover:bg-zinc-100/50 transition"
                 >
                   <td className="px-4 py-3">
                     <div>
-                      <p className="text-white font-medium">
+                      <p className="text-zinc-900 font-medium">
                         {entry.customerId?.firstName} {entry.customerId?.lastName}
                       </p>
                       <p className="text-xs text-zinc-400">{entry.customerId?.phone}</p>
@@ -206,7 +204,7 @@ export default function Waitlist() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        className="p-1 hover:bg-zinc-700 rounded transition"
+                        className="p-1 hover:bg-zinc-100 rounded transition"
                         title="Bearbeiten"
                       >
                         <Edit size={16} className="text-zinc-400" />
@@ -229,13 +227,13 @@ export default function Waitlist() {
 
       {/* Add Form Modal (TODO: Implement) */}
       {showAddForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full">
-            <h2 className="text-xl font-bold text-white mb-4">Kunde zur Warteliste hinzufügen</h2>
+        <div className="fixed inset-0 bg-white/50 flex items-center justify-center z-50">
+          <div className="bg-zinc-50 p-6 rounded-lg max-w-md w-full">
+            <h2 className="text-xl font-bold text-zinc-900 mb-4">Kunde zur Warteliste hinzufügen</h2>
             <p className="text-zinc-400 mb-4">Feature wird noch implementiert...</p>
             <button
               onClick={() => setShowAddForm(false)}
-              className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg w-full"
+              className="bg-zinc-50 hover:bg-zinc-100 text-zinc-900 px-4 py-2 rounded-lg w-full"
             >
               Schließen
             </button>

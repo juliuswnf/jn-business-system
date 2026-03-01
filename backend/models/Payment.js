@@ -2,6 +2,9 @@ import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
 import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const PHONE_REGEX = /^\+?[0-9\s().-]{7,20}$/;
+
 const paymentSchema = new mongoose.Schema(
   {
     companyId: {
@@ -29,12 +32,14 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       trim: true,
+      match: [EMAIL_REGEX, 'Valid email required'],
       sparse: true  // ✅ Added
     },
 
     customerPhone: {
       type: String,
       trim: true,
+      match: [PHONE_REGEX, 'Valid phone number required'],
       sparse: true  // ✅ Added
     },
 
@@ -357,6 +362,7 @@ paymentSchema.index({ companyId: 1, createdAt: -1 });
 
 // ? Customer queries
 paymentSchema.index({ companyId: 1, customerId: 1, createdAt: -1 }, { sparse: true });
+paymentSchema.index({ companyId: 1, customerEmail: 1, createdAt: -1 }, { sparse: true });
 
 // ? Booking queries
 paymentSchema.index({ bookingId: 1, status: 1 });

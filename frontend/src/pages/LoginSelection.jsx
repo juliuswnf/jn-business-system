@@ -48,14 +48,14 @@ function LoginSelection() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       <div className="max-w-7xl mx-auto px-4 py-20">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
             Willkommen zurück
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-zinc-600 max-w-2xl mx-auto">
             Wählen Sie den passenden Login für Ihr Konto
           </p>
         </div>
@@ -68,7 +68,7 @@ function LoginSelection() {
                 <Link
                   key={option.id}
                   to={option.link}
-                  className={`group relative overflow-hidden rounded-2xl border-2 ${option.borderColor} ${option.hoverBorder} bg-gradient-to-br ${option.bgGradient} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-${option.gradient.split(' ')[0]}/20`}
+                  className={`group relative overflow-hidden rounded-2xl border-2 ${option.borderColor} ${option.hoverBorder} bg-gradient-to-br ${option.bgGradient} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-${option.gradient.split(' ')[0]}/20`}
                 >
                   {/* Content */}
                   <div className="p-8 relative z-10">
@@ -78,12 +78,12 @@ function LoginSelection() {
                     </div>
 
                     {/* Title */}
-                    <h2 className="text-2xl font-bold mb-3 text-white group-hover:text-gray-100 transition-colors">
+                    <h2 className="text-2xl font-bold mb-3 text-zinc-900 transition-colors">
                       {option.title}
                     </h2>
 
                     {/* Description */}
-                    <p className="text-gray-300 mb-6 text-sm leading-relaxed">
+                    <p className="text-zinc-600 mb-6 text-sm leading-relaxed">
                       {option.description}
                     </p>
 
@@ -103,24 +103,24 @@ function LoginSelection() {
 
           {/* Additional Links */}
           <div className="text-center space-y-4">
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-zinc-500">
               <Link 
                 to="/register" 
-                className="hover:text-white transition-colors font-medium"
+                className="hover:text-zinc-900 transition-colors font-medium"
               >
                 Noch kein Konto? Jetzt registrieren
               </Link>
-              <span className="text-gray-600">•</span>
+              <span className="text-zinc-500">•</span>
               <Link 
                 to="/forgot-password" 
-                className="hover:text-white transition-colors"
+                className="hover:text-zinc-900 transition-colors"
               >
                 Passwort vergessen?
               </Link>
-              <span className="text-gray-600">•</span>
+              <span className="text-zinc-500">•</span>
               <Link 
                 to="/pricing" 
-                className="hover:text-white transition-colors"
+                className="hover:text-zinc-900 transition-colors"
               >
                 Preise ansehen
               </Link>
@@ -130,7 +130,7 @@ function LoginSelection() {
             <div className="pt-6">
               <Link 
                 to="/" 
-                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
               >
                 <ArrowRightIcon className="w-4 h-4 rotate-180" />
                 Zurück zur Startseite

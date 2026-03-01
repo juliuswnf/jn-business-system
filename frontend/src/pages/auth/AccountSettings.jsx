@@ -37,62 +37,62 @@ const AccountSettings = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-primary text-white flex items-center justify-center">
+      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-primary text-white px-4 py-8">
+    <div className="min-h-screen bg-white text-zinc-900 px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
 
         <div className="space-y-6">
           {/* Profile Section */}
-          <div className="rounded-lg bg-secondary/50 border border-accent/20 p-6 hover:border-accent/40 transition">
+          <div className="rounded-lg bg-secondary/50 border border-zinc-200 p-6 hover:border-zinc-300 transition">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-xl font-semibold text-white">Profile Information</h2>
+                <h2 className="text-xl font-semibold text-zinc-900">Profile Information</h2>
                 <p className="text-sm text-slate-400">Manage your account details</p>
               </div>
               <Link
                 to="/customer/settings"
-                className="px-4 py-2 rounded-lg bg-accent hover:bg-accent-light text-primary font-semibold transition text-sm"
+                className="px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-semibold transition text-sm"
               >
                 Edit Profile
               </Link>
             </div>
             {user && (
               <div className="space-y-2 text-sm">
-                <p><span className="text-slate-400">Name:</span> <span className="text-white">{user.firstName} {user.lastName}</span></p>
-                <p><span className="text-slate-400">Email:</span> <span className="text-white">{user.email}</span></p>
-                <p><span className="text-slate-400">Phone:</span> <span className="text-white">{user.phone}</span></p>
-                <p><span className="text-slate-400">Role:</span> <span className="text-white capitalize">{user.role}</span></p>
+                <p><span className="text-slate-400">Name:</span> <span className="text-zinc-900">{user.firstName} {user.lastName}</span></p>
+                <p><span className="text-slate-400">Email:</span> <span className="text-zinc-900">{user.email}</span></p>
+                <p><span className="text-slate-400">Phone:</span> <span className="text-zinc-900">{user.phone}</span></p>
+                <p><span className="text-slate-400">Role:</span> <span className="text-zinc-900 capitalize">{user.role}</span></p>
               </div>
             )}
           </div>
 
           {/* Security Section */}
-          <div className="rounded-lg bg-secondary/50 border border-accent/20 p-6 hover:border-accent/40 transition">
-            <h2 className="text-xl font-semibold text-white mb-4">Security</h2>
+          <div className="rounded-lg bg-secondary/50 border border-zinc-200 p-6 hover:border-zinc-300 transition">
+            <h2 className="text-xl font-semibold text-zinc-900 mb-4">Security</h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-primary/50 border border-accent/10">
+              <div className="flex items-center justify-between p-4 rounded-lg bg-zinc-50 border border-zinc-200">
                 <div>
-                  <p className="text-white font-semibold">Password</p>
+                  <p className="text-zinc-900 font-semibold">Password</p>
                   <p className="text-sm text-slate-400">Change your password</p>
                 </div>
                 <Link
                   to="/change-password"
-                  className="px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 text-white font-semibold border border-accent/30 transition text-sm"
+                  className="px-4 py-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-900 font-semibold border border-zinc-200 transition text-sm"
                 >
                   Change
                 </Link>
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-lg bg-primary/50 border border-accent/10">
+              <div className="flex items-center justify-between p-4 rounded-lg bg-zinc-50 border border-zinc-200">
                 <div>
-                  <p className="text-white font-semibold">Two-Factor Authentication</p>
+                  <p className="text-zinc-900 font-semibold">Two-Factor Authentication</p>
                   <p className="text-sm text-slate-400">
                     {twoFAEnabled ? '✓ Enabled' : '✗ Disabled'}
                   </p>
@@ -100,28 +100,28 @@ const AccountSettings = () => {
                 {twoFAEnabled ? (
                   <button
                     onClick={handleDisable2FA}
-                    className="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 font-semibold transition text-sm"
+                    className="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 hover:bg-red-500/20 font-semibold transition text-sm"
                   >
                     Disable
                   </button>
                 ) : (
                   <Link
                     to="/2fa-setup"
-                    className="px-4 py-2 rounded-lg bg-accent hover:bg-accent-light text-primary font-semibold transition text-sm"
+                    className="px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-semibold transition text-sm"
                   >
                     Enable
                   </Link>
                 )}
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-lg bg-primary/50 border border-accent/10">
+              <div className="flex items-center justify-between p-4 rounded-lg bg-zinc-50 border border-zinc-200">
                 <div>
-                  <p className="text-white font-semibold">Active Sessions</p>
+                  <p className="text-zinc-900 font-semibold">Active Sessions</p>
                   <p className="text-sm text-slate-400">Manage your devices</p>
                 </div>
                 <Link
                   to="/sessions"
-                  className="px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 text-white font-semibold border border-accent/30 transition text-sm"
+                  className="px-4 py-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-900 font-semibold border border-zinc-200 transition text-sm"
                 >
                   View
                 </Link>
@@ -130,11 +130,11 @@ const AccountSettings = () => {
           </div>
 
           {/* Account Actions Section */}
-          <div className="rounded-lg bg-secondary/50 border border-accent/20 p-6 hover:border-accent/40 transition">
-            <h2 className="text-xl font-semibold text-white mb-4">Konto-Aktionen</h2>
+          <div className="rounded-lg bg-secondary/50 border border-zinc-200 p-6 hover:border-zinc-300 transition">
+            <h2 className="text-xl font-semibold text-zinc-900 mb-4">Konto-Aktionen</h2>
             <div className="space-y-3">
               <button
-                className="w-full px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 font-semibold transition"
+                className="w-full px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 hover:bg-red-500/20 font-semibold transition"
               >
                 Konto löschen
               </button>

@@ -27,7 +27,6 @@ const CEODashboard = () => {
       const data = await ceoAPI.getStats();
       setStats(data.stats || stats);
     } catch (err) {
-      if (import.meta.env.DEV) console.error('Error fetching CEO stats:', err);
       // Mock data for development
       setStats({
         totalSalons: 12,
@@ -46,64 +45,63 @@ const CEODashboard = () => {
         setAtRiskSummary(res.data.summary || { total: 0, highRisk: 0 });
       }
     } catch (err) {
-      if (import.meta.env.DEV) console.error('Error fetching at-risk studios:', err);
     }
   };
 
   const getRiskColor = (level) => {
     switch (level) {
-      case 'high': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'high': return 'bg-red-500/20 text-red-600 border-red-500/30';
+      case 'medium': return 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30';
       default: return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">CEO Dashboard</h1>
-          <p className="text-gray-400 mt-2">System Overview - {user.name}</p>
+          <h1 className="text-3xl font-bold text-zinc-900">CEO Dashboard</h1>
+          <p className="text-zinc-500 mt-2">System Overview - {user.name}</p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Unternehmen</p>
-                <p className="text-3xl font-bold text-white">{stats.totalSalons}</p>
+                <p className="text-sm text-zinc-500">Unternehmen</p>
+                <p className="text-3xl font-bold text-zinc-900">{stats.totalSalons}</p>
               </div>
               <BuildingStorefrontIcon className="h-12 w-12 text-blue-500" />
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Total Users</p>
-                <p className="text-3xl font-bold text-white">{stats.totalUsers}</p>
+                <p className="text-sm text-zinc-500">Total Users</p>
+                <p className="text-3xl font-bold text-zinc-900">{stats.totalUsers}</p>
               </div>
               <UsersIcon className="h-12 w-12 text-green-500" />
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Monthly Revenue</p>
-                <p className="text-3xl font-bold text-white">€{stats.monthlyRevenue}</p>
+                <p className="text-sm text-zinc-500">Monthly Revenue</p>
+                <p className="text-3xl font-bold text-zinc-900">€{stats.monthlyRevenue}</p>
               </div>
               <CurrencyEuroIcon className="h-12 w-12 text-yellow-500" />
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Active Subs</p>
-                <p className="text-3xl font-bold text-white">{stats.activeSubscriptions}</p>
+                <p className="text-sm text-zinc-500">Active Subs</p>
+                <p className="text-3xl font-bold text-zinc-900">{stats.activeSubscriptions}</p>
               </div>
               <ChartBarIcon className="h-12 w-12 text-purple-500" />
             </div>
@@ -114,15 +112,15 @@ const CEODashboard = () => {
         <div className="grid md:grid-cols-2 gap-6">
           {/* At-Risk Studios Alert */}
           {atRiskSummary.total > 0 && (
-            <div className="bg-gradient-to-br from-red-900/30 to-gray-800 rounded-lg p-6 border border-red-500/30">
+            <div className="bg-gradient-to-br from-red-900/30 to-zinc-50 rounded-lg p-6 border border-red-500/30">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                  <ExclamationTriangleIcon className="h-6 w-6 text-red-400" />
+                <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
+                  <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
                   Churn-Risiko Studios
                 </h2>
                 <Link 
                   to="/ceo/analytics"
-                  className="text-sm text-red-400 hover:text-red-300"
+                  className="text-sm text-red-600 hover:text-red-600"
                 >
                   Alle anzeigen →
                 </Link>
@@ -130,12 +128,12 @@ const CEODashboard = () => {
               
               <div className="flex gap-4 mb-4">
                 <div className="bg-red-500/20 rounded-lg px-4 py-2">
-                  <p className="text-2xl font-bold text-red-400">{atRiskSummary.highRisk}</p>
-                  <p className="text-xs text-red-300">Hohes Risiko</p>
+                  <p className="text-2xl font-bold text-red-600">{atRiskSummary.highRisk}</p>
+                  <p className="text-xs text-red-600">Hohes Risiko</p>
                 </div>
                 <div className="bg-yellow-500/20 rounded-lg px-4 py-2">
-                  <p className="text-2xl font-bold text-yellow-400">{atRiskSummary.total - atRiskSummary.highRisk}</p>
-                  <p className="text-xs text-yellow-300">Beobachten</p>
+                  <p className="text-2xl font-bold text-yellow-600">{atRiskSummary.total - atRiskSummary.highRisk}</p>
+                  <p className="text-xs text-yellow-600">Beobachten</p>
                 </div>
               </div>
 
@@ -147,10 +145,10 @@ const CEODashboard = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-white">{studio.name}</p>
+                        <p className="font-medium text-zinc-900">{studio.name}</p>
                         <p className="text-xs opacity-75">{studio.riskFactors?.join(' • ')}</p>
                       </div>
-                      <span className="text-xs font-semibold px-2 py-1 rounded bg-black/30">
+                      <span className="text-xs font-semibold px-2 py-1 rounded bg-white/30">
                         Score: {studio.riskScore}
                       </span>
                     </div>
@@ -161,27 +159,27 @@ const CEODashboard = () => {
           )}
 
           {/* Management Actions */}
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold text-white mb-4">System Management</h2>
+          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
+            <h2 className="text-xl font-semibold text-zinc-900 mb-4">System Management</h2>
             <div className="grid grid-cols-2 gap-4">
-              <Link to="/ceo/companies" className="flex items-center p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-blue-500 transition-colors">
+              <Link to="/ceo/companies" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-blue-500 transition-colors">
                 <BuildingStorefrontIcon className="h-6 w-6 text-blue-500 mr-3" />
-                <span className="font-medium text-white">Unternehmen</span>
+                <span className="font-medium text-zinc-900">Unternehmen</span>
               </Link>
 
-              <Link to="/ceo/users" className="flex items-center p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-green-500 transition-colors">
+              <Link to="/ceo/users" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-green-500 transition-colors">
                 <UsersIcon className="h-6 w-6 text-green-500 mr-3" />
-                <span className="font-medium text-white">Users</span>
+                <span className="font-medium text-zinc-900">Users</span>
               </Link>
 
-              <Link to="/ceo/payments" className="flex items-center p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-yellow-500 transition-colors">
+              <Link to="/ceo/payments" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-yellow-500 transition-colors">
                 <CurrencyEuroIcon className="h-6 w-6 text-yellow-500 mr-3" />
-                <span className="font-medium text-white">Billing</span>
+                <span className="font-medium text-zinc-900">Billing</span>
               </Link>
 
-              <Link to="/ceo/analytics" className="flex items-center p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-purple-500 transition-colors">
+              <Link to="/ceo/analytics" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-purple-500 transition-colors">
                 <ChartBarIcon className="h-6 w-6 text-purple-500 mr-3" />
-                <span className="font-medium text-white">Analytics</span>
+                <span className="font-medium text-zinc-900">Analytics</span>
               </Link>
             </div>
           </div>

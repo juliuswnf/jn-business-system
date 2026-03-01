@@ -35,7 +35,6 @@ export default function NoShowKillerSettings() {
         });
       }
     } catch (error) {
-      console.error('Error loading settings:', error);
     } finally {
       setLoading(false);
     }
@@ -46,7 +45,6 @@ export default function NoShowKillerSettings() {
       const res = await api.get('/stripe-connect/account-status');
       setStripeStatus(res.data);
     } catch (error) {
-      console.error('Error checking Stripe:', error);
     }
   };
 
@@ -77,30 +75,30 @@ export default function NoShowKillerSettings() {
 
   if (loading) {
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-        <div className="text-gray-400">Laden...</div>
+      <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
+        <div className="text-zinc-500">Laden...</div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">NO-SHOW-KILLER Einstellungen</h2>
+      <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
+        <h2 className="text-2xl font-bold text-zinc-900 mb-6">NO-SHOW-KILLER Einstellungen</h2>
 
         {/* Stripe Warning */}
         {!canEnable && (
-          <div className="bg-yellow-900/20 border border-yellow-600/50 rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50/20 border border-yellow-600/50 rounded-lg p-4 mb-6">
             <div className="flex items-start gap-3">
-              <FiAlertCircle className="text-yellow-400 mt-0.5" size={20} />
+              <FiAlertCircle className="text-yellow-600 mt-0.5" size={20} />
               <div className="flex-1">
-                <p className="font-medium text-yellow-400 mb-2">⚠️ Stripe-Konto erforderlich</p>
-                <p className="text-sm text-gray-300 mb-3">
+                <p className="font-medium text-yellow-600 mb-2">⚠️ Stripe-Konto erforderlich</p>
+                <p className="text-sm text-zinc-600 mb-3">
                   Um den NO-SHOW-KILLER zu nutzen, müssen Sie zuerst Ihr Stripe-Konto verbinden.
                 </p>
                 <Link
                   to="/dashboard/settings/stripe"
-                  className="inline-block px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-medium transition"
+                  className="inline-block px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-zinc-900 rounded-lg text-sm font-medium transition"
                 >
                   Jetzt verbinden
                 </Link>
@@ -117,11 +115,11 @@ export default function NoShowKillerSettings() {
               checked={settings.enabled}
               onChange={(e) => setSettings({ ...settings, enabled: e.target.checked })}
               disabled={!canEnable}
-              className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-zinc-900 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-5 h-5 rounded border-zinc-200 bg-zinc-50 text-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-0 focus:ring-offset-zinc-900 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <div>
-              <span className="font-medium text-white">NO-SHOW-KILLER aktivieren</span>
-              <p className="text-sm text-gray-400 mt-1">
+              <span className="font-medium text-zinc-900">NO-SHOW-KILLER aktivieren</span>
+              <p className="text-sm text-zinc-500 mt-1">
                 Kunden müssen Kreditkarte hinterlegen. Bei No-Show wird automatisch Gebühr berechnet.
               </p>
             </div>
@@ -132,7 +130,7 @@ export default function NoShowKillerSettings() {
         {settings.enabled && (
           <>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-zinc-600 mb-2">
                 No-Show-Gebühr
               </label>
               <div className="flex items-center gap-2">
@@ -143,11 +141,11 @@ export default function NoShowKillerSettings() {
                   min="5"
                   max="50"
                   step="1"
-                  className="w-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-32 px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900"
                 />
-                <span className="text-gray-400">€</span>
+                <span className="text-zinc-500">€</span>
               </div>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-zinc-500 mt-1">
                 Empfohlen: €15. Wird automatisch bei Nichterscheinen berechnet.
               </p>
             </div>
@@ -158,7 +156,7 @@ export default function NoShowKillerSettings() {
                 <FiInfo className="text-blue-400 mt-0.5" size={20} />
                 <div>
                   <p className="font-medium text-blue-400 mb-2">So funktioniert's:</p>
-                  <ul className="text-sm text-gray-300 space-y-1">
+                  <ul className="text-sm text-zinc-600 space-y-1">
                     <li>• Kunden hinterlegen Kreditkarte bei Buchung</li>
                     <li>• Karte wird NICHT belastet (nur gespeichert)</li>
                     <li>• Sie markieren No-Show im Dashboard</li>
@@ -170,25 +168,25 @@ export default function NoShowKillerSettings() {
             </div>
 
             {/* Fee Breakdown */}
-            <div className="bg-zinc-800 rounded-lg p-4 mb-6">
-              <h4 className="font-medium text-white mb-3">Gebühren-Übersicht</h4>
+            <div className="bg-zinc-50 rounded-lg p-4 mb-6">
+              <h4 className="font-medium text-zinc-900 mb-3">Gebühren-Übersicht</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Kunde zahlt:</span>
-                  <span className="font-medium text-white">€{settings.feeAmount.toFixed(2)}</span>
+                  <span className="text-zinc-500">Kunde zahlt:</span>
+                  <span className="font-medium text-zinc-900">€{settings.feeAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Stripe-Gebühr (ca.):</span>
-                  <span className="text-red-400">-€{(0.25 + settings.feeAmount * 0.014).toFixed(2)}</span>
+                  <span className="text-zinc-500">Stripe-Gebühr (ca.):</span>
+                  <span className="text-red-600">-€{(0.25 + settings.feeAmount * 0.014).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-zinc-700">
-                  <span className="font-medium text-white">Sie erhalten:</span>
-                  <span className="font-bold text-green-400">
+                <div className="flex justify-between pt-2 border-t border-zinc-200">
+                  <span className="font-medium text-zinc-900">Sie erhalten:</span>
+                  <span className="font-bold text-green-600">
                     €{(settings.feeAmount - (0.25 + settings.feeAmount * 0.014)).toFixed(2)}
                   </span>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-zinc-400 mt-2">
                 Stripe-Standardgebühren: €0,25 + 1,4% pro Transaktion
               </p>
             </div>
@@ -200,7 +198,7 @@ export default function NoShowKillerSettings() {
           <button
             onClick={handleSave}
             disabled={saving || !canEnable}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-zinc-900 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? 'Speichern...' : 'Einstellungen speichern'}
           </button>
@@ -209,20 +207,20 @@ export default function NoShowKillerSettings() {
 
       {/* Stats Card (if enabled) */}
       {settings.enabled && canEnable && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <h3 className="text-xl font-bold text-white mb-4">No-Show Statistiken</h3>
+        <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
+          <h3 className="text-xl font-bold text-zinc-900 mb-4">No-Show Statistiken</h3>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <div className="text-3xl font-bold text-white">0</div>
-              <div className="text-sm text-gray-400 mt-1">No-Shows diesen Monat</div>
+              <div className="text-3xl font-bold text-zinc-900">0</div>
+              <div className="text-sm text-zinc-500 mt-1">No-Shows diesen Monat</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-400">€0,00</div>
-              <div className="text-sm text-gray-400 mt-1">Gebühren eingenommen</div>
+              <div className="text-3xl font-bold text-green-600">€0,00</div>
+              <div className="text-sm text-zinc-500 mt-1">Gebühren eingenommen</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-400">0%</div>
-              <div className="text-sm text-gray-400 mt-1">No-Show-Rate</div>
+              <div className="text-sm text-zinc-500 mt-1">No-Show-Rate</div>
             </div>
           </div>
         </div>

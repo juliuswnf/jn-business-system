@@ -218,7 +218,7 @@ const CampaignAnalytics = () => {
                 {getTypeLabel(campaign.type)}
               </span>
             </div>
-            <p className="text-gray-600">Campaign Analytics & Performance</p>
+            <p className="text-zinc-500">Campaign Analytics & Performance</p>
           </div>
         </div>
         <div className="flex gap-3">
@@ -231,7 +231,7 @@ const CampaignAnalytics = () => {
           </button>
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700"
           >
             <Download className="w-4 h-4" />
             Export CSV
@@ -344,14 +344,14 @@ const CampaignAnalytics = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kunde</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefon</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rabattcode</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gesendet</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Geklickt</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gebucht</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Umsatz</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Kunde</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Telefon</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Rabattcode</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Gesendet</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Geklickt</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Gebucht</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Umsatz</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -362,7 +362,7 @@ const CampaignAnalytics = () => {
                       {recipient.customerName || 'N/A'}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
                     {recipient.phoneNumber}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -370,10 +370,10 @@ const CampaignAnalytics = () => {
                       {getStatusLabel(recipient.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
                     {recipient.discountCode || '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
                     {recipient.sentAt ? new Date(recipient.sentAt).toLocaleString('de-DE', {
                       day: '2-digit',
                       month: '2-digit',
@@ -381,7 +381,7 @@ const CampaignAnalytics = () => {
                       minute: '2-digit'
                     }) : '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
                     {recipient.clickedAt ? new Date(recipient.clickedAt).toLocaleString('de-DE', {
                       day: '2-digit',
                       month: '2-digit',
@@ -389,7 +389,7 @@ const CampaignAnalytics = () => {
                       minute: '2-digit'
                     }) : '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
                     {recipient.bookedAt ? new Date(recipient.bookedAt).toLocaleString('de-DE', {
                       day: '2-digit',
                       month: '2-digit',
@@ -409,7 +409,7 @@ const CampaignAnalytics = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-zinc-500">
               Seite {currentPage} von {totalPages}
             </div>
             <div className="flex gap-2">
@@ -455,9 +455,9 @@ const StatCard = ({ icon, label, value, subtext, color }) => {
         </div>
       </div>
       <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-sm text-gray-600">{label}</div>
+      <div className="text-sm text-zinc-500">{label}</div>
       {subtext && (
-        <div className="text-xs text-gray-500 mt-1">{subtext}</div>
+        <div className="text-xs text-zinc-400 mt-1">{subtext}</div>
       )}
     </motion.div>
   );

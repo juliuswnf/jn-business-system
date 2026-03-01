@@ -64,7 +64,7 @@ const StatsCard = ({
               <span className={`${trendColor} text-xs font-semibold`}>
                 {isTrendPositive ? '+' : ''}{trend}%
               </span>
-              <span className="text-gray-500 text-xs">{trendText}</span>
+              <span className="text-zinc-400 text-xs">{trendText}</span>
             </div>
           )}
         </div>

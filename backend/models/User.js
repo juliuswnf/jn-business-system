@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import logger from '../utils/logger.js';
 
+const PHONE_REGEX = /^\+?[0-9\s().-]{7,20}$/;
+
 const userSchema = new mongoose.Schema(
   {
     // ==================== Authentication ====================
@@ -33,7 +35,8 @@ const userSchema = new mongoose.Schema(
 
     phone: {
       type: String,
-      trim: true
+      trim: true,
+      match: [PHONE_REGEX, 'Valid phone number required']
     },
 
     avatar: {
@@ -367,6 +370,119 @@ userSchema.statics.getCEO = function() {
 userSchema.statics.getActiveUsers = function() {
   return this.find({ isActive: true });
 };
+
+const deleteManyIfModelExists = async (modelName, filter) => {
+  try {
+    const model = mongoose.model(modelName);
+    await model.deleteMany(filter);
+  } catch (error) {
+    if (error.name !== 'MissingSchemaError') {
+      throw error;
+    }
+  }
+};
+
+const cascadeDeleteSalonOwnerData = async (ownerId) => {
+  const Salon = mongoose.model('Salon');
+  const salons = await Salon.find({ owner: ownerId })
+    .setOptions({ includeDeleted: true })
+    .select('_id')
+    .lean();
+
+  const salonIds = salons.map((salon) => salon._id);
+  if (salonIds.length === 0) {
+    return;
+  }
+
+  const bySalon = { salonId: { $in: salonIds } };
+
+  await Promise.all([
+    deleteManyIfModelExists('Booking', bySalon),
+    deleteManyIfModelExists('Customer', bySalon),
+    deleteManyIfModelExists('Service', bySalon),
+    deleteManyIfModelExists('Waitlist', bySalon),
+    deleteManyIfModelExists('SlotSuggestion', bySalon),
+    deleteManyIfModelExists('SMSConsent', bySalon),
+    deleteManyIfModelExists('SMSLog', bySalon),
+    deleteManyIfModelExists('Consent', bySalon),
+    deleteManyIfModelExists('ConsentForm', bySalon),
+    deleteManyIfModelExists('ClinicalNote', bySalon),
+    deleteManyIfModelExists('MedicalHistory', bySalon),
+    deleteManyIfModelExists('CustomerPackage', bySalon),
+    deleteManyIfModelExists('Membership', bySalon),
+    deleteManyIfModelExists('NoShowAnalytics', bySalon),
+    deleteManyIfModelExists('TattooProject', bySalon),
+    deleteManyIfModelExists('TattooSession', bySalon),
+    deleteManyIfModelExists('WorkflowProject', bySalon),
+    deleteManyIfModelExists('WorkflowSession', bySalon),
+    deleteManyIfModelExists('SupportTicket', bySalon),
+    deleteManyIfModelExists('Widget', bySalon)
+  ]);
+
+  try {
+    const MarketingCampaign = mongoose.model('MarketingCampaign');
+    const campaignIds = (await MarketingCampaign.find(bySalon).select('_id').lean()).map((campaign) => campaign._id);
+    if (campaignIds.length > 0) {
+      await deleteManyIfModelExists('MarketingRecipient', { campaignId: { $in: campaignIds } });
+    }
+    await deleteManyIfModelExists('MarketingCampaign', bySalon);
+  } catch (error) {
+    if (error.name !== 'MissingSchemaError') {
+      throw error;
+    }
+  }
+
+  await Promise.all([
+    deleteManyIfModelExists('Payment', { companyId: ownerId }),
+    deleteManyIfModelExists('User', { role: 'employee', salonId: { $in: salonIds } }),
+    deleteManyIfModelExists('Salon', { _id: { $in: salonIds } })
+  ]);
+
+  await mongoose.model('User').updateMany(
+    { additionalSalonIds: { $in: salonIds } },
+    { $pull: { additionalSalonIds: { $in: salonIds } } }
+  );
+};
+
+const runOwnerCascadeIfNeeded = async (userDoc) => {
+  if (!userDoc || userDoc.role !== 'salon_owner') {
+    return;
+  }
+
+  await cascadeDeleteSalonOwnerData(userDoc._id);
+};
+
+userSchema.pre('findOneAndDelete', async function(next) {
+  try {
+    const userDoc = await this.model.findOne(this.getFilter()).setOptions({ includeDeleted: true });
+    await runOwnerCascadeIfNeeded(userDoc);
+    next();
+  } catch (error) {
+    logger.error('User owner cascade delete failed:', error);
+    next(error);
+  }
+});
+
+userSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
+  try {
+    await runOwnerCascadeIfNeeded(this);
+    next();
+  } catch (error) {
+    logger.error('User owner cascade delete failed:', error);
+    next(error);
+  }
+});
+
+userSchema.pre('deleteOne', { document: false, query: true }, async function(next) {
+  try {
+    const userDoc = await this.model.findOne(this.getFilter()).setOptions({ includeDeleted: true });
+    await runOwnerCascadeIfNeeded(userDoc);
+    next();
+  } catch (error) {
+    logger.error('User owner cascade delete failed:', error);
+    next(error);
+  }
+});
 
 // ==================== PRE-SAVE HOOKS ====================
 

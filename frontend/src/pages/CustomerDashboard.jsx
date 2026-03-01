@@ -81,7 +81,6 @@ const CustomerDashboard = () => {
         }
       }
     } catch (error) {
-      console.error('Error cancelling booking:', error);
     }
   };
 
@@ -93,13 +92,13 @@ const CustomerDashboard = () => {
       completed: { label: 'Abgeschlossen', color: 'text-blue-600 bg-blue-100' },
       cancelled: { label: 'Abgesagt', color: 'text-red-600 bg-red-100' }
     };
-    return statusMap[status] || { label: status, color: 'text-gray-600 bg-gray-100' };
+    return statusMap[status] || { label: status, color: 'text-zinc-500 bg-gray-100' };
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-white mb-8">Mein Dashboard</h1>
+        <h1 className="text-3xl font-bold text-zinc-900 mb-8">Mein Dashboard</h1>
 
         {loading ? (
           <div className="flex items-center justify-center h-64">
@@ -108,22 +107,22 @@ const CustomerDashboard = () => {
         ) : (
           <>
             {/* Upcoming Bookings */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
-              <h2 className="text-xl font-semibold text-white mb-4">Bevorstehende Termine</h2>
+            <div className="bg-white border border-zinc-200 rounded-xl p-6 mb-8">
+              <h2 className="text-xl font-semibold text-zinc-900 mb-4">Bevorstehende Termine</h2>
               {upcomingBookings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2"></div>
-                  <p className="text-gray-200">Keine bevorstehenden Termine</p>
+                  <p className="text-zinc-700">Keine bevorstehenden Termine</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {upcomingBookings.map(booking => (
-                    <div key={booking.id} className="border border-gray-800 rounded-lg p-4 hover:bg-gray-800/30 transition">
+                    <div key={booking.id} className="border border-zinc-200 rounded-lg p-4 hover:bg-zinc-100/30 transition">
                       <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-medium text-white">{booking.service}</p>
-                        <p className="text-gray-200">{booking.salon}</p>
-                        <p className="text-gray-500 text-sm">{booking.date}</p>
+                        <p className="font-medium text-zinc-900">{booking.service}</p>
+                        <p className="text-zinc-700">{booking.salon}</p>
+                        <p className="text-zinc-400 text-sm">{booking.date}</p>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusDisplay(booking.status).color}`}>
@@ -131,7 +130,7 @@ const CustomerDashboard = () => {
                           </span>
                           <button
                             onClick={() => handleCancelBooking(booking.id)}
-                            className="px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition text-sm"
+                            className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition text-sm"
                           >
                             Absagen
                           </button>
@@ -144,22 +143,22 @@ const CustomerDashboard = () => {
             </div>
 
             {/* Past Bookings */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-white mb-4">Vergangene Termine</h2>
+            <div className="bg-white border border-zinc-200 rounded-xl p-6">
+              <h2 className="text-xl font-semibold text-zinc-900 mb-4">Vergangene Termine</h2>
               {pastBookings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2">📋</div>
-                  <p className="text-gray-200">Keine vergangenen Termine</p>
+                  <p className="text-zinc-700">Keine vergangenen Termine</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {pastBookings.map(booking => (
-                    <div key={booking.id} className="border border-gray-800 rounded-lg p-4 opacity-75">
+                    <div key={booking.id} className="border border-zinc-200 rounded-lg p-4 opacity-75">
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="font-medium text-gray-300">{booking.service}</p>
-                          <p className="text-gray-500">{booking.salon}</p>
-                          <p className="text-gray-600 text-sm">{booking.date}</p>
+                          <p className="font-medium text-zinc-600">{booking.service}</p>
+                          <p className="text-zinc-400">{booking.salon}</p>
+                          <p className="text-zinc-500 text-sm">{booking.date}</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusDisplay(booking.status).color}`}>
                           {getStatusDisplay(booking.status).label}
@@ -175,7 +174,7 @@ const CustomerDashboard = () => {
             <div className="mt-8 text-center">
               <Link
                 to="/profile"
-                className="inline-flex items-center justify-center px-6 py-3 border-2 border-gray-700 text-base font-medium rounded-lg text-white bg-gray-900 hover:bg-gray-800 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 border-2 border-zinc-200 text-base font-medium rounded-lg text-zinc-900 bg-white hover:bg-zinc-100 transition-colors"
               >
                 Profil bearbeiten
               </Link>

@@ -4,9 +4,9 @@ const BookingWidget = ({ salonId }) => {
   const widgetCode = `<iframe src="https://yourapp.com/widget/${salonId}" width="100%" height="600px" style="border: none;"></iframe>`;
 
   return (
-    <div className="booking-widget w-full max-w-full sm:max-w-md mx-auto bg-white rounded-2xl border border-gray-200 shadow-xl p-4 sm:p-6">
+    <div className="booking-widget w-full max-w-full sm:max-w-md mx-auto bg-white rounded-2xl border border-gray-200 shadow-none p-4 sm:p-6">
       <div className="mb-4">
-        <p className="text-sm uppercase tracking-[0.3em] text-gray-500">Widget</p>
+        <p className="text-sm uppercase tracking-[0.3em] text-zinc-400">Widget</p>
         <h2 className="text-2xl font-semibold text-gray-900">Buchungs-Widget</h2>
       </div>
       <p className="text-sm text-gray-600 mb-4">

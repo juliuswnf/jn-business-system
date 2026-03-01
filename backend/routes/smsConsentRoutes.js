@@ -1,6 +1,7 @@
 import express from 'express';
 import SMSConsent from '../models/SMSConsent.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -62,7 +63,7 @@ router.post('/opt-in', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in SMS opt-in:', error);
+    logger.error('Error in SMS opt-in:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to opt in for SMS notifications',
@@ -113,7 +114,7 @@ router.post('/opt-out', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in SMS opt-out:', error);
+    logger.error('Error in SMS opt-out:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to opt out of SMS notifications',
@@ -162,7 +163,7 @@ router.get('/:customerId/:salonId', authMiddleware.protect, async (req, res) => 
     });
 
   } catch (error) {
-    console.error('Error checking SMS consent:', error);
+    logger.error('Error checking SMS consent:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to check SMS consent status',
@@ -204,7 +205,7 @@ router.get('/salon/:salonId', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching salon SMS consents:', error);
+    logger.error('Error fetching salon SMS consents:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch SMS consents',

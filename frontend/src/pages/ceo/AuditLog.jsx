@@ -49,7 +49,6 @@ const AuditLog = () => {
         setAlerts([]);
       }
     } catch (err) {
-      console.error('Error fetching audit data:', err);
       // Only show error for server errors
       if (err.response?.status >= 500) {
         showMessage('Server-Fehler beim Laden der Audit-Daten', 'error');
@@ -84,7 +83,6 @@ const AuditLog = () => {
       link.remove();
       showMessage('Export erfolgreich', 'success');
     } catch (err) {
-      console.error('Error exporting logs:', err);
       showMessage('Fehler beim Export', 'error');
     }
   };
@@ -99,10 +97,10 @@ const AuditLog = () => {
 
   const getRiskBadge = (level) => {
     const styles = {
-      low: 'bg-green-500/20 text-green-400',
-      medium: 'bg-yellow-500/20 text-yellow-400',
+      low: 'bg-green-500/20 text-green-600',
+      medium: 'bg-yellow-500/20 text-yellow-600',
       high: 'bg-orange-500/20 text-orange-400',
-      critical: 'bg-red-500/20 text-red-400'
+      critical: 'bg-red-500/20 text-red-600'
     };
     const labels = {
       low: 'Niedrig',
@@ -110,7 +108,7 @@ const AuditLog = () => {
       high: 'Hoch',
       critical: 'Kritisch'
     };
-    return <span className={`px-2 py-1 rounded text-xs font-medium ${styles[level] || 'bg-gray-500/20 text-gray-400'}`}>{labels[level] || level}</span>;
+    return <span className={`px-2 py-1 rounded text-xs font-medium ${styles[level] || 'bg-gray-500/20 text-zinc-500'}`}>{labels[level] || level}</span>;
   };
 
   const getCategoryIcon = (category) => {
@@ -141,15 +139,15 @@ const AuditLog = () => {
 
   if (loading && page === 1) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      <header className="border-b border-gray-800 bg-black/80 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-white">
+      <header className="border-b border-zinc-200 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/ceo/dashboard" className="flex items-center gap-3">
@@ -159,18 +157,18 @@ const AuditLog = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-lg font-bold text-white">Security Audit Log</h1>
-                <p className="text-xs text-gray-500">Sicherheitsprotokolle</p>
+                <h1 className="text-lg font-bold text-zinc-900">Security Audit Log</h1>
+                <p className="text-xs text-zinc-400">Sicherheitsprotokolle</p>
               </div>
             </Link>
             <div className="flex items-center gap-4">
-              <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm">
+              <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm">
                 <option value="1d">Heute</option>
                 <option value="7d">Letzte 7 Tage</option>
                 <option value="30d">Letzte 30 Tage</option>
                 <option value="90d">Letzte 90 Tage</option>
               </select>
-              <button onClick={exportLogs} className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition flex items-center gap-2">
+              <button onClick={exportLogs} className="px-4 py-2 bg-zinc-50 text-zinc-900 rounded-lg hover:bg-zinc-100 transition flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
@@ -184,7 +182,7 @@ const AuditLog = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {message && (
-          <div className={`mb-6 p-4 rounded-lg ${message.type === 'error' ? 'bg-red-500/20 border border-red-500/50 text-red-400' : 'bg-green-500/20 border border-green-500/50 text-green-400'}`}>
+          <div className={`mb-6 p-4 rounded-lg ${message.type === 'error' ? 'bg-red-500/20 border border-red-500/50 text-red-600' : 'bg-green-500/20 border border-green-500/50 text-green-600'}`}>
             {message.text}
           </div>
         )}
@@ -197,11 +195,11 @@ const AuditLog = () => {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">⚠️</span>
                   <div>
-                    <p className="text-red-400 font-medium">{alert.title}</p>
-                    <p className="text-red-300/70 text-sm">{alert.description}</p>
+                    <p className="text-red-600 font-medium">{alert.title}</p>
+                    <p className="text-red-600/70 text-sm">{alert.description}</p>
                   </div>
                 </div>
-                <span className="text-red-400/50 text-sm">{formatDate(alert.createdAt)}</span>
+                <span className="text-red-600/50 text-sm">{formatDate(alert.createdAt)}</span>
               </div>
             ))}
           </div>
@@ -209,20 +207,20 @@ const AuditLog = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Gesamt Events</p>
-            <p className="text-3xl font-bold text-white">{(stats?.total || 0).toLocaleString()}</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Gesamt Events</p>
+            <p className="text-3xl font-bold text-zinc-900">{(stats?.total || 0).toLocaleString()}</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Heute</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Heute</p>
             <p className="text-3xl font-bold text-cyan-400">{(stats?.today || 0).toLocaleString()}</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Hohes Risiko</p>
-            <p className="text-3xl font-bold text-red-400">{stats?.highRisk || 0}</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Hohes Risiko</p>
+            <p className="text-3xl font-bold text-red-600">{stats?.highRisk || 0}</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-500 text-sm mb-1">Aktive Alerts</p>
+          <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
+            <p className="text-zinc-400 text-sm mb-1">Aktive Alerts</p>
             <p className="text-3xl font-bold text-orange-400">{alerts?.length || 0}</p>
           </div>
         </div>
@@ -230,8 +228,8 @@ const AuditLog = () => {
         {/* Filters */}
         <div className="flex flex-wrap gap-4 mb-6">
           <div>
-            <label className="block text-gray-400 text-xs mb-1">Kategorie</label>
-            <select value={filter.category} onChange={(e) => { setFilter({...filter, category: e.target.value}); setPage(1); }} className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm min-w-[150px]">
+            <label className="block text-zinc-500 text-xs mb-1">Kategorie</label>
+            <select value={filter.category} onChange={(e) => { setFilter({...filter, category: e.target.value}); setPage(1); }} className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm min-w-[150px]">
               <option value="all">Alle Kategorien</option>
               <option value="auth">Authentifizierung</option>
               <option value="user">Benutzer</option>
@@ -242,8 +240,8 @@ const AuditLog = () => {
             </select>
           </div>
           <div>
-            <label className="block text-gray-400 text-xs mb-1">Risikostufe</label>
-            <select value={filter.riskLevel} onChange={(e) => { setFilter({...filter, riskLevel: e.target.value}); setPage(1); }} className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm min-w-[150px]">
+            <label className="block text-zinc-500 text-xs mb-1">Risikostufe</label>
+            <select value={filter.riskLevel} onChange={(e) => { setFilter({...filter, riskLevel: e.target.value}); setPage(1); }} className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm min-w-[150px]">
               <option value="all">Alle Stufen</option>
               <option value="low">Niedrig</option>
               <option value="medium">Mittel</option>
@@ -254,14 +252,14 @@ const AuditLog = () => {
         </div>
 
         {/* Logs Table */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-gray-800 flex justify-between items-center">
-            <h3 className="font-semibold text-white">Audit Logs</h3>
-            <span className="text-gray-500 text-sm">{logs?.length || 0} Einträge</span>
+        <div className="bg-white/50 border border-zinc-200 rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-zinc-200 flex justify-between items-center">
+            <h3 className="font-semibold text-zinc-900">Audit Logs</h3>
+            <span className="text-zinc-400 text-sm">{logs?.length || 0} Einträge</span>
           </div>
           
           {!logs || logs.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-zinc-400">
               <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
@@ -272,7 +270,7 @@ const AuditLog = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-left text-gray-400 text-sm border-b border-gray-800">
+                    <tr className="text-left text-zinc-500 text-sm border-b border-zinc-200">
                       <th className="p-4">Zeitstempel</th>
                       <th className="p-4">Kategorie</th>
                       <th className="p-4">Aktion</th>
@@ -282,25 +280,25 @@ const AuditLog = () => {
                       <th className="p-4">Details</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-800">
+                  <tbody className="divide-y divide-zinc-200">
                     {(logs || []).map((log) => (
-                      <tr key={log._id} className="hover:bg-gray-800/30 transition">
-                        <td className="p-4 text-gray-400 text-sm whitespace-nowrap">{formatDate(log.createdAt)}</td>
+                      <tr key={log._id} className="hover:bg-zinc-100/30 transition">
+                        <td className="p-4 text-zinc-500 text-sm whitespace-nowrap">{formatDate(log.createdAt)}</td>
                         <td className="p-4">
                           <span className="inline-flex items-center gap-2">
                             <span>{getCategoryIcon(log.category)}</span>
-                            <span className="text-white text-sm">{getCategoryLabel(log.category)}</span>
+                            <span className="text-zinc-900 text-sm">{getCategoryLabel(log.category)}</span>
                           </span>
                         </td>
-                        <td className="p-4 text-white">{log.action}</td>
+                        <td className="p-4 text-zinc-900">{log.action}</td>
                         <td className="p-4">
-                          <p className="text-white text-sm">{log.userName || log.userEmail || '-'}</p>
-                          <p className="text-gray-500 text-xs">{log.userId?.slice(-8) || ''}</p>
+                          <p className="text-zinc-900 text-sm">{log.userName || log.userEmail || '-'}</p>
+                          <p className="text-zinc-400 text-xs">{log.userId?.slice(-8) || ''}</p>
                         </td>
-                        <td className="p-4 text-gray-400 font-mono text-sm">{log.ipAddress || '-'}</td>
+                        <td className="p-4 text-zinc-500 font-mono text-sm">{log.ipAddress || '-'}</td>
                         <td className="p-4">{getRiskBadge(log.riskLevel || 'low')}</td>
                         <td className="p-4">
-                          <button onClick={() => setSelectedLog(log)} className="p-1.5 text-gray-400 hover:text-white transition">
+                          <button onClick={() => setSelectedLog(log)} className="p-1.5 text-zinc-500 hover:text-zinc-900 transition">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -315,12 +313,12 @@ const AuditLog = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="p-4 border-t border-gray-800 flex justify-center gap-2">
-                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 bg-gray-800 text-white rounded disabled:opacity-50">
+                <div className="p-4 border-t border-zinc-200 flex justify-center gap-2">
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 bg-zinc-50 text-zinc-900 rounded disabled:opacity-50">
                     ←
                   </button>
-                  <span className="px-4 py-1 text-gray-400">Seite {page} von {totalPages}</span>
-                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 bg-gray-800 text-white rounded disabled:opacity-50">
+                  <span className="px-4 py-1 text-zinc-500">Seite {page} von {totalPages}</span>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 bg-zinc-50 text-zinc-900 rounded disabled:opacity-50">
                     →
                   </button>
                 </div>
@@ -332,14 +330,14 @@ const AuditLog = () => {
 
       {/* Log Details Modal */}
       {selectedLog && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl p-6 max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-white/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-zinc-200 rounded-2xl w-full max-w-2xl p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h3 className="text-xl font-bold text-white">{selectedLog.action}</h3>
-                <p className="text-gray-500">{formatDate(selectedLog.createdAt)}</p>
+                <h3 className="text-xl font-bold text-zinc-900">{selectedLog.action}</h3>
+                <p className="text-zinc-400">{formatDate(selectedLog.createdAt)}</p>
               </div>
-              <button onClick={() => setSelectedLog(null)} className="p-2 text-gray-400 hover:text-white">
+              <button onClick={() => setSelectedLog(null)} className="p-2 text-zinc-500 hover:text-zinc-900">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -347,44 +345,44 @@ const AuditLog = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-gray-800 rounded-lg p-4">
-                <p className="text-gray-400 text-xs mb-1">Kategorie</p>
-                <p className="text-white">{getCategoryIcon(selectedLog.category)} {getCategoryLabel(selectedLog.category)}</p>
+              <div className="bg-zinc-50 rounded-lg p-4">
+                <p className="text-zinc-500 text-xs mb-1">Kategorie</p>
+                <p className="text-zinc-900">{getCategoryIcon(selectedLog.category)} {getCategoryLabel(selectedLog.category)}</p>
               </div>
-              <div className="bg-gray-800 rounded-lg p-4">
-                <p className="text-gray-400 text-xs mb-1">Risikostufe</p>
+              <div className="bg-zinc-50 rounded-lg p-4">
+                <p className="text-zinc-500 text-xs mb-1">Risikostufe</p>
                 {getRiskBadge(selectedLog.riskLevel || 'low')}
               </div>
             </div>
 
             <div className="space-y-4 text-sm">
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-400">Benutzer</span>
-                <span className="text-white">{selectedLog.userName || selectedLog.userEmail || '-'}</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-500">Benutzer</span>
+                <span className="text-zinc-900">{selectedLog.userName || selectedLog.userEmail || '-'}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-400">Benutzer ID</span>
-                <span className="text-white font-mono">{selectedLog.userId || '-'}</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-500">Benutzer ID</span>
+                <span className="text-zinc-900 font-mono">{selectedLog.userId || '-'}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-400">IP-Adresse</span>
-                <span className="text-white font-mono">{selectedLog.ipAddress || '-'}</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-500">IP-Adresse</span>
+                <span className="text-zinc-900 font-mono">{selectedLog.ipAddress || '-'}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-800">
-                <span className="text-gray-400">User Agent</span>
-                <span className="text-white text-xs break-all">{selectedLog.userAgent || '-'}</span>
+              <div className="flex justify-between py-2 border-b border-zinc-200">
+                <span className="text-zinc-500">User Agent</span>
+                <span className="text-zinc-900 text-xs break-all">{selectedLog.userAgent || '-'}</span>
               </div>
               {selectedLog.details && (
                 <div className="py-2">
-                  <p className="text-gray-400 mb-2">Details</p>
-                  <pre className="bg-gray-800 rounded-lg p-4 text-gray-300 text-xs overflow-x-auto">
+                  <p className="text-zinc-500 mb-2">Details</p>
+                  <pre className="bg-zinc-50 rounded-lg p-4 text-zinc-600 text-xs overflow-x-auto">
                     {JSON.stringify(selectedLog.details, null, 2)}
                   </pre>
                 </div>
               )}
             </div>
 
-            <button onClick={() => setSelectedLog(null)} className="w-full mt-6 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition">
+            <button onClick={() => setSelectedLog(null)} className="w-full mt-6 px-4 py-2 bg-zinc-50 text-zinc-900 rounded-lg hover:bg-zinc-100 transition">
               Schließen
             </button>
           </div>

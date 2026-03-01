@@ -236,7 +236,7 @@ export const getPatientClinicalNotes = async (req, res) => {
       clinicalNotes
     });
   } catch (error) {
-    console.error('Error getting patient clinical notes:', error);
+    logger.error('Error getting patient clinical notes:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -313,7 +313,7 @@ export const updateClinicalNote = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error updating clinical note:', error);
+    logger.error('Error updating clinical note:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -407,7 +407,7 @@ export const shareClinicalNote = async (req, res) => {
       message: 'Clinical note shared'
     });
   } catch (error) {
-    console.error('Error sharing clinical note:', error);
+    logger.error('Error sharing clinical note:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

@@ -1,6 +1,7 @@
 import express from 'express';
 import Waitlist from '../models/Waitlist.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -98,7 +99,7 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error joining waitlist:', error);
+    logger.error('Error joining waitlist:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to join waitlist',
@@ -150,7 +151,7 @@ router.get('/:salonId', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching waitlist:', error);
+    logger.error('Error fetching waitlist:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch waitlist',
@@ -197,7 +198,7 @@ router.get('/customer/:customerId/:salonId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching customer waitlist entry:', error);
+    logger.error('Error fetching customer waitlist entry:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch waitlist entry',
@@ -256,7 +257,7 @@ router.put('/:id', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error updating waitlist entry:', error);
+    logger.error('Error updating waitlist entry:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to update waitlist entry',
@@ -305,7 +306,7 @@ router.delete('/:id', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error removing from waitlist:', error);
+    logger.error('Error removing from waitlist:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to remove from waitlist',

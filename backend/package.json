@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "lint": "eslint . --ext .js,.cjs --ignore-pattern node_modules --ignore-pattern logs",
+    "lint:fix": "eslint . --ext .js,.cjs --ignore-pattern node_modules --ignore-pattern logs --fix",
     "test": "node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --coverage",
     "test:watch": "node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --watch",
     "test:ci": "node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --ci --coverage --forceExit",
@@ -28,7 +30,6 @@
     "@sentry/node": "^10.31.0",
     "@sentry/profiling-node": "^10.32.1",
     "archiver": "^7.0.1",
-    "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.8.0",
     "compression": "^1.8.1",

@@ -3,6 +3,7 @@ import BookingConfirmation from '../models/BookingConfirmation.js';
 import Booking from '../models/Booking.js';
 import { sendBookingConfirmation } from '../services/smsService.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -57,7 +58,7 @@ router.post('/:bookingId', authMiddleware.protect, async (req, res) => {
       confirmation.lastReminderSent = new Date();
       await confirmation.save();
     } catch (smsError) {
-      console.error('Failed to send confirmation SMS:', smsError);
+      logger.error('Failed to send confirmation SMS:', smsError);
       // Continue even if SMS fails (can retry later)
     }
 
@@ -74,7 +75,7 @@ router.post('/:bookingId', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error creating booking confirmation:', error);
+    logger.error('Error creating booking confirmation:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to create booking confirmation',
@@ -168,7 +169,7 @@ router.get('/confirm/:token', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error confirming booking:', error);
+    logger.error('Error confirming booking:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to confirm booking',
@@ -211,7 +212,7 @@ router.get('/:bookingId', authMiddleware.protect, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching confirmation status:', error);
+    logger.error('Error fetching confirmation status:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch confirmation status',

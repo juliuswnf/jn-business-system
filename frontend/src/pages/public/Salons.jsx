@@ -34,7 +34,6 @@ const Salons = () => {
         setPagination(data.pagination);
       }
     } catch (error) {
-      console.error('Error fetching salons:', error);
     } finally {
       setLoading(false);
     }
@@ -55,27 +54,27 @@ const Salons = () => {
   }, [searchQuery, salons]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       {/* SEO Header */}
-      <div className="bg-zinc-900 border-b border-zinc-800 py-16">
+      <div className="bg-zinc-50 border-b border-zinc-200 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">
             Dienstleister in deiner Nähe
           </h1>
-          <p className="text-xl text-gray-300 mb-8">
+          <p className="text-xl text-zinc-600 mb-8">
             Entdecke Top-Anbieter und buche online deinen nächsten Termin
           </p>
 
           {/* Search Bar */}
           <div className="max-w-2xl">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500" />
               <input
                 type="text"
                 placeholder="Name oder Stadt eingeben..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white border border-zinc-700"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-zinc-50 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-white border border-zinc-200"
               />
             </div>
           </div>
@@ -87,23 +86,23 @@ const Salons = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-zinc-900 rounded-lg shadow-sm p-6 animate-pulse border border-zinc-800">
-                <div className="h-6 bg-zinc-800 rounded w-3/4 mb-4"></div>
-                <div className="h-4 bg-zinc-800 rounded w-1/2 mb-2"></div>
-                <div className="h-4 bg-zinc-800 rounded w-2/3"></div>
+              <div key={i} className="bg-zinc-50 rounded-lg shadow-sm p-6 animate-pulse border border-zinc-200">
+                <div className="h-6 bg-zinc-50 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-zinc-50 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-zinc-50 rounded w-2/3"></div>
               </div>
             ))}
           </div>
         ) : filteredSalons.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-300 text-lg">
+            <p className="text-zinc-600 text-lg">
               Keine Anbieter gefunden. Versuche einen anderen Suchbegriff.
             </p>
           </div>
         ) : (
           <>
             <div className="mb-6">
-              <p className="text-gray-300">
+              <p className="text-zinc-600">
                 {filteredSalons.length} {filteredSalons.length === 1 ? 'Anbieter' : 'Anbieter'} gefunden
               </p>
             </div>
@@ -112,15 +111,15 @@ const Salons = () => {
               {filteredSalons.map((salon) => (
                 <div
                   key={salon._id}
-                  className="bg-zinc-900 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 border border-zinc-800"
+                  className="bg-zinc-50 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 border border-zinc-200"
                 >
-                  <h3 className="text-xl font-semibold text-white mb-2">
+                  <h3 className="text-xl font-semibold text-zinc-900 mb-2">
                     {salon.name}
                   </h3>
 
                   {/* Location */}
-                  <div className="flex items-start gap-2 text-gray-300 mb-3">
-                    <MapPinIcon className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex items-start gap-2 text-zinc-600 mb-3">
+                    <MapPinIcon className="h-5 w-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                     <div className="text-sm">
                       {salon.address?.street && <div>{salon.address.street}</div>}
                       <div>
@@ -131,7 +130,7 @@ const Salons = () => {
 
                   {/* Service Count */}
                   {salon.serviceCount > 0 && (
-                    <div className="text-sm text-gray-300 mb-4">
+                    <div className="text-sm text-zinc-600 mb-4">
                       {salon.serviceCount} {salon.serviceCount === 1 ? 'Service' : 'Services'} verfügbar
                     </div>
                   )}
@@ -154,17 +153,17 @@ const Salons = () => {
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-800"
+                  className="px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-100"
                 >
                   Zurück
                 </button>
-                <span className="px-4 py-2 text-gray-300">
+                <span className="px-4 py-2 text-zinc-600">
                   Seite {pagination.page} von {pagination.pages}
                 </span>
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page === pagination.pages}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-800"
+                  className="px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-100"
                 >
                   Weiter
                 </button>
@@ -175,21 +174,21 @@ const Salons = () => {
       </div>
 
       {/* SEO Content Section */}
-      <div className="bg-zinc-950 border-t border-zinc-800">
+      <div className="bg-zinc-50 border-t border-zinc-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="prose max-w-none">
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-zinc-900 mb-4">
               Online Termine bei Top-Dienstleistern buchen
             </h2>
-            <p className="text-gray-300 mb-4">
+            <p className="text-zinc-600 mb-4">
               Finde den perfekten Anbieter in deiner Stadt und buche deinen Termin bequem online -
               24/7 verfügbar, sofortige Bestätigung. Alle Unternehmen auf unserer Plattform bieten
               professionelle Services und moderne Buchungsmöglichkeiten.
             </p>
-            <h3 className="text-xl font-semibold text-white mb-3">
+            <h3 className="text-xl font-semibold text-zinc-900 mb-3">
               Warum online buchen?
             </h3>
-            <ul className="space-y-2 text-gray-300">
+            <ul className="space-y-2 text-zinc-600">
               <li>✓ Sofortige Terminbestätigung</li>
               <li>✓ Keine Wartezeiten am Telefon</li>
               <li>✓ Übersicht aller verfügbaren Zeiten</li>

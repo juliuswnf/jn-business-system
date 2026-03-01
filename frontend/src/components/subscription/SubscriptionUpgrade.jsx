@@ -93,7 +93,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
 
   if (availableTiers.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg">
+      <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-sm">
         <div className="text-center">
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100">
             <svg
@@ -118,7 +118,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
           </p>
           <button
             onClick={onCancel}
-            className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="mt-6 px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
           >
             Zurück
           </button>
@@ -128,7 +128,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-sm">
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900">Plan-Upgrade</h2>
@@ -195,7 +195,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
                 <div className="text-2xl font-bold text-indigo-600">
                   €{prices[tier][billingCycle]}
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-zinc-400">
                   {billingCycle === 'yearly' ? '/ Jahr' : '/ Monat'}
                 </div>
               </div>
@@ -303,7 +303,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
         <button
           onClick={handleUpgrade}
           disabled={!selectedTier || loading}
-          className={`flex-1 py-3 px-6 rounded-lg font-semibold text-white transition-all ${
+          className={`flex-1 py-3 px-6 rounded-lg font-semibold text-zinc-900 transition-all ${
             !selectedTier || loading
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-indigo-600 hover:bg-indigo-700'

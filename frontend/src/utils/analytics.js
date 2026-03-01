@@ -25,7 +25,6 @@ export const trackEvent = (eventName, props = {}) => {
       // Analytics event tracked
     }
   } catch (error) {
-    console.error('Analytics tracking error:', error);
   }
 };
 
@@ -45,7 +44,6 @@ export const trackPageView = (path) => {
       });
     }
   } catch (error) {
-    console.error('Page view tracking error:', error);
   }
 };
 

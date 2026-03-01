@@ -121,7 +121,7 @@ export default function Settings() {
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Einstellungen</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2">Einstellungen</h1>
         <p className="text-slate-400 text-sm md:text-base">
           Verwalte dein Studio, Öffnungszeiten und Integrationen
         </p>
@@ -134,7 +134,7 @@ export default function Settings() {
       )}
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-zinc-800 pb-4">
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-zinc-200 pb-4">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -144,7 +144,7 @@ export default function Settings() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
                 activeTab === tab.id
                   ? 'bg-white text-black'
-                  : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                  : 'bg-zinc-50 text-zinc-300 hover:bg-zinc-100'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -155,7 +155,7 @@ export default function Settings() {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
         <div className="p-4 md:p-6">
 
         {/* Studio Info Tab */}
@@ -168,7 +168,7 @@ export default function Settings() {
                   type="text"
                   value={studioInfo.name}
                   onChange={(e) => setStudioInfo({ ...studioInfo, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="Mein Studio"
                 />
               </div>
@@ -179,7 +179,7 @@ export default function Settings() {
                   type="email"
                   value={studioInfo.email}
                   onChange={(e) => setStudioInfo({ ...studioInfo, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="kontakt@studio.de"
                 />
               </div>
@@ -190,7 +190,7 @@ export default function Settings() {
                   type="tel"
                   value={studioInfo.phone}
                   onChange={(e) => setStudioInfo({ ...studioInfo, phone: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="+49 123 456789"
                 />
               </div>
@@ -201,7 +201,7 @@ export default function Settings() {
                   type="url"
                   value={studioInfo.website}
                   onChange={(e) => setStudioInfo({ ...studioInfo, website: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="https://www.mein-studio.de"
                 />
               </div>
@@ -212,7 +212,7 @@ export default function Settings() {
                   type="text"
                   value={studioInfo.address}
                   onChange={(e) => setStudioInfo({ ...studioInfo, address: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="Musterstraße 123"
                 />
               </div>
@@ -223,7 +223,7 @@ export default function Settings() {
                   type="text"
                   value={studioInfo.zip}
                   onChange={(e) => setStudioInfo({ ...studioInfo, zip: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="12345"
                 />
               </div>
@@ -234,7 +234,7 @@ export default function Settings() {
                   type="text"
                   value={studioInfo.city}
                   onChange={(e) => setStudioInfo({ ...studioInfo, city: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="Berlin"
                 />
               </div>
@@ -248,10 +248,10 @@ export default function Settings() {
             {openingHours.map((hours, index) => (
               <div
                 key={hours.day}
-                className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 bg-zinc-800 rounded-lg"
+                className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 bg-zinc-50 rounded-lg"
               >
                 <div className="w-28 flex-shrink-0">
-                  <span className="font-medium text-white">{hours.day}</span>
+                  <span className="font-medium text-zinc-900">{hours.day}</span>
                 </div>
 
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -259,7 +259,7 @@ export default function Settings() {
                     type="checkbox"
                     checked={!hours.closed}
                     onChange={(e) => updateHours(index, 'closed', !e.target.checked)}
-                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-700 text-blue-500"
+                    className="w-4 h-4 rounded border-zinc-200 bg-zinc-100 text-blue-500"
                   />
                   <span className="text-sm text-zinc-400">Geöffnet</span>
                 </label>
@@ -270,14 +270,14 @@ export default function Settings() {
                       type="time"
                       value={hours.open}
                       onChange={(e) => updateHours(index, 'open', e.target.value)}
-                      className="px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white text-sm"
+                      className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
                     />
                     <span className="text-zinc-500">bis</span>
                     <input
                       type="time"
                       value={hours.close}
                       onChange={(e) => updateHours(index, 'close', e.target.value)}
-                      className="px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white text-sm"
+                      className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
                     />
                   </div>
                 )}
@@ -294,13 +294,13 @@ export default function Settings() {
         {activeTab === 'integrations' && (
           <div className="space-y-6">
             {/* Google Reviews */}
-            <div className="p-4 bg-zinc-800 rounded-lg">
+            <div className="p-4 bg-zinc-50 rounded-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                  <Star className="w-5 h-5 text-yellow-400" />
+                  <Star className="w-5 h-5 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">Google Bewertungen</h3>
+                  <h3 className="font-semibold text-zinc-900">Google Bewertungen</h3>
                   <p className="text-sm text-zinc-400">Link für automatische Review-Anfragen</p>
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function Settings() {
                 type="url"
                 value={integrations.googleReviewLink}
                 onChange={(e) => setIntegrations({ ...integrations, googleReviewLink: e.target.value })}
-                className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-white/20"
                 placeholder="https://g.page/r/..."
               />
               <p className="mt-2 text-xs text-zinc-500">
@@ -318,20 +318,20 @@ export default function Settings() {
             </div>
 
             {/* Stripe */}
-            <div className="p-4 bg-zinc-800 rounded-lg">
+            <div className="p-4 bg-zinc-50 rounded-lg">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
                     <CreditCard className="w-5 h-5 text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Stripe Zahlungen</h3>
+                    <h3 className="font-semibold text-zinc-900">Stripe Zahlungen</h3>
                     <p className="text-sm text-zinc-400">Online-Zahlungen akzeptieren</p>
                   </div>
                 </div>
 
                 {integrations.stripeConnected ? (
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-600">
                     Verbunden
                   </span>
                 ) : (
@@ -342,7 +342,7 @@ export default function Settings() {
               </div>
 
               {!integrations.stripeConnected && (
-                <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition">
+                <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-zinc-900 rounded-lg transition">
                   <ExternalLink className="w-4 h-4" />
                   Mit Stripe verbinden
                 </button>
@@ -350,13 +350,13 @@ export default function Settings() {
             </div>
 
             {/* Email Templates */}
-            <div className="p-4 bg-zinc-800 rounded-lg">
+            <div className="p-4 bg-zinc-50 rounded-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
                   <Mail className="w-5 h-5 text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">E-Mail Templates</h3>
+                  <h3 className="font-semibold text-zinc-900">E-Mail Templates</h3>
                   <p className="text-sm text-zinc-400">Bestätigung, Erinnerung, Review-Anfrage</p>
                 </div>
               </div>
@@ -372,9 +372,9 @@ export default function Settings() {
         {/* Notifications Tab */}
         {activeTab === 'notifications' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg">
               <div>
-                <p className="font-medium text-white">Buchungsbestätigung</p>
+                <p className="font-medium text-zinc-900">Buchungsbestätigung</p>
                 <p className="text-sm text-zinc-400">E-Mail nach jeder neuen Buchung</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -388,9 +388,9 @@ export default function Settings() {
               </label>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg">
               <div>
-                <p className="font-medium text-white">Terminerinnerung</p>
+                <p className="font-medium text-zinc-900">Terminerinnerung</p>
                 <p className="text-sm text-zinc-400">E-Mail 24h vor dem Termin</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -404,9 +404,9 @@ export default function Settings() {
               </label>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg">
               <div>
-                <p className="font-medium text-white">Review-Anfrage</p>
+                <p className="font-medium text-zinc-900">Review-Anfrage</p>
                 <p className="text-sm text-zinc-400">E-Mail nach abgeschlossenem Termin</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -420,9 +420,9 @@ export default function Settings() {
               </label>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg opacity-60">
+            <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg opacity-60">
               <div>
-                <p className="font-medium text-white">SMS-Erinnerung</p>
+                <p className="font-medium text-zinc-900">SMS-Erinnerung</p>
                 <p className="text-sm text-zinc-400">SMS 2h vor dem Termin (Enterprise)</p>
               </div>
               <label className="relative inline-flex items-center cursor-not-allowed">
@@ -447,33 +447,33 @@ export default function Settings() {
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link
           to="/dashboard/branding"
-          className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-cyan-500/30 transition group"
+          className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 hover:border-cyan-500/30 transition group"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition">
               <Palette className="w-5 h-5 text-cyan-400" />
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-white">Branding</div>
-              <div className="text-sm text-gray-400">Buchungsseite anpassen</div>
+              <div className="font-semibold text-zinc-900">Branding</div>
+              <div className="text-sm text-zinc-500">Buchungsseite anpassen</div>
             </div>
-            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition" />
+            <ExternalLink className="w-4 h-4 text-zinc-500 group-hover:text-cyan-400 transition" />
           </div>
         </Link>
 
         <Link
           to="/dashboard/locations"
-          className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-cyan-500/30 transition group"
+          className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 hover:border-cyan-500/30 transition group"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition">
               <MapPin className="w-5 h-5 text-cyan-400" />
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-white">Multi-Standort</div>
-              <div className="text-sm text-gray-400">Mehrere Standorte verwalten</div>
+              <div className="font-semibold text-zinc-900">Multi-Standort</div>
+              <div className="text-sm text-zinc-500">Mehrere Standorte verwalten</div>
             </div>
-            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition" />
+            <ExternalLink className="w-4 h-4 text-zinc-500 group-hover:text-cyan-400 transition" />
           </div>
         </Link>
       </div>

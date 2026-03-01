@@ -94,7 +94,7 @@ const WizardStep = ({
             className={`
               w-full p-4 rounded-xl border-2 text-left transition-all
               ${isSelected(option.value)
-                ? 'border-blue-600 bg-blue-50 shadow-lg'
+                ? 'border-blue-600 bg-blue-50 shadow-sm'
                 : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md'
               }
             `}
@@ -143,7 +143,7 @@ const WizardStep = ({
                 )}
 
                 {option.description && (
-                  <p className="text-xs text-gray-500">{option.description}</p>
+                  <p className="text-xs text-zinc-400">{option.description}</p>
                 )}
 
                 {option.tier && (

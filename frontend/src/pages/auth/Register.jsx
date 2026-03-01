@@ -3,7 +3,6 @@ import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-do
 import { authAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';
 import { FiLock, FiClipboard } from 'react-icons/fi';
-import BusinessTypeModal from '../../components/onboarding/BusinessTypeModal';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -36,13 +35,11 @@ export default function Register() {
     companyCity: '',
     companyZip: '',
     businessType: '',
-    customBusinessType: '', // For "other" selection
     password: '',
     confirmPassword: '',
     userType: 'salon_owner',
     agreeToTerms: false,
   });
-  const [showBusinessTypeModal, setShowBusinessTypeModal] = useState(!checkoutEmail); // Show modal first if not from checkout
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -64,21 +61,6 @@ export default function Register() {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
-  };
-
-  const handleBusinessTypeSelect = (data) => {
-    // data: { businessType, customBusinessType? }
-    setFormData((prev) => ({
-      ...prev,
-      businessType: data.businessType,
-      customBusinessType: data.customBusinessType || '',
-    }));
-    setShowBusinessTypeModal(false);
-  };
-
-  const handleBackFromModal = () => {
-    // Go back to pricing/checkout page
-    navigate(-1);
   };
 
   const validateForm = () => {
@@ -123,7 +105,6 @@ export default function Register() {
         phone: formData.phone,
         companyName: formData.companyName,
         businessType: formData.businessType,
-        ...(formData.customBusinessType && { customBusinessType: formData.customBusinessType }),
         password: formData.password,
         role: 'salon_owner',
         plan: planInfo.planId,
@@ -138,7 +119,7 @@ export default function Register() {
         sessionStorage.removeItem('selectedPlan');
 
         success('Registrierung erfolgreich! Weiterleitung...');
-
+        
         // Navigate immediately - no timeout needed since token is already set
         navigate('/dashboard', { replace: true });
       }
@@ -152,32 +133,40 @@ export default function Register() {
   };
 
   return (
-    <>
-      {/* Business Type Modal - Show first, before registration form */}
-      {showBusinessTypeModal && (
-        <BusinessTypeModal
-          onSelect={handleBusinessTypeSelect}
-          onBack={handleBackFromModal}
-        />
-      )}
-
-      {/* Registration Form - Show only after business type is selected */}
-      {!showBusinessTypeModal && (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="text-4xl font-bold mb-2">Konto erstellen</div>
-          <p className="text-gray-400 text-lg">
-            Bitte füllen Sie die erforderlichen Informationen aus
+          <p className="text-zinc-500 text-lg">
+            Fast geschafft! Erstelle dein {planInfo.planName}-Konto
           </p>
+        </div>
+
+        {/* Plan Info Banner */}
+        <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-zinc-50 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-medium text-zinc-900">{planInfo.planName} Plan</p>
+              <p className="text-sm text-zinc-500">30 Tage kostenlos testen</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xl font-bold text-zinc-900">€{planInfo.price}/Monat</p>
+            <p className="text-xs text-zinc-400">nach Testphase</p>
+          </div>
         </div>
 
         {/* Form Container */}
         <div className="card">
           {/* Error Message */}
           {apiError && (
-            <div className="mb-6 p-4 rounded-lg bg-red-600/10 border border-red-600/30 text-red-400 text-sm">
+            <div className="mb-6 p-4 rounded-lg bg-red-600/10 border border-red-600/30 text-red-600 text-sm">
               {apiError}
             </div>
           )}
@@ -186,13 +175,13 @@ export default function Register() {
 
             {/* Personal Info */}
             <div>
-              <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-800 text-white text-xs font-bold"><FiClipboard /></span>
+              <h3 className="text-sm font-semibold text-zinc-900 mb-4 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-50 text-zinc-900 text-xs font-bold"><FiClipboard /></span>
                 Persönliche Daten
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">Vorname</label>
+                  <label className="block text-sm font-medium text-zinc-700 mb-2">Vorname</label>
                   <input
                     type="text"
                     name="firstName"
@@ -201,10 +190,10 @@ export default function Register() {
                     placeholder="Max"
                     className={`input-field ${errors.firstName ? 'input-error' : ''}`}
                   />
-                  {errors.firstName && <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>}
+                  {errors.firstName && <p className="text-red-600 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">Nachname</label>
+                  <label className="block text-sm font-medium text-zinc-700 mb-2">Nachname</label>
                   <input
                     type="text"
                     name="lastName"
@@ -213,12 +202,12 @@ export default function Register() {
                     placeholder="Mustermann"
                     className={`input-field ${errors.lastName ? 'input-error' : ''}`}
                   />
-                  {errors.lastName && <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>}
+                  {errors.lastName && <p className="text-red-600 text-xs mt-1">{errors.lastName}</p>}
                 </div>
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-200 mb-2">E‑Mail</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-2">E‑Mail</label>
                 <input
                   type="email"
                   name="email"
@@ -227,11 +216,11 @@ export default function Register() {
                   placeholder="kontakt@firma.de"
                   className={`input-field ${errors.email ? 'input-error' : ''}`}
                 />
-                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-red-600 text-xs mt-1">{errors.email}</p>}
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-200 mb-2">Telefon</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-2">Telefon</label>
                 <input
                   type="tel"
                   name="phone"
@@ -240,11 +229,11 @@ export default function Register() {
                   placeholder="+49 123 456789"
                   className={`input-field ${errors.phone ? 'input-error' : ''}`}
                 />
-                {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
+                {errors.phone && <p className="text-red-600 text-xs mt-1">{errors.phone}</p>}
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-200 mb-2">Firmenname</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-2">Firmenname</label>
                 <input
                   type="text"
                   name="companyName"
@@ -253,19 +242,46 @@ export default function Register() {
                   placeholder="Ihr Unternehmen"
                   className={`input-field ${errors.companyName ? 'input-error' : ''}`}
                 />
-                {errors.companyName && <p className="text-red-400 text-xs mt-1">{errors.companyName}</p>}
+                {errors.companyName && <p className="text-red-600 text-xs mt-1">{errors.companyName}</p>}
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-zinc-700 mb-2">Ihre Branche <span className="text-red-600">*</span></label>
+                <select
+                  name="businessType"
+                  value={formData.businessType}
+                  onChange={handleChange}
+                  className={`input-field ${errors.businessType ? 'input-error' : ''}`}
+                >
+                  <option value="">Bitte wählen...</option>
+                  <option value="hair-salon">Friseursalon</option>
+                  <option value="beauty-salon">Beauty-Salon</option>
+                  <option value="spa-wellness">Wellness & Spa</option>
+                  <option value="tattoo-piercing">Tattoo-Studio & Piercing</option>
+                  <option value="medical-aesthetics">Medizinische Praxis / Ästhetik</option>
+                  <option value="personal-training">Personal Training / Fitness</option>
+                  <option value="physiotherapy">Physiotherapie</option>
+                  <option value="barbershop">Barbershop</option>
+                  <option value="nail-salon">Nagelstudio</option>
+                  <option value="massage-therapy">Massagepraxis</option>
+                  <option value="yoga-studio">Yoga-Studio</option>
+                  <option value="pilates-studio">Pilates-Studio</option>
+                  <option value="other">Andere</option>
+                </select>
+                {errors.businessType && <p className="text-red-600 text-xs mt-1">{errors.businessType}</p>}
+                <p className="text-xs text-zinc-500 mt-1">Die Auswahl bestimmt, welche branchenspezifischen Funktionen Ihnen zur Verfügung stehen.</p>
               </div>
             </div>
 
             {/* Security Info */}
             <div>
-              <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-800 text-white text-xs font-bold"><FiLock /></span>
+              <h3 className="text-sm font-semibold text-zinc-900 mb-4 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-50 text-zinc-900 text-xs font-bold"><FiLock /></span>
                 Zugangsdaten
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">Passwort</label>
+                  <label className="block text-sm font-medium text-zinc-700 mb-2">Passwort</label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -275,12 +291,12 @@ export default function Register() {
                       placeholder="Mind. 8 Zeichen"
                       className={`input-field ${errors.password ? 'input-error' : ''}`}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300">{showPassword ? 'Verstecken' : 'Anzeigen'}</button>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600">{showPassword ? 'Verstecken' : 'Anzeigen'}</button>
                   </div>
-                  {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+                  {errors.password && <p className="text-red-600 text-xs mt-1">{errors.password}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">Passwort wiederholen</label>
+                  <label className="block text-sm font-medium text-zinc-700 mb-2">Passwort wiederholen</label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -293,19 +309,19 @@ export default function Register() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-900 transition-colors"
                       aria-label={showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
                     >
                       {showConfirmPassword ? 'Verstecken' : 'Anzeigen'}
                     </button>
                   </div>
-                  {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && <p className="text-red-600 text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
               </div>
             </div>
 
             {/* Terms */}
-            <label className="flex items-start p-4 rounded-lg bg-gray-900 border border-gray-800 cursor-pointer hover:border-gray-700 transition">
+            <label className="flex items-start p-4 rounded-lg bg-white border border-zinc-200 cursor-pointer hover:border-zinc-200 transition">
               <input
                 type="checkbox"
                 name="agreeToTerms"
@@ -313,27 +329,25 @@ export default function Register() {
                 onChange={handleChange}
                 className="mt-1 mr-3 rounded cursor-pointer w-4 h-4"
               />
-              <span className="text-sm text-gray-300">
+              <span className="text-sm text-zinc-600">
                 Ich stimme den{' '}
-                <a href="#" className="text-white font-semibold">Nutzungsbedingungen</a>{' '}
+                <a href="#" className="text-zinc-900 font-semibold">Nutzungsbedingungen</a>{' '}
                 und der{' '}
-                <a href="#" className="text-white font-semibold">Datenschutzerklärung</a>{' '}zu.
+                <a href="#" className="text-zinc-900 font-semibold">Datenschutzerklärung</a>{' '}zu.
               </span>
             </label>
-            {errors.agreeToTerms && <p className="text-red-400 text-xs">{errors.agreeToTerms}</p>}
+            {errors.agreeToTerms && <p className="text-red-600 text-xs">{errors.agreeToTerms}</p>}
 
             {/* Submit Button */}
             <button type="submit" disabled={isLoading} className="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed">{isLoading ? 'Registrierung...' : 'Konto erstellen'}</button>
           </form>
 
           {/* Sign In Link */}
-          <div className="mt-6 text-center text-sm text-gray-400 border-t border-gray-800 pt-6">
-            <p>Bereits registriert? <Link to="/login" className="text-white font-semibold">Hier anmelden</Link></p>
+          <div className="mt-6 text-center text-sm text-zinc-500 border-t border-zinc-200 pt-6">
+            <p>Bereits registriert? <Link to="/login" className="text-zinc-900 font-semibold">Hier anmelden</Link></p>
           </div>
         </div>
       </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }

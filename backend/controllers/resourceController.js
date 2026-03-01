@@ -61,7 +61,7 @@ export const createResource = async (req, res) => {
       resource
     });
   } catch (error) {
-    console.error('Error creating resource:', error);
+    logger.error('Error creating resource:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -91,7 +91,7 @@ export const getSalonResources = async (req, res) => {
       resources
     });
   } catch (error) {
-    console.error('Error getting resources:', error);
+    logger.error('Error getting resources:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -227,7 +227,7 @@ export const updateResource = async (req, res) => {
       resource
     });
   } catch (error) {
-    console.error('Error updating resource:', error);
+    logger.error('Error updating resource:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -366,7 +366,7 @@ export const getResourceUtilization = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting resource utilization:', error);
+    logger.error('Error getting resource utilization:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -428,7 +428,7 @@ export const getAvailableResourcesForService = async (req, res) => {
       resources: availableResources
     });
   } catch (error) {
-    console.error('Error getting available resources:', error);
+    logger.error('Error getting available resources:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

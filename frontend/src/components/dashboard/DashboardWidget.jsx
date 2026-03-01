@@ -26,17 +26,17 @@ const DashboardWidget = ({
   };
 
   return (
-    <div className={`bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden ${className}`}>
+    <div className={`bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="bg-zinc-800 px-6 py-4 border-b border-zinc-800">
+      <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {Icon && (
-              <div className="w-10 h-10 bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center">
-                <Icon size={20} className="text-gray-400" />
+              <div className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-lg flex items-center justify-center">
+                <Icon size={20} className="text-zinc-500" />
               </div>
             )}
-            <h3 className="text-lg font-semibold text-white">{title}</h3>
+            <h3 className="text-lg font-semibold text-zinc-900">{title}</h3>
           </div>
           
           {action && (

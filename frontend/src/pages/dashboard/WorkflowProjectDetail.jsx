@@ -28,7 +28,6 @@ export default function WorkflowProjectDetail() {
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching project:', error);
       toast.error('Fehler beim Laden');
       setLoading(false);
     }
@@ -42,7 +41,6 @@ export default function WorkflowProjectDetail() {
       setShowCompleteModal(false);
       fetchProjectDetails();
     } catch (error) {
-      console.error('Error completing session:', error);
       toast.error('Fehler beim Abschließen');
     }
   };
@@ -71,12 +69,12 @@ export default function WorkflowProjectDetail() {
 
   const getStatusColor = (status) => {
     const colors = {
-      draft: 'bg-zinc-800 text-zinc-300',
+      draft: 'bg-zinc-50 text-zinc-300',
       scheduled: 'bg-blue-500/20 text-blue-400',
-      in_progress: 'bg-yellow-500/20 text-yellow-400',
-      completed: 'bg-green-500/20 text-green-400',
-      cancelled: 'bg-red-500/20 text-red-400',
-      no_show: 'bg-red-500/20 text-red-400'
+      in_progress: 'bg-yellow-500/20 text-yellow-600',
+      completed: 'bg-green-500/20 text-green-600',
+      cancelled: 'bg-red-500/20 text-red-600',
+      no_show: 'bg-red-500/20 text-red-600'
     };
     return colors[status] || colors.draft;
   };
@@ -96,12 +94,12 @@ export default function WorkflowProjectDetail() {
             <span className="text-5xl mr-4">{getIndustryIcon(project.industry)}</span>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-gray-600">{project.description}</p>
+              <p className="text-zinc-500">{project.description}</p>
             </div>
           </div>
           <button
             onClick={() => navigate(`/dashboard/workflow-projects/${id}/edit`)}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-blue-600 text-zinc-900 px-6 py-2 rounded-lg hover:bg-blue-700"
           >
             Bearbeiten
           </button>
@@ -118,23 +116,23 @@ export default function WorkflowProjectDetail() {
                 <div className="text-2xl font-bold text-gray-900">
                   {project.completedSessions}/{project.totalSessions}
                 </div>
-                <div className="text-sm text-gray-600">Sessions</div>
+                <div className="text-sm text-zinc-500">Sessions</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">{project.progress}%</div>
-                <div className="text-sm text-gray-600">Fortschritt</div>
+                <div className="text-sm text-zinc-500">Fortschritt</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">
                   {project.totalPrice.toLocaleString()}€
                 </div>
-                <div className="text-sm text-gray-600">Gesamtpreis</div>
+                <div className="text-sm text-zinc-500">Gesamtpreis</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-600">
                   {project.paidAmount.toLocaleString()}€
                 </div>
-                <div className="text-sm text-gray-600">Bezahlt</div>
+                <div className="text-sm text-zinc-500">Bezahlt</div>
               </div>
             </div>
           </div>
@@ -179,14 +177,14 @@ export default function WorkflowProjectDetail() {
           <h3 className="text-lg font-semibold text-gray-900">Sessions</h3>
           <button
             onClick={() => navigate(`/dashboard/workflow-projects/${id}/new-session`)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+            className="bg-blue-600 text-zinc-900 px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
           >
             + Neue Session
           </button>
         </div>
 
         {sessions.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">Noch keine Sessions geplant</p>
+          <p className="text-zinc-400 text-center py-8">Noch keine Sessions geplant</p>
         ) : (
           <div className="space-y-4">
             {sessions.map((session, index) => (
@@ -218,7 +216,7 @@ export default function WorkflowProjectDetail() {
                     alt={photo.caption || 'Project photo'}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2">
+                  <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-50 text-zinc-900 text-xs p-2">
                     {photo.type} - {photo.caption}
                   </div>
                 </div>
@@ -239,7 +237,7 @@ export default function WorkflowProjectDetail() {
               >
                 <div>
                   <div className="text-sm font-medium text-gray-900">{consent.type}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-zinc-400">
                     {consent.signedAt ? `Unterschrieben: ${new Date(consent.signedAt).toLocaleDateString('de-DE')}` : 'Ausstehend'}
                   </div>
                 </div>
@@ -279,10 +277,10 @@ function SessionCard({ session, index, onComplete }) {
   const getStatusColor = (status) => {
     const colors = {
       scheduled: 'bg-blue-500/20 text-blue-400',
-      in_progress: 'bg-yellow-500/20 text-yellow-400',
-      completed: 'bg-green-500/20 text-green-400',
-      cancelled: 'bg-red-500/20 text-red-400',
-      no_show: 'bg-red-500/20 text-red-400'
+      in_progress: 'bg-yellow-500/20 text-yellow-600',
+      completed: 'bg-green-500/20 text-green-600',
+      cancelled: 'bg-red-500/20 text-red-600',
+      no_show: 'bg-red-500/20 text-red-600'
     };
     return colors[status] || colors.scheduled;
   };
@@ -292,7 +290,7 @@ function SessionCard({ session, index, onComplete }) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="flex items-center p-4 bg-zinc-800 rounded-lg border border-zinc-700"
+      className="flex items-center p-4 bg-zinc-50 rounded-lg border border-zinc-200"
     >
       <div className="flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full text-xl font-bold text-blue-400 mr-4">
         {session.sessionNumber}
@@ -301,7 +299,7 @@ function SessionCard({ session, index, onComplete }) {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
             <span className="text-2xl mr-2">{getStatusIcon(session.status)}</span>
-            <span className="font-medium text-white">{session.phase || 'Session'}</span>
+            <span className="font-medium text-zinc-900">{session.phase || 'Session'}</span>
           </div>
           <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(session.status)}`}>
             {session.status}
@@ -338,13 +336,13 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 max-w-md w-full"
+        className="bg-zinc-50 border border-zinc-200 rounded-lg p-6 max-w-md w-full"
       >
-        <h3 className="text-xl font-bold text-white mb-4">
+        <h3 className="text-xl font-bold text-zinc-900 mb-4">
           Session {session.sessionNumber} abschließen
         </h3>
         <form onSubmit={handleSubmit}>
@@ -369,7 +367,7 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Was wurde gemacht? Wie war die Session?"
             />
           </div>
@@ -377,13 +375,13 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-zinc-800 text-zinc-300 py-2 px-4 rounded-lg hover:bg-zinc-700 border border-zinc-700"
+              className="flex-1 bg-zinc-50 text-zinc-300 py-2 px-4 rounded-lg hover:bg-zinc-100 border border-zinc-200"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
+              className="flex-1 bg-green-600 text-zinc-900 py-2 px-4 rounded-lg hover:bg-green-700"
             >
               Abschließen
             </button>

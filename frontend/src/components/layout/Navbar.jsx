@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 /**
- * Clean dark Navbar with full navigation
+ * Clean dark-gray Navbar with full navigation
  */
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -54,7 +54,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-black border-b border-zinc-800 px-4 md:px-8 py-4 sticky top-0 z-50">
+    <nav className="bg-zinc-700 border-b border-zinc-600 px-4 md:px-8 py-4 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
@@ -70,10 +70,10 @@ const Navbar = () => {
             <Link
               key={link.to}
               to={link.to}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
                 isActive(link.to)
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-zinc-600 text-white border-zinc-500'
+                  : 'text-gray-300 bg-zinc-700 border-zinc-700 hover:text-white hover:bg-zinc-600 hover:border-zinc-500'
               }`}
             >
               {link.label}
@@ -89,9 +89,9 @@ const Navbar = () => {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 onMouseEnter={(e) => e.currentTarget.querySelector('.dropdown-arrow').classList.remove('opacity-0')}
                 onMouseLeave={(e) => !showUserMenu && e.currentTarget.querySelector('.dropdown-arrow').classList.add('opacity-0')}
-                className="group flex items-center gap-1 px-2 py-2 rounded-lg hover:bg-white/5 transition"
+                className="group flex items-center gap-1 px-2 py-2 rounded-lg bg-zinc-700 border border-zinc-700 hover:bg-zinc-600 hover:border-zinc-500 transition"
               >
-                <div className="w-9 h-9 bg-zinc-800 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                <div className="w-9 h-9 bg-zinc-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <svg
@@ -112,8 +112,8 @@ const Navbar = () => {
                     onClick={() => setShowUserMenu(false)}
                   />
                   {/* Dropdown */}
-                  <div className="absolute right-0 mt-2 w-56 bg-zinc-900 rounded-lg border border-zinc-800 shadow-xl z-50 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-gray-800">
+                  <div className="absolute right-0 mt-2 w-56 bg-zinc-700 rounded-lg border border-zinc-600 shadow-xl z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-zinc-600">
                       <p className="text-sm font-medium text-white">{user?.name}</p>
                       <p className="text-xs text-gray-400">{user?.email}</p>
                     </div>
@@ -150,7 +150,7 @@ const Navbar = () => {
                         Einstellungen
                       </Link>
                     </div>
-                    <div className="border-t border-gray-800 py-1">
+                    <div className="border-t border-zinc-600 py-1">
                       <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition"
@@ -168,7 +168,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/pricing"
-              className="px-4 py-2 bg-white text-black rounded text-sm font-medium hover:bg-gray-100 transition"
+              className="px-4 py-2 bg-zinc-700 border border-zinc-700 text-white rounded text-sm font-medium hover:bg-zinc-600 hover:border-zinc-500 transition"
             >
               Jetzt starten
             </Link>

@@ -78,7 +78,6 @@ const CEOLogin = () => {
       notification.error(msg);
       setLoading(false);
     } catch (err) {
-      console.error('CEO login error:', err);
       const errorMsg = err.response?.data?.message || 'Authentifizierung fehlgeschlagen';
       setError(errorMsg);
       notification.error(errorMsg);
@@ -99,7 +98,7 @@ const CEOLogin = () => {
   // 2FA Setup View
   if (step === '2fa-setup') {
     return (
-      <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0" style={{
             backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
@@ -115,13 +114,13 @@ const CEOLogin = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-white">2FA Einrichtung</h1>
-            <p className="text-gray-400 mt-2 text-sm">Pflicht für CEO-Zugang</p>
+            <h1 className="text-2xl font-bold text-zinc-900">2FA Einrichtung</h1>
+            <p className="text-zinc-500 mt-2 text-sm">Pflicht für CEO-Zugang</p>
           </div>
 
-          <div className="bg-zinc-900/80 backdrop-blur-xl rounded-2xl border border-zinc-800 p-6">
+          <div className="bg-zinc-50/80 backdrop-blur-xl rounded-2xl border border-zinc-200 p-6">
             <div className="text-center mb-6">
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="text-zinc-500 text-sm mb-4">
                 Scannen Sie diesen QR-Code mit Ihrer Authenticator-App
               </p>
               {qrCode && (
@@ -132,22 +131,22 @@ const CEOLogin = () => {
             </div>
 
             <div className="mb-6">
-              <p className="text-gray-500 text-xs mb-2">Oder geben Sie diesen Code manuell ein:</p>
-              <div className="bg-black/50 p-3 rounded-lg font-mono text-sm text-indigo-400 break-all text-center">
+              <p className="text-zinc-400 text-xs mb-2">Oder geben Sie diesen Code manuell ein:</p>
+              <div className="bg-zinc-50 p-3 rounded-lg font-mono text-sm text-zinc-900 break-all text-center">
                 {setupSecret}
               </div>
             </div>
 
             <form onSubmit={handleVerify2FA} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
                   Verifizierungscode
                 </label>
                 <input
                   type="text"
                   value={twoFactorCode}
                   onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="w-full px-4 py-3 bg-black/50 border border-zinc-700 rounded-xl text-white text-center text-2xl tracking-widest font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 text-center text-2xl tracking-widest font-mono focus:outline-none focus:border-zinc-900"
                   placeholder="000000"
                   maxLength={6}
                   autoFocus
@@ -155,13 +154,13 @@ const CEOLogin = () => {
               </div>
 
               {error && (
-                <p className="text-red-400 text-sm text-center">{error}</p>
+                <p className="text-red-600 text-sm text-center">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={loading || twoFactorCode.length !== 6}
-                className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-zinc-900 font-semibold rounded-xl transition-all disabled:opacity-50"
               >
                 {loading ? 'Verifiziere...' : '2FA Aktivieren & Anmelden'}
               </button>
@@ -175,7 +174,7 @@ const CEOLogin = () => {
   // 2FA Verification View
   if (step === '2fa') {
     return (
-      <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0" style={{
             backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
@@ -193,18 +192,18 @@ const CEOLogin = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-white">Zwei-Faktor-Authentifizierung</h1>
-            <p className="text-gray-400 mt-2 text-sm">Geben Sie den Code aus Ihrer Authenticator-App ein</p>
+            <h1 className="text-2xl font-bold text-zinc-900">Zwei-Faktor-Authentifizierung</h1>
+            <p className="text-zinc-500 mt-2 text-sm">Geben Sie den Code aus Ihrer Authenticator-App ein</p>
           </div>
 
-          <div className="bg-zinc-900/80 backdrop-blur-xl rounded-2xl border border-zinc-800 p-6">
+          <div className="bg-zinc-50/80 backdrop-blur-xl rounded-2xl border border-zinc-200 p-6">
             <form onSubmit={handleVerify2FA} className="space-y-4">
               <div>
                 <input
                   type="text"
                   value={twoFactorCode}
                   onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="w-full px-4 py-4 bg-black/50 border border-zinc-700 rounded-xl text-white text-center text-3xl tracking-[0.5em] font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full px-4 py-4 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 text-center text-3xl tracking-[0.5em] font-mono focus:outline-none focus:border-zinc-900"
                   placeholder="••••••"
                   maxLength={6}
                   autoFocus
@@ -212,13 +211,13 @@ const CEOLogin = () => {
               </div>
 
               {error && (
-                <p className="text-red-400 text-sm text-center">{error}</p>
+                <p className="text-red-600 text-sm text-center">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={loading || twoFactorCode.length !== 6}
-                className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 font-semibold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -240,7 +239,7 @@ const CEOLogin = () => {
                   setTwoFactorCode('');
                   setError('');
                 }}
-                className="w-full py-2 text-gray-500 hover:text-white text-sm transition-colors"
+                className="w-full py-2 text-zinc-400 hover:text-zinc-900 text-sm transition-colors"
               >
                 Zurück zum Login
               </button>
@@ -253,7 +252,7 @@ const CEOLogin = () => {
 
   // Credentials View (Default)
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center">
       {/* Animated Background Grid */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0" style={{
@@ -271,43 +270,43 @@ const CEOLogin = () => {
       <div className="relative z-10 w-full max-w-md px-6">
         {/* Logo/Brand */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-6 shadow-2xl shadow-indigo-500/30">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-6 shadow-none shadow-indigo-500/30">
             <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">
             Executive Access
           </h1>
-          <p className="text-gray-500 mt-2 text-sm tracking-wide uppercase">
+          <p className="text-zinc-400 mt-2 text-sm tracking-wide uppercase">
             Restricted System Portal
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-zinc-900/80 backdrop-blur-xl rounded-2xl border border-zinc-800 p-8 shadow-2xl">
+        <div className="bg-zinc-50/80 backdrop-blur-xl rounded-2xl border border-zinc-200 p-8 shadow-none">
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3">
-              <svg className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div>
-                <p className="text-red-400 text-sm font-medium">Zugriff verweigert</p>
-                <p className="text-red-400/70 text-xs mt-1">{error}</p>
+                <p className="text-red-600 text-sm font-medium">Zugriff verweigert</p>
+                <p className="text-red-600/70 text-xs mt-1">{error}</p>
               </div>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
                 Autorisierte E-Mail
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3.5 bg-black/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all"
+                className="w-full px-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900/50 transition-all"
                 placeholder="ceo@unternehmen.de"
                 required
                 autoComplete="off"
@@ -315,7 +314,7 @@ const CEOLogin = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
                 Sicherheitsschlüssel
               </label>
               <div className="relative">
@@ -323,7 +322,7 @@ const CEOLogin = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-black/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all pr-12"
+                  className="w-full px-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900/50 transition-all pr-12"
                   placeholder="••••••••••••"
                   required
                   autoComplete="off"
@@ -331,7 +330,7 @@ const CEOLogin = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-900 transition-colors"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -350,7 +349,7 @@ const CEOLogin = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 mt-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 flex items-center justify-center gap-2"
+              className="w-full py-4 mt-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 font-semibold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-indigo-500/25 hover:shadow-indigo-500/40 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

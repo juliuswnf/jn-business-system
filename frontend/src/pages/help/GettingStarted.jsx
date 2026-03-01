@@ -138,30 +138,30 @@ export default function GettingStarted() {
   const progress = Math.round((completedSteps.length / setupSteps.length) * 100);
 
   return (
-    <div className="min-h-screen bg-black text-white py-8">
+    <div className="min-h-screen bg-white text-zinc-900 py-8">
       <div className="max-w-4xl mx-auto px-6">
 
         {/* Header */}
         <div className="mb-10">
-          <Link to="/dashboard" className="text-gray-300 hover:text-white text-sm mb-4 inline-flex items-center gap-2" aria-label="Zurück zum Dashboard">
+          <Link to="/dashboard" className="text-zinc-600 hover:text-zinc-900 text-sm mb-4 inline-flex items-center gap-2" aria-label="Zurück zum Dashboard">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Zurück zum Dashboard
           </Link>
           <h1 className="text-3xl font-bold mb-2">Getting Started</h1>
-          <p className="text-gray-300">
+          <p className="text-zinc-600">
             Folge diesen Schritten, um dein Buchungssystem einzurichten.
           </p>
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-gray-900 rounded-2xl p-6 mb-8 border border-gray-800">
+        <div className="bg-white rounded-2xl p-6 mb-8 border border-zinc-200">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium">Setup-Fortschritt</span>
-            <span className="text-sm text-gray-300">{completedSteps.length} von {setupSteps.length} Schritten</span>
+            <span className="text-sm text-zinc-600">{completedSteps.length} von {setupSteps.length} Schritten</span>
           </div>
-          <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-3 bg-zinc-50 rounded-full overflow-hidden">
             <div
               className="h-full bg-white transition-all duration-500"
               style={{ width: `${progress}%` }}
@@ -169,7 +169,7 @@ export default function GettingStarted() {
           </div>
           {progress === 100 && (
             <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl text-center">
-              <span className="text-green-400 font-medium">Glückwunsch! Dein Setup ist abgeschlossen.</span>
+              <span className="text-green-600 font-medium">Glückwunsch! Dein Setup ist abgeschlossen.</span>
             </div>
           )}
         </div>
@@ -179,10 +179,10 @@ export default function GettingStarted() {
           {setupSteps.map((step, index) => (
             <div
               key={step.id}
-              className={`bg-gray-900 rounded-xl border transition-all ${
+              className={`bg-white rounded-xl border transition-all ${
                 completedSteps.includes(step.id)
                   ? 'border-green-500/50 bg-green-500/5'
-                  : 'border-gray-800 hover:border-gray-700'
+                  : 'border-zinc-200 hover:border-zinc-200'
               }`}
             >
               <div className="p-6">
@@ -201,7 +201,7 @@ export default function GettingStarted() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
-                      <span className="text-gray-500 font-bold">{step.id}</span>
+                      <span className="text-zinc-400 font-bold">{step.id}</span>
                     )}
                   </button>
 
@@ -210,19 +210,19 @@ export default function GettingStarted() {
                     <div className="flex items-center gap-3 mb-1">
                       <step.icon className="w-6 h-6 text-white" />
                       <h3 className={`text-lg font-semibold ${
-                        completedSteps.includes(step.id) ? 'line-through text-gray-500' : ''
+                        completedSteps.includes(step.id) ? 'line-through text-zinc-400' : ''
                       }`}>
                         {step.title}
                       </h3>
                     </div>
-                    <p className="text-gray-300 mb-4">{step.description}</p>
+                    <p className="text-zinc-600 mb-4">{step.description}</p>
 
                     {/* Tips */}
-                    <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
-                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Tipps</div>
+                    <div className="bg-zinc-50/50 rounded-lg p-4 mb-4">
+                      <div className="text-xs text-zinc-400 uppercase tracking-wide mb-2">Tipps</div>
                       <ul className="space-y-1">
                         {step.tips.map((tip, i) => (
-                          <li key={i} className="text-sm text-gray-300 flex items-center gap-2">
+                          <li key={i} className="text-sm text-zinc-600 flex items-center gap-2">
                             <svg className="w-3 h-3 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
@@ -235,7 +235,7 @@ export default function GettingStarted() {
                     {/* Action Button */}
                     <Link
                       to={step.link}
-                      className="inline-flex items-center gap-2 text-zinc-400 hover:text-white font-medium text-sm"
+                      className="inline-flex items-center gap-2 text-zinc-400 hover:text-zinc-900 font-medium text-sm"
                     >
                       {step.title} öffnen
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,13 +257,13 @@ export default function GettingStarted() {
               <a
                 key={index}
                 href={video.url}
-                className="bg-gray-900 rounded-xl border border-gray-800 hover:border-zinc-600 p-6 transition-all group"
+                className="bg-white rounded-xl border border-zinc-200 hover:border-zinc-300 p-6 transition-all group"
               >
-                <video.thumbnail className="w-10 h-10 text-white mb-4" />
-                <h3 className="font-medium mb-1 group-hover:text-white transition-colors">
+                <video.thumbnail className="w-10 h-10 text-zinc-900 mb-4" />
+                <h3 className="font-medium mb-1 group-hover:text-zinc-900 transition-colors">
                   {video.title}
                 </h3>
-                <span className="text-sm text-gray-500">{video.duration}</span>
+                <span className="text-sm text-zinc-400">{video.duration}</span>
               </a>
             ))}
           </div>
@@ -276,7 +276,7 @@ export default function GettingStarted() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden"
+                className="bg-white rounded-xl border border-zinc-200 overflow-hidden"
               >
                 <button
                   onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
@@ -284,7 +284,7 @@ export default function GettingStarted() {
                 >
                   <span className="font-medium">{faq.question}</span>
                   <svg
-                    className={`w-5 h-5 text-gray-300 transition-transform ${
+                    className={`w-5 h-5 text-zinc-600 transition-transform ${
                       expandedFaq === index ? 'rotate-180' : ''
                     }`}
                     fill="none"
@@ -296,7 +296,7 @@ export default function GettingStarted() {
                 </button>
                 {expandedFaq === index && (
                   <div className="px-5 pb-5">
-                    <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                    <p className="text-zinc-600 leading-relaxed">{faq.answer}</p>
                   </div>
                 )}
               </div>
@@ -305,9 +305,9 @@ export default function GettingStarted() {
         </div>
 
         {/* Support CTA */}
-        <div className="bg-zinc-900 rounded-lg p-8 text-center border border-zinc-800">
+        <div className="bg-zinc-50 rounded-lg p-8 text-center border border-zinc-200">
           <h3 className="text-xl font-bold mb-2">Noch Fragen?</h3>
-          <p className="text-gray-300 mb-6">Unser Support-Team hilft dir gerne weiter.</p>
+          <p className="text-zinc-600 mb-6">Unser Support-Team hilft dir gerne weiter.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="mailto:support@jn-business-system.de"

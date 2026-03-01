@@ -5,6 +5,8 @@
  */
 import { escapeRegExp } from '../utils/securityHelpers.js';
 
+import { escapeRegExp } from '../utils/securityHelpers.js';
+
 export const SMS_TEMPLATES = {
   // ==================== STANDARD BOOKING ====================
   booking_confirmation: {

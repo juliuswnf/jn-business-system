@@ -8,13 +8,13 @@ export default function FAQ({ questions = [] }) {
   return (
     <div className="space-y-3">
       {questions.map((q, i) => (
-        <div key={i} className="border border-zinc-800 rounded-lg overflow-hidden">
+        <div key={i} className="border border-zinc-200 rounded-lg overflow-hidden">
           <button
             onClick={() => toggle(i)}
-            className="w-full flex items-center justify-between p-4 bg-black/20 text-left"
+            className="w-full flex items-center justify-between p-4 bg-white/20 text-left"
             aria-expanded={openIndex === i}
           >
-            <span className="font-medium text-white">{q.question}</span>
+            <span className="font-medium text-zinc-900">{q.question}</span>
             <svg
               className={`w-5 h-5 text-zinc-300 transform transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
               viewBox="0 0 24 24"

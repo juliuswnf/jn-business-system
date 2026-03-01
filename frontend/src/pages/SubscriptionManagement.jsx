@@ -40,7 +40,6 @@ const SubscriptionManagement = () => {
         setSubscription(response.data.subscription);
       }
     } catch (err) {
-      console.error('Failed to fetch subscription:', err);
       setError('Fehler beim Laden der Subscription-Informationen');
     } finally {
       setLoading(false);
@@ -82,7 +81,6 @@ const SubscriptionManagement = () => {
         fetchSubscriptionStatus();
       }
     } catch (err) {
-      console.error('Cancel error:', err);
       alert('? Kündigung fehlgeschlagen: ' + (err.response?.data?.message || err.message));
     }
   };
@@ -92,7 +90,7 @@ const SubscriptionManagement = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <svg
-            className="animate-spin h-12 w-12 text-indigo-600 mx-auto"
+            className="animate-spin h-12 w-12 text-zinc-900 mx-auto"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -120,7 +118,7 @@ const SubscriptionManagement = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md p-8 bg-white rounded-lg shadow-lg text-center">
+        <div className="max-w-md p-8 bg-white rounded-lg shadow-sm text-center">
           <svg
             className="w-16 h-16 text-red-500 mx-auto"
             fill="none"
@@ -137,7 +135,7 @@ const SubscriptionManagement = () => {
           <h3 className="mt-4 text-xl font-bold text-gray-900">{error}</h3>
           <button
             onClick={() => navigate('/')}
-            className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="mt-6 px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
           >
             Zurück zum Dashboard
           </button>
@@ -190,7 +188,7 @@ const SubscriptionManagement = () => {
         </div>
 
         {/* Current Plan */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
           <div className="flex items-start justify-between mb-6">
             <div>
               <div className="flex items-center space-x-3">
@@ -211,10 +209,10 @@ const SubscriptionManagement = () => {
               </p>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold text-indigo-600">
+              <div className="text-4xl font-bold text-zinc-900">
                 €{subscription.price.current}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-zinc-500">
                 {subscription.billingCycle === 'yearly' ? '/ Jahr' : '/ Monat'}
               </div>
             </div>
@@ -247,7 +245,7 @@ const SubscriptionManagement = () => {
           {/* Billing Info */}
           <div className="grid md:grid-cols-2 gap-6 py-6 border-t border-gray-200">
             <div>
-              <h3 className="text-sm font-medium text-gray-600 mb-2">Nächste Abrechnung</h3>
+              <h3 className="text-sm font-medium text-zinc-500 mb-2">Nächste Abrechnung</h3>
               <p className="text-lg font-semibold text-gray-900">
                 {new Date(subscription.currentPeriodEnd).toLocaleDateString('de-DE', {
                   year: 'numeric',
@@ -257,7 +255,7 @@ const SubscriptionManagement = () => {
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600 mb-2">Zahlungsmethode</h3>
+              <h3 className="text-sm font-medium text-zinc-500 mb-2">Zahlungsmethode</h3>
               <p className="text-lg font-semibold text-gray-900 capitalize">
                 {subscription.paymentMethod === 'card'
                   ? '?? Kreditkarte'
@@ -279,7 +277,7 @@ const SubscriptionManagement = () => {
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg
-                    className="w-8 h-8 text-indigo-600"
+                    className="w-8 h-8 text-zinc-900"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -299,7 +297,7 @@ const SubscriptionManagement = () => {
                   </p>
                   <button
                     onClick={() => setShowUpgrade(true)}
-                    className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold"
+                    className="mt-4 px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700 font-semibold"
                   >
                     Jetzt upgraden
                   </button>
@@ -349,7 +347,7 @@ const SubscriptionManagement = () => {
 
         {/* Cancel Subscription */}
         {!subscription.cancelAtPeriodEnd && (
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white rounded-lg shadow-sm p-8">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Abonnement kündigen</h3>
             <p className="text-gray-700 mb-6">
               Du kannst dein Abonnement jederzeit kündigen. Du behältst den Zugriff bis zum Ende
@@ -357,7 +355,7 @@ const SubscriptionManagement = () => {
             </p>
             <button
               onClick={handleCancelSubscription}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold"
+              className="px-6 py-2 bg-red-600 text-zinc-900 rounded-lg hover:bg-red-700 font-semibold"
             >
               Abonnement kündigen
             </button>

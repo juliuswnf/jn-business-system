@@ -177,7 +177,7 @@ const cleanupOldBackups = async () => {
     }
 
     // ? SECURITY FIX: Clean up old backup records from database
-    const deletedRecords = await Backup.updateMany(
+    await Backup.updateMany(
       {
         status: 'completed',
         createdAt: { $lt: retentionDate }

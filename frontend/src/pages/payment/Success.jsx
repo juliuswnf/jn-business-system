@@ -5,11 +5,11 @@ const Success = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="text-6xl mb-6">✓</div>
         <h1 className="text-4xl font-bold mb-4">Payment Successful!</h1>
-        <p className="text-gray-100 mb-8">
+        <p className="text-zinc-900 mb-8">
           Your payment has been processed successfully. You will receive a confirmation email shortly.
         </p>
         <button

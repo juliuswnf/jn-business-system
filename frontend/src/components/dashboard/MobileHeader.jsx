@@ -56,14 +56,14 @@ export default function MobileHeader() {
       {showMenu && (
         <>
           <div
-            className="fixed inset-0 z-50 bg-black bg-opacity-40 md:hidden"
+            className="fixed inset-0 z-50 bg-white bg-opacity-40 md:hidden"
             onClick={() => setShowMenu(false)}
           />
           <div
             className="
               fixed right-0 top-0 bottom-0 z-50
               w-72 max-w-[85vw]
-              bg-white shadow-2xl
+              bg-white shadow-none
               overflow-y-auto
               md:hidden
             "
@@ -71,10 +71,10 @@ export default function MobileHeader() {
           >
             <div className="p-6 border-b">
               <div className="flex items-center gap-3">
-                <UserCircleIcon className="w-12 h-12 text-gray-400" />
+                <UserCircleIcon className="w-12 h-12 text-zinc-500" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{user?.name || 'User'}</p>
-                  <p className="text-xs text-gray-500 truncate">{user?.email || 'keine Email'}</p>
+                  <p className="text-xs text-zinc-400 truncate">{user?.email || 'keine Email'}</p>
                 </div>
               </div>
             </div>

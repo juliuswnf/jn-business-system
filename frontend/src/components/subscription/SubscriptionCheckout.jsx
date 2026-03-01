@@ -92,7 +92,7 @@ const CheckoutForm = ({ tier, billingCycle, onSuccess, onError }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
           placeholder="deine@email.de"
         />
       </div>
@@ -120,7 +120,7 @@ const CheckoutForm = ({ tier, billingCycle, onSuccess, onError }) => {
             }}
           />
         </div>
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-2 text-xs text-zinc-400">
           🔒 Sichere Zahlung über Stripe. Deine Kartendaten werden verschlüsselt übertragen.
         </p>
       </div>
@@ -129,7 +129,7 @@ const CheckoutForm = ({ tier, billingCycle, onSuccess, onError }) => {
       <button
         type="submit"
         disabled={!stripe || loading}
-        className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-all ${
+        className={`w-full py-3 px-6 rounded-lg font-semibold text-zinc-900 transition-all ${
           loading
             ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-indigo-600 hover:bg-indigo-700'
@@ -165,7 +165,7 @@ const CheckoutForm = ({ tier, billingCycle, onSuccess, onError }) => {
       </button>
 
       {/* Security Notice */}
-      <div className="flex items-start space-x-2 text-xs text-gray-500">
+      <div className="flex items-start space-x-2 text-xs text-zinc-400">
         <svg
           className="w-5 h-5 text-green-500 flex-shrink-0"
           fill="none"
@@ -211,7 +211,7 @@ const SubscriptionCheckout = ({ tier, billingCycle, onSuccess, onCancel }) => {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg">
+      <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-sm">
         <div className="text-center">
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
             <svg
@@ -234,7 +234,7 @@ const SubscriptionCheckout = ({ tier, billingCycle, onSuccess, onCancel }) => {
           <p className="mt-2 text-gray-600">
             Dein {tier.charAt(0).toUpperCase() + tier.slice(1)}-Plan wurde aktiviert.
           </p>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-zinc-400">
             Du wirst in Kürze weitergeleitet...
           </p>
         </div>
@@ -243,7 +243,7 @@ const SubscriptionCheckout = ({ tier, billingCycle, onSuccess, onCancel }) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg">
+    <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-sm">
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900">Zahlungsinformationen</h2>
