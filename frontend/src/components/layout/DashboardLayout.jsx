@@ -16,7 +16,7 @@ import Footer from './Footer';
  */
 const DashboardLayout = ({
   children,
-  title = 'Dashboard',
+  title = 'Kontrollpanel',
   breadcrumbs = []
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

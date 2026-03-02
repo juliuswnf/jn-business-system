@@ -5,7 +5,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { OnboardingChecklist } from '../../components/dashboard';
 import OnboardingTour from '../../components/onboarding/OnboardingTour';
 import { useNotification } from '../../hooks/useNotification';
-import { useBusinessType } from '../../hooks/useBusinessType';
+import { useDashboardIndustry } from '../../hooks/useDashboardIndustry';
 import { salonAPI, bookingAPI } from '../../utils/api';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 import MobileBookingCard from '../../components/Dashboard/MobileBookingCard';
@@ -17,33 +17,37 @@ import WellnessDashboard from './dashboards/WellnessDashboard';
 import BarberDashboard from './dashboards/BarberDashboard';
 import BeautyDashboard from './dashboards/BeautyDashboard';
 import NailsDashboard from './dashboards/NailsDashboard';
-import PetGroomingDashboard from './dashboards/PetGroomingDashboard';
+import MassageDashboard from './dashboards/MassageDashboard';
+import PhysiotherapyDashboard from './dashboards/PhysiotherapyDashboard';
 
 export default function StudioDashboard() {
-  const businessType = useBusinessType();
+  const industry = useDashboardIndustry();
   const { showNotification } = useNotification();
 
-  // Conditional routing based on business type
-  if (businessType === 'tattoo-piercing') {
+  // Conditional routing based on industry only (plan-independent)
+  if (industry === 'tattoo') {
     return <TattooStudioDashboard />;
   }
-  if (businessType === 'medical-aesthetics') {
+  if (industry === 'medical_aesthetics') {
     return <MedicalSpaDashboard />;
   }
-  if (businessType === 'spa-wellness') {
+  if (industry === 'spa_wellness') {
     return <WellnessDashboard />;
   }
-  if (businessType === 'barbershop') {
+  if (industry === 'barbershop') {
     return <BarberDashboard />;
   }
-  if (businessType === 'beauty-salon') {
+  if (industry === 'beauty') {
     return <BeautyDashboard />;
   }
-  if (businessType === 'nail-salon') {
+  if (industry === 'nails') {
     return <NailsDashboard />;
   }
-  if (businessType === 'petgrooming') {
-    return <PetGroomingDashboard />;
+  if (industry === 'massage') {
+    return <MassageDashboard />;
+  }
+  if (industry === 'physiotherapy') {
+    return <PhysiotherapyDashboard />;
   }
 
   // Default to salon dashboard
@@ -90,7 +94,7 @@ export default function StudioDashboard() {
       const bookings = bookingsResponse.data?.data || bookingsResponse.data?.bookings || [];
       setRecentBookings(bookings.slice(0, 5));
     } catch (error) {
-      showNotification('Fehler beim Laden der Dashboard-Daten', 'error');
+      showNotification('Fehler beim Laden der Kontrollpanel-Daten', 'error');
     } finally {
       setLoading(false);
     }

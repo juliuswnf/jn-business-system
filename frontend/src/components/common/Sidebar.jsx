@@ -17,7 +17,7 @@ export default function Sidebar() {
     { path: '/company/services', label: 'Services', role: 'admin' },
     { path: '/company/employees', label: 'Mitarbeiter', role: 'admin' },
     { path: '/company/payments', label: 'Zahlungen', role: 'admin' },
-    { path: '/ceo/dashboard', label: '👔 CEO Dashboard', role: 'ceo' },
+    { path: '/ceo/dashboard', label: '👔 CEO Kontrollpanel', role: 'ceo' },
     { path: '/ceo/companies', label: '🏢 Companies', role: 'ceo' },
     { path: '/ceo/users', label: '👥 Users', role: 'ceo' },
     { path: '/ceo/settings', label: '⚙️ System Settings', role: 'ceo' },

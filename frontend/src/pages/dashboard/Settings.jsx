@@ -113,7 +113,7 @@ export default function Settings() {
     { id: 'hours', label: 'Öffnungszeiten', icon: Clock },
     { id: 'integrations', label: 'Integrationen', icon: Star },
     { id: 'notifications', label: 'Benachrichtigungen', icon: Bell },
-    { id: 'noShowKiller', label: 'NO-SHOW-KILLER', icon: CreditCard }
+    { id: 'noShowKiller', label: 'AUSFALL-SCHUTZ', icon: CreditCard }
   ];
 
   if (loading) return <LoadingSpinner />;
@@ -129,7 +129,7 @@ export default function Settings() {
 
       {isMobile && (
         <div className="mb-4 px-4 py-3 rounded-2xl bg-yellow-500/10 text-yellow-600 border border-yellow-200 text-sm">
-          Einige Einstellungen (z. B. Integrationen oder No-Show-Killer) sind nur am Desktop verfügbar.
+          Einige Einstellungen (z. B. Integrationen oder Ausfall-Schutz) sind nur am Desktop verfügbar.
         </div>
       )}
 
@@ -438,7 +438,7 @@ export default function Settings() {
           </div>
         )}
 
-        {/* No-Show-Killer Tab */}
+        {/* Ausfall-Schutz Tab */}
         {activeTab === 'noShowKiller' && <NoShowKillerSettings />}
         </div>
       </div>
@@ -470,7 +470,7 @@ export default function Settings() {
               <MapPin className="w-5 h-5 text-cyan-400" />
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-zinc-900">Multi-Standort</div>
+              <div className="font-semibold text-zinc-900">Mehrere Standorte</div>
               <div className="text-sm text-zinc-500">Mehrere Standorte verwalten</div>
             </div>
             <ExternalLink className="w-4 h-4 text-zinc-500 group-hover:text-cyan-400 transition" />

@@ -138,7 +138,7 @@ export default function AGB() {
                 sich automatisch um ein weiteres Jahr. Kündigung bis 30 Tage vor Ablauf möglich.
               </p>
               <p>
-                (3) Die Kündigung kann jederzeit im Dashboard oder per E-Mail an
+                (3) Die Kündigung kann jederzeit im Kontrollpanel oder per E-Mail an
                 <a href="mailto:support@jn-business-system.de" className="text-zinc-300 hover:text-zinc-900 hover:underline ml-1">
                 support@jn-business-system.de</a> erfolgen.
               </p>

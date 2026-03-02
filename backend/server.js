@@ -138,22 +138,50 @@ let lifecycleWorkerIntervalId = null;
 // ==================== GLOBAL MIDDLEWARE ====================
 
 // 0️⃣ CORS FIRST (must be before other middleware for preflight requests)
-app.use(cors({
+const normalizeOrigin = (value) => (value || '').trim().replace(/\/$/, '');
+
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174'
+];
+
+const envAllowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])]
+  .map(normalizeOrigin);
+
+const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'];
-    // Allow requests with no origin (like mobile apps or curl requests)
+    const normalizedOrigin = normalizeOrigin(origin);
+
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
     }
+
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID', 'X-CSRF-Token'],
   exposedHeaders: ['X-Request-ID']
-}));
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(generalLimiter);
 

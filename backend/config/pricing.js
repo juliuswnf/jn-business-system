@@ -3,9 +3,9 @@
  * Updated: December 13, 2025
  *
  * Pricing Structure:
- * - Starter: ?69/month (?690/year with 17% discount)
- * - Professional: ?169/month (?1,690/year with 17% discount)
- * - Enterprise: ?399/month (?3,990/year with 17% discount)
+ * - Starter: €129/month (€1,290/year with 17% discount)
+ * - Professional: €249/month (€2,490/year with 17% discount)
+ * - Enterprise: €599/month (€5,990/year with 17% discount)
  */
 
 export const PRICING_TIERS = {
@@ -14,8 +14,8 @@ export const PRICING_TIERS = {
     slug: 'starter',
 
     // Pricing
-    priceMonthly: 69,
-    priceYearly: 690, // 17% discount (2 months free)
+    priceMonthly: 129,
+    priceYearly: 1290, // 17% discount (2 months free)
     currency: 'EUR',
 
     // Limits
@@ -85,8 +85,8 @@ export const PRICING_TIERS = {
     slug: 'professional',
 
     // Pricing
-    priceMonthly: 169,
-    priceYearly: 1690, // 17% discount
+    priceMonthly: 249,
+    priceYearly: 2490, // 17% discount
     currency: 'EUR',
 
     // Limits
@@ -146,8 +146,8 @@ export const PRICING_TIERS = {
     slug: 'enterprise',
 
     // Pricing
-    priceMonthly: 399,
-    priceYearly: 3990, // 17% discount
+    priceMonthly: 599,
+    priceYearly: 5990, // 17% discount
     currency: 'EUR',
 
     // Limits

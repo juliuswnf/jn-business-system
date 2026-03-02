@@ -16,7 +16,7 @@ const Success = () => {
           onClick={() => navigate('/customer/dashboard')}
           className="inline-block px-8 py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition"
         >
-          Zum Dashboard
+          Zum Kontrollpanel
         </button>
       </div>
     </div>

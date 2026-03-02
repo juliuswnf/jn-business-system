@@ -79,7 +79,7 @@ export const wizardQuestions = [
     id: 3,
     key: 'locations',
     title: 'Wie viele Standorte hast du?',
-    subtitle: 'Multi-Location Features ab Professional',
+    subtitle: 'Funktionen für mehrere Standorte ab Professional',
     type: 'single',
     icon: '📍',
     required: true,
@@ -88,18 +88,18 @@ export const wizardQuestions = [
         value: 1,
         label: '1 Standort',
         subtitle: 'Ein Ort, volle Konzentration',
-        description: 'Single-Location Business'
+        description: 'Einzelstandort-Betrieb'
       },
       {
         value: 2,
         label: '2-3 Standorte',
         subtitle: 'Expandierend',
-        description: 'Multi-Location Management nötig'
+        description: 'Verwaltung mehrerer Standorte nötig'
       },
       {
         value: 4,
         label: '4+ Standorte',
-        subtitle: 'Multi-Location Business',
+        subtitle: 'Mehrere Standorte',
         description: 'Enterprise-Level Verwaltung'
       }
     ]
@@ -117,7 +117,7 @@ export const wizardQuestions = [
       {
         value: 'sms_reminders',
         label: 'SMS-Erinnerungen',
-        subtitle: 'Reduziere No-Shows um 70%',
+        subtitle: 'Weniger verpasste Termine',
         icon: '📱',
         tier: 'professional',
         description: 'Automatische SMS 24h und 2h vor Termin'

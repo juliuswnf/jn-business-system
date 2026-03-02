@@ -150,7 +150,7 @@ const AccountSettings = () => {
             to="/customer/dashboard"
             className="text-accent hover:text-accent-light font-semibold transition"
           >
-            ← Back to Dashboard
+            ← Zurück zum Kontrollpanel
           </Link>
         </div>
       </div>

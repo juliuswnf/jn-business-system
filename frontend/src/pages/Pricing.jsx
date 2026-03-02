@@ -13,23 +13,28 @@ const plans = [
     features: [
       { name: 'Mitarbeiter', value: '5', description: 'Bis zu 5 Mitarbeiter können das System nutzen' },
       { name: 'Standorte', value: '1', description: 'Für einen Unternehmens-Standort' },
-      { name: 'Buchungen/Monat', value: '100', description: 'Bis zu 100 Termine pro Monat verwaltbar' },
-      { name: 'Kunden', value: '200', description: 'Bis zu 200 Kundenkontakte speicherbar' },
+      { name: 'Buchungen/Monat', value: '200', description: 'Bis zu 200 Termine pro Monat verwaltbar' },
+      { name: 'Kunden', value: '500', description: 'Bis zu 500 Kundenkontakte speicherbar' },
+      { name: 'Speicherplatz', value: '5 GB', description: '5 GB für Bilder und Dokumente' },
       { name: 'Online-Buchung', included: true, description: 'Kunden buchen selbständig Termine über Ihre Webseite' },
-      { name: 'Kalender & Terminverwaltung', included: true, description: 'Alle Termine übersichtlich im Kalender' },
-      { name: 'E-Mail-Benachrichtigungen', included: true, description: 'Automatische E-Mails an Kunden bei Buchung' },
-      { name: 'Automatische Erinnerungen', included: true, description: 'Kunden bekommen vor Terminen eine Erinnerungs-E-Mail' },
-      { name: 'Automatische Erinnerungen (Basis)', included: true, description: 'Kunden bekommen E-Mails mit Terminbestätigung' },
+      { name: 'Öffentliche Buchungsseite', included: true, description: 'Eigene Seite, auf der Kunden Ihre Dienste sehen und buchen können' },
+      { name: 'Kalender & Terminverwaltung', included: true, description: 'Alle Termine übersichtlich im Kalender verwalten' },
+      { name: 'E-Mail-Benachrichtigungen', included: true, description: 'Automatische Bestätigungs- und Erinnerungs-E-Mails an Kunden' },
       { name: 'Kundendatenbank (CRM)', included: true, description: 'Alle Kundendaten sicher an einem Ort gespeichert' },
-      { name: 'Zahlungsabwicklung', included: true, description: 'Kunden können direkt online bezahlen' },
-      { name: 'Basis-Reporting', included: true, description: 'Einfache Übersicht über Umsätze und Termine' },
+      { name: 'Zahlungsabwicklung (Stripe)', included: true, description: 'Kunden können direkt online per Kreditkarte bezahlen' },
+      { name: 'Basis-Auswertungen', included: true, description: 'Einfache Übersicht über Umsätze und Termine' },
       { name: 'Google-Bewertungen', included: true, description: 'Automatisch Kunden nach Bewertungen fragen' },
-      { name: 'E-Mail-Support', included: true, description: 'Hilfe per E-Mail bei Fragen' },
+      { name: 'E-Mail-Support', included: true, description: 'Support-Ticket jederzeit schreiben – Antwort werktags zwischen 10 und 16 Uhr' },
     ],
     notIncluded: [
-      'Nachrichten per SMS',
+      'SMS-Benachrichtigungen',
       'Automatisches Marketing',
-      'Spezial-Funktionen für Ihre Branche',
+      'Erweiterte Auswertungen',
+      'Ausfall-Schutz (Gebühr bei Nichterscheinen)',
+      'Warteliste',
+      'Wiederkehrende Termine',
+      'Service-Pakete & Abos',
+      'Portfolio & Galerien',
       'Mehrere Standorte',
     ]
   },
@@ -43,55 +48,68 @@ const plans = [
     popular: true,
     features: [
       { name: 'Mitarbeiter', value: '30', description: 'Bis zu 30 Mitarbeiter können das System nutzen' },
-      { name: 'Standorte', value: '2', description: 'Für bis zu 2 Standorte' },
-      { name: 'Buchungen/Monat', value: 'Unbegrenzt', description: 'Keine Begrenzung bei der Anzahl der Termine' },
+      { name: 'Standorte', value: '1', description: 'Für einen Unternehmens-Standort' },
+      { name: 'Buchungen/Monat', value: '1.000', description: 'Bis zu 1.000 Termine pro Monat verwaltbar' },
       { name: 'Kunden', value: 'Unbegrenzt', description: 'Unbegrenzt viele Kundenkontakte speichern' },
+      { name: 'Speicherplatz', value: '25 GB', description: '25 GB für Bilder, Galerien und Dokumente' },
       { name: 'Alles aus Starter', included: true, bold: true, description: 'Alle Funktionen vom Starter-Plan inklusive' },
-      { name: 'Automatische Erinnerungen (Komplett)', included: true, highlight: true, description: 'Nachrichten 2 Tage vor Termin, automatische Absage nach 1 Tag, Warteliste' },
-      { name: 'Automatisches Marketing (5 pro Monat)', included: true, highlight: true, description: 'Geburtstag, Rückholung, Bewertung, Mehrverkauf, Empfehlung - alles automatisch' },
-      { name: 'BRANCHEN-WORKFLOW (1 aktiviert)', included: true, description: 'Tattoo Studio, Medical/Botox oder Wellness Spa Workflow' },
-      { name: 'Erweiterte Auswertungen', included: true, description: 'Detaillierte Übersicht über Umsätze, vergessene Termine und Gewinn' },
-      { name: 'Multi-Service Buchungen', included: true, description: 'Kunden können mehrere Behandlungen auf einmal buchen' },
-      { name: 'Portfolio & Galerien', included: true, description: 'Vorher-Nachher Bilder Ihrer Arbeit zeigen' },
-      { name: 'Custom Branding', included: true, description: 'Buchungsseite in Ihren Farben und mit Ihrem Logo' },
-      { name: 'Service-Pakete & Memberships', included: true, description: 'Pakete (z.B. 10 Massagen) und monatliche Abos anbieten' },
-      { name: 'Fortschrittsverfolgung', included: true, description: 'Behandlungsverläufe dokumentieren (z.B. bei Tattoos)' },
-      { name: 'Ressourcenmanagement', included: true, description: 'Räume und Geräte planen (z.B. Massageräume)' },
-      { name: 'Prioritäts-Support', included: true, description: 'Schnellere Hilfe bei Fragen und Problemen' },
+      { name: 'Erweiterte Auswertungen', included: true, highlight: true, description: 'Detaillierte Übersicht über Umsätze, Ausfälle und Gewinn' },
+      { name: 'Automatisches Marketing & E-Mail-Kampagnen', included: true, highlight: true, description: 'Geburtstag, Rückholung, Bewertung, Empfehlung – alles automatisch per E-Mail' },
+      { name: 'Ausfall-Schutz', included: true, highlight: true, description: 'Kunden hinterlegen Kreditkarte – bei Nichterscheinen wird automatisch eine Gebühr berechnet' },
+      { name: 'Warteliste', included: true, description: 'Kunden werden automatisch benachrichtigt, wenn ein Platz frei wird' },
+      { name: 'Wiederkehrende Termine', included: true, description: 'Regelmäßige Termine automatisch planen (z. B. alle 4 Wochen)' },
+      { name: 'Mehrere Behandlungen pro Buchung', included: true, description: 'Kunden können mehrere Behandlungen auf einmal buchen' },
+      { name: 'Eigene Buchungsformulare', included: true, description: 'Zusätzliche Felder und Fragen bei der Buchung abfragen' },
+      { name: 'Portfolio & Vorher-Nachher-Bilder', included: true, description: 'Galerien Ihrer Arbeit zeigen (z. B. Tattoos, Kosmetik)' },
+      { name: 'Eigenes Branding', included: true, description: 'Buchungsseite in Ihren Farben und mit Ihrem Logo' },
+      { name: 'Service-Pakete & Abos', included: true, description: 'Pakete (z. B. 10 Massagen) und monatliche Abos anbieten' },
+      { name: 'Behandlungsverläufe', included: true, description: 'Fortschritt dokumentieren (z. B. bei Tattoo-Sitzungen)' },
+      { name: 'Raum- & Geräteplanung', included: true, description: 'Räume und Geräte verwalten (z. B. Behandlungsräume)' },
+      { name: 'Team-Berechtigungen', included: true, description: 'Unterschiedliche Zugriffsrechte für Mitarbeiter festlegen' },
+      { name: 'Protokoll (Audit-Log)', included: true, description: 'Nachvollziehen, wer was wann geändert hat' },
+      { name: 'Zwei-Faktor-Anmeldung', included: true, description: 'Zusätzliche Sicherheit beim Login für Sie und Ihr Team' },
+      { name: 'Bevorzugter Support', included: true, description: 'Support-Ticket jederzeit schreiben – bevorzugte Bearbeitung werktags zwischen 10 und 16 Uhr' },
     ],
     notIncluded: [
-      'Alle 8 Branchen-Workflows (nur 1)',
-      'Unlimited Marketing-Kampagnen (nur 5/Mo)',
-      'Multi-Standort (max 2)',
-      'White-Label',
-      'API-Zugang',
+      'SMS-Benachrichtigungen',
+      'Mehrere Standorte',
+      'White-Label (ohne JN-Logo)',
+      'Eigene Domain',
+      'API-Schnittstelle',
+      'Webhooks',
+      'SEPA & Rechnung',
+      'HIPAA Compliance',
+      'Eigene Berichte',
     ]
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
-    description: 'Maximale Power & Features',
+    description: 'Für Unternehmen mit höchsten Ansprüchen',
     price: 599,
     yearlyPrice: 5990,
     yearlyMonthlyCost: 499.17,
-    badge: 'FULL POWER',
+    badge: 'ALLES INKLUSIVE',
     features: [
       { name: 'Mitarbeiter', value: 'Unbegrenzt', description: 'Beliebig viele Mitarbeiter ohne Aufpreis' },
-      { name: 'Standorte', value: 'Unbegrenzt', description: 'Beliebig viele Filialen gleichzeitig verwalten' },
+      { name: 'Standorte', value: 'Bis zu 5', description: 'Bis zu 5 Filialen gleichzeitig verwalten' },
       { name: 'Buchungen/Monat', value: 'Unbegrenzt', description: 'Keine Begrenzung bei der Anzahl der Termine' },
       { name: 'Kunden', value: 'Unbegrenzt', description: 'Unbegrenzt viele Kundenkontakte speichern' },
+      { name: 'Speicherplatz', value: '100 GB', description: '100 GB für alle Ihre Dateien' },
       { name: 'Alles aus Professional', included: true, bold: true, description: 'Alle Funktionen vom Professional-Plan inklusive' },
-      { name: 'Automatische Erinnerungen (Komplett + Eigene Regeln)', included: true, highlight: true, description: 'Nachrichten, automatische Absage, Warteliste + eigene Regeln pro Service' },
-      { name: 'Automatisches Marketing (Unbegrenzt)', included: true, highlight: true, description: 'Unbegrenzte Aktionen, verschiedene Versionen testen, Erfolg messen' },
-      { name: 'ALLE 8 BRANCHEN-FUNKTIONEN', included: true, highlight: true, description: 'Tattoo, Medizin/Botox, Wellness, Frisör, Kosmetik, Nägel, Massage, Tier-Pflege' },
-      { name: 'Multi-Standort Dashboard', included: true, description: 'Alle Standorte zentral verwalten mit einer Übersicht' },
-      { name: 'White-Label Optionen', included: true, description: 'Komplett in Ihrem Design - kein JN Business System Logo sichtbar' },
-      { name: 'Schnittstelle für Entwickler', included: true, description: 'Anbindung an Ihre eigene Software möglich' },
-      { name: 'Webhook Integrationen', included: true, description: 'Automatische Benachrichtigungen an andere Programme' },
-      { name: 'HIPAA Compliance', included: true, description: 'Medizinische Daten AES-256-GCM verschlüsselt' },
-      { name: 'Audit-Logs', included: true, description: 'Nachvollziehen wer was wann geändert hat (90 Tage)' },
+      { name: 'SMS-Benachrichtigungen (500/Monat)', included: true, highlight: true, description: '500 SMS inklusive, +50 pro Mitarbeiter über 5. Automatische Erinnerungen 2h & 24h vor Termin.' },
+      { name: 'Automatisches Marketing (Unbegrenzt)', included: true, highlight: true, description: 'Unbegrenzte E-Mail-Kampagnen, verschiedene Versionen testen, Erfolg messen' },
+      { name: 'Alle Branchen-Funktionen', included: true, highlight: true, description: 'Tattoo, Medizin/Botox, Wellness, Frisör, Kosmetik, Nägel, Massage, Physiotherapie' },
+      { name: 'Standort-Übersicht', included: true, description: 'Alle Standorte zentral verwalten mit einer Übersicht' },
+      { name: 'Eigene Berichte', included: true, description: 'Individuelle Auswertungen nach Ihren Anforderungen erstellen' },
+      { name: 'White-Label', included: true, description: 'Komplett in Ihrem Design – kein JN Business System Logo sichtbar' },
+      { name: 'Eigene Domain', included: true, description: 'Buchungsseite unter Ihrer eigenen Internetadresse' },
+      { name: 'Schnittstelle für Entwickler (API)', included: true, description: 'Anbindung an Ihre eigene Software möglich' },
+      { name: 'Webhook-Integrationen', included: true, description: 'Automatische Benachrichtigungen an andere Programme senden' },
+      { name: 'HIPAA Compliance', included: true, description: 'Medizinische Daten nach höchstem Standard verschlüsselt (AES-256-GCM)' },
+      { name: 'SEPA & Rechnung', included: true, description: 'Neben Kreditkarte auch Lastschrift und Rechnung als Zahlungsart möglich' },
       { name: 'Dedizierter Account Manager', included: true, description: 'Persönlicher Ansprechpartner nur für Sie' },
-      { name: 'Prioritäts-Support (24/7)', included: true, description: 'Hilfe rund um die Uhr - auch nachts und am Wochenende' },
+      { name: 'Bevorzugter Support', included: true, description: 'Support-Ticket jederzeit schreiben – bevorzugte Bearbeitung werktags zwischen 10 und 16 Uhr' },
     ],
   },
 ];
@@ -99,7 +117,7 @@ const plans = [
 const faq = [
   {
     q: 'Gibt es eine Testphase?',
-    a: 'Ja, Sie können jeden Plan 30 Tage kostenlos und unverbindlich testen. Keine Kreditkarte erforderlich.',
+    a: 'Ja, das Enterprise-Paket können Sie 14 Tage kostenlos und unverbindlich testen. Sie bekommen automatisch Zugang zu allen Enterprise-Funktionen, inklusive 50 SMS.',
   },
   {
     q: 'Kann ich den Plan später wechseln?',
@@ -107,7 +125,7 @@ const faq = [
   },
   {
     q: 'Gibt es versteckte Kosten?',
-    a: 'Nein. Der angezeigte Preis ist alles, was Sie zahlen. Keine Provisionen, keine Einrichtungsgebühren.',
+    a: 'Nein. Der angezeigte Preis ist alles, was Sie zahlen. Keine Provisionen, keine Einrichtungsgebühren. Im Enterprise-Plan können bei SMS-Überschreitung zusätzliche Kosten anfallen (ab €0,05 pro SMS über 500).'
   },
   {
     q: 'Wie funktioniert die Kündigung?',
@@ -134,7 +152,7 @@ export default function Pricing() {
     <>
       <SEO
         title="Preise - Faire Preise ohne versteckte Kosten"
-        description="Starter ab €69/Monat, Professional €199/Monat, Enterprise €499/Monat. 30 Tage kostenlos testen. Keine Kreditkarte erforderlich."
+        description="Starter ab €129/Monat, Professional €249/Monat, Enterprise €599/Monat. 14 Tage kostenlose Testphase im Enterprise-Paket."
         keywords="Preise, Buchungssystem Kosten, Business Software Preis, Unternehmenssoftware"
         url="/pricing"
       />
@@ -174,21 +192,21 @@ export default function Pricing() {
           </span>
           {yearly && (
             <span className="ml-2 px-3 py-1 bg-green-500/20 text-green-600 text-sm font-medium rounded-full">
-              Spare bis zu €2.388
+              Spare bis zu €1.198
             </span>
           )}
         </div>
 
-        {/* Enterprise Trial Banner */}
+        {/* Enterprise Testphase Banner */}
         <div className="max-w-4xl mx-auto mb-12 bg-zinc-50 border-2 border-white rounded-xl p-6 text-center shadow-none shadow-white/10">
           <div className="flex items-center justify-center gap-2 mb-2">
             <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <h3 className="text-xl font-bold">14-Tage Enterprise Trial</h3>
+            <h3 className="text-xl font-bold">14 Tage Enterprise-Testphase</h3>
           </div>
           <p className="text-zinc-700 mb-4">
-            Teste alle Enterprise Features kostenlos - inkl. 50 Nachrichten. Keine Kreditkarte erforderlich.
+            Testen Sie alle Enterprise-Funktionen 14 Tage kostenlos – inkl. 50 SMS. Danach wählen Sie Ihren Plan.
           </p>
           <Link
             to="/register?trial=enterprise"
@@ -339,7 +357,7 @@ export default function Pricing() {
             <div className="flex-1">
               <h3 className="text-xl font-bold mb-2">Nachrichten per SMS nur in Enterprise</h3>
               <p className="text-zinc-600 mb-4">
-                Reduziere vergessene Termine um bis zu 60% mit automatischen Nachrichten 2 Stunden & 1 Tag vor Terminen.
+                Weniger vergessene Termine durch automatische Nachrichten 2 Stunden und 1 Tag vor dem Termin.
                 Inklusive 500 Nachrichten pro Monat (mehr bei größerem Team: +50 Nachrichten pro Mitarbeiter).
               </p>
               <div className="grid sm:grid-cols-2 gap-4 text-sm">

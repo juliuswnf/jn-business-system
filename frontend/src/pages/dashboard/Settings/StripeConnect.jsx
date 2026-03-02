@@ -4,7 +4,7 @@ import { FiCheckCircle, FiXCircle, FiExternalLink, FiAlertCircle } from 'react-i
 
 /**
  * Stripe Connect Settings Page
- * Allows salon owners to connect their Stripe account for No-Show-Killer payments
+ * Allows salon owners to connect their Stripe account for missed-appointment fee payments
  */
 export default function StripeConnectSettings() {
   const [status, setStatus] = useState(null);
@@ -62,7 +62,7 @@ export default function StripeConnectSettings() {
               <div>
                 <p className="font-medium text-blue-400 mb-2">Warum Stripe verbinden?</p>
                 <ul className="text-sm text-zinc-600 space-y-1">
-                  <li>• Automatische No-Show-Gebühren-Abrechnung</li>
+                  <li>• Automatische Abrechnung bei Nichterscheinen</li>
                   <li>• Direkte Auszahlungen auf Ihr Bankkonto</li>
                   <li>• Sichere Zahlungsabwicklung über Stripe</li>
                   <li>• Keine zusätzlichen Gebühren (nur Stripe-Standardgebühren)</li>
@@ -125,7 +125,7 @@ export default function StripeConnectSettings() {
               Stripe-Konto verbunden und aktiv
             </p>
             <p className="text-sm text-zinc-600 mt-1">
-              Sie können jetzt No-Show-Gebühren empfangen.
+              Sie können jetzt Gebühren bei Nichterscheinen empfangen.
             </p>
           </div>
 

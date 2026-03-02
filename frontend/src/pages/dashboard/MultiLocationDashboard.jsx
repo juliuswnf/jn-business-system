@@ -155,9 +155,9 @@ export default function MultiLocationDashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-zinc-900 mb-2">Multi-Location</h1>
+          <h1 className="text-2xl font-bold text-zinc-900 mb-2">Mehrere Standorte</h1>
           <p className="text-zinc-600 mb-6">
-            Verwalten Sie bis zu 5 Standorte von einem Dashboard aus.
+            Verwalten Sie bis zu 5 Standorte von einer zentralen Übersicht aus.
             Diese Funktion ist exklusiv für Enterprise-Kunden.
           </p>
           <Link
@@ -175,7 +175,7 @@ export default function MultiLocationDashboard() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-zinc-900 mb-2">Multi-Standort Übersicht</h1>
+          <h1 className="text-3xl font-bold text-zinc-900 mb-2">Standort-Übersicht</h1>
           <p className="text-zinc-600">Alle Ihre Standorte auf einen Blick</p>
         </div>
         {locations.length < 5 && (

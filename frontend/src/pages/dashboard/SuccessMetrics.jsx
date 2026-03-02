@@ -117,7 +117,7 @@ const SuccessMetrics = () => {
             <div>
               <h1 className="text-2xl font-bold text-zinc-900 flex items-center gap-2">
                 <BarChart3 className="w-7 h-7 text-zinc-900" />
-                Erfolgs-Dashboard
+                Erfolgs-Kontrollpanel
               </h1>
               <p className="text-zinc-600 text-sm mt-1">Deine KPIs auf einen Blick</p>
             </div>

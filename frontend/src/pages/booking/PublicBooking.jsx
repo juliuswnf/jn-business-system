@@ -229,8 +229,8 @@ export default function PublicBooking() {
         requestBody.gdprConsentAccepted = true;
         requestBody.noShowFeeAcceptance = {
           accepted: true,
-          terms: `NO-SHOW-GEBÜHR RICHTLINIE\n\nBei Nichterscheinen wird eine Gebühr von €${noShowFeeAmount} automatisch von Ihrer hinterlegten Kreditkarte abgebucht. Sie können kostenlos stornieren, wenn Sie dies mindestens 24 Stunden vorher tun.`,
-          checkboxText: `Ich akzeptiere die No-Show-Gebühr von €${noShowFeeAmount} bei Nichterscheinen und habe die Richtlinie gelesen.`
+          terms: `RICHTLINIE BEI NICHTERSCHEINEN\n\nBei Nichterscheinen wird eine Gebühr von €${noShowFeeAmount} automatisch von Ihrer hinterlegten Kreditkarte abgebucht. Sie können kostenlos stornieren, wenn Sie dies mindestens 24 Stunden vorher tun.`,
+          checkboxText: `Ich akzeptiere die Gebühr von €${noShowFeeAmount} bei Nichterscheinen und habe die Richtlinie gelesen.`
         };
       }
 

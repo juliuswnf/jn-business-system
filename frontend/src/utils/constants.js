@@ -155,18 +155,18 @@ export const MESSAGES = {
 
 export const MENU_ITEMS = {
   CEO: [
-    { label: 'Dashboard', path: '/ceo/dashboard', icon: 'FiHome' },
+    { label: 'Kontrollpanel', path: '/ceo/dashboard', icon: 'FiHome' },
     { label: 'Analytics', path: '/ceo/analytics', icon: 'FiBarChart2' },
     { label: 'Settings', path: '/ceo/settings', icon: 'FiSettings' }
   ],
   ADMIN: [
-    { label: 'Dashboard', path: '/admin/dashboard', icon: 'FiHome' },
+    { label: 'Kontrollpanel', path: '/admin/dashboard', icon: 'FiHome' },
     { label: 'Customers', path: '/admin/customers', icon: 'FiUsers' },
     { label: 'Appointments', path: '/admin/appointments', icon: 'FiCalendar' },
     { label: 'Payments', path: '/admin/payments', icon: 'FiDollarSign' }
   ],
   EMPLOYEE: [
-    { label: 'Dashboard', path: '/employee/dashboard', icon: 'FiHome' },
+    { label: 'Kontrollpanel', path: '/employee/dashboard', icon: 'FiHome' },
     { label: 'Schedule', path: '/employee/schedule', icon: 'FiCalendar' },
     { label: 'Appointments', path: '/employee/appointments', icon: 'FiClock' }
   ]

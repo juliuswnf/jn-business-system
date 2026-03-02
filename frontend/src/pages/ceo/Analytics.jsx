@@ -166,7 +166,7 @@ const Analytics = () => {
                 </div>
               </div>
               <div className="flex items-center justify-between p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/30">
-                <span className="text-zinc-900">Trial</span>
+                <span className="text-zinc-900">Testphase</span>
                 <div className="text-right">
                   <p className="text-yellow-600 font-bold">{overview?.subscriptions?.trial || 0}</p>
                   <p className="text-zinc-400 text-sm">Potenzielle Kunden</p>

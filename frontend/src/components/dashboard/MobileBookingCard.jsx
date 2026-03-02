@@ -74,7 +74,7 @@ export default function MobileBookingCard({ booking, onUpdate }) {
         {booking.paymentMethodId && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <CreditCardIcon className="w-4 h-4 text-zinc-500" />
-            <span>No-Show Schutz aktiv</span>
+            <span>Ausfall-Schutz aktiv</span>
           </div>
         )}
       </div>
@@ -87,7 +87,7 @@ export default function MobileBookingCard({ booking, onUpdate }) {
               className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-orange-600 border border-orange-300 bg-white hover:bg-orange-50 transition"
             >
               <XMarkIcon className="w-4 h-4" />
-              {loading ? 'Verarbeite...' : 'Als No-Show markieren'}
+              {loading ? 'Verarbeite...' : 'Als nicht erschienen markieren'}
             </button>
           )}
           {canComplete && (
@@ -115,7 +115,7 @@ function getStatusLabel(status) {
     pending: 'Ausstehend',
     completed: 'Abgeschlossen',
     cancelled: 'Storniert',
-    no_show: 'No-Show'
+    no_show: 'Nicht erschienen'
   };
   return labels[status] || status;
 }

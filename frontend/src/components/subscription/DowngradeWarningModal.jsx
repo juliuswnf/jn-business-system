@@ -19,7 +19,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
     enterprise: {
       professional: [
         'SMS-Benachrichtigungen (500/Monat)',
-        'Multi-Standort Support (5 Standorte → 1)',
+        'Mehrere Standorte (5 Standorte → 1)',
         'Unbegrenzte Mitarbeiter → 30',
         'Unbegrenzte Buchungen → 1.000/Monat',
         'White-Label Optionen',
@@ -27,25 +27,25 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
         'HIPAA Compliance',
         'Dedizierter Account Manager',
         'SEPA & Rechnung als Zahlungsart',
-        '24/7 Priority Support',
+        'Schneller Support (rund um die Uhr)',
       ],
       starter: [
         'SMS-Benachrichtigungen (500/Monat)',
-        'Multi-Standort Support (5 Standorte → 1)',
+        'Mehrere Standorte (5 Standorte → 1)',
         'Unbegrenzte Mitarbeiter → 5',
         'Unbegrenzte Buchungen → 200/Monat',
         'White-Label Optionen',
         'REST API-Zugang',
         'HIPAA Compliance',
-        'Marketing-Automation',
-        'Erweiterte Analytics',
+        'Automatisches Marketing',
+        'Erweiterte Auswertungen',
         'Portfolio & Galerien',
         'Service-Pakete',
         'Fortschrittsverfolgung',
         'Ressourcenmanagement',
         'Dedizierter Account Manager',
         'SEPA & Rechnung als Zahlungsart',
-        'Priority Support',
+        'Schneller Support',
       ],
     },
     professional: {
@@ -53,15 +53,15 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
         'Zusätzliche Mitarbeiter (30 → 5)',
         'Mehr Buchungen (1.000 → 200/Monat)',
         'Mehr Kunden (2.500 → 500)',
-        'Marketing-Automation',
-        'Erweiterte Analytics',
+        'Automatisches Marketing',
+        'Erweiterte Auswertungen',
         'Multi-Service Buchungen',
         'Portfolio & Galerien',
         'Custom Branding',
         'Service-Pakete',
         'Fortschrittsverfolgung',
         'Ressourcenmanagement',
-        'Priority Support',
+        'Schneller Support',
       ],
     },
   };
@@ -132,7 +132,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
         <div className="p-6">
           <div className="mb-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-3">
-              📉 Diese Features verlierst du:
+              📉 Diese Funktionen entfallen:
             </h4>
             <ul className="space-y-2">
               {lostFeatures.map((feature, idx) => (
@@ -207,7 +207,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
                 className="mt-1 mr-3 h-5 w-5 text-indigo-600 focus:ring-zinc-900 border-gray-300 rounded"
               />
               <span className="text-sm text-gray-700">
-                Ich habe verstanden, dass ich die oben aufgeführten Features verlieren werde und
+                Ich habe verstanden, dass ich die oben aufgeführten Funktionen verlieren werde und
                 möchte mit dem Downgrade fortfahren.
               </span>
             </label>
@@ -288,7 +288,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
         {/* Footer Note */}
         <div className="p-4 bg-gray-50 border-t border-gray-200">
           <p className="text-xs text-gray-600 text-center">
-            💡 Du kannst jederzeit wieder upgraden, um diese Features zurückzuerhalten.
+            💡 Du kannst jederzeit wieder upgraden, um diese Funktionen zurückzuerhalten.
           </p>
         </div>
       </div>

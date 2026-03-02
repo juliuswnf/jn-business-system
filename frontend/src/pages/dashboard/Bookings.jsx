@@ -180,7 +180,7 @@ export default function Bookings() {
       }
     } catch (error) {
       captureError(error, { context: 'handleMarkAsNoShow' });
-      const errorMessage = error.response?.data?.message || 'Fehler beim Markieren als No-Show';
+      const errorMessage = error.response?.data?.message || 'Fehler beim Markieren als nicht erschienen';
       toast.error(errorMessage);
     } finally {
       setMarkingNoShow(prev => ({ ...prev, [booking._id]: false }));
@@ -191,7 +191,7 @@ export default function Bookings() {
    * Undo No-Show and refund fee
    */
   const handleUndoNoShow = async (booking) => {
-    if (!window.confirm('Möchten Sie die No-Show-Markierung rückgängig machen? Die Gebühr wird zurückerstattet.')) {
+    if (!window.confirm('Möchten Sie die Markierung „Nicht erschienen“ rückgängig machen? Die Gebühr wird zurückerstattet.')) {
       return;
     }
 
@@ -201,7 +201,7 @@ export default function Bookings() {
       const response = await api.patch(`/bookings/${booking._id}/undo-no-show`);
 
       if (response.data.success) {
-        toast.success('No-Show-Markierung rückgängig gemacht. Gebühr wurde zurückerstattet.');
+        toast.success('Markierung „Nicht erschienen“ rückgängig gemacht. Gebühr wurde zurückerstattet.');
         
         // Update booking in state
         setBookings(prev => prev.map(b =>
@@ -595,7 +595,7 @@ export default function Bookings() {
                               ) : (
                                 <>
                                   <X className="w-3 h-3 sm:w-4 sm:h-4" />
-                                  <span className="hidden sm:inline">Als No-Show markieren</span>
+                                  <span className="hidden sm:inline">Als nicht erschienen markieren</span>
                                 </>
                               )}
                             </button>

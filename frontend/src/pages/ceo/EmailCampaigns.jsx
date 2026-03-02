@@ -307,7 +307,7 @@ const EmailCampaigns = () => {
                   <option value="all">Alle Unternehmen</option>
                   <option value="active">Nur aktive Unternehmen</option>
                   <option value="inactive">Inaktive Unternehmen</option>
-                  <option value="trial">Trial-Nutzer</option>
+                  <option value="trial">Nutzer in Testphase</option>
                   <option value="premium">Premium-Kunden</option>
                 </select>
               </div>

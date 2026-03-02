@@ -1,6 +1,9 @@
 import express from 'express';
 import Waitlist from '../models/Waitlist.js';
+import Salon from '../models/Salon.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
+import { tierHasFeature } from '../config/pricing.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -28,12 +31,140 @@ const canAccessWaitlistEntry = (req, waitlistEntry) => {
   return req.user?.role === 'customer' && waitlistEntry?.customerId?.toString() === userCustomerId?.toString();
 };
 
+const isObjectId = (value) => /^[a-f\d]{24}$/i.test(String(value || ''));
+
+const normalizeTier = (salon) => {
+  const explicitTier = salon?.subscription?.tier;
+  if (explicitTier) {
+    return explicitTier;
+  }
+
+  const planId = (salon?.subscription?.planId || '').toLowerCase();
+  if (planId.includes('enterprise')) {
+    return 'enterprise';
+  }
+  if (planId.includes('professional') || planId.includes('pro')) {
+    return 'professional';
+  }
+
+  return 'starter';
+};
+
+const hasActiveSubscription = (salon) => {
+  const status = salon?.subscription?.status;
+  return ['active', 'trial', 'trialing'].includes(status);
+};
+
+const resolveSalonFromReference = async (salonReference) => {
+  if (!salonReference) {
+    return null;
+  }
+
+  if (isObjectId(salonReference)) {
+    return Salon.findById(salonReference)
+      .select('_id slug businessName subscription')
+      .lean();
+  }
+
+  return Salon.findOne({ slug: salonReference })
+    .select('_id slug businessName subscription')
+    .lean();
+};
+
+const requirePublicWaitlistFeature = async (req, res, next) => {
+  try {
+    const salonReference = req.body.salonId || req.body.studioId;
+
+    if (!salonReference) {
+      return res.status(400).json({
+        success: false,
+        message: 'salonId oder studioId ist erforderlich',
+        code: 'SALON_ID_MISSING'
+      });
+    }
+
+    const salon = await resolveSalonFromReference(salonReference);
+
+    if (!salon) {
+      return res.status(404).json({
+        success: false,
+        message: 'Salon nicht gefunden',
+        code: 'SALON_NOT_FOUND'
+      });
+    }
+
+    if (!hasActiveSubscription(salon)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Warteliste ist für dieses Studio aktuell nicht verfügbar',
+        code: 'SUBSCRIPTION_INACTIVE'
+      });
+    }
+
+    const currentTier = normalizeTier(salon);
+    const hasFeature = tierHasFeature(currentTier, 'waitlistManagement');
+
+    if (!hasFeature) {
+      return res.status(403).json({
+        success: false,
+        message: 'Warteliste ist in diesem Plan nicht enthalten',
+        code: 'FEATURE_NOT_AVAILABLE',
+        feature: 'waitlistManagement',
+        currentTier,
+        requiredTier: 'professional'
+      });
+    }
+
+    req.body.salonId = salon._id.toString();
+    req.resolvedSalon = salon;
+    return next();
+  } catch (error) {
+    logger.error('Public waitlist feature access check failed:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Feature-Zugriff konnte nicht geprüft werden',
+      code: 'FEATURE_CHECK_FAILED'
+    });
+  }
+};
+
+const requireWaitlistFeature = async (req, res, next) => {
+  try {
+    let salonId = req.params.salonId || req.body.salonId;
+
+    if (!salonId && req.params.id) {
+      const waitlistEntry = await Waitlist.findById(req.params.id)
+        .select('salonId')
+        .lean();
+      salonId = waitlistEntry?.salonId?.toString();
+    }
+
+    if (!salonId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Salon ID required for waitlist feature check',
+        code: 'SALON_ID_MISSING'
+      });
+    }
+
+    req.params.salonId = salonId;
+    return checkFeatureAccess('waitlistManagement')(req, res, next);
+  } catch (error) {
+    logger.error('Waitlist feature access check failed:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to verify waitlist access',
+      code: 'FEATURE_CHECK_FAILED'
+    });
+  }
+};
+
 /**
  * @route   POST /api/waitlist
  * @desc    Join waitlist for a preferred time slot
  * @access  Public (can be called during booking flow)
  */
-router.post('/', async (req, res) => {
+router.post('/', requirePublicWaitlistFeature, async (req, res) => {
   try {
     const {
       customerId,
@@ -113,7 +244,7 @@ router.post('/', async (req, res) => {
  * @desc    Get all active waitlist entries for a salon (sorted by priority)
  * @access  Private (salon owner only)
  */
-router.get('/:salonId', authMiddleware.protect, async (req, res) => {
+router.get('/:salonId', authMiddleware.protect, requireWaitlistFeature, async (req, res) => {
   try {
     const { salonId } = req.params;
 
@@ -212,7 +343,7 @@ router.get('/customer/:customerId/:salonId', async (req, res) => {
  * @desc    Update waitlist entry (e.g., change preferred time)
  * @access  Private (customer or salon owner)
  */
-router.put('/:id', authMiddleware.protect, async (req, res) => {
+router.put('/:id', authMiddleware.protect, requireWaitlistFeature, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -271,7 +402,7 @@ router.put('/:id', authMiddleware.protect, async (req, res) => {
  * @desc    Remove customer from waitlist
  * @access  Private (customer or salon owner)
  */
-router.delete('/:id', authMiddleware.protect, async (req, res) => {
+router.delete('/:id', authMiddleware.protect, requireWaitlistFeature, async (req, res) => {
   try {
     const { id } = req.params;
 

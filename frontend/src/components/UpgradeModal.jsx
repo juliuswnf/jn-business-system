@@ -43,15 +43,15 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
   // Feature names mapping
   const featureNames = {
     smsNotifications: 'SMS-Benachrichtigungen',
-    multiLocation: 'Multi-Standort',
+    multiLocation: 'Mehrere Standorte',
     apiAccess: 'API-Zugang',
     webhooks: 'Webhook-Integrationen',
     whiteLabel: 'White-Label',
     hipaaCompliance: 'HIPAA Compliance',
     auditLogs: 'Audit-Logs',
     portfolio: 'Portfolio & Galerien',
-    marketingAutomation: 'Marketing-Automation',
-    advancedAnalytics: 'Erweiterte Analytics',
+    marketingAutomation: 'Automatisches Marketing',
+    advancedAnalytics: 'Erweiterte Auswertungen',
     packages: 'Service-Pakete',
     progressTracking: 'Fortschrittsverfolgung',
   };
@@ -61,7 +61,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
   // Feature benefits
   const featureBenefits = {
     smsNotifications: [
-      'Reduziere No-Shows um bis zu 60%',
+      'Weniger verpasste Termine',
       '500 SMS pro Monat inklusive',
       'Automatische 2h & 24h Erinnerungen',
       'Prioritäts-basiertes SMS-System',
@@ -77,7 +77,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
     apiAccess: [
       'REST API-Zugang',
       'Integration mit eigenen Systemen',
-      'Automatisierung von Workflows',
+      'Automatisierung von Abläufen',
       'Daten-Export & -Import',
       'Entwickler-Dokumentation',
     ],
@@ -101,7 +101,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
     'Erweiterte Funktionalität',
     'Bessere Performance',
     'Mehr Kontrolle',
-    'Professioneller Support',
+    'Schneller Support',
   ];
 
   // Tier order for comparison
