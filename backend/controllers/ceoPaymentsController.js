@@ -10,8 +10,9 @@ import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
-  starter: 29,
-  pro: 69
+  starter: 129,
+  pro: 249,
+  enterprise: 599
 };
 
 // ==================== GET ALL TRANSACTIONS ====================

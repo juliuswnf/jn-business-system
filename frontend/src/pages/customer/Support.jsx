@@ -381,8 +381,8 @@ const Support = () => {
 
         {/* Back to Dashboard */}
         <div className="mt-8 text-center">
-          <Link to="/customer/dashboard" className="text-zinc-600 hover:text-zinc-900" aria-label="Zurück zum Kunden-Dashboard">
-            ← Zurück zum Dashboard
+          <Link to="/customer/dashboard" className="text-zinc-600 hover:text-zinc-900" aria-label="Zurück zum Kunden-Kontrollpanel">
+            ← Zurück zum Kontrollpanel
           </Link>
         </div>
       </div>

@@ -5,8 +5,8 @@ import { FiAlertCircle, FiInfo, FiCheckCircle, FiXCircle } from 'react-icons/fi'
 import { Link } from 'react-router-dom';
 
 /**
- * No-Show-Killer Settings Page
- * Allows salon owners to configure No-Show-Killer feature
+ * No-show settings page
+ * Allows salon owners to configure missed-appointment fee feature
  */
 export default function NoShowKillerSettings() {
   const { showNotification } = useNotification();
@@ -84,7 +84,7 @@ export default function NoShowKillerSettings() {
   return (
     <div className="space-y-6">
       <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-6">NO-SHOW-KILLER Einstellungen</h2>
+        <h2 className="text-2xl font-bold text-zinc-900 mb-6">Ausfall-Schutz Einstellungen</h2>
 
         {/* Stripe Warning */}
         {!canEnable && (
@@ -94,7 +94,7 @@ export default function NoShowKillerSettings() {
               <div className="flex-1">
                 <p className="font-medium text-yellow-600 mb-2">⚠️ Stripe-Konto erforderlich</p>
                 <p className="text-sm text-zinc-600 mb-3">
-                  Um den NO-SHOW-KILLER zu nutzen, müssen Sie zuerst Ihr Stripe-Konto verbinden.
+                  Um den Ausfall-Schutz zu nutzen, müssen Sie zuerst Ihr Stripe-Konto verbinden.
                 </p>
                 <Link
                   to="/dashboard/settings/stripe"
@@ -118,9 +118,9 @@ export default function NoShowKillerSettings() {
               className="w-5 h-5 rounded border-zinc-200 bg-zinc-50 text-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-0 focus:ring-offset-zinc-900 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <div>
-              <span className="font-medium text-zinc-900">NO-SHOW-KILLER aktivieren</span>
+              <span className="font-medium text-zinc-900">Ausfall-Schutz aktivieren</span>
               <p className="text-sm text-zinc-500 mt-1">
-                Kunden müssen Kreditkarte hinterlegen. Bei No-Show wird automatisch Gebühr berechnet.
+                Kunden müssen eine Kreditkarte hinterlegen. Bei Nichterscheinen wird automatisch eine Gebühr berechnet.
               </p>
             </div>
           </label>
@@ -131,7 +131,7 @@ export default function NoShowKillerSettings() {
           <>
             <div className="mb-6">
               <label className="block text-sm font-medium text-zinc-600 mb-2">
-                No-Show-Gebühr
+                Gebühr bei Nichterscheinen
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -159,7 +159,7 @@ export default function NoShowKillerSettings() {
                   <ul className="text-sm text-zinc-600 space-y-1">
                     <li>• Kunden hinterlegen Kreditkarte bei Buchung</li>
                     <li>• Karte wird NICHT belastet (nur gespeichert)</li>
-                    <li>• Sie markieren No-Show im Dashboard</li>
+                    <li>• Sie markieren den Termin als „Nicht erschienen“ in der Übersicht</li>
                     <li>• Gebühr wird automatisch abgebucht</li>
                     <li>• Geld geht direkt auf Ihr Stripe-Konto</li>
                   </ul>
@@ -208,11 +208,11 @@ export default function NoShowKillerSettings() {
       {/* Stats Card (if enabled) */}
       {settings.enabled && canEnable && (
         <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
-          <h3 className="text-xl font-bold text-zinc-900 mb-4">No-Show Statistiken</h3>
+          <h3 className="text-xl font-bold text-zinc-900 mb-4">Statistiken zu Nichterscheinen</h3>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-3xl font-bold text-zinc-900">0</div>
-              <div className="text-sm text-zinc-500 mt-1">No-Shows diesen Monat</div>
+              <div className="text-sm text-zinc-500 mt-1">Nichterscheinen diesen Monat</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">€0,00</div>
@@ -220,7 +220,7 @@ export default function NoShowKillerSettings() {
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-400">0%</div>
-              <div className="text-sm text-zinc-500 mt-1">No-Show-Rate</div>
+              <div className="text-sm text-zinc-500 mt-1">Rate Nichterscheinen</div>
             </div>
           </div>
         </div>

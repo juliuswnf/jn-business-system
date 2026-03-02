@@ -82,7 +82,7 @@ const BusinessLogin = () => {
             Geschäfts-Login
           </h1>
           <p className="text-zinc-500">
-            Zugang zu Ihrem Geschäfts-Dashboard
+            Zugang zu Ihrem Geschäfts-Kontrollpanel
           </p>
         </div>
 

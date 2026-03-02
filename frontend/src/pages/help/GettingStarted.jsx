@@ -143,11 +143,11 @@ export default function GettingStarted() {
 
         {/* Header */}
         <div className="mb-10">
-          <Link to="/dashboard" className="text-zinc-600 hover:text-zinc-900 text-sm mb-4 inline-flex items-center gap-2" aria-label="Zurück zum Dashboard">
+          <Link to="/dashboard" className="text-zinc-600 hover:text-zinc-900 text-sm mb-4 inline-flex items-center gap-2" aria-label="Zurück zum Kontrollpanel">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Zurück zum Dashboard
+            Zurück zum Kontrollpanel
           </Link>
           <h1 className="text-3xl font-bold mb-2">Getting Started</h1>
           <p className="text-zinc-600">

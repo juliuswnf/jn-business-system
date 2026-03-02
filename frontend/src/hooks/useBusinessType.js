@@ -9,7 +9,8 @@ const normalizeBusinessType = (value) => {
     medical: 'medical-aesthetics',
     wellness: 'spa-wellness',
     beauty: 'beauty-salon',
-    nails: 'nail-salon'
+    nails: 'nail-salon',
+    'massage-therapy': 'massage'
   };
 
   return mapping[value] || value || 'hair-salon';

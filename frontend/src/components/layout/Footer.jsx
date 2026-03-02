@@ -67,7 +67,7 @@ const Footer = () => {
               <ul className="space-y-2.5 text-sm">
                 <li>
                   <Link to="/dashboard" className="text-zinc-400 hover:text-zinc-900 transition">
-                    Dashboard
+                    Kontrollpanel
                   </Link>
                 </li>
                 <li>

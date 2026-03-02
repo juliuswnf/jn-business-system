@@ -99,10 +99,10 @@ export default function Demo() {
                 <h3 className="text-xl font-bold mb-6 text-zinc-900">So funktioniert es</h3>
                 <div className="space-y-4">
                   {[
-                    { step: 1, title: 'Widget einbinden', desc: 'Code-Snippet auf Ihre Website kopieren' },
-                    { step: 2, title: 'Services anlegen', desc: 'Behandlungen mit Preisen definieren' },
-                    { step: 3, title: 'Kunden buchen', desc: '24/7 ohne Anruf oder Wartezeit' },
-                    { step: 4, title: 'Automatische E-Mails', desc: 'Bestätigung und Erinnerung' },
+                    { step: 1, title: 'Buchung einrichten', desc: 'Buchungsfenster auf Ihrer Webseite einbinden' },
+                    { step: 2, title: 'Angebote anlegen', desc: 'Behandlungen mit Preisen und Dauer festlegen' },
+                    { step: 3, title: 'Kunden buchen online', desc: 'Rund um die Uhr, ohne Anruf oder Wartezeit' },
+                    { step: 4, title: 'Automatische E-Mails', desc: 'Bestätigung und Erinnerung werden automatisch verschickt' },
                   ].map((item) => (
                     <div key={item.step} className="flex gap-4">
                       <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 text-black rounded-lg text-sm font-bold flex items-center justify-center flex-shrink-0">
@@ -120,7 +120,7 @@ export default function Demo() {
               {/* Benefits */}
               <div className="space-y-3">
                 {[
-                  { title: '5 Minuten Setup', desc: 'Sofort einsatzbereit' },
+                  { title: '5 Minuten Einrichtung', desc: 'Sofort einsatzbereit' },
                   { title: 'Mehr Google-Bewertungen', desc: 'Automatische Anfrage nach Termin' },
                   { title: 'Keine Provisionen', desc: 'Fixpreis statt Prozente' },
                 ].map((b, i) => (
@@ -137,7 +137,7 @@ export default function Demo() {
               {/* CTA */}
               <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-6 text-center">
                 <h3 className="text-xl font-bold mb-2 text-zinc-900">Bereit loszulegen?</h3>
-                <p className="text-sm text-zinc-600 mb-5">30 Tage kostenlos testen</p>
+                <p className="text-sm text-zinc-600 mb-5">14 Tage Enterprise kostenlos testen</p>
                 <Link
                   to="/register"
                   className="inline-block w-full px-6 py-3 bg-zinc-200 text-zinc-900 font-bold rounded-lg border border-zinc-300 hover:bg-zinc-300 transition-colors"
@@ -334,7 +334,7 @@ export default function Demo() {
                             value={form.name}
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                             className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition"
-                            placeholder="Ihr Name"
+                            placeholder="Dein Name"
                           />
                         </div>
                         <div>
@@ -344,7 +344,7 @@ export default function Demo() {
                             value={form.email}
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                             className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition"
-                            placeholder="ihre@email.de"
+                            placeholder="deine@email.de"
                           />
                         </div>
                         <div>
@@ -388,7 +388,7 @@ export default function Demo() {
                         Bestätigung wurde an <span className="text-zinc-900 font-medium">{form.email}</span> gesendet.
                       </p>
                       <p className="text-sm text-zinc-500 mb-8">
-                        Sie erhalten eine E-Mail mit allen Details zu Ihrem Termin.
+                        Du erhältst eine E-Mail mit allen Details zu deinem Termin.
                       </p>
                       <button
                         onClick={reset}

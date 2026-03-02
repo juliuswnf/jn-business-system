@@ -97,9 +97,9 @@ const LifecycleEmails = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Lifecycle E-Mails</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Automatische E-Mail-Strecke</h1>
           <p className="text-zinc-500 mt-1">
-            Automatisierte Trial-Nurturing E-Mails für Conversion-Optimierung
+            Automatisierte E-Mails für Nutzer in der Testphase und bessere Abschlussrate
           </p>
         </div>
         <button
@@ -306,14 +306,14 @@ const LifecycleEmails = () => {
 
       {/* Info Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2">📧 Lifecycle E-Mail Flow</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">📧 E-Mail-Ablauf</h3>
         <div className="text-sm text-blue-800 space-y-1">
           <p><strong>Tag 1:</strong> Willkommen + Setup-Guide</p>
           <p><strong>Tag 3:</strong> &quot;Hast du schon deinen ersten Termin erstellt?&quot;</p>
-          <p><strong>Tag 7:</strong> &quot;Noch 23 Tage Trial – brauchst du Hilfe?&quot;</p>
+          <p><strong>Tag 7:</strong> &quot;Noch 23 Tage Testphase – brauchst du Hilfe?&quot;</p>
           <p><strong>Tag 23:</strong> &quot;Nur noch 7 Tage – jetzt upgraden!&quot;</p>
-          <p><strong>Tag 30:</strong> &quot;Dein Trial endet heute – letzte Chance!&quot;</p>
-          <p><strong>Tag 31:</strong> &quot;Trial abgelaufen – 20% Rabatt als Dankeschön&quot;</p>
+          <p><strong>Tag 30:</strong> &quot;Deine Testphase endet heute – letzte Chance!&quot;</p>
+          <p><strong>Tag 31:</strong> &quot;Testphase abgelaufen – 20% Rabatt als Dankeschön&quot;</p>
           <p><strong>Tag 45:</strong> Win-Back Kampagne</p>
         </div>
       </div>

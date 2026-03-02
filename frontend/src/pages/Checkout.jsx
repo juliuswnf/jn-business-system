@@ -15,7 +15,7 @@ const plans = {
       'Online-Buchungswidget',
       'Automatische E-Mails',
       'Google-Review Integration',
-      'Studio-Dashboard',
+      'Studio-Übersicht',
       'Kundendatenbank',
       'E-Mail Support',
     ],
@@ -41,7 +41,7 @@ const plans = {
     name: 'Enterprise',
     price: 199,
     yearlyPrice: 159,
-    description: 'Für Multi-Location Unternehmen & Filialisten',
+    description: 'Für Unternehmen mit mehreren Standorten',
     features: [
       'Unbegrenzte Termine',
       'Unbegrenzte Mitarbeiter',
@@ -163,14 +163,14 @@ export default function Checkout() {
               </ul>
             </div>
 
-            {/* Trial Info */}
+            {/* Testphase Info */}
             <div className="bg-zinc-50 rounded-lg p-4 border border-zinc-200">
               <div className="flex items-start gap-3">
                 <svg className="w-5 h-5 text-zinc-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <h4 className="font-medium text-zinc-900">30 Tage kostenlos testen</h4>
+                  <h4 className="font-medium text-zinc-900">Kostenlose Testphase</h4>
                   <p className="text-sm text-zinc-700 mt-1">
                     Du wirst erst nach Ablauf der Testphase belastet. Jederzeit kündbar.
                   </p>

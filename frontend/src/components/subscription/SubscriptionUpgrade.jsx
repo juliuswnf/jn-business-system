@@ -32,8 +32,8 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
       '30 Mitarbeiter',
       '1 Standort',
       '1.000 Buchungen/Monat',
-      'Marketing-Automation',
-      'Erweiterte Analytics',
+      'Automatisches Marketing',
+      'Erweiterte Auswertungen',
       'Portfolio & Galerien',
     ],
     enterprise: [
@@ -44,7 +44,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
       'HIPAA Compliance',
       'API-Zugang',
       'White-Label',
-      '24/7 Priority Support',
+      'Schneller Support (rund um die Uhr)',
     ],
   };
 

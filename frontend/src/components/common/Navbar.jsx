@@ -84,7 +84,7 @@ export default function Navbar() {
                       to="/ceo/dashboard"
                       className="block px-4 py-3 text-slate-300 dark:text-slate-400 hover:text-accent dark:hover:text-accent hover:bg-primary/50 dark:hover:bg-slate-800 border-b border-accent/10 dark:border-accent/5 transition duration-200"
                     >
-                      CEO Dashboard
+                      CEO Kontrollpanel
                     </Link>
                   )}
                   {user.role === 'admin' && (
@@ -92,7 +92,7 @@ export default function Navbar() {
                       to="/admin/dashboard"
                       className="block px-4 py-3 text-slate-300 dark:text-slate-400 hover:text-accent dark:hover:text-accent hover:bg-primary/50 dark:hover:bg-slate-800 border-b border-accent/10 dark:border-accent/5 transition duration-200"
                     >
-                      Firmen-Dashboard
+                      Firmen-Kontrollpanel
                     </Link>
                   )}
                   <Link

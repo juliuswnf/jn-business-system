@@ -91,7 +91,7 @@ export default function EmployeeDashboard() {
   return (
     <div className="employee-dashboard">
       <div className="dashboard-header">
-        <h1>Mein Dashboard</h1>
+        <h1>Mein Kontrollpanel</h1>
         {error && <div className="alert alert-error">{error}</div>}
       </div>
 

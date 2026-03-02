@@ -114,11 +114,11 @@ const FAQ = () => {
         },
         {
           question: 'Wie schnell ist der Support?',
-          answer: 'Support-Anfragen werden binnen 24h beantwortet (werktags). Pro & Enterprise-Kunden haben Prioritäts-Support mit Antwortzeit unter 4h.'
+          answer: 'Support-Anfragen werden binnen 24h beantwortet (werktags). Pro- und Enterprise-Kunden erhalten bevorzugte Hilfe mit Antwortzeit unter 4h.'
         },
         {
           question: 'Gibt es Schulungen?',
-          answer: 'Ja! Wir bieten kostenlose Onboarding-Calls (30min) für alle neuen Kunden an. Video-Tutorials sind im Dashboard verfügbar.'
+          answer: 'Ja! Wir bieten kostenlose Einrichtungs-Calls (30min) für alle neuen Kunden an. Video-Anleitungen sind in der Übersicht verfügbar.'
         },
         {
           question: 'Was ist nicht im Preis enthalten?',

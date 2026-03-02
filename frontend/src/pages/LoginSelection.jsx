@@ -26,7 +26,7 @@ function LoginSelection() {
     {
       id: 'business',
       title: 'Business Inhaber',
-      description: 'Dashboard, Mitarbeiter & Buchungen verwalten',
+      description: 'Kontrollpanel, Mitarbeiter & Buchungen verwalten',
       icon: BuildingOfficeIcon,
       link: `/login/business${redirectQuery}`,
       gradient: 'from-purple-500 to-pink-400',
@@ -37,7 +37,7 @@ function LoginSelection() {
     {
       id: 'employee',
       title: 'Mitarbeiter',
-      description: 'Zugang zum Mitarbeiter-Dashboard',
+      description: 'Zugang zum Mitarbeiter-Kontrollpanel',
       icon: BriefcaseIcon,
       link: `/login/employee${redirectQuery}`,
       gradient: 'from-emerald-500 to-teal-400',

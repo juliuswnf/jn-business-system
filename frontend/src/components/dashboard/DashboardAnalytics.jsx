@@ -44,7 +44,7 @@ export default function DashboardAnalytics() {
   return (
     <div className="dashboard-analytics">
       <div className="analytics-header">
-        <h1>Dashboard Analytics</h1>
+        <h1>Kontrollpanel Auswertungen</h1>
         {error && <div className="alert alert-error">{error}</div>}
       </div>
 

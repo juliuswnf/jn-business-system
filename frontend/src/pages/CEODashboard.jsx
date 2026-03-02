@@ -131,7 +131,7 @@ const CEODashboard = () => {
   const markErrorAsResolved = async (errorId) => {
     // ? SECURITY FIX: Use central api instance
     try {
-      const response = await api.patch(`/ceo/errors/${errorId}/resolve`, { notes: 'Vom CEO Dashboard als gelöst markiert' });
+      const response = await api.patch(`/ceo/errors/${errorId}/resolve`, { notes: 'Vom CEO Kontrollpanel als gelöst markiert' });
 
       if (response.data.success) {
         setErrors(errors.map(e => e.id === errorId ? { ...e, resolved: true, resolvedAt: new Date().toISOString() } : e));
@@ -250,7 +250,7 @@ const CEODashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-zinc-900">
-                {navItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
+                {navItems.find(item => item.id === activeTab)?.label || 'Kontrollpanel'}
               </h1>
               <p className="text-zinc-700 text-sm mt-1">
                 Willkommen im CEO Control Center
@@ -467,7 +467,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
           </div>
         </div>
 
-        {/* Trial Accounts */}
+        {/* Testphase Accounts */}
         <div className="bg-gradient-to-br from-cyan-900/40 to-teal-800/20 border border-cyan-500/30 rounded-2xl p-6 relative overflow-hidden group hover:border-cyan-400/50 transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
           <div className="relative">
@@ -476,7 +476,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-cyan-300/80 text-xs font-medium uppercase tracking-wider">Trial</p>
+            <p className="text-cyan-300/80 text-xs font-medium uppercase tracking-wider">Testphase</p>
             <p className="text-4xl font-black text-zinc-900 mt-1">{stats.trialAbos}</p>
             <p className="text-cyan-400/60 text-xs mt-2">In Testphase</p>
           </div>
@@ -502,7 +502,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               style={{ width: `${conversionRate}%` }}
             ></div>
           </div>
-          <p className="text-zinc-700 text-xs mt-2">Trial → Zahlender Kunde</p>
+          <p className="text-zinc-700 text-xs mt-2">Testphase → Zahlender Kunde</p>
         </div>
 
         {/* Avg Revenue */}
@@ -929,7 +929,7 @@ const CustomersTab = ({ customers }) => {
             {[
               { key: 'all', label: 'Alle' },
               { key: 'active', label: 'Aktiv', color: 'text-green-600' },
-              { key: 'trial', label: 'Trial', color: 'text-orange-400' },
+              { key: 'trial', label: 'Testphase', color: 'text-orange-400' },
               { key: 'starter', label: 'Starter', color: 'text-blue-400' },
               { key: 'pro', label: 'Pro', color: 'text-purple-400' },
             ].map((f) => (
@@ -1010,7 +1010,7 @@ const CustomersTab = ({ customers }) => {
                         ? 'bg-orange-500/20 text-orange-400'
                         : 'bg-gray-500/20 text-zinc-500'
                     }`}>
-                      {customer.status === 'active' ? 'Aktiv' : customer.status === 'trial' ? 'Trial' : 'Inaktiv'}
+                      {customer.status === 'active' ? 'Aktiv' : customer.status === 'trial' ? 'Testphase' : 'Inaktiv'}
                     </span>
                     <p className="text-zinc-500 text-xs mt-1">seit {formatDate(customer.since)}</p>
                   </div>
@@ -1033,7 +1033,7 @@ const CustomersTab = ({ customers }) => {
             </div>
             <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-orange-400">{trialCount}</p>
-              <p className="text-xs text-orange-400/70">Trial</p>
+              <p className="text-xs text-orange-400/70">Testphase</p>
             </div>
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-blue-400">{starterCount}</p>
@@ -1067,7 +1067,7 @@ const CustomersTab = ({ customers }) => {
               <div className="flex justify-between py-2 border-b border-zinc-200">
                 <span className="text-zinc-400">Status</span>
                 <span className={selectedCustomer.status === 'active' ? 'text-green-600' : 'text-orange-400'}>
-                  {selectedCustomer.status === 'active' ? 'Aktiv' : 'Trial'}
+                  {selectedCustomer.status === 'active' ? 'Aktiv' : 'Testphase'}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-zinc-200">
@@ -1103,7 +1103,7 @@ const CustomersTab = ({ customers }) => {
           <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-3">Conversion</h3>
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-zinc-500 text-sm">Trial → Aktiv</span>
+              <span className="text-zinc-500 text-sm">Testphase → Aktiv</span>
               <span className="text-green-600 font-semibold">
                 {trialCount > 0 ? Math.round((activeCount / (activeCount + trialCount)) * 100) : 0}%
               </span>
@@ -1175,7 +1175,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
             {[
               { key: 'all', label: 'Alle' },
               { key: 'active', label: 'Aktiv', color: 'text-green-600' },
-              { key: 'trial', label: 'Trial', color: 'text-orange-400' },
+              { key: 'trial', label: 'Testphase', color: 'text-orange-400' },
               { key: 'cancelled', label: 'Gekündigt', color: 'text-red-600' },
             ].map((f) => (
               <button
@@ -1254,7 +1254,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
                         ? 'bg-orange-500/20 text-orange-400'
                         : 'bg-red-500/20 text-red-600'
                     }`}>
-                      {sub.status === 'active' ? 'Aktiv' : sub.status === 'trial' ? 'Trial' : 'Gekündigt'}
+                      {sub.status === 'active' ? 'Aktiv' : sub.status === 'trial' ? 'Testphase' : 'Gekündigt'}
                     </span>
                   </div>
                 </div>
@@ -1299,7 +1299,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                <span className="text-zinc-500 text-sm">Trial</span>
+                <span className="text-zinc-500 text-sm">Testphase</span>
               </div>
               <span className="text-zinc-900 font-semibold">{trialCount}</span>
             </div>

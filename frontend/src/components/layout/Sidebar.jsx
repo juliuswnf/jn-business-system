@@ -23,7 +23,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
 
   const menuItems = {
     ceo: [
-      { icon: FiHome, label: 'Dashboard', path: '/ceo/dashboard' },
+      { icon: FiHome, label: 'Kontrollpanel', path: '/ceo/dashboard' },
       {
         icon: FiDollarSign,
         label: 'Analytics',
@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
       { icon: FiSettings, label: 'Settings', path: '/ceo/settings' }
     ],
     admin: [
-      { icon: FiHome, label: 'Dashboard', path: '/admin/dashboard' },
+      { icon: FiHome, label: 'Kontrollpanel', path: '/admin/dashboard' },
       {
         icon: FiUsers,
         label: 'Management',
@@ -51,7 +51,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
       { icon: FiSettings, label: 'Settings', path: '/admin/settings' }
     ],
     employee: [
-      { icon: FiHome, label: 'Dashboard', path: '/employee/dashboard' },
+      { icon: FiHome, label: 'Kontrollpanel', path: '/employee/dashboard' },
       { icon: FiCalendar, label: 'Schedule', path: '/employee/schedule' },
       { icon: FiCalendar, label: 'Appointments', path: '/employee/appointments' }
     ]

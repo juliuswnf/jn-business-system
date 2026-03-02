@@ -182,7 +182,7 @@ const Salons = () => {
             </h2>
             <p className="text-zinc-600 mb-4">
               Finde den perfekten Anbieter in deiner Stadt und buche deinen Termin bequem online -
-              24/7 verfügbar, sofortige Bestätigung. Alle Unternehmen auf unserer Plattform bieten
+              rund um die Uhr verfügbar, sofortige Bestätigung. Alle Unternehmen auf unserer Plattform bieten
               professionelle Services und moderne Buchungsmöglichkeiten.
             </p>
             <h3 className="text-xl font-semibold text-zinc-900 mb-3">

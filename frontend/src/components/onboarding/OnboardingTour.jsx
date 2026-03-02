@@ -18,7 +18,7 @@ const tourSteps = [
   {
     id: 'dashboard',
     target: '[data-tour="dashboard"]',
-    title: 'Dein Dashboard',
+    title: 'Dein Kontrollpanel',
     content: 'Hier siehst du alle wichtigen Kennzahlen auf einen Blick: Buchungen, Umsatz und anstehende Termine.',
     position: 'bottom',
     highlight: true,

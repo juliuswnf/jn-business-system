@@ -55,7 +55,7 @@ const EmployeeLogin = () => {
             Mitarbeiter-Login
           </h1>
           <p className="text-zinc-500">
-            Zugang zu Ihrem Mitarbeiter-Dashboard
+            Zugang zu Ihrem Mitarbeiter-Kontrollpanel
           </p>
         </div>
 

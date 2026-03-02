@@ -137,7 +137,7 @@ const SubscriptionManagement = () => {
             onClick={() => navigate('/')}
             className="mt-6 px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
           >
-            Zurück zum Dashboard
+            Zurück zum Kontrollpanel
           </button>
         </div>
       </div>

@@ -99,7 +99,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-1">Mein Dashboard</h1>
+              <h1 className="text-3xl font-bold mb-1">Mein Kontrollpanel</h1>
               <p className="text-zinc-700 text-sm">
                 Willkommen zurück{employee ? `, ${employee.name}` : ''}!
               </p>

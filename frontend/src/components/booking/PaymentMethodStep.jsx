@@ -19,7 +19,7 @@ const CARD_ELEMENT_OPTIONS = {
 
 /**
  * PaymentMethodStep Component
- * Collects payment method for No-Show-Killer protection
+ * Collects payment method for missed-appointment fee protection
  */
 export default function PaymentMethodStep({
   onComplete,
@@ -44,7 +44,7 @@ export default function PaymentMethodStep({
     }
 
     if (!policyAccepted) {
-      setError('Bitte akzeptieren Sie die No-Show-Richtlinie.');
+      setError('Bitte akzeptieren Sie die Richtlinie bei Nichterscheinen.');
       return;
     }
 
@@ -79,7 +79,7 @@ export default function PaymentMethodStep({
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-zinc-900 mb-2">Kreditkarte hinterlegen</h2>
       <p className="text-zinc-500 mb-6">
-        Fast fertig! Hinterlegen Sie Ihre Kreditkarte für No-Show-Schutz.
+        Fast fertig! Hinterlegen Sie Ihre Kreditkarte für den Ausfall-Schutz.
       </p>
 
       <div className="bg-blue-900/20 border border-blue-600/50 rounded-lg p-4 mb-6">
@@ -129,7 +129,7 @@ export default function PaymentMethodStep({
                 onClick={() => setShowPolicy(!showPolicy)}
                 className="text-blue-400 hover:text-blue-300 underline"
               >
-                No-Show-Richtlinie
+                Richtlinie bei Nichterscheinen
               </button>
               {' '}und stimme zu, dass bei Nichterscheinen eine Gebühr von €{feeAmount} automatisch von meiner Kreditkarte abgebucht wird.
             </span>
@@ -137,24 +137,24 @@ export default function PaymentMethodStep({
 
           {showPolicy && (
             <div className="bg-zinc-50 rounded-lg p-4 text-sm max-h-64 overflow-y-auto border border-zinc-200">
-              <h4 className="font-semibold text-zinc-900 mb-2">NO-SHOW-GEBÜHR RICHTLINIE</h4>
+              <h4 className="font-semibold text-zinc-900 mb-2">RICHTLINIE BEI NICHTERSCHEINEN</h4>
               
               <h5 className="font-medium mt-3 mb-1 text-zinc-600">1. DEFINITION</h5>
               <p className="text-zinc-500">
-                Ein "No-Show" liegt vor, wenn Sie nicht zu Ihrem gebuchten Termin erscheinen 
+                Ein "Nichterscheinen" liegt vor, wenn Sie nicht zu Ihrem gebuchten Termin erscheinen 
                 und diesen nicht mindestens 24 Stunden vorher storniert haben.
               </p>
 
               <h5 className="font-medium mt-3 mb-1 text-zinc-600">2. GEBÜHR</h5>
               <p className="text-zinc-500">
-                Bei einem No-Show wird automatisch eine Gebühr von €{feeAmount} von Ihrer 
+                Bei Nichterscheinen wird automatisch eine Gebühr von €{feeAmount} von Ihrer 
                 hinterlegten Kreditkarte abgebucht.
               </p>
 
               <h5 className="font-medium mt-3 mb-1 text-zinc-600">3. ZAHLUNGSMETHODE</h5>
               <p className="text-zinc-500">
                 Sie verpflichten sich, eine gültige Kreditkarte bei der Buchung zu hinterlegen. 
-                Diese wird nur im Falle eines No-Shows belastet.
+                Diese wird nur im Falle eines Nichterscheinens belastet.
               </p>
 
               <h5 className="font-medium mt-3 mb-1 text-zinc-600">4. STORNIERUNG</h5>

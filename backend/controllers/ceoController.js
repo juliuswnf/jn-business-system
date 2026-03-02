@@ -12,8 +12,9 @@ import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
-  starter: 29,  // €29/Monat
-  pro: 69       // €69/Monat
+  starter: 129,  // €129/Monat
+  pro: 249,  // €249/Monat
+  enterprise: 599  // €599/Monat
 };
 
 // ==================== GET CEO DASHBOARD ====================

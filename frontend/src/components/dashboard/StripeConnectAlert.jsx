@@ -59,12 +59,12 @@ export default function StripeConnectAlert() {
               </h3>
             </div>
             <p className="text-sm text-zinc-600 mb-3">
-              Um No-Show-Gebühren zu erhalten, verbinden Sie Ihr Stripe-Konto.
+              Um Gebühren bei Nichterscheinen zu erhalten, verbinden Sie Ihr Stripe-Konto.
               Die Einrichtung dauert nur 2-3 Minuten.
             </p>
             <ul className="text-sm text-zinc-500 space-y-1 mb-3">
               <li>✓ Direkte Auszahlungen auf Ihr Bankkonto</li>
-              <li>✓ Automatische No-Show-Gebühren-Abrechnung</li>
+              <li>✓ Automatische Abrechnung bei Nichterscheinen</li>
               <li>✓ 100% sicher über Stripe</li>
             </ul>
           </div>
@@ -93,7 +93,7 @@ export default function StripeConnectAlert() {
             </div>
             <p className="text-sm text-zinc-600 mb-3">
               Ihre Stripe-Kontoanmeldung ist noch nicht abgeschlossen.
-              Schließen Sie die Einrichtung ab, um No-Show-Gebühren zu erhalten.
+              Schließen Sie die Einrichtung ab, um Gebühren bei Nichterscheinen zu erhalten.
             </p>
           </div>
           <button

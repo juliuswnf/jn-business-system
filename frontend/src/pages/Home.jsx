@@ -7,10 +7,35 @@ function BrowserFrame({ children, url = 'app.jn-business.de' }) {
     <div className="rounded-xl border border-zinc-200 overflow-hidden shadow-[0_2px_40px_-12px_rgba(0,0,0,0.12)]">
       {/* Title bar */}
       <div className="flex items-center gap-2 px-4 py-2.5 bg-zinc-50 border-b border-zinc-200">
-        <div className="flex gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
-          <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
-          <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
+        <div className="group/mac-controls flex gap-2">
+          <span
+            className="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] flex items-center justify-center"
+            aria-label="Schließen"
+            title="Schließen"
+          >
+            <svg className="w-2 h-2 text-[#7a1510] opacity-0 group-hover/mac-controls:opacity-90 transition-opacity" viewBox="0 0 10 10" fill="none">
+              <path d="M2.3 2.3L7.7 7.7M7.7 2.3L2.3 7.7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+            </svg>
+          </span>
+          <span
+            className="w-3 h-3 rounded-full bg-[#febc2e] border border-[#e0a12a] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] flex items-center justify-center"
+            aria-label="Minimieren"
+            title="Minimieren"
+          >
+            <svg className="w-2 h-2 text-[#7f5600] opacity-0 group-hover/mac-controls:opacity-90 transition-opacity" viewBox="0 0 10 10" fill="none">
+              <path d="M2.1 5H7.9" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+            </svg>
+          </span>
+          <span
+            className="w-3 h-3 rounded-full bg-[#28c840] border border-[#1faa34] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] flex items-center justify-center"
+            aria-label="Maximieren"
+            title="Maximieren"
+          >
+            <svg className="w-2.5 h-2.5 text-[#0f4a1c] opacity-0 group-hover/mac-controls:opacity-100 transition-opacity" viewBox="0 0 12 12" fill="none">
+              <path d="M1.7 4.8V1.7H4.8L3.5 3Z" fill="currentColor" />
+              <path d="M10.3 7.2V10.3H7.2L8.5 9Z" fill="currentColor" />
+            </svg>
+          </span>
         </div>
         <div className="flex-1 flex justify-center">
           <span className="text-[11px] text-zinc-400 bg-zinc-100 rounded px-3 py-0.5">{url}</span>
@@ -27,7 +52,7 @@ function Home() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "JN Business System",
-    "description": "Online-Buchungssystem für Unternehmen mit automatischen Terminbestätigungen und No-Show-Killer",
+    "description": "Online-Buchungssystem für Unternehmen mit automatischen Terminbestätigungen und Ausfall-Schutz",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "offers": {
@@ -45,25 +70,25 @@ function Home() {
 
   const features = [
     { title: 'Online-Buchungen', desc: 'Kunden buchen rund um die Uhr über Ihre Website. Keine Anrufe, keine Doppelbuchungen.' },
-    { title: 'No-Show-Killer', desc: 'Automatische SMS-Bestätigung 48h vorher. Keine Antwort? Termin wird storniert, Warteliste rückt nach.' },
-    { title: 'Marketing-Autopilot', desc: 'Geburtstagsgutscheine, Rückgewinnung inaktiver Kunden und Bewertungs-Anfragen. Vollautomatisch.' },
-    { title: 'Branchen-Workflows', desc: 'Spezielle Abläufe für Tattoo-Studios, Ärzte, Wellness, Beauty und mehr.' },
-    { title: 'Mehrere Standorte', desc: 'Zentrale Verwaltung aller Filialen. Eigene Preise, eigene Teams, ein Dashboard.' },
-    { title: 'DSGVO-konform', desc: 'Server in Deutschland. Verschlüsselte Daten, automatische Löschfristen.' },
+    { title: 'Ausfall-Schutz', desc: 'Sichere deine Einnahmen ab. Lass dir bei verpassten Terminen Ausfallgebühren automatisch erstatten.' },
+    { title: 'Automatisches Marketing', desc: 'Geburtstagsgutscheine, Rückgewinnung inaktiver Kunden und Bewertungs-Anfragen. Alles läuft automatisch.' },
+    { title: 'Branchen-Abläufe', desc: 'Spezielle Abläufe für Tattoo-Studios, Ärzte, Wellness, Beauty und mehr.' },
+    { title: 'Mehrere Standorte', desc: 'Zentrale Verwaltung aller Filialen. Eigene Preise, eigene Teams, eine klare Übersicht.' },
+    { title: 'Datenschutz-konform (DSGVO)', desc: 'Server in Deutschland. Verschlüsselte Daten, automatische Löschfristen.' },
   ];
 
   const metrics = [
-    { value: '€544', label: 'weniger Verlust / Monat', sub: 'durch No-Show-Killer' },
-    { value: '€4.026', label: 'Zusatz-Umsatz / Monat', sub: 'durch Marketing-Autopilot' },
-    { value: '30 Tage', label: 'kostenlos testen', sub: 'keine Kreditkarte nötig' },
+    { value: 'Automatisches Marketing', label: 'Aktiviere ungenutztes Umsatzpotenzial', sub: 'durch automatisches Marketing' },
+    { value: 'Ausfall-Schutz', label: 'Reduziere deinen Umsatzverlust', sub: 'durch verpasste Termine drastisch' },
+    { value: 'Einfach starten', label: 'Schnell eingerichtet', sub: 'klar, transparent und professionell' },
   ];
 
   return (
     <>
       <SEO
         title="Online-Buchungssystem für Unternehmen"
-        description="Automatische Terminbuchungen für Dienstleister aller Branchen. 30 Tage kostenlos testen. No-Show-Killer inklusive."
-        keywords="Online Buchungssystem, Terminvereinbarung, Business Software, Unternehmensverwaltung, No-Show-Killer"
+        description="Automatische Terminbuchungen für Dienstleister aller Branchen. Mit Ausfall-Schutz und automatischem Marketing."
+        keywords="Online Buchungssystem, Terminvereinbarung, Business Software, Unternehmensverwaltung, Ausfall-Schutz"
         url="/"
         structuredData={structuredData}
       />
@@ -82,7 +107,7 @@ function Home() {
           </h1>
           <p className="mt-6 max-w-xl text-center text-lg text-zinc-500 leading-relaxed">
             Online-Termine, automatische Erinnerungen,
-            No-Show-Schutz und Marketing. Alles in einem System.
+            Ausfall-Schutz und Marketing. Alles in einem System.
           </p>
           <Link
             to="/register"
@@ -91,7 +116,7 @@ function Home() {
             Jetzt starten
           </Link>
           <p className="mt-4 text-sm text-zinc-400">
-            30 Tage kostenlos · Keine Kreditkarte
+            Schnell eingerichtet · Sofort einsatzbereit
           </p>
         </section>
 
@@ -106,7 +131,7 @@ function Home() {
                     { label: 'Heute', value: '12 Termine', accent: false },
                     { label: 'Diese Woche', value: '47 Buchungen', accent: false },
                     { label: 'Umsatz', value: '€2.340', accent: true },
-                    { label: 'No-Show-Rate', value: '0 %', accent: true },
+                    { label: 'Ausfall-Quote', value: '0 %', accent: true },
                   ].map((s, i) => (
                     <div key={i} className="rounded-lg border border-zinc-100 p-4">
                       <p className="text-xs text-zinc-400">{s.label}</p>
@@ -204,8 +229,8 @@ function Home() {
               </p>
               <ul className="mt-8 space-y-4">
                 {[
-                  'Widget auf Ihrer Website einbetten',
-                  'Eigene Arbeitszeiten pro Mitarbeiter',
+                  'Buchungsfenster auf Ihrer Website einbetten',
+                  'Kunden können 24/7 Termine buchen',
                   'Warteliste bei vollen Tagen',
                   'Automatische Bestätigungs-E-Mail',
                 ].map((item, i) => (
@@ -281,20 +306,20 @@ function Home() {
           </div>
         </section>
 
-        {/* No-Show-Killer */}
+        {/* Ausfall-Schutz */}
         <section className="py-24 md:py-32 px-6">
           <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
             {/* Visual first on mobile, text first on desktop */}
             <div className="order-2 lg:order-1">
-              <BrowserFrame url="app.jn-business.de/no-show-killer">
+              <BrowserFrame url="app.jn-business.de/ausfall-schutz">
                 <div className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-zinc-900">No-Show-Killer</p>
+                    <p className="text-sm font-semibold text-zinc-900">Ausfall-Schutz</p>
                     <span className="text-xs font-medium px-2.5 py-1 rounded-full text-emerald-600 bg-emerald-50">Aktiv</span>
                   </div>
                   {/* Steps */}
                   {[
-                    { num: '1', time: '48h vorher', title: 'SMS gesendet', detail: '"Hallo Anna! Ihr Termin ist übermorgen um 10:00. Antworten Sie JA zur Bestätigung."', color: 'border-l-zinc-300' },
+                    { num: '1', time: '48 Stunden vorher', title: 'SMS gesendet', detail: '"Hallo Anna! Ihr Termin ist übermorgen um 10:00. Antworten Sie JA zur Bestätigung."', color: 'border-l-zinc-300' },
                     { num: '2', time: '24h vorher', title: 'Keine Antwort', detail: 'Termin automatisch storniert. Platz wird freigegeben.', color: 'border-l-zinc-400' },
                     { num: '3', time: 'Sofort', title: 'Warteliste benachrichtigt', detail: '"Ein Termin ist frei geworden: Do 10:00 Uhr. Jetzt buchen!"', color: 'border-l-zinc-900' },
                   ].map((s, i) => (
@@ -307,9 +332,9 @@ function Home() {
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-3 pt-2">
                     {[
-                      { v: '0', l: 'No-Shows' },
+                      { v: '0', l: 'Ausfälle' },
                       { v: '€0', l: 'Verlust' },
-                      { v: '0 %', l: 'Rate' },
+                      { v: '0 %', l: 'Quote' },
                     ].map((x, i) => (
                       <div key={i} className="text-center rounded-lg border border-zinc-100 py-3">
                         <p className="text-lg font-bold text-zinc-900">{x.v}</p>
@@ -324,15 +349,15 @@ function Home() {
             <div className="order-1 lg:order-2">
               <p className="text-sm tracking-widest uppercase text-zinc-400 mb-4">Einzigartig</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900">
-                No-Show-Killer
+                Ausfall-Schutz
               </h2>
               <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
-                30 % aller Termine werden vergessen. Das kostet Studios
-                durchschnittlich €544 pro Monat. Unser System stoppt das. Automatisch.
+                Sichere deine Einnahmen ab. Lass dir bei verpassten Terminen
+                Ausfallgebühren automatisch erstatten.
               </p>
               <ul className="mt-8 space-y-4">
                 {[
-                  'SMS-Bestätigung 48 Stunden vorher',
+                  'Kunde muss Termin 48 Stunden vorher bestätigen',
                   'Automatische Stornierung bei Nichtreaktion',
                   'Warteliste rückt sofort nach',
                   'Optionale Gebührenabrechnung via Stripe',
@@ -347,16 +372,16 @@ function Home() {
           </div>
         </section>
 
-        {/* Marketing Autopilot */}
+        {/* Automatisches Marketing */}
         <section className="py-24 md:py-32 px-6 bg-zinc-50">
           <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <p className="text-sm tracking-widest uppercase text-zinc-400 mb-4">Automatisiert</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900">
-                Marketing, das sich selbst steuert
+                Marketing, das automatisch läuft
               </h2>
               <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
-                Einmal einrichten, für immer profitieren. Das System kümmert sich
+                Einmal einrichten, dauerhaft profitieren. Die Software kümmert sich
                 um Ihre Kundenbeziehungen. Ohne dass Sie daran denken müssen.
               </p>
               <ul className="mt-8 space-y-4">
@@ -395,8 +420,8 @@ function Home() {
                   </div>
                 ))}
                 <div className="rounded-lg bg-zinc-50 border border-zinc-100 p-4 text-center mt-2">
-                  <p className="text-2xl font-bold text-zinc-900">+€4.026</p>
-                  <p className="text-xs text-zinc-400 mt-1">geschätzter Zusatz-Umsatz diesen Monat</p>
+                  <p className="text-lg font-semibold text-zinc-900">Aktiviere ungenutztes Umsatzpotenzial</p>
+                  <p className="text-xs text-zinc-400 mt-1">durch automatisches Marketing</p>
                 </div>
               </div>
             </BrowserFrame>
@@ -411,14 +436,14 @@ function Home() {
                 In drei Schritten startklar
               </h2>
               <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
-                Kein Onboarding-Marathon. Kein Technik-Studium.
+                Ganz simpel und unkompliziert.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-16">
               {[
                 { num: '01', title: 'Account anlegen', desc: 'Registrieren, Firmenname eingeben, Öffnungszeiten setzen. In unter drei Minuten startklar.' },
                 { num: '02', title: 'Services einrichten', desc: 'Dienstleistungen mit Preis und Dauer anlegen. Mitarbeiter zuweisen. Fertig.' },
-                { num: '03', title: 'Buchungen empfangen', desc: 'Kunden buchen direkt. Sie verwalten alles im Dashboard mit Echtzeit-Kalender.' },
+                { num: '03', title: 'Buchungen empfangen', desc: 'Kunden buchen direkt. Sie verwalten alles in einer Übersicht mit Live-Kalender.' },
               ].map((s) => (
                 <div key={s.num}>
                   <span className="text-sm font-mono text-zinc-300">{s.num}</span>
@@ -481,7 +506,7 @@ function Home() {
             <div>
               <p className="text-sm tracking-widest uppercase text-zinc-400 mb-4">Skalierbar</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900">
-                Mehrere Standorte, ein Dashboard
+                Mehrere Standorte, eine Übersicht
               </h2>
               <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
                 Ob 2 oder 20 Filialen. Verwalten Sie alle zentral.
@@ -514,9 +539,9 @@ function Home() {
             </p>
             <div className="mt-16 grid md:grid-cols-3 gap-8 text-left">
               {[
-                { name: 'Starter', price: '€129', sub: '/Monat', items: ['5 Mitarbeiter', '100 Buchungen/Mo', 'No-Show-Killer Basic', 'E-Mail-Support'] },
-                { name: 'Professional', price: '€249', sub: '/Monat', popular: true, items: ['Unbegrenzt Mitarbeiter', 'No-Show-Killer Full', 'Marketing-Autopilot', 'Branchen-Workflow'] },
-                { name: 'Enterprise', price: '€599', sub: '/Monat', items: ['Alles unbegrenzt', 'Alle 8 Workflows', 'Multi-Location', '24/7 Priority-Support'] },
+                { name: 'Starter', price: '€129', sub: '/Monat', items: ['5 Mitarbeiter', '100 Buchungen/Mo', 'Ausfall-Schutz (Basis)', 'E-Mail-Support'] },
+                { name: 'Professional', price: '€249', sub: '/Monat', popular: true, items: ['Unbegrenzt Mitarbeiter', 'Ausfall-Schutz (Komplett)', 'Automatisches Marketing', 'Branchen-Abläufe'] },
+                { name: 'Enterprise', price: '€599', sub: '/Monat', items: ['Alles unbegrenzt', 'Alle 8 Branchen-Abläufe', 'Mehrere Standorte', 'Priorisierter Support rund um die Uhr'] },
               ].map((plan, i) => (
                 <div
                   key={i}
@@ -532,6 +557,9 @@ function Home() {
                     <span className="text-3xl font-bold text-zinc-900">{plan.price}</span>
                     <span className="text-sm text-zinc-400">{plan.sub}</span>
                   </p>
+                  {plan.name === 'Enterprise' && (
+                    <p className="mt-2 text-xs text-zinc-500">Inklusive 14 Tage kostenloser Testphase für das Enterprise-Paket</p>
+                  )}
                   <ul className="mt-6 space-y-3">
                     {plan.items.map((item, j) => (
                       <li key={j} className="flex items-center gap-2 text-sm text-zinc-600">
@@ -559,10 +587,10 @@ function Home() {
         <section className="py-28 md:py-36 px-6 border-t border-zinc-100">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900">
-              Bereit, Ihr Studio zu digitalisieren?
+              Bereit, Ihr Studio effizient zu organisieren?
             </h2>
             <p className="mt-4 text-lg text-zinc-500">
-              Starten Sie kostenlos. Keine Kreditkarte, kein Risiko.
+              Lernen Sie das System kennen. Transparent, professionell und ohne leere Versprechen.
             </p>
             <Link
               to="/register"
