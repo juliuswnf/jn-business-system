@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNotification } from '../../context/NotificationContext';
-import { authAPI } from '../../utils/api';
+import { authAPI, localizeApiMessage } from '../../utils/api';
 
 const CEOLogin = () => {
   const [email, setEmail] = useState('');
@@ -73,12 +73,15 @@ const CEOLogin = () => {
       }
 
       // Other failure cases
-      const msg = data.message || 'Zugriff verweigert';
+      const msg = localizeApiMessage(data.message, 'Zugriff verweigert');
       setError(msg);
       notification.error(msg);
       setLoading(false);
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Authentifizierung fehlgeschlagen';
+      const errorMsg = localizeApiMessage(
+        err.response?.data?.message || err.message,
+        'Authentifizierung fehlgeschlagen'
+      );
       setError(errorMsg);
       notification.error(errorMsg);
       setLoading(false);

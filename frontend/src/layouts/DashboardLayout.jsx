@@ -6,14 +6,14 @@ import MobileBottomNav from '../components/Dashboard/MobileBottomNav';
 import MobileHeader from '../components/Dashboard/MobileHeader';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
-export default function DashboardLayout() {
+export default function DashboardLayout({ children }) {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-50">
       <div className="flex">
         {!isMobile && (
-          <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-20">
+          <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-zinc-200 z-20">
             <Sidebar />
           </aside>
         )}
@@ -28,7 +28,7 @@ export default function DashboardLayout() {
           >
             <div className="px-4 py-6 md:px-8 md:py-8 max-w-7xl mx-auto">
               <StripeConnectAlert />
-              <Outlet />
+              {children || <Outlet />}
             </div>
           </main>
         </div>

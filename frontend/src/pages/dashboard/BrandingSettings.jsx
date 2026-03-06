@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNotification } from '../../hooks/useNotification';
 import { api } from '../../utils/api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 export default function BrandingSettings() {
   const { showNotification } = useNotification();
   const [branding, setBranding] = useState({

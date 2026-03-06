@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { captureError } from '../../utils/errorTracking';
-import { api } from '../../utils/api';
+import { api, API_URL } from '../../utils/api';
 import {
   TrendingUp,
   TrendingDown,
@@ -19,8 +19,6 @@ import {
   Repeat,
   Award
 } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /**
  * Success Metrics Dashboard for Business Owners

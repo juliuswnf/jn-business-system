@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FiSearch, FiMapPin, FiScissors, FiChevronRight } from 'react-icons/fi';
 import { captureError } from '../../utils/errorTracking';
+import { API_URL } from '../../utils/api';
 
 /**
  * SalonSelector Component
@@ -14,8 +15,6 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
   const [salons, setSalons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     fetchSalons();

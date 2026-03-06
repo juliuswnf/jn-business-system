@@ -52,8 +52,11 @@ router.post('/', mutationLimiter, async (req, res) => {
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
 
-    // Use salonId from tenant filter (user's salon)
-    const salonId = req.tenantFilter.salonId || req.user.salonId || req.user._id;
+    const salonId = req.user?.studioId || req.user?.salonId;
+
+    if (!salonId) {
+      return res.status(400).json({ success: false, message: 'Kein Studio im Benutzerkontext gefunden' });
+    }
 
     const service = new Service({
       ...req.body,
@@ -73,17 +76,22 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
   let updateData = {};
   try {
     const { Service } = await import('../models/index.js').then(m => m.default);
+    const salonId = req.user?.studioId || req.user?.salonId;
+
+    if (!salonId) {
+      return res.status(400).json({ success: false, message: 'Kein Studio im Benutzerkontext gefunden' });
+    }
 
     // Prevent changing salonId - extract and discard it from the update
     // eslint-disable-next-line no-unused-vars
-    const { salonId, ...safeUpdateData } = req.body;
+    const { salonId: ignoredSalonId, studioId: ignoredStudioId, ...safeUpdateData } = req.body;
     updateData = safeUpdateData;
 
     // ? OPTIMISTIC LOCKING - load, check version, update, save
-    const service = await Service.findById(req.params.id);
+    const service = await Service.findOne({ _id: req.params.id, salonId });
 
     if (!service) {
-      return res.status(404).json({ success: false, message: 'Service not found' });
+      return res.status(404).json({ success: false, message: 'Service nicht gefunden oder kein Zugriff' });
     }
 
     // Check version if client provided it (prevents lost updates)

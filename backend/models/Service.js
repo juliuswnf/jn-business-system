@@ -7,7 +7,16 @@ const serviceSchema = new mongoose.Schema(
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: false,
+      index: true
+    },
+
+    // Primary multi-tenant binding for SaaS studio isolation
+    salonId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Salon',
       required: true,
+      alias: 'studioId',
       index: true
     },
 
@@ -96,7 +105,7 @@ const serviceSchema = new mongoose.Schema(
     assignedEmployees: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Employee',
+        ref: 'User',
         index: true  // ✅ Added
       }
     ],
@@ -869,6 +878,13 @@ serviceSchema.statics.getTrendingServices = function(companyId, limit = 5) {
 
 serviceSchema.pre('save', async function(next) {
   try {
+    if (!this.salonId && this.companyId) {
+      this.salonId = this.companyId;
+    }
+    if (!this.companyId && this.salonId) {
+      this.companyId = this.salonId;
+    }
+
     this.updatedAt = new Date();
 
     // Auto-generate slug

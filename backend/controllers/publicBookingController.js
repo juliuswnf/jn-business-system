@@ -17,6 +17,7 @@ import {
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
 import Service from '../models/Service.js';
+import Customer from '../models/Customer.js';
 import User from '../models/User.js';
 import emailService from '../services/emailService.js';
 import emailTemplateService from '../services/emailTemplateService.js';
@@ -800,13 +801,171 @@ export const createPublicBooking = async (req, res) => {
   }
 };
 
+/**
+ * Get public booking base data for a studio slug
+ * GET /api/public/booking/:studioSlug
+ */
+export const getPublicBookingData = async (req, res) => {
+  try {
+    const { studioSlug } = req.params;
+
+    const salon = await Salon.findBySlug(studioSlug);
+
+    if (!salon) {
+      return res.status(404).json({
+        success: false,
+        message: 'Studio nicht gefunden'
+      });
+    }
+
+    const services = await Service.find({
+      salonId: salon._id,
+      isActive: true
+    })
+      .select('_id name description price duration category')
+      .sort({ name: 1 })
+      .lean()
+      .maxTimeMS(5000);
+
+    return res.status(200).json({
+      success: true,
+      studio: {
+        id: salon._id,
+        slug: salon.slug,
+        businessName: salon.name,
+        address: salon.address || null
+      },
+      services
+    });
+  } catch (error) {
+    logger.error('GetPublicBookingData Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Interner Serverfehler'
+    });
+  }
+};
+
+/**
+ * Create public appointment for a studio slug
+ * POST /api/public/booking/:studioSlug/appointments
+ */
+export const createPublicAppointment = async (req, res) => {
+  try {
+    const { studioSlug } = req.params;
+    const {
+      serviceId,
+      customerName,
+      customerEmail,
+      customerPhone,
+      startTime
+    } = req.body;
+
+    if (!serviceId || !customerName || !customerEmail || !customerPhone || !startTime) {
+      return res.status(400).json({
+        success: false,
+        message: 'serviceId, customerName, customerEmail, customerPhone und startTime sind erforderlich'
+      });
+    }
+
+    if (!isValidObjectId(serviceId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültige Service-ID'
+      });
+    }
+
+    if (!isValidEmail(customerEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültige E-Mail-Adresse'
+      });
+    }
+
+    const parsedStartTime = parseValidDate(startTime);
+    if (!parsedStartTime) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültiges Datumsformat für startTime'
+      });
+    }
+
+    const salon = await Salon.findBySlug(studioSlug);
+
+    if (!salon) {
+      return res.status(404).json({
+        success: false,
+        message: 'Studio nicht gefunden'
+      });
+    }
+
+    const service = await Service.findOne({
+      _id: serviceId,
+      salonId: salon._id,
+      isActive: true
+    }).maxTimeMS(5000);
+
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        message: 'Dienstleistung nicht gefunden'
+      });
+    }
+
+    const normalizedEmail = customerEmail.toLowerCase().trim();
+    let customer = await Customer.findOne({
+      salonId: salon._id,
+      email: normalizedEmail
+    }).maxTimeMS(5000);
+
+    if (!customer) {
+      const [firstName, ...lastNameParts] = customerName.trim().split(' ');
+      customer = await Customer.create({
+        salonId: salon._id,
+        firstName: firstName || customerName.trim(),
+        lastName: lastNameParts.join(' ') || 'Walk-in',
+        email: normalizedEmail,
+        phone: customerPhone.trim()
+      });
+    }
+
+    const booking = await Booking.create({
+      salonId: salon._id,
+      serviceId: service._id,
+      customerId: customer._id,
+      customerName: customerName.trim(),
+      customerEmail: normalizedEmail,
+      customerPhone: customerPhone.trim(),
+      bookingDate: parsedStartTime,
+      duration: service.duration || 30,
+      status: 'pending'
+    });
+
+    await booking.populate('serviceId', 'name duration price');
+
+    return res.status(201).json({
+      success: true,
+      message: 'Termin erfolgreich erstellt',
+      appointment: booking
+    });
+  } catch (error) {
+    logger.error('CreatePublicAppointment Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: sanitizeErrorMessage(error, 'Termin konnte nicht erstellt werden')
+    });
+  }
+};
+
 export default {
   getAllSalons,
   searchSalons,
   getSalonsByCity,
   getSalonBySlug,
   getAvailableSlots,
-  createPublicBooking
+  createPublicBooking,
+  getPublicBookingData,
+  createPublicAppointment
 };
 
 

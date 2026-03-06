@@ -21,6 +21,7 @@ const customerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Salon',
       required: true,
+      alias: 'studioId',
       index: true
     },
 

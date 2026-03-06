@@ -35,7 +35,7 @@ const navItems = [
     label: 'Kunden'
   },
   {
-    to: '/dashboard/notifications',
+    to: '/dashboard/help',
     icon: BellIcon,
     iconSolid: BellIconSolid,
     label: 'Benachr.'

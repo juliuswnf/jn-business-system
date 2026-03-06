@@ -4,6 +4,8 @@ export { default as User } from './User.js';
 export { default as Salon } from './Salon.js';
 export { default as Service } from './Service.js';
 export { default as Booking } from './Booking.js';
+export { default as Appointment } from './Appointment.js';
+export { default as Staff } from './Staff.js';
 export { default as Payment } from './Payment.js';
 export { default as EmailQueue } from './EmailQueue.js';
 export { default as EmailLog } from './EmailLog.js';
@@ -21,6 +23,8 @@ export default {
   Salon: () => import('./Salon.js'),
   Service: () => import('./Service.js'),
   Booking: () => import('./Booking.js'),
+  Appointment: () => import('./Appointment.js'),
+  Staff: () => import('./Staff.js'),
   Payment: () => import('./Payment.js'),
   EmailQueue: () => import('./EmailQueue.js'),
   EmailLog: () => import('./EmailLog.js'),

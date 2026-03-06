@@ -1,5 +1,5 @@
 ﻿import React, { createContext, useState, useCallback, useEffect } from 'react';
-import api, { authAPI } from '../utils/api';
+import api, { authAPI, localizeApiMessage } from '../utils/api';
 import { captureError, captureMessage } from '../utils/errorTracking';
 
 // Create Context
@@ -83,7 +83,10 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, user };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.';
+      const errorMessage = localizeApiMessage(
+        err.response?.data?.message || err.message,
+        'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.'
+      );
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -108,7 +111,10 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, user };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+      const errorMessage = localizeApiMessage(
+        err.response?.data?.message || err.message,
+        'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.'
+      );
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {

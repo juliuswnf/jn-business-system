@@ -54,8 +54,8 @@ router.put('/profile', authMiddleware.protect, authController.updateProfile);
 // Password
 router.post('/change-password', authMiddleware.protect, authController.changePassword);
 
-// Logout
-router.post('/logout', authMiddleware.protect, authController.logout);
+// Logout (must work even when access token is expired, using refresh cookie)
+router.post('/logout', authController.logout);
 
 // Token Verification
 router.get('/verify-token', authMiddleware.protect, authController.verifyToken);

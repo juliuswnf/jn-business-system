@@ -1,6 +1,6 @@
 ﻿import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -45,6 +45,10 @@ api.interceptors.response.use(
       originalRequest?.url?.includes('/auth/profile') ||
       originalRequest?.url?.includes('/auth/refresh-token')
     );
+
+    if (isExpected401) {
+      return Promise.reject(error);
+    }
 
     // Silently handle 404 errors for confirmations endpoint
     // (not all bookings have confirmations, so 404 is expected)
@@ -115,11 +119,11 @@ api.interceptors.response.use(
 );
 
 export const authAPI = {
-  login: (email, password) => api.post('/auth/login', { email, password }),
+  login: (email, password, rememberMe = false) => api.post('/auth/login', { email, password, rememberMe }),
   register: (userData) => api.post('/auth/register', userData),
   registerAdmin: (userData) => api.post('/auth/register-admin', userData),
   ceoLogin: (email, password, twoFactorCode) => api.post('/auth/ceo-login', { email, password, twoFactorCode }),
-  employeeLogin: (email, password) => api.post('/auth/employee-login', { email, password }),
+  employeeLogin: (email, password, rememberMe = false) => api.post('/auth/employee-login', { email, password, rememberMe }),
   logout: () => api.post('/auth/logout'),
   logoutFromAllDevices: () => api.post('/auth/logout-all'),
   refreshToken: () => api.post('/auth/refresh-token', {}, { withCredentials: true }), // ? SECURITY FIX: Token is in HTTP-only cookie
@@ -871,10 +875,62 @@ export const errorAPI = {
   export: (params) => api.get('/errors/export', { params, responseType: 'blob' })
 };
 
+const ERROR_MESSAGE_TRANSLATIONS = {
+  'Invalid Email or Password': 'Ungültige E-Mail oder falsches Passwort.',
+  'Invalid email or password': 'Ungültige E-Mail oder falsches Passwort.',
+  'Falsches Passwort oder Falsche Email': 'Falsche E-Mail oder falsches Passwort.',
+  'Falsches Passwort oder falsche Email': 'Falsche E-Mail oder falsches Passwort.',
+  'Falsche Email oder falsches Passwort': 'Falsche E-Mail oder falsches Passwort.',
+  'Falsche E-Mail oder falsches Passwort.': 'Falsche E-Mail oder falsches Passwort.',
+  'Unauthorized': 'Nicht autorisiert. Bitte melden Sie sich an.',
+  'Forbidden': 'Zugriff verweigert. Sie haben keine Berechtigung.',
+  'Access denied': 'Zugriff verweigert. Sie haben keine Berechtigung.',
+  'User not found': 'Benutzerkonto wurde nicht gefunden.',
+  'Invalid credentials': 'Ungültige Anmeldedaten.',
+  'Too many requests': 'Zu viele Anfragen. Bitte versuchen Sie es später erneut.',
+  'Network Error': 'Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.',
+  'Request failed with status code 401': 'Nicht autorisiert. Bitte melden Sie sich an.',
+  'Request failed with status code 403': 'Zugriff verweigert. Sie haben keine Berechtigung.',
+  'Request failed with status code 404': 'Die angeforderte Ressource wurde nicht gefunden.',
+  'Request failed with status code 429': 'Zu viele Anfragen. Bitte versuchen Sie es später erneut.',
+  'Request failed with status code 500': 'Serverfehler. Bitte versuchen Sie es später erneut.'
+};
+
+export const localizeApiMessage = (message, fallback = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.') => {
+  if (!message || typeof message !== 'string') return fallback;
+
+  const trimmedMessage = message.trim();
+  if (!trimmedMessage) return fallback;
+
+  if (ERROR_MESSAGE_TRANSLATIONS[trimmedMessage]) {
+    return ERROR_MESSAGE_TRANSLATIONS[trimmedMessage];
+  }
+
+  const normalizedMessage = trimmedMessage.toLowerCase();
+
+  if (normalizedMessage.includes('invalid email') || normalizedMessage.includes('invalid password') || normalizedMessage.includes('invalid credentials')) {
+    return 'Ungültige E-Mail oder falsches Passwort.';
+  }
+
+  if (normalizedMessage.includes('unauthorized') || normalizedMessage.includes('not authenticated')) {
+    return 'Nicht autorisiert. Bitte melden Sie sich an.';
+  }
+
+  if (normalizedMessage.includes('forbidden') || normalizedMessage.includes('access denied')) {
+    return 'Zugriff verweigert. Sie haben keine Berechtigung.';
+  }
+
+  if (normalizedMessage.includes('network')) {
+    return 'Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.';
+  }
+
+  return trimmedMessage;
+};
+
 export const getErrorMessage = (error) => {
-  if (error.response?.data?.message) return error.response.data.message;
-  if (error.response?.data?.error?.message) return error.response.data.error.message;
-  if (error.message) return error.message;
+  if (error.response?.data?.message) return localizeApiMessage(error.response.data.message);
+  if (error.response?.data?.error?.message) return localizeApiMessage(error.response.data.error.message);
+  if (error.message) return localizeApiMessage(error.message);
   return 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
 };
 
@@ -884,11 +940,11 @@ export const getSuccessData = (response) => {
 
 export const formatError = (error) => {
   const message = getErrorMessage(error);
-  if (error.response?.status === 401) return 'Please log in again';
-  if (error.response?.status === 403) return 'You do not have permission';
-  if (error.response?.status === 404) return 'Resource not found';
-  if (error.response?.status === 429) return 'Too many requests. Try again later';
-  if (error.response?.status >= 500) return 'Server error. Try again later';
+  if (error.response?.status === 401) return 'Nicht autorisiert. Bitte melden Sie sich an.';
+  if (error.response?.status === 403) return 'Zugriff verweigert. Sie haben keine Berechtigung.';
+  if (error.response?.status === 404) return 'Die angeforderte Ressource wurde nicht gefunden.';
+  if (error.response?.status === 429) return 'Zu viele Anfragen. Bitte versuchen Sie es später erneut.';
+  if (error.response?.status >= 500) return 'Serverfehler. Bitte versuchen Sie es später erneut.';
   return message;
 };
 

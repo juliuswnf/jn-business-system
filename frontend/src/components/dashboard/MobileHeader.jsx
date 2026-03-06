@@ -33,7 +33,7 @@ export default function MobileHeader() {
           </button>
           <div className="flex items-center gap-1">
             <button
-              onClick={() => navigate('/dashboard/notifications')}
+              onClick={() => navigate('/dashboard/help')}
               className="relative p-2 rounded-lg touch-manipulation active:bg-gray-100"
             >
               <BellIcon className="w-6 h-6 text-gray-700" />

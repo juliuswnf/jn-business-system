@@ -45,7 +45,9 @@ import authRoutes from './routes/authRoutes.js';
 import salonRoutes from './routes/salonRoutes.js';
 import publicBookingRoutes from './routes/publicBookingRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import appointmentsRoutes from './routes/appointmentsRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import stripeConnectRoutes from './routes/stripeConnectRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import subscriptionManagementRoutes from './routes/subscriptionManagement.js';
 import ceoRoutes from './routes/ceoRoutes.js';
@@ -308,6 +310,7 @@ app.get('/', (req, res) => {
       ceo: '/api/v1/ceo',
       salon: '/api/v1/salon',
       bookings: '/api/v1/bookings',
+      appointments: '/api/v1/appointments',
       publicBooking: '/api/v1/bookings/public/s/:slug',
       widget: '/api/v1/widget',
       payments: '/api/v1/payments',
@@ -332,6 +335,7 @@ app.get('/', (req, res) => {
 // Public Routes (No Auth Required)
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/bookings/public', publicBookingRoutes);
+app.use('/api/v1/public', publicBookingRoutes);
 app.use('/api/v1/widget', widgetRoutes); // Embeddable Widget API
 app.use('/api/v1/subscriptions', subscriptionRoutes); // Stripe Subscription Management
 app.use('/api/v1/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected)
@@ -341,6 +345,7 @@ app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: p
 // Protected Routes (Auth Required)
 app.use('/api/v1/salon', authMiddleware.protect, salonRoutes);
 app.use('/api/v1/bookings', authMiddleware.protect, bookingRoutes);
+app.use('/api/v1/appointments', appointmentsRoutes);
 app.use('/api/v1/payments', authMiddleware.protect, paymentRoutes);
 app.use('/api/v1/services', authMiddleware.protect, serviceRoutes);
 app.use('/api/v1/employees', authMiddleware.protect, employeeRoutes);

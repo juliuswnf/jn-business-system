@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../components/common/UserMenu';
-import { api } from '../utils/api';
+import { api, API_URL } from '../utils/api';
 import { captureError } from '../utils/errorTracking';
+
+const BACKEND_ORIGIN = API_URL.replace(/\/api\/?$/, '');
 
 // Icons als SVG Components
 const DashboardIcon = () => (
@@ -1381,7 +1383,7 @@ const SystemControlTab = () => {
       name: 'Backend Server',
       description: 'Node.js API Server',
       status: 'unknown',
-      port: 5000,
+      port: 3000,
       type: 'server',
       command: 'node'
     },
@@ -1852,7 +1854,7 @@ const SystemControlTab = () => {
               </svg>
             </button>
             <button
-              onClick={() => window.open('http://localhost:5000/api/health', '_blank')}
+              onClick={() => window.open(`${BACKEND_ORIGIN}/api/health`, '_blank')}
               className="w-full flex items-center gap-3 px-4 py-3 bg-white/30 rounded-lg text-left hover:bg-white/50 transition group"
             >
               <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">

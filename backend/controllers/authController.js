@@ -30,6 +30,21 @@ const generateRefreshToken = () => {
   return crypto.randomBytes(64).toString('hex');
 };
 
+const getCookieOptions = ({ rememberMe = true, maxAge, httpOnly = true, path = '/', sameSite = 'strict' } = {}) => {
+  const options = {
+    httpOnly,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite,
+    path
+  };
+
+  if (rememberMe && typeof maxAge === 'number') {
+    options.maxAge = maxAge;
+  }
+
+  return options;
+};
+
 /**
  * Create refresh token in database
  */
@@ -47,7 +62,8 @@ const createRefreshToken = async (userId, deviceInfo = {}) => {
     expiresAt,
     deviceInfo: {
       userAgent: deviceInfo.userAgent || 'unknown',
-      ipAddress: deviceInfo.ipAddress || 'unknown'
+      ipAddress: deviceInfo.ipAddress || 'unknown',
+      rememberMe: deviceInfo.rememberMe !== false
     }
   });
 
@@ -252,7 +268,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe = false } = req.body;
 
     // Validate input
     if (!email || !password) {
@@ -269,7 +285,7 @@ export const login = async (req, res) => {
       logger.warn(`🚨 Login attempt with non-existent email: ${email}`);
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Falsche E-Mail oder falsches Passwort.'
       });
     }
 
@@ -289,7 +305,7 @@ export const login = async (req, res) => {
       await user.incLoginAttempts();
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Falsche E-Mail oder falsches Passwort.'
       });
     }
 
@@ -302,27 +318,24 @@ export const login = async (req, res) => {
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: req.ip || req.connection.remoteAddress
+      ipAddress: req.ip || req.connection.remoteAddress,
+      rememberMe: Boolean(rememberMe)
     });
 
     logger.info(`? User logged in: ${user.email} (${user.role})`);
 
     // Set secure HTTP-only cookies for both tokens
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    res.cookie('refreshToken', refreshToken, getCookieOptions({
+      rememberMe: Boolean(rememberMe),
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/api/auth'
-    });
+    }));
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+    res.cookie('accessToken', accessToken, getCookieOptions({
+      rememberMe: Boolean(rememberMe),
+      maxAge: 15 * 60 * 1000,
       path: '/'
-    });
+    }));
 
     res.status(200).json({
       success: true,
@@ -382,7 +395,7 @@ export const ceoLogin = async (req, res) => {
   const userAgent = req.headers['user-agent'] || 'unknown';
 
   try {
-    const { email, password, twoFactorCode } = req.body;
+    const { email, password, twoFactorCode, rememberMe = false } = req.body;
 
     // SECURITY: Log all CEO login attempts with full details
     logger.warn(`[CEO-SECURITY] Login attempt - IP: ${clientIP}, Email: ${email || 'not provided'}, UA: ${userAgent.substring(0, 50)}`);
@@ -608,27 +621,24 @@ export const ceoLogin = async (req, res) => {
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: clientIP
+      ipAddress: clientIP,
+      rememberMe: Boolean(rememberMe)
     });
 
     logger.info(`[CEO-SECURITY] ✅ SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
 
     // Set secure HTTP-only cookies for both tokens
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    res.cookie('refreshToken', refreshToken, getCookieOptions({
+      rememberMe: Boolean(rememberMe),
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/api/auth'
-    });
+    }));
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000, // 1 day for CEO
+    res.cookie('accessToken', accessToken, getCookieOptions({
+      rememberMe: Boolean(rememberMe),
+      maxAge: 24 * 60 * 60 * 1000,
       path: '/'
-    });
+    }));
 
     // ? SECURITY FIX: Generate CSRF token for state-changing operations
     generateCSRFToken(req, res, () => {});
@@ -654,7 +664,7 @@ export const ceoLogin = async (req, res) => {
 
 export const employeeLogin = async (req, res) => {
   try {
-    const { email, password, companyId } = req.body;
+    const { email, password, companyId, rememberMe = false } = req.body;
 
     // Validate input
     if (!email || !password) {
@@ -722,27 +732,24 @@ export const employeeLogin = async (req, res) => {
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: req.ip || req.connection.remoteAddress
+      ipAddress: req.ip || req.connection.remoteAddress,
+      rememberMe: Boolean(rememberMe)
     });
 
     logger.info(`✅ Employee logged in: ${user.email} (${user.role})`);
 
     // Set secure HTTP-only cookies for both tokens
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    res.cookie('refreshToken', refreshToken, getCookieOptions({
+      rememberMe: Boolean(rememberMe),
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/api/auth'
-    });
+    }));
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+    res.cookie('accessToken', accessToken, getCookieOptions({
+      rememberMe: Boolean(rememberMe),
+      maxAge: 15 * 60 * 1000,
       path: '/'
-    });
+    }));
 
     // ? SECURITY FIX: Generate CSRF token for state-changing operations
     generateCSRFToken(req, res, () => {});
@@ -1602,7 +1609,8 @@ export const refreshToken = async (req, res) => {
     const newAccessToken = generateToken(user._id, '15m'); // Short-lived access token
     const newRefreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: req.ip || req.connection.remoteAddress
+      ipAddress: req.ip || req.connection.remoteAddress,
+      rememberMe: storedToken?.deviceInfo?.rememberMe !== false
     });
 
     // Update last used
@@ -1613,21 +1621,19 @@ export const refreshToken = async (req, res) => {
     logger.info(`?? Token refreshed for: ${user.email}`);
 
     // Set secure HTTP-only cookies for both new tokens
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/api/auth'
-    });
+    const rememberMe = storedToken?.deviceInfo?.rememberMe !== false;
 
-    res.cookie('accessToken', newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+    res.cookie('refreshToken', newRefreshToken, getCookieOptions({
+      rememberMe,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/api/auth'
+    }));
+
+    res.cookie('accessToken', newAccessToken, getCookieOptions({
+      rememberMe,
+      maxAge: 15 * 60 * 1000,
       path: '/'
-    });
+    }));
 
     // ? SECURITY FIX: Generate new CSRF token after token refresh
     generateCSRFToken(req, res, () => {});

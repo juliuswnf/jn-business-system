@@ -1,54 +1,17 @@
 import React from 'react';
-import { Stethoscope } from 'lucide-react';
+import CoreDashboard from './CoreDashboard';
 
 export default function MedicalSpaDashboard() {
   return (
-    <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-zinc-900">Medical Spa Kontrollpanel</h1>
-        <p className="text-sm text-zinc-500">Willkommen in deinem Medical Spa.</p>
-      </header>
-
-      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex items-start gap-4">
-        <Stethoscope className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-        <div>
-          <h2 className="text-lg font-semibold text-blue-900 mb-2">In Entwicklung</h2>
-          <p className="text-blue-800 mb-4">
-            Das Medical Spa Kontrollpanel wird derzeit entwickelt. Spezielle Funktionen für Medical Spas werden bald verfügbar sein.
-          </p>
-          <div className="bg-blue-100/50 rounded p-4 border border-blue-200">
-            <p className="text-sm text-blue-800">
-              <strong>Geplante Funktionen:</strong>
-            </p>
-            <ul className="text-sm text-blue-800 mt-2 space-y-1">
-              <li>- Behandlungspläne</li>
-              <li>- Einwilligungserklärungen</li>
-              <li>- Vorher-Nachher-Fotos</li>
-              <li>- Nachsorge & Folgetermine</li>
-              <li>- Medikamenten-Tracking</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Behandlungen</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
-        </div>
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Patienten</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
-        </div>
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Folgetermine</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
-        </div>
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Umsatz</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
-        </div>
-      </div>
-    </div>
+    <CoreDashboard
+      title="Medical Spa Kontrollpanel"
+      subtitle="Willkommen in deinem Medical Spa."
+      appointmentsTitle="Anstehende Behandlungen heute"
+      appointmentsSubtitle="Alle noch ausstehenden Behandlungen für deinen heutigen Tag."
+      newAppointmentButtonLabel="Neue Behandlung anlegen"
+      modalTitle="Neue Behandlung anlegen"
+      emptyTitle="Für heute stehen keine weiteren Behandlungen an."
+      emptySubtitle="Nutze die Zeit für Dokumentation und Nachsorgeplanung."
+    />
   );
 }

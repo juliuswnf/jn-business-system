@@ -1,4 +1,4 @@
-﻿import { useContext } from 'react';
+﻿import { useCallback, useContext } from 'react';
 import { NotificationContext } from '../context/NotificationContext';
 
 /**
@@ -23,13 +23,17 @@ export const useNotification = () => {
     clearAllNotifications,
   } = context;
 
+  const showNotification = useCallback((message, type = 'info', duration = 5000) => {
+    return addNotification(message, type, duration);
+  }, [addNotification]);
+
   return {
     notifications,
     success,
     error,
     warning,
     info,
-    showNotification: (message, type = 'info', duration = 5000) => addNotification(message, type, duration),
+    showNotification,
     addNotification,
     removeNotification,
     clearAllNotifications,
