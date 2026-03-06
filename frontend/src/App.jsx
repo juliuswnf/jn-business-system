@@ -4,6 +4,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 import { api } from './utils/api';
+import { usePlanAccess } from './hooks/usePlanAccess';
+import { useAuth } from './hooks/useAuth';
 
 // Critical path - load immediately
 import Home from './pages/Home';
@@ -40,7 +42,7 @@ const CustomerSettings = lazy(() => import('./pages/customer/Settings'));
 const CustomerProfile = lazy(() => import('./pages/customer/Profile'));
 const CustomerSupport = lazy(() => import('./pages/customer/Support'));
 const BookingAction = lazy(() => import('./pages/BookingAction'));
-const Services = lazy(() => import('./pages/dashboard/Services'));
+const Services = lazy(() => import('./pages/dashboard/services/ServiceManager'));
 const Employees = lazy(() => import('./pages/dashboard/Employees'));
 const Customers = lazy(() => import('./pages/company/Customers'));
 const WidgetSetup = lazy(() => import('./pages/dashboard/WidgetSetup'));
@@ -68,6 +70,8 @@ const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
 const Marketing = lazy(() => import('./pages/dashboard/Marketing'));
 const CampaignEditor = lazy(() => import('./pages/dashboard/CampaignEditor'));
 const CampaignAnalytics = lazy(() => import('./pages/dashboard/CampaignAnalytics'));
+const SmsManager = lazy(() => import('./pages/dashboard/marketing/SmsManager'));
+const InvoiceManager = lazy(() => import('./pages/dashboard/billing/InvoiceManager'));
 
 // NO-SHOW-KILLER System
 const Waitlist = lazy(() => import('./pages/dashboard/Waitlist'));
@@ -94,6 +98,7 @@ const PricingWizard = lazy(() => import('./pages/onboarding/PricingWizard'));
 const PublicBooking = lazy(() => import('./pages/booking/PublicBooking'));
 const BookingConfirmation = lazy(() => import('./pages/booking/BookingConfirmation'));
 const Salons = lazy(() => import('./pages/public/Salons'));
+const PublicBookingPage = lazy(() => import('./pages/public/PublicBookingPage'));
 
 // Error Pages
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -215,6 +220,32 @@ const ProtectedRoute = ({ children, requiredRole, allowedRoles }) => {
   return children;
 };
 
+const TierRoute = ({ children, requiredTier = 'starter', bypassRoles = ['ceo', 'admin'] }) => {
+  const { user } = useAuth();
+  const { isLoading, canAccessTier } = usePlanAccess();
+
+  if (bypassRoles.includes(user?.role)) {
+    return children;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p>Lade Planrechte...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canAccessTier(requiredTier)) {
+    return <Navigate to="/pricing" replace />;
+  }
+
+  return children;
+};
+
 /**
  * JN Business System - Main App Component
  * Version: 2.0.0 MVP Professional
@@ -225,7 +256,7 @@ function App() {
   return (
     <HelmetProvider>
       <ErrorBoundary>
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ScrollToTop />
           <KeyboardShortcuts />
           <Routes>
@@ -436,9 +467,11 @@ function App() {
           path="/dashboard/branding"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
-              <DashboardLayout>
-                <LazyPage><BrandingSettings /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><BrandingSettings /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -446,9 +479,11 @@ function App() {
           path="/dashboard/locations"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
-              <DashboardLayout>
-                <LazyPage><MultiLocationDashboard /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="enterprise">
+                <DashboardLayout>
+                  <LazyPage><MultiLocationDashboard /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -464,9 +499,11 @@ function App() {
           path="/dashboard/success-metrics"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin']}>
-              <DashboardLayout>
-                <LazyPage><SuccessMetrics /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="enterprise">
+                <DashboardLayout>
+                  <LazyPage><SuccessMetrics /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -486,9 +523,11 @@ function App() {
           path="/dashboard/marketing"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
-              <DashboardLayout>
-                <LazyPage><Marketing /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><Marketing /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -496,9 +535,11 @@ function App() {
           path="/dashboard/campaign-editor/:id"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
-              <DashboardLayout>
-                <LazyPage><CampaignEditor /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><CampaignEditor /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -506,9 +547,35 @@ function App() {
           path="/dashboard/campaign-analytics/:id"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
-              <DashboardLayout>
-                <LazyPage><CampaignAnalytics /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><CampaignAnalytics /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/marketing/sms"
+          element={
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
+              <TierRoute requiredTier="enterprise">
+                <DashboardLayout>
+                  <LazyPage><SmsManager /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/billing/invoices"
+          element={
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
+              <TierRoute requiredTier="enterprise">
+                <DashboardLayout>
+                  <LazyPage><InvoiceManager /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -518,9 +585,11 @@ function App() {
           path="/dashboard/waitlist"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
-              <DashboardLayout>
-                <LazyPage><Waitlist /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><Waitlist /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -572,9 +641,11 @@ function App() {
           path="/dashboard/workflows"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
-              <DashboardLayout>
-                <LazyPage><Workflows /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><Workflows /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -582,9 +653,11 @@ function App() {
           path="/dashboard/workflow-projects"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
-              <DashboardLayout>
-                <LazyPage><WorkflowProjects /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><WorkflowProjects /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -592,9 +665,11 @@ function App() {
           path="/dashboard/workflow-projects/new"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
-              <DashboardLayout>
-                <LazyPage><WorkflowProjectEditor /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><WorkflowProjectEditor /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -602,9 +677,11 @@ function App() {
           path="/dashboard/workflow-projects/:id/edit"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
-              <DashboardLayout>
-                <LazyPage><WorkflowProjectEditor /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><WorkflowProjectEditor /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -612,9 +689,11 @@ function App() {
           path="/dashboard/workflow-projects/:id"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
-              <DashboardLayout>
-                <LazyPage><WorkflowProjectDetail /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><WorkflowProjectDetail /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -622,9 +701,11 @@ function App() {
           path="/dashboard/packages-memberships"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
-              <DashboardLayout>
-                <LazyPage><PackagesMemberships /></LazyPage>
-              </DashboardLayout>
+              <TierRoute requiredTier="professional">
+                <DashboardLayout>
+                  <LazyPage><PackagesMemberships /></LazyPage>
+                </DashboardLayout>
+              </TierRoute>
             </ProtectedRoute>
           }
         />
@@ -725,6 +806,10 @@ function App() {
         <Route
           path="/s/:slug"
           element={<LazyPage><PublicBooking /></LazyPage>}
+        />
+        <Route
+          path="/book/:studioSlug"
+          element={<LazyPage><PublicBookingPage /></LazyPage>}
         />
         <Route
           path="/booking/public"

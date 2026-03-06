@@ -10,6 +10,7 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Salon',
       required: true,
+      alias: 'studioId',
       index: true
     },
 
@@ -157,6 +158,7 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       default: null,
+      alias: 'staffId',
       index: true
     },
 
@@ -255,7 +257,7 @@ const bookingSchema = new mongoose.Schema(
     // ==================== Status ====================
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'],
+      enum: ['pending', 'booked', 'confirmed', 'completed', 'cancelled', 'no_show'],
       default: 'pending',
       index: true // ? Performance optimization
     },
@@ -569,6 +571,18 @@ bookingSchema.virtual('isToday').get(function() {
     bookingDay.getMonth() === today.getMonth() &&
     bookingDay.getFullYear() === today.getFullYear()
   );
+});
+
+bookingSchema.virtual('startTime').get(function() {
+  return this.bookingDate;
+});
+
+bookingSchema.virtual('endTime').get(function() {
+  if (!this.bookingDate || !this.duration) {
+    return this.bookingDate;
+  }
+
+  return new Date(this.bookingDate.getTime() + this.duration * 60 * 1000);
 });
 
 bookingSchema.virtual('canCancel').get(function() {

@@ -8,6 +8,31 @@ import { sendSMS } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
 
+const getSalonForRequestUser = async (req, { populateOwner = false } = {}) => {
+  const userId = req.user?._id || req.user?.id;
+  const userSalonId = req.user?.salonId;
+
+  let salonQuery = userSalonId
+    ? Salon.findById(userSalonId)
+    : Salon.findOne({ owner: userId });
+
+  if (populateOwner) {
+    salonQuery = salonQuery.populate('owner');
+  }
+
+  let salon = await salonQuery;
+
+  if (!salon && userId) {
+    let legacyQuery = Salon.findOne({ userId });
+    if (populateOwner) {
+      legacyQuery = legacyQuery.populate('owner');
+    }
+    salon = await legacyQuery;
+  }
+
+  return salon;
+};
+
 /**
  * @desc    Get all marketing templates
  * @route   GET /api/marketing/templates
@@ -15,7 +40,7 @@ import { escapeRegExp } from '../utils/securityHelpers.js';
  */
 export const getTemplates = async (req, res) => {
   try {
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
@@ -43,7 +68,7 @@ export const createCampaign = async (req, res) => {
   try {
     const { templateId, name, customRules, customMessage, customSchedule } = req.body;
 
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
@@ -90,7 +115,7 @@ export const createCampaign = async (req, res) => {
  */
 export const getCampaigns = async (req, res) => {
   try {
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
@@ -124,7 +149,7 @@ export const getCampaign = async (req, res) => {
     }
 
     // Verify ownership
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
@@ -158,7 +183,7 @@ export const updateCampaign = async (req, res) => {
     }
 
     // Verify ownership
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
@@ -201,7 +226,7 @@ export const deleteCampaign = async (req, res) => {
     }
 
     // Verify ownership
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
@@ -232,7 +257,7 @@ export const runCampaign = async (req, res) => {
     }
 
     // Verify ownership
-    const salon = await Salon.findOne({ userId: req.user._id }).populate('userId');
+    const salon = await getSalonForRequestUser(req, { populateOwner: true });
     if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
@@ -286,7 +311,7 @@ export const previewCampaign = async (req, res) => {
     }
 
     // Verify ownership
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
@@ -339,7 +364,7 @@ export const getRecipients = async (req, res) => {
     }
 
     // Verify ownership
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
@@ -409,7 +434,7 @@ export const trackClick = async (req, res) => {
  */
 export const getStats = async (req, res) => {
   try {
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
@@ -462,7 +487,7 @@ export const getStats = async (req, res) => {
  */
 export const getLimits = async (req, res) => {
   try {
-    const salon = await Salon.findOne({ userId: req.user._id });
+    const salon = await getSalonForRequestUser(req);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }

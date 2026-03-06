@@ -22,35 +22,28 @@ import PhysiotherapyDashboard from './dashboards/PhysiotherapyDashboard';
 
 export default function StudioDashboard() {
   const industry = useDashboardIndustry();
+  const industryDashboards = {
+    tattoo: TattooStudioDashboard,
+    medical_aesthetics: MedicalSpaDashboard,
+    spa_wellness: WellnessDashboard,
+    barbershop: BarberDashboard,
+    beauty: BeautyDashboard,
+    nails: NailsDashboard,
+    massage: MassageDashboard,
+    physiotherapy: PhysiotherapyDashboard
+  };
+
+  const IndustryDashboardComponent = industryDashboards[industry];
+
+  if (IndustryDashboardComponent) {
+    return <IndustryDashboardComponent />;
+  }
+
+  return <DefaultSalonDashboard />;
+}
+
+function DefaultSalonDashboard() {
   const { showNotification } = useNotification();
-
-  // Conditional routing based on industry only (plan-independent)
-  if (industry === 'tattoo') {
-    return <TattooStudioDashboard />;
-  }
-  if (industry === 'medical_aesthetics') {
-    return <MedicalSpaDashboard />;
-  }
-  if (industry === 'spa_wellness') {
-    return <WellnessDashboard />;
-  }
-  if (industry === 'barbershop') {
-    return <BarberDashboard />;
-  }
-  if (industry === 'beauty') {
-    return <BeautyDashboard />;
-  }
-  if (industry === 'nails') {
-    return <NailsDashboard />;
-  }
-  if (industry === 'massage') {
-    return <MassageDashboard />;
-  }
-  if (industry === 'physiotherapy') {
-    return <PhysiotherapyDashboard />;
-  }
-
-  // Default to salon dashboard
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({

@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import WizardStep from '../../components/wizard/WizardStep';
 import TierRecommendation from '../../components/wizard/TierRecommendation';
 import wizardQuestions from '../../config/wizardQuestions';
+import { API_URL } from '../../utils/api';
 
 /**
  * PricingWizard Page
@@ -97,7 +98,7 @@ const PricingWizard = () => {
     try {
       const timeToComplete = startTime ? Math.round((Date.now() - startTime) / 1000) : null;
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/pricing-wizard/recommend`, {
+      const response = await fetch(`${API_URL}/pricing-wizard/recommend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -130,7 +131,7 @@ const PricingWizard = () => {
 
     try {
       // Save selection to backend
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/pricing-wizard/save`, {
+      await fetch(`${API_URL}/pricing-wizard/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

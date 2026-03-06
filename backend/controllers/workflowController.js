@@ -243,7 +243,15 @@ export const createProject = async (req, res) => {
 // GET /api/workflow-projects - Get all projects
 export const getProjects = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonId = req.user?.salonId || req.query?.salonId;
+
+    if (!salonId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Salon ID is required'
+      });
+    }
+
     const filters = {
       industry: req.query.industry,
       status: req.query.status,
@@ -387,8 +395,15 @@ export const deleteProject = async (req, res) => {
 // GET /api/workflow-projects/stats - Get dashboard stats
 export const getProjectStats = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonId = req.user?.salonId || req.query?.salonId;
     const { industry } = req.query;
+
+    if (!salonId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Salon ID is required'
+      });
+    }
 
     const stats = await WorkflowProject.getDashboardStats(salonId, industry);
 
@@ -721,13 +736,46 @@ export const createPackage = async (req, res) => {
 export const getSalonPackages = async (req, res) => {
   try {
     const { salonId } = req.params;
+
+    if (!salonId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Salon ID is required'
+      });
+    }
+
     const filters = {
       status: req.query.status,
       customerId: req.query.customerId,
       type: req.query.type
     };
 
-    const packages = await Package.getSalonPackages(salonId, filters);
+    const query = {
+      salonId,
+      deletedAt: null
+    };
+
+    if (filters.type) {
+      query.type = filters.type;
+    }
+
+    if (filters.status) {
+      query.isActive = filters.status === 'active';
+    }
+
+    const packageDocs = await Package.find(query)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const packages = packageDocs.map((pkg) => ({
+      ...pkg,
+      status: pkg.isActive ? 'active' : 'inactive',
+      creditsTotal: pkg.totalSessions || 0,
+      creditsRemaining: pkg.totalSessions || 0,
+      validUntil: null,
+      customerId: null,
+      services: []
+    }));
 
     res.json({
       success: true,

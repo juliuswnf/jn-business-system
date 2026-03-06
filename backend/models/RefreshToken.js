@@ -33,7 +33,11 @@ const refreshTokenSchema = new mongoose.Schema(
     },
     deviceInfo: {
       userAgent: String,
-      ipAddress: String
+      ipAddress: String,
+      rememberMe: {
+        type: Boolean,
+        default: true
+      }
     },
     isRevoked: {
       type: Boolean,

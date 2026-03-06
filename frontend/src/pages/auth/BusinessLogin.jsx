@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { authAPI } from '../../utils/api';
+import { authAPI, localizeApiMessage } from '../../utils/api';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const BusinessLogin = () => {
@@ -25,21 +25,13 @@ const BusinessLogin = () => {
     // Login attempt
 
     try {
-      const response = await authAPI.login(email, password);
+      const response = await authAPI.login(email, password, rememberMe);
       const data = response.data;
 
       // Login response received
 
-      if (data.success && data.token) {
+      if (data.success && data.user) {
         const role = data.user?.role || 'salon_owner';
-
-        // Block customers from business login - they should use customer login
-        if (role === 'customer') {
-          setError('Dieser Login ist nur für Geschäftskunden. Bitte nutzen Sie den Kunden-Login.');
-          notification.error('Bitte nutzen Sie den Kunden-Login für Ihr Konto.');
-          setLoading(false);
-          return;
-        }
 
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
         // Tokens are automatically sent by browser with withCredentials: true
@@ -48,7 +40,9 @@ const BusinessLogin = () => {
         // Auth data saved, redirecting
 
         // Redirect based on role
-        if (role === 'ceo') {
+        if (role === 'customer') {
+          window.location.replace('/customer/dashboard');
+        } else if (role === 'ceo') {
           window.location.replace('/ceo/dashboard');
         } else {
           // salon_owner, employee, etc.
@@ -57,13 +51,16 @@ const BusinessLogin = () => {
         return; // Stop execution after redirect
       } else {
         // Login failed
-        const msg = data.message || 'Login fehlgeschlagen';
+        const msg = localizeApiMessage(data.message, 'Anmeldung fehlgeschlagen');
         setError(msg);
         notification.error(msg);
         setLoading(false);
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Verbindungsfehler. Bitte versuchen Sie es erneut.';
+      const errorMsg = localizeApiMessage(
+        err.response?.data?.message || err.message,
+        'Verbindungsfehler. Bitte versuchen Sie es erneut.'
+      );
       setError(errorMsg);
       notification.error(errorMsg);
       setLoading(false);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { authAPI } from '../../utils/api';
+import { authAPI, localizeApiMessage } from '../../utils/api';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const CustomerLogin = () => {
@@ -29,7 +29,7 @@ const CustomerLogin = () => {
     // Login attempt
 
     try {
-      const response = await authAPI.login(email, password);
+      const response = await authAPI.login(email, password, rememberMe);
       const data = response.data;
 
       // Login response received
@@ -56,13 +56,16 @@ const CustomerLogin = () => {
         return; // Stop execution after redirect
       } else {
         // Login failed
-        const msg = data.message || 'Login fehlgeschlagen';
+        const msg = localizeApiMessage(data.message, 'Anmeldung fehlgeschlagen');
         setError(msg);
         notification.error(msg);
         setLoading(false);
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Verbindungsfehler. Bitte versuchen Sie es erneut.';
+      const errorMsg = localizeApiMessage(
+        err.response?.data?.message || err.message,
+        'Verbindungsfehler. Bitte versuchen Sie es erneut.'
+      );
       setError(errorMsg);
       notification.error(errorMsg);
       setLoading(false);

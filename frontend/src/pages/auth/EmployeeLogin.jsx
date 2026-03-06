@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { authAPI } from '../../utils/api';
+import { authAPI, localizeApiMessage } from '../../utils/api';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const EmployeeLogin = () => {
@@ -22,7 +22,7 @@ const EmployeeLogin = () => {
     setError('');
 
     try {
-      const response = await authAPI.employeeLogin(email, password);
+      const response = await authAPI.employeeLogin(email, password, rememberMe);
       const data = response.data;
 
       if (data.success) {
@@ -34,13 +34,16 @@ const EmployeeLogin = () => {
         navigate('/employee/dashboard');
         return;
       } else {
-        const msg = data.message || 'Anmeldung fehlgeschlagen';
+        const msg = localizeApiMessage(data.message, 'Anmeldung fehlgeschlagen');
         setError(msg);
         notification.error(msg);
         setLoading(false);
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Verbindungsfehler. Bitte versuchen Sie es erneut.';
+      const errorMsg = localizeApiMessage(
+        err.response?.data?.message || err.message,
+        'Verbindungsfehler. Bitte versuchen Sie es erneut.'
+      );
       setError(errorMsg);
       notification.error(errorMsg);
       setLoading(false);

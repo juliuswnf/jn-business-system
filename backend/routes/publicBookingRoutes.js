@@ -61,4 +61,21 @@ router.post(
   publicBookingController.createPublicBooking
 );
 
+// Public booking base data (studio + active services)
+// GET /api/public/booking/:studioSlug
+router.get(
+  '/booking/:studioSlug',
+  widgetLimiter,
+  publicBookingController.getPublicBookingData
+);
+
+// Public booking creation endpoint
+// POST /api/public/booking/:studioSlug/appointments
+router.post(
+  '/booking/:studioSlug/appointments',
+  securityMiddleware.validateContentType,
+  publicBookingLimiter,
+  publicBookingController.createPublicAppointment
+);
+
 export default router;

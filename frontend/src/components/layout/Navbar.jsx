@@ -13,7 +13,7 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Clear all auth data from localStorage first
     localStorage.removeItem('jnAuthToken');
     localStorage.removeItem('jnUser');
@@ -22,8 +22,8 @@ const Navbar = () => {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('tempUser');
 
-    // Then call logout and redirect
-    logout();
+    // Then call logout and wait for backend cookie cleanup
+    await logout();
     setShowUserMenu(false);
     window.location.replace('/');
   };

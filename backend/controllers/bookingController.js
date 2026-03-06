@@ -17,6 +17,7 @@ import {
 
 import Booking from '../models/Booking.js';
 import Service from '../models/Service.js';
+import Customer from '../models/Customer.js';
 
 // ==================== CREATE BOOKING ====================
 
@@ -920,6 +921,307 @@ export const getBookingStats = async (req, res) => {
   }
 };
 
+// ==================== GET APPOINTMENT DASHBOARD STATS ====================
+
+export const getDashboardStats = async (req, res) => {
+  try {
+    const studioId = req.user?.studioId || req.user?.salonId;
+
+    if (!studioId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kein Studio im Benutzerkontext gefunden'
+      });
+    }
+
+    const endOfToday = new Date();
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const todayFilter = {
+      salonId: studioId,
+      bookingDate: { $gte: startOfToday, $lte: endOfToday },
+      status: { $in: ['booked', 'pending', 'confirmed', 'completed'] }
+    };
+
+    const completedTodayFilter = {
+      salonId: studioId,
+      bookingDate: { $gte: startOfToday, $lte: endOfToday },
+      status: 'completed'
+    };
+
+    const [todayAppointments, totalCustomers, revenueResult] = await Promise.all([
+      Booking.countDocuments(todayFilter),
+      Customer.countDocuments({ salonId: studioId, status: { $ne: 'blocked' } }),
+      Booking.aggregate([
+        { $match: completedTodayFilter },
+        {
+          $lookup: {
+            from: 'services',
+            localField: 'serviceId',
+            foreignField: '_id',
+            as: 'primaryService'
+          }
+        },
+        {
+          $addFields: {
+            primaryServiceRevenue: {
+              $ifNull: [{ $arrayElemAt: ['$primaryService.price', 0] }, 0]
+            },
+            multiServiceRevenue: {
+              $sum: {
+                $map: {
+                  input: { $ifNull: ['$services', []] },
+                  as: 'svc',
+                  in: { $ifNull: ['$$svc.price', 0] }
+                }
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            revenue: {
+              $cond: [
+                { $gt: [{ $size: { $ifNull: ['$services', []] } }, 0] },
+                '$multiServiceRevenue',
+                '$primaryServiceRevenue'
+              ]
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenueToday: { $sum: '$revenue' }
+          }
+        }
+      ])
+    ]);
+
+    res.status(200).json({
+      success: true,
+      studioId,
+      stats: {
+        todayAppointments,
+        totalRevenueToday: revenueResult[0]?.totalRevenueToday || 0,
+        totalCustomers
+      }
+    });
+  } catch (error) {
+    logger.error('GetDashboardStats Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Interner Serverfehler'
+    });
+  }
+};
+
+// ==================== GET TODAY'S UPCOMING APPOINTMENTS ====================
+
+export const getTodayAppointments = async (req, res) => {
+  try {
+    const studioId = req.user?.studioId || req.user?.salonId;
+
+    if (!studioId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kein Studio im Benutzerkontext gefunden'
+      });
+    }
+
+    const now = new Date();
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const appointments = await Booking.find({
+      salonId: studioId,
+      bookingDate: { $gte: now, $lte: endOfToday },
+      status: { $in: ['booked', 'pending', 'confirmed'] }
+    })
+      .populate('customerId', 'firstName lastName')
+      .populate('serviceId', 'name duration')
+      .sort({ bookingDate: 1 })
+      .limit(100)
+      .lean()
+      .maxTimeMS(5000);
+
+    res.status(200).json({
+      success: true,
+      count: appointments.length,
+      appointments
+    });
+  } catch (error) {
+    logger.error('GetTodayAppointments Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Interner Serverfehler'
+    });
+  }
+};
+
+// ==================== UPDATE APPOINTMENT STATUS ====================
+
+export const updateAppointmentStatus = async (req, res) => {
+  try {
+    const studioId = req.user?.studioId || req.user?.salonId;
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!studioId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kein Studio im Benutzerkontext gefunden'
+      });
+    }
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültige Termin-ID'
+      });
+    }
+
+    const allowedStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültiger Statuswert',
+        allowedStatuses
+      });
+    }
+
+    const appointment = await Booking.findOne({
+      _id: id,
+      salonId: studioId
+    }).maxTimeMS(5000);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Termin nicht gefunden oder kein Zugriff'
+      });
+    }
+
+    appointment.status = status;
+    await appointment.save();
+
+    cacheService.invalidate('bookings', studioId?.toString());
+
+    return res.status(200).json({
+      success: true,
+      message: 'Terminstatus aktualisiert',
+      appointment
+    });
+  } catch (error) {
+    logger.error('UpdateAppointmentStatus Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Interner Serverfehler'
+    });
+  }
+};
+
+// ==================== CREATE APPOINTMENT (MANUAL ENTRY) ====================
+
+export const createAppointment = async (req, res) => {
+  try {
+    const studioId = req.user?.studioId || req.user?.salonId;
+    const {
+      serviceId,
+      customerName,
+      customerEmail,
+      customerPhone,
+      startTime,
+      bookingDate,
+      notes
+    } = req.body;
+
+    if (!studioId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kein Studio im Benutzerkontext gefunden'
+      });
+    }
+
+    if (!serviceId || !customerName || !(startTime || bookingDate)) {
+      return res.status(400).json({
+        success: false,
+        message: 'serviceId, customerName und startTime oder bookingDate sind erforderlich'
+      });
+    }
+
+    if (!isValidObjectId(serviceId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültige Service-ID'
+      });
+    }
+
+    const service = await Service.findOne({
+      _id: serviceId,
+      salonId: studioId
+    }).maxTimeMS(5000);
+
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        message: 'Dienstleistung nicht gefunden oder kein Zugriff'
+      });
+    }
+
+    const parsedStartTime = parseValidDate(startTime || bookingDate);
+    if (!parsedStartTime) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültiges Datumsformat für startTime/bookingDate'
+      });
+    }
+
+    const sanitizedCustomerName = customerName.trim();
+    if (!sanitizedCustomerName) {
+      return res.status(400).json({
+        success: false,
+        message: 'customerName darf nicht leer sein'
+      });
+    }
+
+    const fallbackEmail = `walkin+${Date.now()}@example.invalid`;
+
+    const appointment = await Booking.create({
+      salonId: studioId,
+      serviceId: service._id,
+      bookingDate: parsedStartTime,
+      duration: service.duration || 30,
+      customerName: sanitizedCustomerName,
+      customerEmail: (customerEmail || fallbackEmail).toLowerCase().trim(),
+      customerPhone: customerPhone || null,
+      notes: notes || '',
+      status: 'booked'
+    });
+
+    await appointment.populate('serviceId', 'name duration price');
+
+    cacheService.invalidate('bookings', studioId?.toString());
+
+    return res.status(201).json({
+      success: true,
+      message: 'Termin erfolgreich erstellt',
+      appointment
+    });
+  } catch (error) {
+    logger.error('CreateAppointment Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Interner Serverfehler'
+    });
+  }
+};
+
 // ==================== GET BOOKINGS BY DATE ====================
 
 export const getBookingsByDate = async (req, res) => {
@@ -988,6 +1290,10 @@ export default {
   undoNoShow,
   deleteBooking,
   getBookingStats,
+  getDashboardStats,
+  getTodayAppointments,
+  createAppointment,
+  updateAppointmentStatus,
   getBookingsByDate
 };
 

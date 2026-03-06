@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Salon',
       default: null,
+      alias: 'studioId',
       index: true
     },
 
