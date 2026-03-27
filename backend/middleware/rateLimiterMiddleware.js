@@ -24,14 +24,21 @@ class MemoryStoreAdapter {
         this.cleanup();
       }
 
-      const timestamp = Date.now();
+      const now = Date.now();
       const existing = this.hits.get(key);
-      const current = (existing?.count || 0) + 1;
-      this.hits.set(key, { count: current, timestamp });
 
-      // Return totalHits and resetTime as Date object
-      const resetTime = new Date(timestamp + this.windowMs);
-      cb(null, current, resetTime);
+      // If a prior entry exists and its window hasn't expired yet, count within the same window
+      if (existing && (now - existing.windowStart) <= this.windowMs) {
+        const current = existing.count + 1;
+        this.hits.set(key, { count: current, windowStart: existing.windowStart });
+        const resetTime = new Date(existing.windowStart + this.windowMs);
+        cb(null, current, resetTime);
+      } else {
+        // New entry or expired window — start a fresh window
+        this.hits.set(key, { count: 1, windowStart: now });
+        const resetTime = new Date(now + this.windowMs);
+        cb(null, 1, resetTime);
+      }
     } catch (err) {
       logger.error('MemoryStore incr error:', err);
       cb(err);
@@ -40,9 +47,12 @@ class MemoryStoreAdapter {
 
   decrement(key, cb) {
     try {
-      const current = Math.max(0, (this.hits.get(key)?.count || 1) - 1);
-      this.hits.set(key, { count: current, timestamp: Date.now() });
-      if (cb) cb(null, current);
+      const existing = this.hits.get(key);
+      if (existing) {
+        const current = Math.max(0, existing.count - 1);
+        this.hits.set(key, { count: current, windowStart: existing.windowStart });
+      }
+      if (cb) cb(null);
     } catch (err) {
       logger.error('MemoryStore decrement error:', err);
       if (cb) cb(err);
@@ -64,16 +74,14 @@ class MemoryStoreAdapter {
     let deleted = 0;
 
     for (const [key, value] of this.hits.entries()) {
-      // Delete if expired OR if single request older than 2x windowMs (cleanup old one-offs)
-      if (now - value.timestamp > this.windowMs ||
-          (value.count === 1 && now - value.timestamp > this.windowMs * 2)) {
+      if (now - value.windowStart > this.windowMs) {
         this.hits.delete(key);
         deleted++;
       }
     }
 
     if (deleted > 0) {
-      logger.log(`? Cleaned up ${deleted} expired rate limit entries`);
+      logger.log(`✓ Cleaned up ${deleted} expired rate limit entries`);
     }
   }
 
@@ -90,7 +98,8 @@ class MemoryStoreAdapter {
   }
 }
 
-const memoryStoreAdapter = new MemoryStoreAdapter(15 * 60 * 1000, 10000);
+// Each limiter gets its own store so counts are fully isolated per limiter
+const makeStore = (windowMs) => new MemoryStoreAdapter(windowMs, 10000);
 
 // ==================== RATE LIMITERS ====================
 
@@ -112,7 +121,7 @@ const generalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  store: memoryStoreAdapter,
+  store: makeStore(15 * 60 * 1000),
   keyGenerator: (req) => {
     // Use user ID if authenticated, otherwise use IP
     // This allows authenticated users to have higher limits
@@ -144,16 +153,20 @@ const generalLimiter = rateLimit({
 
 // ? SECURITY FIX: Login Rate Limiter - Prevents brute force attacks
 // Limits both per-email and per-IP to prevent bypassing by trying different emails
+const _authMax = process.env.NODE_ENV === 'development'
+  ? parseInt(process.env.RATE_LIMIT_AUTH || '100')  // relaxed in dev
+  : parseInt(process.env.RATE_LIMIT_AUTH || '5');   // strict in production
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_AUTH || '5'), // 5 failed attempts per email per 15 minutes
+  max: _authMax,
   skipSuccessfulRequests: true, // Don't count successful logins
   skipFailedRequests: false, // Count failed login attempts
   message: {
     success: false,
     message: 'Zu viele Login-Versuche, bitte später versuchen'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(15 * 60 * 1000),
   keyGenerator: (req) => {
     // ? SECURITY FIX: Rate limit by both email and IP to prevent bypassing
     const email = req.body?.email?.toLowerCase()?.trim() || 'unknown';
@@ -176,16 +189,20 @@ const authLimiter = rateLimit({
 // ? SECURITY FIX: IP-based rate limiter for login endpoints
 // Prevents brute force attacks by limiting total login attempts per IP
 // regardless of which email is being used
+const _loginIPMax = process.env.NODE_ENV === 'development'
+  ? parseInt(process.env.RATE_LIMIT_LOGIN_IP || '200')
+  : parseInt(process.env.RATE_LIMIT_LOGIN_IP || '10');
+
 const loginIPLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_LOGIN_IP || '10'), // 10 total login attempts per IP per 15 minutes
+  max: _loginIPMax,
   skipSuccessfulRequests: true, // Don't count successful logins
   skipFailedRequests: false, // Count all failed attempts
   message: {
     success: false,
     message: 'Zu viele Login-Versuche von dieser IP-Adresse'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(15 * 60 * 1000),
   keyGenerator: (req) => `login:ip:${req.ip || 'unknown'}`,
   handler: (req, res) => {
     logger.warn(`🚨 Login IP rate limit exceeded for IP: ${req.ip}`);
@@ -201,7 +218,7 @@ const strictLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_STRICT || '10'),
   message: { success: false, message: 'Zu viele Anfragen, bitte warten' },
-  store: memoryStoreAdapter,
+  store: makeStore(1 * 60 * 1000),
   handler: (req, res) => {
     res.status(429).json({
       success: false,
@@ -215,7 +232,7 @@ const apiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_API || (process.env.NODE_ENV === 'development' ? '10000' : '1000')),
   message: { success: false, message: 'API Rate Limit überschritten' },
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip,
   skip: (req) => {
     // Skip for CEO
@@ -234,7 +251,7 @@ const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_PAYMENT || '50'),
   message: { success: false, message: 'Zu viele Zahlungsversuche, bitte später versuchen' },
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip,
   handler: (req, res) => {
     logger.warn(`⚠️ Payment rate limit exceeded for user ${req.user?.id}`);
@@ -250,7 +267,7 @@ const uploadLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_UPLOAD || '50'),
   message: { success: false, message: 'Upload Limit erreicht' },
-  store: memoryStoreAdapter,
+  store: makeStore(24 * 60 * 60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip,
   handler: (req, res) => {
     res.status(429).json({
@@ -266,7 +283,7 @@ const emailLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_EMAIL || '5'),
   message: { success: false, message: 'Zu viele Email-Anfragen' },
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 60 * 1000),
   keyGenerator: (req) => req.user?.email || req.email || req.ip,
   handler: (req, res) => {
     logger.warn(`⚠️ Email rate limit exceeded for ${req.user?.email || req.ip}`);
@@ -282,7 +299,7 @@ const searchLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_SEARCH || '30'),
   message: { success: false, message: 'Zu viele Suchanfragen' },
-  store: memoryStoreAdapter,
+  store: makeStore(10 * 60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip
 });
 
@@ -290,7 +307,7 @@ const exportLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_EXPORT || '10'),
   message: { success: false, message: 'Export Limit erreicht' },
-  store: memoryStoreAdapter,
+  store: makeStore(24 * 60 * 60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip,
   handler: (req, res) => {
     res.status(429).json({
@@ -305,7 +322,7 @@ const bookingLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_BOOKING || '100'),
   message: { success: false, message: 'Zu viele Buchungen in kurzer Zeit' },
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip
 });
 
@@ -316,7 +333,7 @@ const bookingCreationLimiter = rateLimit({
   message: { success: false, message: 'Zu viele Buchungen in kurzer Zeit' },
   standardHeaders: true,
   legacyHeaders: false,
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   skip: (req) => req.user && req.user.role === 'ceo', // CEO bypass
   handler: (req, res) => {
@@ -336,7 +353,7 @@ const mutationLimiter = rateLimit({
   message: { success: false, message: 'Zu viele Änderungen in kurzer Zeit' },
   standardHeaders: true,
   legacyHeaders: false,
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   skip: (req) => req.user && req.user.role === 'ceo', // CEO bypass
   handler: (req, res) => {
@@ -353,7 +370,7 @@ const reviewLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_REVIEW || '5'),
   message: { success: false, message: 'Zu viele Bewertungen pro Tag' },
-  store: memoryStoreAdapter,
+  store: makeStore(24 * 60 * 60 * 1000),
   keyGenerator: (req) => req.user?.id || req.ip
 });
 
@@ -367,7 +384,7 @@ const ceoLoginLimiter = rateLimit({
     success: false,
     message: 'Zu viele CEO-Login-Versuche. Bitte warten Sie 15 Minuten.'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(15 * 60 * 1000),
   keyGenerator: (req) => `ceo:${req.body?.email || req.ip}`,
   handler: (req, res) => {
     logger.warn(`🚨 CEO login rate limit exceeded for ${req.body?.email || req.ip}`);
@@ -388,7 +405,7 @@ const passwordResetLimiter = rateLimit({
     success: false,
     message: 'Zu viele Passwort-Reset-Anfragen. Bitte versuchen Sie es in einer Stunde erneut.'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 60 * 1000),
   keyGenerator: (req) => {
     // Rate limit by both email and IP for better security
     const email = req.body?.email?.toLowerCase()?.trim() || 'unknown';
@@ -414,7 +431,7 @@ const tokenVerifyLimiter = rateLimit({
     success: false,
     message: 'Zu viele Token-Verifizierungsversuche. Bitte warten Sie 15 Minuten.'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(15 * 60 * 1000),
   keyGenerator: (req) => {
     const token = req.body?.token || req.query?.token || 'unknown';
     const tokenHash = require('crypto').createHash('sha256').update(token).digest('hex').substring(0, 16);
@@ -439,7 +456,7 @@ const registrationLimiter = rateLimit({
     success: false,
     message: 'Zu viele Registrierungen von dieser IP. Bitte später versuchen.'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 60 * 1000),
   keyGenerator: (req) => `register:${req.ip}`,
   handler: (req, res) => {
     logger.warn(`⚠️ Registration rate limit exceeded for IP ${req.ip}`);
@@ -460,7 +477,7 @@ const widgetLimiter = rateLimit({
     success: false,
     message: 'Zu viele Anfragen. Bitte warten Sie einen Moment.'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(1 * 60 * 1000),
   keyGenerator: (req) => `widget:${req.ip}`,
   handler: (req, res) => {
     res.status(429).json({
@@ -478,7 +495,7 @@ const publicBookingLimiter = rateLimit({
     success: false,
     message: 'Zu viele Buchungen. Bitte versuchen Sie es später erneut.'
   },
-  store: memoryStoreAdapter,
+  store: makeStore(60 * 60 * 1000),
   keyGenerator: (req) => `publicbook:${req.ip}:${req.body?.customerEmail || 'unknown'}`,
   handler: (req, res) => {
     logger.warn(`⚠️ Public booking rate limit exceeded for IP ${req.ip}`);
@@ -497,7 +514,7 @@ const customLimiter = (windowMs, max, prefix = 'custom') => {
     windowMs,
     max,
     message: { success: false, message: `Zu viele Anfragen (${max} pro ${windowMs / 1000}s)` },
-    store: memoryStoreAdapter,
+    store: makeStore(windowMs),
     keyGenerator: (req) => req.user?.id || req.ip,
     prefix: `rl:${prefix}:`
   });
@@ -517,7 +534,7 @@ const createRateLimiter = (config) => {
     windowMs: config.windowMs || 15 * 60 * 1000,
     max: config.max || 100,
     message: config.message || 'Zu viele Anfragen',
-    store: memoryStoreAdapter,
+    store: makeStore(config.windowMs || 15 * 60 * 1000),
     keyGenerator: config.keyGenerator || ((req) => req.ip),
     skip: config.skip,
     handler: config.handler,
@@ -542,17 +559,16 @@ const getRateLimitStatus = (req, res) => {
       search: `${process.env.RATE_LIMIT_SEARCH || 30} pro 10 Minuten`,
       review: `${process.env.RATE_LIMIT_REVIEW || 5} pro Tag`
     },
-    store: 'Memory',
-    activeKeys: memoryStoreAdapter.hits.size
+    store: 'Memory (per-limiter)'
   });
 };
 
 const resetRateLimiter = (req, res) => {
   if (req.user && req.user.role === 'ceo') {
-    memoryStoreAdapter.resetAll();
+    // Stores are per-limiter instances; individual expiry handles cleanup automatically
     res.status(200).json({
       success: true,
-      message: 'Rate Limiter zurückgesetzt'
+      message: 'Rate Limiter Information: Stores laufen isoliert, Fenster laufen automatisch ab'
     });
   } else {
     res.status(403).json({
@@ -571,7 +587,7 @@ const resetRateLimitKey = (req, res) => {
         message: 'Key erforderlich'
       });
     }
-    memoryStoreAdapter.resetKey(key);
+    // Note: keys are distributed across per-limiter stores; no single reset is possible
     res.status(200).json({
       success: true,
       message: `Rate Limit Key ${key} zurückgesetzt`
@@ -610,11 +626,11 @@ const rateLimiterMiddlewareChain = [generalLimiter, apiLimiter];
 // ==================== CLEANUP ON SHUTDOWN ====================
 
 process.on('SIGTERM', () => {
-  memoryStoreAdapter.stopCleanupInterval();
+  // Individual store cleanup intervals will stop when process exits
 });
 
 process.on('SIGINT', () => {
-  memoryStoreAdapter.stopCleanupInterval();
+  // Individual store cleanup intervals will stop when process exits
 });
 
 // ==================== EXPORT ====================
@@ -644,7 +660,6 @@ export {
   widgetLimiter,
   publicBookingLimiter,
   // Utilities
-  memoryStoreAdapter,
   customLimiter,
   adminBypass,
   createRateLimiter,

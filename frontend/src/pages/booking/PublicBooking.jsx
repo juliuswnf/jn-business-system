@@ -15,6 +15,13 @@ const defaultTimeSlots = [
   '16:00', '16:30', '17:00', '17:30'
 ];
 
+const toLocalDateString = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 /**
  * PUBLIC BOOKING - Ohne Anmeldung
  * Unterstützt zwei Formate:
@@ -53,7 +60,6 @@ export default function PublicBooking() {
   const [submitting, setSubmitting] = useState(false);
   const [salonInfo, setSalonInfo] = useState(null);
   const [services, setServices] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
   // Step 0 = Service, 1 = Zeit, 2 = Daten, 3 = Übersicht
@@ -70,8 +76,6 @@ export default function PublicBooking() {
     serviceId: '',
     date: '',
     time: '',
-    employee: '',
-    employeeId: '',
   });
   const [paymentMethodId, setPaymentMethodId] = useState(null);
   const [noShowKillerEnabled] = useState(false);
@@ -123,14 +127,6 @@ export default function PublicBooking() {
             })));
           }
 
-          // Map employees if available
-          if (data.employees) {
-            setEmployees(data.employees.map(e => ({
-              id: e._id,
-              name: e.name,
-              rating: e.rating || 4.5
-            })));
-          }
         }
       }
     } catch (error) {
@@ -156,8 +152,7 @@ export default function PublicBooking() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             date: bookingData.date,
-            serviceId: bookingData.serviceId,
-            employeeId: bookingData.employeeId || undefined
+            serviceId: bookingData.serviceId
           })
         }
       );
@@ -191,14 +186,6 @@ export default function PublicBooking() {
     }));
   };
 
-  const handleEmployeeSelect = (emp) => {
-    setBookingData(prev => ({
-      ...prev,
-      employee: emp.name,
-      employeeId: emp.id
-    }));
-  };
-
   const handleSubmit = async () => {
     if (submitting) return;
     setSubmitting(true);
@@ -212,7 +199,6 @@ export default function PublicBooking() {
       // Prepare request body
       const requestBody = {
         serviceId: bookingData.serviceId,
-        employeeId: bookingData.employeeId || undefined,
         bookingDate: {
           date: bookingData.date, // "2025-12-15"
           time: bookingData.time  // "14:00"
@@ -245,7 +231,6 @@ export default function PublicBooking() {
         const confirmationData = {
           salon: salonInfo?.name || 'Salon',
           service: bookingData.service,
-          employee: bookingData.employee || 'Wird zugewiesen',
           date: bookingData.date,
           time: bookingData.time,
           name: bookingData.customerName,
@@ -276,7 +261,7 @@ export default function PublicBooking() {
     return (
       <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700 mx-auto"></div>
           <p className="text-zinc-600 mt-4">Lade Buchungsoptionen...</p>
         </div>
       </div>
@@ -352,6 +337,29 @@ export default function PublicBooking() {
       }));
     };
 
+    const selectedDate = bookingData.date ? new Date(`${bookingData.date}T00:00:00`) : null;
+    const selectedDayName = selectedDate
+      ? ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][selectedDate.getDay()]
+      : null;
+    const selectedDayHours = selectedDayName ? salonInfo?.businessHours?.[selectedDayName] : null;
+    const isTodaySelected = bookingData.date === toLocalDateString(new Date());
+    const hasBookedSlots = bookedSlots.length > 0;
+    let availabilityHint = '';
+
+    if (isTodaySelected) {
+      availabilityHint = 'Hinweis: Fuer heute werden bereits vergangene Uhrzeiten automatisch ausgeblendet.';
+    } else if (hasBookedSlots) {
+      availabilityHint = 'Hinweis: Einzelne Uhrzeiten koennen bereits belegt sein und werden deshalb nicht angezeigt.';
+    } else if (selectedDate) {
+      if (selectedDayHours?.closed) {
+        availabilityHint = 'Hinweis: Der gewaehlte Wochentag ist laut Oeffnungszeiten geschlossen.';
+      } else {
+        const openLabel = selectedDayHours?.open || '09:00';
+        const closeLabel = selectedDayHours?.close || '18:00';
+        availabilityHint = `Hinweis: Die Verfuegbarkeit richtet sich nach den Oeffnungszeiten (${openLabel} - ${closeLabel}) des ausgewaehlten Wochentags.`;
+      }
+    }
+
     return (
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
         <div className="order-1">
@@ -365,15 +373,15 @@ export default function PublicBooking() {
           {isMobile ? (
             <input
               type="date"
-              min={new Date().toISOString().split('T')[0]}
+              min={toLocalDateString(new Date())}
               value={bookingData.date}
               onChange={(e) => handleDateSelect(e.target.value)}
-              className="w-full p-4 text-lg border-2 rounded-2xl bg-white focus:border-blue-500 transition touch-manipulation"
+              className={`w-full p-4 text-lg border-2 rounded-2xl bg-white focus:border-blue-500 transition touch-manipulation ${bookingData.date ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}`}
             />
           ) : (
             <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
               {upcomingDates.map((date) => {
-                const dateStr = date.toISOString().split('T')[0];
+                const dateStr = toLocalDateString(date);
                 const dayName = date.toLocaleDateString('de-DE', { weekday: 'short' });
                 const dayNum = date.getDate();
                 const monthName = date.toLocaleDateString('de-DE', { month: 'short' });
@@ -384,7 +392,7 @@ export default function PublicBooking() {
                     onClick={() => handleDateSelect(dateStr)}
                     className={`flex flex-col items-center rounded-2xl text-center px-2 py-3 text-sm transition ${
                       isActive
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-blue-50 text-blue-800 border-2 border-blue-500 ring-2 ring-blue-200'
                         : 'bg-white text-gray-800 border border-gray-200 hover:border-blue-500'
                     }`}
                   >
@@ -415,7 +423,7 @@ export default function PublicBooking() {
                   className={`
                     rounded-2xl px-3 py-2 text-sm md:text-base transition
                     ${isBooked ? 'bg-gray-200 text-zinc-500 line-through' : ''}
-                    ${isSelected && !isBooked ? 'bg-blue-600 text-white' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-blue-500'}
+                    ${isSelected && !isBooked ? 'bg-blue-50 text-blue-800 border-2 border-blue-500 ring-2 ring-blue-200 font-semibold' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-blue-500'}
                   `}
                 >
                   {slot}
@@ -423,6 +431,11 @@ export default function PublicBooking() {
               );
             })}
           </div>
+          {availabilityHint && (
+            <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+              {availabilityHint}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -543,28 +556,6 @@ export default function PublicBooking() {
                 <ServiceGrid />
               </div>
 
-              {employees.length > 0 && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold">Bevorzugter Mitarbeiter (optional)</h3>
-                    <span className="text-sm text-zinc-400">({employees.length} verfügbar)</span>
-                  </div>
-                  <div className="space-y-2">
-                    {employees.map(emp => (
-                      <button
-                        key={emp.id}
-                        onClick={() => handleEmployeeSelect(emp)}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-left transition border ${
-                          bookingData.employeeId === emp.id ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-gray-200 hover:border-blue-500 bg-white'
-                        }`}
-                      >
-                        <span className="font-medium">{emp.name}</span>
-                        <span className="text-sm text-zinc-400">{emp.rating ? emp.rating.toFixed(1) : '⭐'}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
@@ -652,8 +643,6 @@ export default function PublicBooking() {
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
                   <p className="text-sm text-zinc-400">Service</p>
                   <p className="font-semibold">{bookingData.service}</p>
-                  <p className="text-sm text-zinc-400">Mitarbeiter</p>
-                  <p className="font-semibold">{bookingData.employee || 'Wird zugewiesen'}</p>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">

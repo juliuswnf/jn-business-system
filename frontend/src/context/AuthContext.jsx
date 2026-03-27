@@ -7,6 +7,8 @@ export const AuthContext = createContext();
 
 // AuthProvider Component
 export const AuthProvider = ({ children }) => {
+  const SKIP_AUTH_INIT_ONCE_KEY = 'jn:skipAuthInitOnce';
+  const PROTECTED_PATH_PREFIXES = ['/dashboard', '/customer', '/ceo', '/admin', '/employee', '/sessions'];
   const [user, setUser] = useState(null);
   const [isAuthenticated, isAuthenticatedSet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,10 +20,51 @@ export const AuthProvider = ({ children }) => {
     let isMounted = true;
     
     const initializeAuth = async () => {
+      const currentPath = window.location.pathname || '/';
+      const isProtectedPath = PROTECTED_PATH_PREFIXES.some((prefix) => currentPath.startsWith(prefix));
+      const hasAuthHint = Boolean(
+        localStorage.getItem('jnUser') ||
+        localStorage.getItem('user') ||
+        localStorage.getItem('jnAuthToken') ||
+        localStorage.getItem('token')
+      );
+
+      // On public pages without auth hints, skip profile check to avoid expected 401 noise on hard refresh
+      if (!isProtectedPath && !hasAuthHint) {
+        if (isMounted) {
+          setUser(null);
+          isAuthenticatedSet(false);
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      const shouldSkipInitOnce = sessionStorage.getItem(SKIP_AUTH_INIT_ONCE_KEY) === '1';
+      if (shouldSkipInitOnce) {
+        sessionStorage.removeItem(SKIP_AUTH_INIT_ONCE_KEY);
+        if (isMounted) {
+          setUser(null);
+          isAuthenticatedSet(false);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         // ? SECURITY FIX: Tokens are now in HTTP-only cookies
         // Check if user is authenticated by calling the profile endpoint
-        const response = await api.get('/auth/profile');
+        const response = await api.get('/auth/profile', {
+          validateStatus: (status) => status === 200 || status === 401
+        });
+
+        if (response.status === 401) {
+          if (isMounted) {
+            setUser(null);
+            isAuthenticatedSet(false);
+          }
+          return;
+        }
+
         if (isMounted && response.data.success) {
           const user = response.data.user;
           setUser(user);
@@ -78,6 +121,7 @@ export const AuthProvider = ({ children }) => {
       // ? SECURITY FIX: Tokens are now in HTTP-only cookies
       // Tokens are automatically sent by browser with withCredentials: true
       // No need to store in localStorage or set headers manually
+      sessionStorage.removeItem(SKIP_AUTH_INIT_ONCE_KEY);
       setUser(user);
       isAuthenticatedSet(true);
 
@@ -106,6 +150,7 @@ export const AuthProvider = ({ children }) => {
       // ? SECURITY FIX: Tokens are now in HTTP-only cookies
       // Tokens are automatically sent by browser with withCredentials: true
       // No need to store in localStorage or set headers manually
+      sessionStorage.removeItem(SKIP_AUTH_INIT_ONCE_KEY);
       setUser(user);
       isAuthenticatedSet(true);
 
@@ -145,6 +190,9 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('jnUser');
       localStorage.removeItem('user');
       localStorage.removeItem('tempUser');
+
+      // Skip exactly one initializeAuth profile call after redirect/reload
+      sessionStorage.setItem(SKIP_AUTH_INIT_ONCE_KEY, '1');
 
       return { success: true };
     } catch (err) {

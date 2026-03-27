@@ -1,0 +1,108 @@
+[
+  {
+    "_id": "694875997c88bac8c459d07b",
+    "salonId": "6936054fc3f0f48ae67db4b7",
+    "apiKey": "c6488926751cbf506cc73f1ee70824381684759b0aa50ee35444ba9122332eb9",
+    "allowedDomains": [],
+    "theme": {
+      "primaryColor": "#3B82F6",
+      "secondaryColor": "#1F2937",
+      "fontFamily": "Inter, system-ui, sans-serif",
+      "borderRadius": "8px"
+    },
+    "settings": {
+      "showLogo": true,
+      "showAddress": true,
+      "showBusinessHours": true,
+      "requirePhone": false,
+      "enableGuestBooking": true,
+      "defaultLanguage": "de",
+      "enableLanguageSwitch": true
+    },
+    "layout": "popup",
+    "width": "100%",
+    "height": "600px",
+    "isActive": true,
+    "stats": {
+      "totalBookings": 0,
+      "lastBookingAt": null,
+      "totalViews": 0,
+      "lastViewAt": null
+    },
+    "createdAt": "2025-12-21T22:32:57.305Z",
+    "updatedAt": "2025-12-21T22:32:57.312Z",
+    "__v": 0
+  },
+  {
+    "_id": "69a834ba5513b278b062f81b",
+    "salonId": "69a82dd7aa2c0181cd06f515",
+    "apiKey": "9e69243bd12bd4aacb063bd9b5b2de1e885476af2debbf5f694c961d4c22900b",
+    "allowedDomains": [],
+    "theme": {
+      "primaryColor": "#3B82F6",
+      "secondaryColor": "#1F2937",
+      "fontFamily": "Inter, system-ui, sans-serif",
+      "borderRadius": "8px"
+    },
+    "settings": {
+      "showLogo": true,
+      "showAddress": true,
+      "showBusinessHours": true,
+      "requirePhone": false,
+      "enableGuestBooking": true,
+      "defaultLanguage": "de",
+      "enableLanguageSwitch": true
+    },
+    "layout": "popup",
+    "width": "100%",
+    "deletedAt": null,
+    "deletedBy": null,
+    "height": "600px",
+    "isActive": true,
+    "stats": {
+      "totalBookings": 0,
+      "lastBookingAt": null,
+      "totalViews": 0,
+      "lastViewAt": null
+    },
+    "createdAt": "2026-03-04T13:33:46.265Z",
+    "updatedAt": "2026-03-04T13:33:46.268Z",
+    "__v": 0
+  },
+  {
+    "_id": "69a83648a2b6f64f8f23455c",
+    "salonId": "69a82dd8aa2c0181cd06f522",
+    "apiKey": "7374880a9854dbd97285de031de2c9ddb77b9373f5a294f33ef34d90ee527d13",
+    "allowedDomains": [],
+    "theme": {
+      "primaryColor": "#3B82F6",
+      "secondaryColor": "#1F2937",
+      "fontFamily": "Inter, system-ui, sans-serif",
+      "borderRadius": "8px"
+    },
+    "settings": {
+      "showLogo": true,
+      "showAddress": true,
+      "showBusinessHours": true,
+      "requirePhone": false,
+      "enableGuestBooking": true,
+      "defaultLanguage": "de",
+      "enableLanguageSwitch": true
+    },
+    "layout": "popup",
+    "width": "100%",
+    "deletedAt": null,
+    "deletedBy": null,
+    "height": "600px",
+    "isActive": true,
+    "stats": {
+      "totalBookings": 0,
+      "lastBookingAt": null,
+      "totalViews": 0,
+      "lastViewAt": null
+    },
+    "createdAt": "2026-03-04T13:40:24.159Z",
+    "updatedAt": "2026-03-04T13:40:24.160Z",
+    "__v": 0
+  }
+]

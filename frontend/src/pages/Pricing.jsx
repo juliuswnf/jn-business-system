@@ -198,7 +198,7 @@ export default function Pricing() {
         </div>
 
         {/* Enterprise Testphase Banner */}
-        <div className="max-w-4xl mx-auto mb-12 bg-zinc-50 border-2 border-white rounded-xl p-6 text-center shadow-none shadow-white/10">
+        <div className="max-w-4xl mx-auto mb-12 bg-zinc-50 border-2 border-zinc-300 rounded-xl p-6 text-center shadow-none">
           <div className="flex items-center justify-center gap-2 mb-2">
             <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -223,7 +223,7 @@ export default function Pricing() {
               key={plan.id}
               className={`border rounded-xl p-8 relative ${
                 plan.popular
-                  ? 'border-white bg-zinc-50 shadow-none scale-105'
+                  ? 'border-zinc-900 bg-white shadow-sm scale-105'
                   : 'border-zinc-200 bg-zinc-50/50'
               }`}
             >
@@ -347,7 +347,7 @@ export default function Pricing() {
         </div>
 
         {/* SMS Callout */}
-        <div className="max-w-4xl mx-auto mb-20 bg-zinc-50 border border-zinc-200 rounded-xl p-8 hover:border-white/30 transition-all duration-300">
+        <div className="max-w-4xl mx-auto mb-20 bg-zinc-50 border border-zinc-200 rounded-xl p-8 hover:border-zinc-400 transition-all duration-300">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
               <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">

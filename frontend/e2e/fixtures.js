@@ -8,8 +8,8 @@ import { test as base, expect } from '@playwright/test';
 // Test user credentials
 export const TEST_USERS = {
   owner: {
-    email: 'test-owner@jn-business-system.test',
-    password: 'TestOwner123!',
+    email: 'test-salon@jnbusiness.de',
+    password: 'TestPassword123!',
     name: 'Test Owner'
   },
   customer: {
@@ -27,7 +27,7 @@ export const TEST_USERS = {
 // Test salon data
 export const TEST_SALON = {
   name: 'E2E Test Salon',
-  slug: 'e2e-test-salon',
+  slug: 'demo-barber-starter',
   address: 'Test Street 123, 12345 Berlin',
   phone: '+49123456789'
 };
@@ -36,29 +36,12 @@ export const TEST_SALON = {
 export const test = base.extend({
   // Auto-login as salon owner
   authenticatedPage: async ({ page }, use) => {
-    await page.goto('/login');
-    await page.fill('input[name="email"]', TEST_USERS.owner.email);
-    await page.fill('input[name="password"]', TEST_USERS.owner.password);
+    await page.goto('/login/business');
+    await page.fill('input#email, input[type="email"]', TEST_USERS.owner.email);
+    await page.fill('input#password, input[type="password"]', TEST_USERS.owner.password);
     await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard');
+    await page.waitForURL('**/dashboard**');
     await use(page);
-  },
-
-  // Storage state for authenticated user
-  storageState: async ({ browser }, use) => {
-    const context = await browser.newContext();
-    const page = await context.newPage();
-
-    await page.goto('/login');
-    await page.fill('input[name="email"]', TEST_USERS.owner.email);
-    await page.fill('input[name="password"]', TEST_USERS.owner.password);
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard');
-
-    const storage = await context.storageState();
-    await context.close();
-
-    await use(storage);
   }
 });
 

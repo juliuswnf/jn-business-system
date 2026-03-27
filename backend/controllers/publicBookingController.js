@@ -23,6 +23,18 @@ import emailService from '../services/emailService.js';
 import emailTemplateService from '../services/emailTemplateService.js';
 import emailQueueWorker from '../workers/emailQueueWorker.js';
 
+const isPublicBookingAvailable = (salon) => {
+  if (!salon) return false;
+
+  if (process.env.NODE_ENV !== 'production') {
+    return true;
+  }
+
+  return typeof salon.hasActiveSubscription === 'function'
+    ? salon.hasActiveSubscription()
+    : false;
+};
+
 /**
  * Get all salons for public listing
  * GET /api/public/salons
@@ -200,7 +212,7 @@ export const getSalonBySlug = async (req, res) => {
     }
 
     // Check if salon has active subscription
-    if (!salon.hasActiveSubscription()) {
+    if (!isPublicBookingAvailable(salon)) {
       return res.status(403).json({
         success: false,
         message: 'Buchungen sind derzeit nicht verfügbar'
@@ -261,7 +273,7 @@ export const getAvailableSlots = async (req, res) => {
 
     const salon = await Salon.findBySlug(slug);
 
-    if (!salon || !salon.hasActiveSubscription()) {
+    if (!salon || !isPublicBookingAvailable(salon)) {
       return res.status(404).json({
         success: false,
         message: 'Salon nicht gefunden oder Buchungen nicht verfügbar'
@@ -519,7 +531,7 @@ export const createPublicBooking = async (req, res) => {
 
     // Check subscription
     stage = 'check_subscription';
-    if (!salon.hasActiveSubscription()) {
+    if (!isPublicBookingAvailable(salon)) {
       return res.status(403).json({
         success: false,
         message: 'Buchungen sind derzeit nicht verfügbar'

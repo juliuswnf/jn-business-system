@@ -541,7 +541,7 @@ function Home() {
               {[
                 { name: 'Starter', price: '€129', sub: '/Monat', items: ['5 Mitarbeiter', '100 Buchungen/Mo', 'Ausfall-Schutz (Basis)', 'E-Mail-Support'] },
                 { name: 'Professional', price: '€249', sub: '/Monat', popular: true, items: ['Unbegrenzt Mitarbeiter', 'Ausfall-Schutz (Komplett)', 'Automatisches Marketing', 'Branchen-Abläufe'] },
-                { name: 'Enterprise', price: '€599', sub: '/Monat', items: ['Alles unbegrenzt', 'Alle 8 Branchen-Abläufe', 'Mehrere Standorte', 'Priorisierter Support rund um die Uhr'] },
+                { name: 'Enterprise', price: '€599', sub: '/Monat', items: ['Alles unbegrenzt', 'Alle 8 Branchen-Abläufe', 'Mehrere Standorte', 'Priorisierter Support'] },
               ].map((plan, i) => (
                 <div
                   key={i}

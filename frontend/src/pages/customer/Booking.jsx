@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../hooks/useNotification';
-import { FiClock, FiStar } from 'react-icons/fi';
+import { FiClock } from 'react-icons/fi';
 import SalonSelector from '../../components/booking/SalonSelector';
 import { api } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
@@ -32,14 +32,11 @@ export default function Booking() {
     serviceId: '',
     date: '',
     time: '',
-    employee: '',
-    employeeId: '',
     note: '',
   });
 
-  // Service & employee state (loaded after salon selection)
+  // Service state (loaded after salon selection)
   const [services, setServices] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
 
@@ -82,18 +79,16 @@ export default function Booking() {
 
   // Handle salon selection
   const handleSalonSelect = async (salon) => {
-    setBookingData(prev => ({
-      ...prev,
-      salonId: salon._id,
-      salonName: salon.name,
-      salonSlug: salon.slug
-    }));
-
-    // ? SECURITY FIX: Use central api instance (public endpoint, no auth needed)
-    // Fetch services and employees for this salon
     try {
       const res = await api.get(`/bookings/public/s/${salon.slug}`);
       if (res.data.success) {
+        setBookingData(prev => ({
+          ...prev,
+          salonId: salon._id,
+          salonName: salon.name,
+          salonSlug: salon.slug
+        }));
+
         const data = res.data;
         setServices(data.services?.map(s => ({
           id: s._id,
@@ -103,18 +98,13 @@ export default function Booking() {
           durationMinutes: s.duration || 30
         })) || []);
 
-        setEmployees(data.employees?.map(e => ({
-          id: e._id,
-          name: e.name,
-          rating: 4.5,
-          appointments: 0
-        })) || []);
+        setBookingStep(1);
       }
     } catch (error) {
       captureError(error, { context: 'fetchSalonDetails' });
+      const errorMessage = error?.response?.data?.message || 'Salon konnte nicht geladen werden. Bitte versuchen Sie es erneut.';
+      showNotification(errorMessage, 'error');
     }
-
-    setBookingStep(1);
   };
 
   // Fetch available slots when date changes
@@ -129,8 +119,7 @@ export default function Booking() {
       // ? SECURITY FIX: Use central api instance (public endpoint, no auth needed)
       const res = await api.post(`/bookings/public/s/${bookingData.salonSlug}/available-slots`, {
         date: bookingData.date,
-        serviceId: bookingData.serviceId,
-        employeeId: bookingData.employeeId || undefined
+        serviceId: bookingData.serviceId
       });
 
       if (res.data.success && res.data.slots) {
@@ -159,14 +148,6 @@ export default function Booking() {
     }));
   };
 
-  const handleEmployeeSelect = (emp) => {
-    setBookingData(prev => ({
-      ...prev,
-      employee: emp.name,
-      employeeId: emp.id
-    }));
-  };
-
   const handleSubmit = async () => {
     if (submitting) return;
     
@@ -191,7 +172,6 @@ export default function Booking() {
       // ✅ AUDIT FIX: Send date and time separately for timezone handling
       const res = await api.post(`/bookings/public/s/${bookingData.salonSlug}/book`, {
         serviceId: bookingData.serviceId,
-        employeeId: bookingData.employeeId || undefined,
         bookingDate: {
           date: bookingData.date, // "2025-12-15"
           time: bookingData.time  // "14:00"
@@ -224,12 +204,9 @@ export default function Booking() {
           serviceId: '',
           date: '',
           time: '',
-          employee: '',
-          employeeId: '',
           note: '',
         });
         setServices([]);
-        setEmployees([]);
       } else {
         if (res.status === 409) {
           showNotification('Dieser Termin ist leider schon vergeben. Bitte wähle eine andere Uhrzeit.', 'error');
@@ -255,7 +232,7 @@ export default function Booking() {
     return (
       <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700 mx-auto"></div>
           <p className="text-zinc-600 mt-4">Lade Buchungsoptionen...</p>
         </div>
       </div>
@@ -345,7 +322,7 @@ export default function Booking() {
                     onClick={() => handleServiceSelect(service)}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition ${
                       bookingData.service === service.name
-                        ? 'border-white bg-zinc-50'
+                        ? 'border-zinc-900 bg-white shadow-sm'
                         : 'border-zinc-200 hover:border-zinc-300 bg-zinc-50'
                     }`}
                   >
@@ -357,37 +334,6 @@ export default function Booking() {
                   </div>
                 ))}
               </div>
-            )}
-
-            {employees.length > 0 && (
-              <>
-                <h3 className="text-xl font-bold mb-4 mt-8">Bevorzugten Mitarbeiter wählen (optional)</h3>
-                <div className="space-y-3 mb-6">
-                  {employees.map((emp) => (
-                    <div
-                      key={emp.id}
-                      onClick={() => handleEmployeeSelect(emp)}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition ${
-                        bookingData.employee === emp.name
-                          ? 'border-white bg-white/5'
-                          : 'border-zinc-200 hover:border-zinc-300 bg-zinc-50'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold">{emp.name}</p>
-                        </div>
-                        {emp.rating > 0 && (
-                          <div className="flex items-center text-sm text-zinc-600 gap-2">
-                            <FiStar className="text-yellow-600" />
-                            <span>{emp.rating.toFixed(1)}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
             )}
 
             <div className="flex gap-4">
@@ -523,10 +469,6 @@ export default function Booking() {
               <div className="flex justify-between">
                 <span className="text-zinc-600">Service:</span>
                 <span className="font-semibold">{bookingData.service}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-600">Mitarbeiter:</span>
-                <span className="font-semibold">{bookingData.employee || 'Wird zugewiesen'}</span>
               </div>
               <div className="border-t border-zinc-200 pt-4 mt-4">
                 <div className="flex justify-between font-bold text-lg">

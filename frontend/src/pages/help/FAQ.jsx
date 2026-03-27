@@ -15,114 +15,102 @@ const FAQ = () => {
 
   const faqs = [
     {
-      category: 'Für Geschäftsinhaber',
+      category: 'Einstieg & Grundlagen',
       questions: [
         {
-          question: 'Wie viel kostet JN Business System?',
-          answer: 'Wir bieten verschiedene Preise an: Starter (€129 pro Monat), Professional (€249 pro Monat) und Enterprise (€599 pro Monat). Jeder Plan kann 30 Tage kostenlos getestet werden ohne Kreditkarte.'
+          question: 'Wie schnell kann ich mit dem System starten?',
+          answer: 'In der Regel sind die wichtigsten Einstellungen in 10–15 Minuten erledigt: Services anlegen, Öffnungszeiten festlegen und Buchungsseite aktivieren. Danach können Kunden direkt Termine buchen.'
         },
         {
-          question: 'Wie schnell kann ich starten?',
-          answer: 'Nach der Registrierung dauert das Setup ca. 10-15 Minuten. Sie fügen Ihre Services hinzu, legen Öffnungszeiten fest und können sofort Buchungen empfangen. Kein technisches Wissen erforderlich.'
+          question: 'Benötige ich eine eigene Website?',
+          answer: 'Nein. Sie erhalten eine eigene Buchungsseite, die Sie sofort teilen können. Optional können Sie zusätzlich das Buchungs-Widget in Ihre bestehende Website einbinden.'
         },
         {
-          question: 'Brauche ich eine Website?',
-          answer: 'Nein! Sie erhalten automatisch eine eigene Buchungsseite (z.B. /s/ihr-business-name), die Sie in Social Media teilen können. Optional können Sie auch unser Booking-Widget auf Ihrer bestehenden Website einbinden.'
+          question: 'Gibt es eine Testphase?',
+          answer: 'Ja. Sie können das System zunächst testen und anschließend den passenden Plan wählen. Die aktuellen Konditionen finden Sie jederzeit transparent auf der Preisseite.'
         },
         {
-          question: 'Wie werden meine Kunden benachrichtigt?',
-          answer: 'Automatische E-Mails bei Buchung, 1 Tag vor dem Termin als Erinnerung und nach dem Termin mit Bitte um Bewertung. Alles vollautomatisch.'
+          question: 'Muss ich technisches Wissen mitbringen?',
+          answer: 'Nein. Die Oberfläche ist für den täglichen Einsatz in Studios und Dienstleistungsbetrieben ausgelegt. Die wichtigsten Funktionen sind ohne technische Vorkenntnisse nutzbar.'
         },
         {
-          question: 'Kann ich mehrere Mitarbeiter verwalten?',
-          answer: 'Ja! Sie können beliebig viele Mitarbeiter hinzufügen. Jeder Mitarbeiter bekommt einen eigenen Login und kann seine Termine selbst verwalten. Perfekt für Teams.'
+          question: 'Für welche Branchen ist JN Business System geeignet?',
+          answer: 'Das System ist für servicebasierte Unternehmen konzipiert, z. B. Beauty, Barbershop, Tattoo, Wellness oder ähnliche Terminbetriebe mit Kundenbuchungen.'
         },
-        {
-          question: 'Was passiert, wenn ein Kunde nicht erscheint?',
-          answer: 'Sie können vergessene Termine markieren und optional eine Gebühr in den Einstellungen aktivieren. Wir zählen für Sie mit wie oft das passiert.'
-        },
-        {
-          question: 'Kann ich Online-Zahlungen empfangen?',
-          answer: 'Ja, über den Bezahldienst Stripe. Kunden können bei der Buchung direkt bezahlen. Sie erhalten Ihr Geld automatisch ausgezahlt (Stripe-Gebühren: 1,5% + €0,25 pro Zahlung).'
-        },
-        {
-          question: 'Wie funktioniert die Testphase?',
-          answer: '30 Tage kostenlos, keine Kreditkarte erforderlich. Sie haben Zugriff auf alle Funktionen. Nach der Testphase wählen Sie einen Preis oder Ihr Konto wird pausiert (keine Löschung Ihrer Daten).'
-        }
       ]
     },
     {
-      category: 'Für Kunden',
+      category: 'Buchung & Kundenkommunikation',
       questions: [
         {
           question: 'Muss ich mich registrieren, um zu buchen?',
-          answer: 'Nein, Buchungen sind auch als Gast möglich. Sie geben nur Name, E-Mail und Telefonnummer an. Für ein eigenes Kundenkonto können Sie sich optional registrieren.'
+          answer: 'Nein, Buchungen können je nach Einstellung auch ohne vollständiges Kundenkonto erfolgen. Ein Kundenkonto ist optional und vereinfacht spätere Umbuchungen und Übersicht.'
         },
         {
           question: 'Wie kann ich meinen Termin ändern oder stornieren?',
-          answer: 'In der Bestätigungs-E-Mail finden Sie einen Link zum Verwalten Ihres Termins. Dort können Sie umbuchen oder stornieren. Bei Stornierung weniger als 24h vorher kann eine Gebühr anfallen.'
+          answer: 'Über den Link in der Bestätigung können Termine verwaltet werden. Ob und bis wann kostenfrei storniert werden kann, legt der jeweilige Anbieter in seinen Regeln fest.'
         },
         {
           question: 'Bekomme ich eine Erinnerung?',
-          answer: 'Ja, Sie erhalten 24 Stunden vor Ihrem Termin eine Erinnerungs-E-Mail mit allen Details (Datum, Uhrzeit, Adresse, Service).'
+          answer: 'Ja. Erinnerungen werden automatisiert versendet, damit Termine zuverlässig wahrgenommen werden. Der genaue Zeitpunkt kann vom Anbieter konfiguriert werden.'
         },
         {
           question: 'Kann ich mehrere Services gleichzeitig buchen?',
-          answer: 'Das hängt vom Anbieter ab. Viele Unternehmen erlauben es, mehrere Services zu kombinieren. Die Zeiten werden automatisch zusammengerechnet.'
+          answer: 'Wenn der Anbieter Kombinationsbuchungen aktiviert hat, können mehrere Leistungen in einem Termin geplant werden. Die Dauer wird dabei automatisch berücksichtigt.'
         },
         {
-          question: 'Wie sicher sind meine Daten?',
-          answer: 'Sehr sicher! Alle Daten werden verschlüsselt übertragen. Wir speichern nur das Nötigste und geben niemals Daten an andere weiter. Nach deutschem Datenschutz.'
+          question: 'Wie werden Kunden nach der Buchung informiert?',
+          answer: 'Nach der Buchung erhalten Kunden eine Bestätigung mit allen Details. Zusätzlich sind je nach Konfiguration Erinnerungen und Folge-Nachrichten möglich.'
         }
       ]
     },
     {
-      category: 'Technisches',
+      category: 'Team, Betrieb & Zahlungen',
       questions: [
         {
-          question: 'Funktioniert es auf dem Smartphone?',
-          answer: 'Ja! Das gesamte System ist für Mobile optimiert. Sowohl Geschäftsinhaber als auch Kunden können alles bequem vom Smartphone aus nutzen.'
+          question: 'Kann ich Mitarbeiter-Zugänge vergeben?',
+          answer: 'Ja. Teams können mit eigenen Logins arbeiten, sodass Termine und tägliche Abläufe dezentral bearbeitet werden können.'
         },
         {
-          question: 'Welche Browser werden unterstützt?',
-          answer: 'Alle modernen Browser: Chrome, Firefox, Safari, Edge. Auch auf Tablets und iPads funktioniert alles einwandfrei.'
+          question: 'Wie gehe ich mit No-Shows um?',
+          answer: 'Termine können als nicht erschienen markiert werden. Je nach Einstellungen sind Regeln für Storno- oder Ausfallprozesse abbildbar.'
         },
         {
-          question: 'Gibt es eine App?',
-          answer: 'Aktuell nicht, aber unsere Web-Seite funktioniert wie eine App. Sie können sie auf Ihrem Startbildschirm speichern.'
+          question: 'Sind Online-Zahlungen möglich?',
+          answer: 'Ja. Über unterstützte Zahlungsanbieter können Zahlungen im Buchungsprozess integriert werden. Die Auszahlung erfolgt über den jeweils angebundenen Provider.'
+        },
+        {
+          question: 'Kann ich mehrere Standorte verwalten?',
+          answer: 'Ja, je nach gewähltem Plan sind Multi-Location-Funktionen verfügbar, damit mehrere Standorte zentral verwaltet werden können.'
+        },
+        {
+          question: 'Wie transparent sind Kosten und Limits?',
+          answer: 'Planumfang und verfügbare Funktionen sind klar pro Tarif ausgewiesen. So ist jederzeit ersichtlich, welche Features in Ihrem Paket enthalten sind.'
+        }
+      ]
+    },
+    {
+      category: 'Datenschutz, Technik & Support',
+      questions: [
+        {
+          question: 'Sind meine Daten sicher?',
+          answer: 'Datenübertragung und Zugriff sind auf Sicherheit ausgelegt. Zusätzlich gelten die jeweils definierten Datenschutz- und Zugriffskonzepte innerhalb der Plattform.'
         },
         {
           question: 'Kann ich meine Daten exportieren?',
-          answer: 'Ja, Sie können jederzeit Sicherungen erstellen und Ihre Daten als Excel-Datei herunterladen. Ihre Daten gehören Ihnen!'
+          answer: 'Ja. Je nach Bereich stehen Export- und Sicherungsoptionen zur Verfügung, damit Daten bei Bedarf weiterverarbeitet oder archiviert werden können.'
         },
         {
-          question: 'Was passiert bei einem Ausfall?',
-          answer: 'Wir garantieren 99,9% Verfügbarkeit. Unser System läuft mit automatischen Sicherungen. Bei Problemen werden Sie sofort informiert.'
-        }
-      ]
-    },
-    {
-      category: 'Abrechnung & Support',
-      questions: [
-        {
-          question: 'Kann ich monatlich kündigen?',
-          answer: 'Ja, monatliche Pläne sind jederzeit kündbar. Jahrespläne laufen automatisch aus, keine automatische Verlängerung. Keine versteckten Kosten.'
+          question: 'Funktioniert das System auf Mobilgeräten?',
+          answer: 'Ja. Die Anwendung ist responsiv und für aktuelle Smartphones, Tablets und Desktop-Browser optimiert.'
         },
         {
-          question: 'Gibt es einen Mengenrabatt?',
-          answer: 'Ja, bei mehr als 5 Standorten (z.B. Ketten) bieten wir individuelle Enterprise-Konditionen. Kontaktieren Sie uns für ein Angebot.'
+          question: 'Welche Browser werden unterstützt?',
+          answer: 'Die Plattform unterstützt aktuelle Versionen von Chrome, Safari, Firefox und Edge.'
         },
         {
-          question: 'Wie schnell ist der Support?',
-          answer: 'Support-Anfragen werden binnen 24h beantwortet (werktags). Pro- und Enterprise-Kunden erhalten bevorzugte Hilfe mit Antwortzeit unter 4h.'
-        },
-        {
-          question: 'Gibt es Schulungen?',
-          answer: 'Ja! Wir bieten kostenlose Einrichtungs-Calls (30min) für alle neuen Kunden an. Video-Anleitungen sind in der Übersicht verfügbar.'
-        },
-        {
-          question: 'Was ist nicht im Preis enthalten?',
-          answer: 'Der Plan-Preis ist all-inclusive. Einzige Extra-Kosten: Stripe-Gebühren bei Online-Zahlungen (1,5% + €0,25 pro Transaktion) - diese zahlt optional der Kunde.'
+          question: 'Wie erreiche ich den Support?',
+          answer: 'Über den Support-Bereich oder per E-Mail. Je nach Tarif können Reaktionszeiten und Support-Umfang variieren.'
         }
       ]
     }
@@ -136,65 +124,71 @@ const FAQ = () => {
         keywords="FAQ, Häufige Fragen, Buchungssystem Hilfe, Support"
         url="/faq"
       />
-    <div className="min-h-screen bg-white text-zinc-900 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white text-zinc-900 py-16 md:py-20">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-zinc-900 mb-4">
+        <div className="text-center mb-14 md:mb-16">
+          <p className="text-xs tracking-[0.2em] uppercase text-zinc-400 mb-4">Support</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 mb-4">
             Häufig gestellte Fragen
           </h1>
-          <p className="text-xl text-zinc-600">
+          <p className="text-lg md:text-xl text-zinc-500 max-w-2xl mx-auto">
             Alles, was Sie über JN Business System wissen müssen
           </p>
         </div>
 
-        {/* FAQ Sections */}
-        {faqs.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-12">
-            <h2 className="text-2xl font-bold text-zinc-900 mb-6">
-              {section.category}
-            </h2>
-            <div className="space-y-4">
-              {section.questions.map((faq, index) => {
-                const globalIndex = `${sectionIndex}-${index}`;
-                const isOpen = openIndex === globalIndex;
+        <section className="mb-14 space-y-10">
+          {faqs.map((section, sectionIndex) => (
+            <div key={section.category}>
+              <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 mb-4">
+                {section.category}
+              </h2>
 
-                return (
-                  <div
-                    key={index}
-                    className="bg-zinc-50 rounded-lg shadow-sm border border-zinc-200 overflow-hidden"
-                  >
-                    <button
-                      onClick={() => toggleFAQ(globalIndex)}
-                      className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-zinc-100 transition-colors"
-                    >
-                      <span className="font-semibold text-zinc-900 pr-8">
-                        {faq.question}
-                      </span>
-                      {isOpen ? (
-                        <ChevronUpIcon className="h-5 w-5 text-zinc-500 flex-shrink-0" />
-                      ) : (
-                        <ChevronDownIcon className="h-5 w-5 text-zinc-500 flex-shrink-0" />
+              <div className="border-t border-zinc-200">
+                {section.questions.map((faq, index) => {
+                  const globalIndex = `${sectionIndex}-${index}`;
+                  const isOpen = openIndex === globalIndex;
+
+                  return (
+                    <article key={globalIndex} className="border-b border-zinc-200">
+                      <button
+                        onClick={() => toggleFAQ(globalIndex)}
+                        className="w-full !bg-transparent !border-0 !rounded-none px-0 py-5 text-left flex items-start justify-between gap-6 hover:bg-zinc-50/60 transition-colors"
+                      >
+                        <span className="font-medium text-zinc-900 leading-relaxed text-base md:text-lg">
+                          {faq.question}
+                        </span>
+
+                        <span className="flex-shrink-0 mt-0.5">
+                          {isOpen ? (
+                            <ChevronUpIcon className="h-5 w-5 text-zinc-500" />
+                          ) : (
+                            <ChevronDownIcon className="h-5 w-5 text-zinc-500" />
+                          )}
+                        </span>
+                      </button>
+
+                      {isOpen && (
+                        <div className="pb-6 -mt-1 max-w-3xl">
+                          <div className="pl-4 border-l-2 border-zinc-200 text-zinc-600 leading-relaxed">
+                            {faq.answer}
+                          </div>
+                        </div>
                       )}
-                    </button>
-                    {isOpen && (
-                      <div className="px-6 pb-4 text-zinc-600">
-                        {faq.answer}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                    </article>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </section>
 
         {/* Contact CTA */}
-        <div className="bg-zinc-50 rounded-lg p-8 text-center mt-12 border border-zinc-200">
-          <h3 className="text-2xl font-bold text-zinc-900 mb-4">
+        <div className="bg-zinc-50 rounded-2xl p-8 md:p-10 text-center mt-14 border border-zinc-200">
+          <h3 className="text-2xl font-semibold text-zinc-900 mb-3">
             Noch Fragen?
           </h3>
-          <p className="text-zinc-600 mb-6">
+          <p className="text-zinc-600 mb-7">
             Unser Support-Team hilft Ihnen gerne weiter.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
