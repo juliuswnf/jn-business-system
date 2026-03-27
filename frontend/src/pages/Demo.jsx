@@ -194,7 +194,7 @@ export default function Demo() {
                             onClick={() => { setService(s); setStep(1); }}
                             className={`p-4 rounded-lg border-2 cursor-pointer transition ${
                               service?.id === s.id
-                                ? 'border-white bg-zinc-50'
+                                ? 'border-zinc-900 bg-white shadow-sm'
                                 : 'border-zinc-200 hover:border-zinc-300 bg-zinc-50'
                             }`}
                           >

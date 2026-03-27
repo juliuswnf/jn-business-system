@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import StripeConnectAlert from '../components/Dashboard/StripeConnectAlert';
 import MobileBottomNav from '../components/Dashboard/MobileBottomNav';
@@ -10,10 +11,12 @@ export default function DashboardLayout({ children }) {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-white">
+      {!isMobile && <Navbar />}
+
       <div className="flex">
         {!isMobile && (
-          <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-zinc-200 z-20">
+          <aside className="fixed left-0 top-[73px] bottom-0 w-64 bg-white border-r border-zinc-200 z-20">
             <Sidebar />
           </aside>
         )}

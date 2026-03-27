@@ -443,12 +443,12 @@ export default function Settings() {
                     onClick={() => handlePreferenceChange(pref.key)}
                     className={`relative w-12 h-6 rounded-full transition ${
                       preferences[pref.key]
-                        ? 'bg-white'
-                        : 'bg-gray-600'
+                        ? 'bg-zinc-900'
+                        : 'bg-zinc-200'
                     }`}
                   >
                     <div className={`absolute top-1 w-4 h-4 rounded-full transition transform ${
-                      preferences[pref.key] ? 'translate-x-6 bg-white' : 'translate-x-1 bg-white'
+                      preferences[pref.key] ? 'translate-x-6 bg-white' : 'translate-x-1 bg-zinc-700'
                     }`} />
                   </button>
                 </div>

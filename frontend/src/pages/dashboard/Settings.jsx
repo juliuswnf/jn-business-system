@@ -384,7 +384,7 @@ export default function Settings() {
                   onChange={(e) => setNotifications({ ...notifications, emailConfirmation: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-zinc-700 peer-focus:ring-2 peer-focus:ring-white/20 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                <div className="w-11 h-6 bg-zinc-200 peer-focus:ring-2 peer-focus:ring-zinc-400/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-500 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zinc-900 peer-checked:after:bg-white"></div>
               </label>
             </div>
 
@@ -400,7 +400,7 @@ export default function Settings() {
                   onChange={(e) => setNotifications({ ...notifications, emailReminder: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-zinc-700 peer-focus:ring-2 peer-focus:ring-white/20 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                <div className="w-11 h-6 bg-zinc-200 peer-focus:ring-2 peer-focus:ring-zinc-400/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-500 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zinc-900 peer-checked:after:bg-white"></div>
               </label>
             </div>
 
@@ -416,7 +416,7 @@ export default function Settings() {
                   onChange={(e) => setNotifications({ ...notifications, emailReview: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-zinc-700 peer-focus:ring-2 peer-focus:ring-white/20 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                <div className="w-11 h-6 bg-zinc-200 peer-focus:ring-2 peer-focus:ring-zinc-400/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-500 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zinc-900 peer-checked:after:bg-white"></div>
               </label>
             </div>
 
@@ -432,7 +432,7 @@ export default function Settings() {
                   disabled
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-zinc-700 rounded-full peer after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-500 after:rounded-full after:h-5 after:w-5"></div>
+                <div className="w-11 h-6 bg-zinc-200 rounded-full peer after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-400 after:rounded-full after:h-5 after:w-5"></div>
               </label>
             </div>
           </div>

@@ -63,18 +63,18 @@ export default function MobileHeader() {
             className="
               fixed right-0 top-0 bottom-0 z-50
               w-72 max-w-[85vw]
-              bg-white shadow-none
+              bg-zinc-700 shadow-xl
               overflow-y-auto
               md:hidden
             "
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b">
+            <div className="p-6 border-b border-zinc-600">
               <div className="flex items-center gap-3">
-                <UserCircleIcon className="w-12 h-12 text-zinc-500" />
+                <UserCircleIcon className="w-12 h-12 text-zinc-300" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold truncate">{user?.name || 'User'}</p>
-                  <p className="text-xs text-zinc-400 truncate">{user?.email || 'keine Email'}</p>
+                  <p className="font-semibold text-white truncate">{user?.name || 'User'}</p>
+                  <p className="text-xs text-zinc-300 truncate">{user?.email || 'keine Email'}</p>
                 </div>
               </div>
             </div>
@@ -92,10 +92,10 @@ export default function MobileHeader() {
                 Einstellungen
               </MenuButton>
             </div>
-            <div className="sticky bottom-0 w-full border-t border-gray-200 bg-white p-4">
+            <div className="sticky bottom-0 w-full bg-zinc-700 p-4">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 touch-manipulation active:bg-gray-100"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium !bg-red-600 !text-white hover:!bg-red-700 border-0 ring-0 outline-none focus:ring-0 focus:outline-none appearance-none touch-manipulation"
               >
                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
                 Abmelden
@@ -112,7 +112,7 @@ function MenuButton({ onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left py-3 px-4 rounded-lg text-gray-700 font-medium touch-manipulation active:bg-gray-100 transition-colors"
+      className="w-full text-left py-3 px-4 rounded-lg text-zinc-300 font-medium touch-manipulation active:bg-white/10 transition-colors"
     >
       {children}
     </button>

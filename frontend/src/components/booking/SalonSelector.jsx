@@ -88,7 +88,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
       {/* Salon List */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-700 mx-auto"></div>
           <p className="text-zinc-500 mt-4">Lade Salons...</p>
         </div>
       ) : filteredSalons.length === 0 ? (
@@ -107,7 +107,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
               onClick={() => onSelect(salon)}
               className={`p-4 rounded-lg border-2 cursor-pointer transition text-left ${
                 selectedSalonId === salon._id
-                  ? 'border-white bg-zinc-50'
+                  ? 'border-zinc-900 bg-white shadow-sm'
                   : 'border-zinc-200 hover:border-zinc-200 bg-zinc-50 hover:bg-zinc-750'
               }`}
             >

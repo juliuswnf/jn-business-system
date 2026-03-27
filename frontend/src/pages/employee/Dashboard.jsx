@@ -114,7 +114,7 @@ export default function Dashboard() {
       {/* Loading State */}
       {loading && (
         <div className="max-w-7xl mx-auto px-6 py-12 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700 mx-auto"></div>
           <p className="text-zinc-700 mt-4">Lade Daten...</p>
         </div>
       )}

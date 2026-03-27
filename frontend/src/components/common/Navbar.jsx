@@ -112,7 +112,7 @@ export default function Navbar() {
                       handleLogout();
                       setDropdownOpen(false);
                     }}
-                    className="w-full text-left px-4 py-3 text-red-400 dark:text-red-400 hover:text-red-300 dark:hover:text-red-300 hover:bg-primary/50 dark:hover:bg-slate-800 transition duration-200"
+                    className="w-full text-left px-4 py-3 !bg-red-600 !text-white hover:!bg-red-700 border-0 ring-0 outline-none focus:ring-0 focus:outline-none appearance-none transition duration-200"
                   >
                     Abmelden
                   </button>

@@ -21,7 +21,7 @@ const CustomerLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
+      <header className="bg-zinc-700 border-b border-zinc-600 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -38,10 +38,10 @@ const CustomerLayout = ({ children }) => {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
                     isActive(link.to)
-                      ? 'bg-white/10 text-white'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-zinc-600 text-white border-zinc-500'
+                      : 'text-gray-300 bg-zinc-700 border-zinc-700 hover:text-white hover:bg-zinc-600 hover:border-zinc-500'
                   }`}
                 >
                   {link.label}
@@ -55,16 +55,16 @@ const CustomerLayout = ({ children }) => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-zinc-800">
+        <div className="md:hidden border-t border-zinc-600">
           <div className="px-4 py-2 flex gap-1 overflow-x-auto">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-lg border text-sm font-medium whitespace-nowrap transition-colors ${
                   isActive(link.to)
-                    ? 'bg-white/10 text-white'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'bg-zinc-600 text-white border-zinc-500'
+                    : 'text-gray-300 bg-zinc-700 border-zinc-700 hover:text-white hover:bg-zinc-600 hover:border-zinc-500'
                 }`}
               >
                 {link.label}

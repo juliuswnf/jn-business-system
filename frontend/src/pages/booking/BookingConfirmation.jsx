@@ -15,7 +15,6 @@ export default function BookingConfirmation() {
     // Get booking data from URL params or sessionStorage
     const salonName = searchParams.get('salon') || sessionStorage.getItem('booking_salon');
     const service = searchParams.get('service') || sessionStorage.getItem('booking_service');
-    const employee = searchParams.get('employee') || sessionStorage.getItem('booking_employee') || 'Wird zugewiesen';
     const date = searchParams.get('date') || sessionStorage.getItem('booking_date');
     const time = searchParams.get('time') || sessionStorage.getItem('booking_time');
     const customerName = searchParams.get('name') || sessionStorage.getItem('booking_name');
@@ -26,7 +25,6 @@ export default function BookingConfirmation() {
       setConfirmationData({
         salonName,
         service,
-        employee,
         date,
         time,
         customerName,
@@ -37,7 +35,6 @@ export default function BookingConfirmation() {
       // Clear sessionStorage after reading
       sessionStorage.removeItem('booking_salon');
       sessionStorage.removeItem('booking_service');
-      sessionStorage.removeItem('booking_employee');
       sessionStorage.removeItem('booking_date');
       sessionStorage.removeItem('booking_time');
       sessionStorage.removeItem('booking_name');
@@ -55,7 +52,7 @@ export default function BookingConfirmation() {
     return (
       <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700 mx-auto mb-4"></div>
           <p className="text-zinc-600">Lade Bestätigung...</p>
         </div>
       </div>
@@ -111,15 +108,6 @@ export default function BookingConfirmation() {
                   <div className="flex-1">
                     <p className="text-sm text-zinc-500 mb-1">Service</p>
                     <p className="text-lg font-semibold text-zinc-900">{confirmationData.service}</p>
-                  </div>
-                </div>
-
-                {/* Employee */}
-                <div className="flex items-start gap-4 p-4 bg-zinc-50/50 rounded-lg">
-                  <User className="w-5 h-5 text-zinc-500 mt-1 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm text-zinc-500 mb-1">Mitarbeiter</p>
-                    <p className="text-lg font-semibold text-zinc-900">{confirmationData.employee}</p>
                   </div>
                 </div>
 

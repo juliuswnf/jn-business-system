@@ -317,12 +317,12 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
       </nav>
 
       {/* Logout Button */}
-      <div className="border-t border-zinc-200 p-6">
+      <div className="p-6">
         <button
           onClick={handleLogout}
           className={`
             w-full flex items-center gap-3 px-4 py-2 rounded
-            transition-colors bg-zinc-900 hover:bg-zinc-800 text-white
+            transition-colors !bg-red-600 hover:!bg-red-700 !text-white border-0 ring-0 outline-none focus:ring-0 focus:outline-none appearance-none
           `}
         >
           <FiLogOut size={20} />

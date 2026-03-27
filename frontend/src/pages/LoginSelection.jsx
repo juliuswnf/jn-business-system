@@ -18,10 +18,11 @@ function LoginSelection() {
       description: 'Termine ansehen, buchen und verwalten',
       icon: UserIcon,
       link: `/login/customer${redirectQuery}`,
-      gradient: 'from-blue-500 to-cyan-400',
-      bgGradient: 'from-blue-500/10 to-cyan-400/10',
-      borderColor: 'border-blue-500/30',
-      hoverBorder: 'hover:border-blue-500/60',
+      gradient: 'from-[#3b82f6] to-[#22d3ee]',
+      bgGradient: 'from-[#3b82f6]/10 to-[#22d3ee]/10',
+      borderColor: 'border-[#3b82f6]/30',
+      hoverBorder: 'hover:border-[#3b82f6]/60',
+      hoverShadow: 'hover:shadow-[0_20px_45px_-20px_rgba(59,130,246,0.45)]',
     },
     {
       id: 'business',
@@ -29,10 +30,11 @@ function LoginSelection() {
       description: 'Kontrollpanel, Mitarbeiter & Buchungen verwalten',
       icon: BuildingOfficeIcon,
       link: `/login/business${redirectQuery}`,
-      gradient: 'from-purple-500 to-pink-400',
-      bgGradient: 'from-purple-500/10 to-pink-400/10',
-      borderColor: 'border-purple-500/30',
-      hoverBorder: 'hover:border-purple-500/60',
+      gradient: 'from-[#a855f7] to-[#f472b6]',
+      bgGradient: 'from-[#a855f7]/10 to-[#f472b6]/10',
+      borderColor: 'border-[#a855f7]/30',
+      hoverBorder: 'hover:border-[#a855f7]/60',
+      hoverShadow: 'hover:shadow-[0_20px_45px_-20px_rgba(168,85,247,0.45)]',
     },
     {
       id: 'employee',
@@ -40,10 +42,11 @@ function LoginSelection() {
       description: 'Zugang zum Mitarbeiter-Kontrollpanel',
       icon: BriefcaseIcon,
       link: `/login/employee${redirectQuery}`,
-      gradient: 'from-emerald-500 to-teal-400',
-      bgGradient: 'from-emerald-500/10 to-teal-400/10',
-      borderColor: 'border-emerald-500/30',
-      hoverBorder: 'hover:border-emerald-500/60',
+      gradient: 'from-[#10b981] to-[#2dd4bf]',
+      bgGradient: 'from-[#10b981]/10 to-[#2dd4bf]/10',
+      borderColor: 'border-[#10b981]/30',
+      hoverBorder: 'hover:border-[#10b981]/60',
+      hoverShadow: 'hover:shadow-[0_20px_45px_-20px_rgba(16,185,129,0.45)]',
     },
   ];
 
@@ -68,7 +71,7 @@ function LoginSelection() {
                 <Link
                   key={option.id}
                   to={option.link}
-                  className={`group relative overflow-hidden rounded-2xl border-2 ${option.borderColor} ${option.hoverBorder} bg-gradient-to-br ${option.bgGradient} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-${option.gradient.split(' ')[0]}/20`}
+                  className={`group relative overflow-hidden rounded-2xl border-2 ${option.borderColor} ${option.hoverBorder} ${option.hoverShadow} bg-gradient-to-br ${option.bgGradient} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl`}
                 >
                   {/* Content */}
                   <div className="p-8 relative z-10">
