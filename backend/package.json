@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .js,.cjs --ignore-pattern node_modules --ignore-pattern logs",
     "lint:fix": "eslint . --ext .js,.cjs --ignore-pattern node_modules --ignore-pattern logs --fix",
     "test": "node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --coverage",
+    "test:integration": "node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --config jest.integration.config.js --runInBand",
     "test:watch": "node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --watch",
     "test:ci": "node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --ci --coverage --forceExit",
     "seed": "node scripts/seedDatabase.js",
