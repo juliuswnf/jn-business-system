@@ -12,7 +12,7 @@ import {
 } from '../controllers/consentFormController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
-const { protect } = authMiddleware;
+const { protect, authorize } = authMiddleware;
 
 const router = express.Router();
 
@@ -21,29 +21,31 @@ const router = express.Router();
 // Create consent form (Public - Customer signs)
 router.post('/', createConsentForm);
 
-// Get customer's consents (Public/Protected)
-router.get('/customer/:customerId', getCustomerConsents);
+// Get customer's consents (Protected)
+router.get('/customer/:customerId', protect, getCustomerConsents);
 
-// Get consent by ID (Public/Protected)
-router.get('/:id', getConsentById);
-
-// Revoke consent (Protected - Customer or Admin)
-router.patch('/:id/revoke', protect, revokeConsent);
-
-// Check consent validity (Public - For booking flow)
-router.get('/check/:customerId/:consentType', checkConsentValidity);
+// Check consent validity (Protected)
+router.get('/check/:customerId/:consentType', protect, checkConsentValidity);
 
 // Get expiring consents (Protected - Salon admin)
-router.get('/salon/:salonId/expiring', protect, getExpiringConsents);
-
-// Download consent PDF (Public/Protected)
-router.get('/:id/pdf', downloadConsentPDF);
-
-// Add witness signature (Protected)
-router.post('/:id/witness', protect, addWitnessSignature);
+router.get('/salon/:salonId/expiring', protect, authorize('salon_owner', 'employee', 'admin', 'ceo'), getExpiringConsents);
 
 // Get all salon consents (Protected - Salon admin)
-router.get('/salon/:salonId', protect, getSalonConsents);
+router.get('/salon/:salonId', protect, authorize('salon_owner', 'employee', 'admin', 'ceo'), getSalonConsents);
+
+// Download consent PDF (Protected)
+router.get('/:id/pdf', protect, downloadConsentPDF);
+
+// Add witness signature (Protected)
+router.post('/:id/witness', protect, authorize('salon_owner', 'employee', 'admin', 'ceo'), addWitnessSignature);
+
+// Revoke consent (Protected)
+router.patch('/:id/revoke', protect, revokeConsent);
+// Backward compatibility for existing clients using POST
+router.post('/:id/revoke', protect, revokeConsent);
+
+// Get consent by ID (Protected)
+router.get('/:id', protect, getConsentById);
 
 export default router;
 

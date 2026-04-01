@@ -1,9 +1,8 @@
 import React, { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
-import { api } from './utils/api';
 import { usePlanAccess } from './hooks/usePlanAccess';
 import { useAuth } from './hooks/useAuth';
 
@@ -98,7 +97,6 @@ const PricingWizard = lazy(() => import('./pages/onboarding/PricingWizard'));
 const PublicBooking = lazy(() => import('./pages/booking/PublicBooking'));
 const BookingConfirmation = lazy(() => import('./pages/booking/BookingConfirmation'));
 const Salons = lazy(() => import('./pages/public/Salons'));
-const PublicBookingPage = lazy(() => import('./pages/public/PublicBookingPage'));
 
 // Error Pages
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -147,35 +145,17 @@ const KeyboardShortcuts = () => {
   return null;
 };
 
+const LegacyBookingRouteRedirect = () => {
+  const { studioSlug } = useParams();
+  return <Navigate to={`/s/${studioSlug}`} replace />;
+};
+
 /**
  * Protected Route Component
- * ✅ FIX: Check authentication via API instead of localStorage (HTTP-only cookies)
+ * Uses the global auth state from AuthContext
  */
 const ProtectedRoute = ({ children, requiredRole, allowedRoles }) => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [user, setUser] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // ✅ FIX: Verify authentication via API (tokens are in HTTP-only cookies)
-        const response = await api.get('/auth/profile');
-        if (response.data.success) {
-          setUser(response.data.user);
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
+  const { isAuthenticated, user, isLoading } = useAuth();
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -714,7 +694,7 @@ function App() {
         <Route
           path="/admin/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['admin', 'ceo']}>
               <LazyPage><AdminDashboard /></LazyPage>
             </ProtectedRoute>
           }
@@ -809,7 +789,7 @@ function App() {
         />
         <Route
           path="/book/:studioSlug"
-          element={<LazyPage><PublicBookingPage /></LazyPage>}
+          element={<LegacyBookingRouteRedirect />}
         />
         <Route
           path="/booking/public"

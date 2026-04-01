@@ -10,6 +10,52 @@ import { validateUrl } from '../utils/securityHelpers.js';
  * Digital signature + compliance tracking
  */
 
+const getRequestUserId = (req) => req.user?.id || req.user?._id;
+
+const isAuthorizedForConsent = (req, consent) => {
+  if (!req.user || !consent) {
+    return false;
+  }
+
+  if (req.user.role === 'ceo') {
+    return true;
+  }
+
+  const userSalonId = req.user.salonId?.toString();
+  return Boolean(userSalonId && consent.salonId?.toString() === userSalonId);
+};
+
+const buildTenantScopedConsentQuery = (req, customerId) => {
+  if (!req.user) {
+    throw new Error('Authentication required');
+  }
+
+  const query = { deletedAt: null };
+
+  if (req.user.role === 'ceo') {
+    if (customerId) {
+      query.customerId = customerId;
+    }
+
+    if (req.query?.salonId) {
+      query.salonId = req.query.salonId;
+    }
+
+    return query;
+  }
+
+  if (!req.user.salonId) {
+    throw new Error('Missing tenant context');
+  }
+
+  query.salonId = req.user.salonId;
+  if (customerId) {
+    query.customerId = customerId;
+  }
+
+  return query;
+};
+
 // ==================== CREATE CONSENT FORM ====================
 export const createConsentForm = async (req, res) => {
   try {
@@ -81,20 +127,32 @@ export const createConsentForm = async (req, res) => {
 // ==================== GET CUSTOMER CONSENTS ====================
 export const getCustomerConsents = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
     const { customerId } = req.params;
     const { consentType, isActive } = req.query;
 
-    const query = { customerId, deletedAt: null };
+    let query;
+    try {
+      query = buildTenantScopedConsentQuery(req, customerId);
+    } catch (_error) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
     if (consentType) query.consentType = consentType;
     if (typeof isActive !== 'undefined') query.isActive = isActive === 'true';
 
-    const consents = await ConsentForm.find(query).lean().maxTimeMS(5000)
+    const consents = await ConsentForm.find(query)
       .sort({ signedAt: -1 })
-      .lean();
+      .lean()
+      .maxTimeMS(5000);
 
     return res.json({
       success: true,
-      consents
+      consents,
+      forms: consents
     });
   } catch (error) {
     logger.error('Error getting customer consents:', error);
@@ -105,6 +163,10 @@ export const getCustomerConsents = async (req, res) => {
 // ==================== GET CONSENT BY ID ====================
 export const getConsentById = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
     const { id } = req.params;
 
     const consent = await ConsentForm.findById(id)
@@ -115,8 +177,7 @@ export const getConsentById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
 
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (req.user.role !== 'ceo' && consent.salonId.toString() !== req.user.salonId?.toString()) {
+    if (!isAuthorizedForConsent(req, consent)) {
       return res.status(403).json({
         success: false,
         message: 'Access denied - Resource belongs to another salon'
@@ -136,17 +197,20 @@ export const getConsentById = async (req, res) => {
 // ==================== REVOKE CONSENT ====================
 export const revokeConsent = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
     const { id } = req.params;
     const { reason } = req.body;
-    const userId = req.user.id;
+    const userId = getRequestUserId(req);
 
     const consent = await ConsentForm.findById(id).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
 
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (req.user.role !== 'ceo' && consent.salonId.toString() !== req.user.salonId?.toString()) {
+    if (!isAuthorizedForConsent(req, consent)) {
       return res.status(403).json({
         success: false,
         message: 'Access denied - Resource belongs to another salon'
@@ -178,14 +242,26 @@ export const revokeConsent = async (req, res) => {
 // ==================== CHECK CONSENT VALIDITY ====================
 export const checkConsentValidity = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
     const { customerId, consentType } = req.params;
 
+    let query;
+    try {
+      query = buildTenantScopedConsentQuery(req, customerId);
+    } catch (_error) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
     const consent = await ConsentForm.findOne({
-      customerId,
+      ...query,
       consentType,
-      isActive: true,
-      deletedAt: null
-    }).sort({ signedAt: -1 }).maxTimeMS(5000);
+      isActive: true
+    })
+      .sort({ signedAt: -1 })
+      .maxTimeMS(5000);
 
     if (!consent) {
       return res.json({
@@ -212,18 +288,37 @@ export const checkConsentValidity = async (req, res) => {
 // ==================== GET EXPIRING CONSENTS ====================
 export const getExpiringConsents = async (req, res) => {
   try {
-    const { salonId } = req.params;
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
+    const { salonId: requestedSalonId } = req.params;
     const { daysAhead = 30 } = req.query;
 
+    const targetSalonId = req.user.role === 'ceo' ? requestedSalonId : req.user.salonId?.toString();
+
+    if (!targetSalonId) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    if (req.user.role !== 'ceo' && requestedSalonId !== targetSalonId) {
+      return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+    }
+
+    const parsedDaysAhead = Number.parseInt(daysAhead, 10);
+    const normalizedDaysAhead = Number.isFinite(parsedDaysAhead)
+      ? Math.min(365, Math.max(1, parsedDaysAhead))
+      : 30;
+
     const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + parseInt(daysAhead));
+    expirationDate.setDate(expirationDate.getDate() + normalizedDaysAhead);
 
     const expiringConsents = await ConsentForm.find({
-      salonId,
+      salonId: targetSalonId,
       isActive: true,
       expiresAt: {
         $lte: expirationDate,
-        $gte: new Date().lean().maxTimeMS(5000)
+        $gte: new Date()
       },
       deletedAt: null
     })
@@ -245,6 +340,10 @@ export const getExpiringConsents = async (req, res) => {
 // ==================== DOWNLOAD CONSENT PDF ====================
 export const downloadConsentPDF = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
     const { id } = req.params;
 
     const consent = await ConsentForm.findById(id)
@@ -254,8 +353,7 @@ export const downloadConsentPDF = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
 
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (req.user.role !== 'ceo' && consent.salonId.toString() !== req.user.salonId?.toString()) {
+    if (!isAuthorizedForConsent(req, consent)) {
       return res.status(403).json({
         success: false,
         message: 'Access denied - Resource belongs to another salon'
@@ -306,12 +404,23 @@ export const downloadConsentPDF = async (req, res) => {
 // ==================== ADD WITNESS SIGNATURE ====================
 export const addWitnessSignature = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
     const { id } = req.params;
     const { witnessName, witnessSignature } = req.body;
 
     const consent = await ConsentForm.findById(id).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
+    }
+
+    if (!isAuthorizedForConsent(req, consent)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
     }
 
     consent.witnessName = witnessName;
@@ -334,8 +443,12 @@ export const addWitnessSignature = async (req, res) => {
 // ==================== GET SALON CONSENTS (ADMIN) ====================
 export const getSalonConsents = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
     const { salonId } = req.params;
-    const userId = req.user.id;
+    const userId = getRequestUserId(req);
     const { consentType, isActive, page = 1, limit = 50 } = req.query;
 
     // Verify authorization
@@ -344,7 +457,11 @@ export const getSalonConsents = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
 
-    if (salon.owner.toString() !== userId) {
+    const isCeo = req.user.role === 'ceo';
+    const hasSalonTenantAccess = req.user.salonId?.toString() === salonId;
+    const isOwner = salon.owner?.toString() === userId?.toString();
+
+    if (!isCeo && !hasSalonTenantAccess && !isOwner) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 

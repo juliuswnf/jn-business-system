@@ -90,6 +90,8 @@ export const multiTenantPlugin = (schema, options = {}) => {
   // Aggregate hook: Warn if $match doesn't include salonId
   schema.pre('aggregate', function() {
     const pipeline = this.pipeline();
+    const strictTenantMode = process.env.MULTI_TENANT_STRICT === 'true' ||
+      (process.env.NODE_ENV === 'production' && process.env.MULTI_TENANT_STRICT !== 'false');
 
     if (pipeline.length > 0) {
       const firstStage = pipeline[0];
@@ -100,7 +102,7 @@ export const multiTenantPlugin = (schema, options = {}) => {
         logger.warn(`[MultiTenant] Pipeline: ${JSON.stringify(pipeline[0])}`);
 
         // In strict mode, throw error
-        if (process.env.MULTI_TENANT_STRICT === 'true') {
+        if (strictTenantMode) {
           throw new Error(`Aggregation MUST include ${tenantField} in first $match stage`);
         }
       }
