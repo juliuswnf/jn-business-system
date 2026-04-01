@@ -38,7 +38,7 @@ jobs:
         env:
           NODE_ENV: test
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-for-ci' }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'sk_test_mock' }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'ci_test_placeholder_key' }}
       
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
@@ -47,6 +47,34 @@ jobs:
           directory: ./backend/coverage
           flags: backend
           name: backend-coverage
+
+  # ==================== TENANT-BOUNDARY INTEGRATION TESTS ====================
+  tenant-boundary-integration:
+    name: Tenant Boundary Integration Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: './backend/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tenant-boundary integration tests
+        run: npm run test:integration
+        env:
+          NODE_ENV: test
 
   # ==================== FRONTEND BUILD ====================
   frontend-build:
@@ -119,7 +147,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [backend-test, frontend-build, security-scan]
+    needs: [backend-test, tenant-boundary-integration, frontend-build, security-scan]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     
     steps:
@@ -190,7 +218,7 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [backend-test, frontend-build, security-scan]
+    needs: [backend-test, tenant-boundary-integration, frontend-build, security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
     

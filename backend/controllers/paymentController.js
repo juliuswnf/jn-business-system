@@ -260,6 +260,25 @@ export const refundPayment = async (req, res) => {
       });
     }
 
+    // ? SECURITY FIX: Authorization check - prevent cross-tenant refund IDOR
+    const booking = await Booking.findById(payment.bookingId)
+      .select('salonId')
+      .maxTimeMS(5000);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found for payment'
+      });
+    }
+
+    if (req.user.role !== 'ceo' && booking.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     if (payment.status === 'refunded') {
       return res.status(400).json({
         success: false,
