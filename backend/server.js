@@ -67,6 +67,8 @@ import consentFormRoutes from './routes/consentFormRoutes.js';
 import packageRoutes from './routes/packageRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
+import workflowRoutes from './routes/workflows.js';
+import complianceRoutes from './routes/complianceRoutes.js';
 
 // Pricing & Feature Gate Routes - Phase 5
 import pricingRoutes from './routes/pricing.js';
@@ -190,7 +192,7 @@ app.use(generalLimiter);
 // ==================== HEALTH CHECK ROUTES ====================
 
 app.get('/api/rate-limit/status', getRateLimitStatus);
-app.post('/api/rate-limit/reset', resetRateLimiter);
+app.post('/api/rate-limit/reset', authMiddleware.protect, authMiddleware.authorize('ceo'), resetRateLimiter);
 
 // ==================== MIDDLEWARE EXECUTION ORDER ====================
 // 1️⃣ SENTRY (if production)
@@ -272,13 +274,6 @@ if (process.env.NODE_ENV === 'development' || process.env.SENTRY_ENABLED === 'tr
     // Test Sentry error tracking
     throw new Error('🧪 Test Sentry Backend Error - This is intentional!');
   });
-
-  app.get('/api/test-sentry-message', (req, res) => {
-    // Test Sentry message tracking
-    const { captureMessage } = require('./config/sentry.js');
-    captureMessage('🧪 Test Sentry Backend Message - This is intentional!', { level: 'info' });
-    res.json({ success: true, message: 'Sentry message sent!' });
-  });
 }
 
 // Metrics endpoint (protected - CEO only in production)
@@ -345,12 +340,13 @@ app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: p
 // Protected Routes (Auth Required)
 app.use('/api/v1/salon', authMiddleware.protect, salonRoutes);
 app.use('/api/v1/bookings', authMiddleware.protect, bookingRoutes);
-app.use('/api/v1/appointments', appointmentsRoutes);
+app.use('/api/v1/appointments', authMiddleware.protect, appointmentsRoutes);
 app.use('/api/v1/payments', authMiddleware.protect, paymentRoutes);
 app.use('/api/v1/services', authMiddleware.protect, serviceRoutes);
 app.use('/api/v1/employees', authMiddleware.protect, employeeRoutes);
 app.use('/api/v1/ceo', ceoRoutes); // Auth middleware is already in ceoRoutes
 app.use('/api/v1/gdpr', gdprRoutes); // GDPR Compliance (Protected)
+app.use('/api/v1/compliance', authMiddleware.protect, complianceRoutes); // Compliance & HIPAA routes
 
 // Multi-Industry Routes - Phase 2
 app.use('/api/v1/portfolio', artistPortfolioRoutes); // Mixed: upload protected, galleries public
@@ -375,7 +371,6 @@ app.use('/api/v1/slot-suggestions', slotSuggestionRoutes); // Slot Suggestions (
 app.use('/api/v1/tattoo', tattooRoutes); // Tattoo Studio Features (Projects, Sessions, Consents, Portfolio)
 
 // Workflow System Routes (Industry-Specific Features)
-import workflowRoutes from './routes/workflows.js';
 app.use('/api/v1/workflows', workflowRoutes); // Workflow Management (Multi-Industry)
 
 // Pricing Wizard Routes

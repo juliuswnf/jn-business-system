@@ -24,7 +24,8 @@
     "migrate:soft-delete": "node scripts/migrateToSoftDelete.js",
     "migrate:onboarding": "node migrations/migrate-onboarding-fields.js",
     "test:email": "node scripts/emailDeliverabilityTest.js",
-    "create:test-accounts": "node scripts/createTestBusinessAccounts.js"
+    "create:test-accounts": "node scripts/createTestBusinessAccounts.js",
+    "security:scan-secrets": "node scripts/scanSecrets.js"
   },
   "dependencies": {
     "@sentry/node": "^10.31.0",
