@@ -3,28 +3,9 @@
  * Covers route protection, RBAC redirects, session persistence and logout invalidation.
  */
 
-import { test, expect, TEST_USERS } from './fixtures.js';
+import { test, expect } from './fixtures.js';
 
 test.describe.configure({ mode: 'serial' });
-
-async function loginAsOwner(page) {
-  await page.goto('/login/business');
-  await page.fill('input#email, input[type="email"]', TEST_USERS.owner.email);
-  await page.fill('input#password, input[type="password"]', TEST_USERS.owner.password);
-
-  await Promise.all([
-    page.waitForURL('**/dashboard**', { timeout: 15000 }).catch(() => null),
-    page.click('button[type="submit"]')
-  ]);
-
-  const rateLimited = await page
-    .locator(':has-text("Zu viele Anfragen"), :has-text("Zu viele Login-Versuche"), :has-text("too many requests")')
-    .first()
-    .isVisible({ timeout: 2500 })
-    .catch(() => false);
-
-  return { rateLimited };
-}
 
 async function dismissOnboardingIfPresent(page) {
   const skipOnboarding = page
@@ -48,6 +29,8 @@ async function clearBrowserAuthState(page) {
 }
 
 test.describe('Critical Access Flows', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   test('should redirect unauthenticated user away from protected route', async ({ page }) => {
     await clearBrowserAuthState(page);
 
@@ -63,11 +46,11 @@ test.describe('Critical Access Flows', () => {
 });
 
 test.describe('Critical Owner Session and RBAC Flows', () => {
-  test.beforeEach(async ({ page }) => {
-    const { rateLimited } = await loginAsOwner(page);
-    test.skip(rateLimited, 'Backend login rate limit active for this run');
+  test.use({ storageState: 'playwright/.auth/owner.json' });
 
-    await page.waitForURL('**/dashboard**', { timeout: 20000 });
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.waitForURL('**/dashboard**', { timeout: 15000 });
     await dismissOnboardingIfPresent(page);
   });
 
