@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -10,7 +11,6 @@ import cookieParser from 'cookie-parser';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import logger from './utils/logger.js';
 import { addRequestContext } from './utils/structuredLogger.js';
 import { generalLimiter, getRateLimitStatus, resetRateLimiter } from './middleware/rateLimiterMiddleware.js';
@@ -36,9 +36,6 @@ import { startMarketingAnalyticsWorker } from './workers/marketingAnalyticsWorke
 
 // Suppress iconv-lite encoding warning (UTF-8 is correctly used)
 process.env.ICONV_PURE = '1';
-
-// Load environment variables
-dotenv.config();
 
 // Import Routes - MVP Only
 import authRoutes from './routes/authRoutes.js';

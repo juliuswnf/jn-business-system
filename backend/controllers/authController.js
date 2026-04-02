@@ -337,6 +337,9 @@ export const login = async (req, res) => {
       path: '/'
     }));
 
+    // Generate CSRF token for protected state-changing operations.
+    generateCSRFToken(req, res, () => {});
+
     res.status(200).json({
       success: true,
       // Tokens are now in HTTP-only cookies, not in response body for security

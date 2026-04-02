@@ -697,7 +697,7 @@ export const createPublicBooking = async (req, res) => {
 
     // Create booking (no Customer model - data stored directly in Booking)
     stage = 'create_booking';
-    const booking = await Booking.create({
+    const bookingData = {
       salonId: salon._id,
       customerName,
       customerEmail: customerEmail.toLowerCase(),
@@ -710,7 +710,6 @@ export const createPublicBooking = async (req, res) => {
       language: language || salon.defaultLanguage || 'de',
       status: 'confirmed', // Auto-confirm public bookings
       confirmedAt: new Date(),
-      idempotencyKey: idempotencyKey || null, // ? SRE FIX #30
       // NO-SHOW-KILLER fields
       stripeCustomerId: stripeCustomerId || null,
       paymentMethodId: paymentMethodId || null,
@@ -729,7 +728,14 @@ export const createPublicBooking = async (req, res) => {
         cancellationDeadline: new Date(parsedBookingDate.getTime() - 24 * 60 * 60 * 1000), // 24h before
         serviceDescription: service.name || 'Service'
       }
-    });
+    };
+
+    // Persist idempotency key only when it is a non-empty string.
+    if (typeof idempotencyKey === 'string' && idempotencyKey.trim()) {
+      bookingData.idempotencyKey = idempotencyKey.trim();
+    }
+
+    const booking = await Booking.create(bookingData);
 
     // Populate for email
     stage = 'populate_booking';

@@ -186,9 +186,13 @@ export const createBooking = async (req, res) => {
         customerEmail: customerEmail.toLowerCase(),
         customerPhone,
         notes,
-        status: 'pending',
-        idempotencyKey: idempotencyKey || null // ? SRE FIX #30: Store idempotency key
+        status: 'pending'
       };
+
+      // Persist idempotency key only when it is a non-empty string.
+      if (typeof idempotencyKey === 'string' && idempotencyKey.trim()) {
+        bookingData.idempotencyKey = idempotencyKey.trim();
+      }
 
       const [booking] = await Booking.create([bookingData], { session });
       await session.commitTransaction();

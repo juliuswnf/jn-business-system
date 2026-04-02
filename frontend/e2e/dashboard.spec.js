@@ -9,6 +9,7 @@
  */
 
 import { test, expect } from './fixtures.js';
+<<<<<<< HEAD
 
 test.use({
   storageState: 'playwright/.auth/owner.json'
@@ -25,6 +26,20 @@ test.describe('Dashboard & Booking Management', () => {
       .locator('button:has-text("Überspringen"), [role="button"]:has-text("Überspringen"), button:has-text("Skip")')
       .first();
     if (await skipOnboarding.isVisible({ timeout: 3000 }).catch(() => false)) {
+=======
+
+test.describe('Dashboard & Booking Management', () => {
+
+  test.use({ storageState: 'playwright/.auth/owner-dashboard.json' });
+  
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.waitForURL('**/dashboard**', { timeout: 15000 });
+
+    // Close onboarding walkthrough if present to avoid click interception
+    const skipOnboarding = page.locator('button:has-text("Überspringen")').first();
+    if (await skipOnboarding.isVisible({ timeout: 1000 }).catch(() => false)) {
+>>>>>>> dfd340e (feat: enhance booking process with idempotency key handling and CSRF token generation)
       await skipOnboarding.click();
     }
   });
@@ -183,15 +198,20 @@ test.describe('Dashboard & Booking Management', () => {
 
     test('should navigate between dashboard sections', async ({ page }) => {
       const navItems = [
-        { link: 'Services', url: 'service' },
-        { link: 'Mitarbeiter', url: 'employee' },
-        { link: 'Einstellungen', url: 'setting' },
-        { link: 'Widget', url: 'widget' }
+        { href: '/dashboard/services', url: '/dashboard/services' },
+        { href: '/dashboard/employees', url: '/dashboard/employees' },
+        { href: '/dashboard/settings', url: '/dashboard/settings' },
+        { href: '/dashboard/widget', url: '/dashboard/widget' }
       ];
 
       for (const item of navItems) {
+<<<<<<< HEAD
         const navLink = page.locator(`a:has-text("${item.link}"), [href*="${item.url}"]`).first();
 
+=======
+        const navLink = page.locator(`a[href="${item.href}"]`).first();
+        
+>>>>>>> dfd340e (feat: enhance booking process with idempotency key handling and CSRF token generation)
         if (await navLink.isVisible({ timeout: 1000 }).catch(() => false)) {
           await navLink.click();
           await page.waitForLoadState('networkidle');

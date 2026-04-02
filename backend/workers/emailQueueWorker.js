@@ -112,8 +112,11 @@ const processEmailQueueItem = async (queueItem) => {
   try {
     logger.log(`?? Processing email: ${queueItem._id} | Type: ${queueItem.type} | To: ${queueItem.to || 'N/A'}`);
 
+    const bookingRef = queueItem.booking || queueItem.bookingId;
+    const salonRef = queueItem.salon || queueItem.salonId;
+
     // If no bookingId, treat as direct email (notification/custom)
-    if (!queueItem.bookingId) {
+    if (!bookingRef) {
       logger.log(`?? Direct email (no booking) - sending to: ${queueItem.to}`);
 
       // Send direct email
@@ -135,11 +138,11 @@ const processEmailQueueItem = async (queueItem) => {
     }
 
     // Get booking with related data
-    const booking = await Booking.findById(queueItem.bookingId)
+    const booking = await Booking.findById(bookingRef)
       .populate('salonId')
       .populate('serviceId');
     if (!booking) {
-      logger.warn(`??  Booking not found: ${queueItem.bookingId}`);
+      logger.warn(`??  Booking not found: ${bookingRef}`);
       queueItem.status = 'failed';
       queueItem.error = {
         message: 'Booking not found',
@@ -150,7 +153,7 @@ const processEmailQueueItem = async (queueItem) => {
       return;
     }
     // Get salon
-    const salon = await Salon.findById(booking.salonId || queueItem.salonId);
+    const salon = await Salon.findById(booking.salonId || salonRef);
     if (!salon) {
       logger.warn('??  Salon not found');
       queueItem.status = 'failed';
@@ -261,7 +264,7 @@ const processEmailQueueItem = async (queueItem) => {
       // Log failed send (with required fields, non-blocking)
       try {
         await EmailLog.create({
-          companyId: queueItem.salonId || queueItem.salon,
+          companyId: salonRef,
           recipientEmail: queueItem.to || 'unknown',
           subject: `Failed: ${queueItem.type}`,
           emailType: 'general',
@@ -300,11 +303,15 @@ const scheduleReminderEmail = async (booking, salon) => {
       logger.log('??  Skipping reminder - booking is too soon or in the past');
       return null;
     }
+
+    const serviceName = booking.serviceId?.name || 'Ihr Termin';
     const queueItem = await EmailQueue.create({
-      salonId: salon._id,
-      bookingId: booking._id,
+      salon: salon._id,
+      booking: booking._id,
+      to: booking.customerEmail,
+      subject: `Erinnerung: ${serviceName}`,
+      body: `Erinnerung zu Ihrem Termin ${serviceName}.`,
       type: 'reminder',
-      recipient: booking.customerEmail,
       scheduledFor,
       status: 'pending'
     });
@@ -325,11 +332,15 @@ const scheduleReviewEmail = async (booking, salon) => {
   try {
     const reviewHours = salon.reviewHoursAfter || 2;
     const scheduledFor = new Date(booking.bookingDate.getTime() + reviewHours * 60 * 60 * 1000);
+
+    const serviceName = booking.serviceId?.name || 'Ihrem Termin';
     const queueItem = await EmailQueue.create({
-      salonId: salon._id,
-      bookingId: booking._id,
+      salon: salon._id,
+      booking: booking._id,
+      to: booking.customerEmail,
+      subject: `Wie war ${serviceName}?`,
+      body: `Bitte bewerten Sie ${serviceName}.`,
       type: 'review',
-      recipient: booking.customerEmail,
       scheduledFor,
       status: 'pending'
     });
@@ -349,7 +360,10 @@ const cancelScheduledEmails = async (bookingId) => {
   try {
     const result = await EmailQueue.updateMany(
       {
-        bookingId,
+        $or: [
+          { booking: bookingId },
+          { bookingId }
+        ],
         status: 'pending'
       },
       {

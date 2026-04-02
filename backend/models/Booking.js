@@ -243,7 +243,8 @@ const bookingSchema = new mongoose.Schema(
     idempotencyKey: {
       type: String,
       unique: true,
-      sparse: true, // Allow null for legacy bookings
+      default: undefined,
+      sparse: true, // Only index documents where idempotencyKey is present
       index: true,
       comment: 'Prevents duplicate bookings from double-clicks'
     },
@@ -537,6 +538,19 @@ bookingSchema.index({ customerId: 1, bookingDate: -1 }); // ? Customer booking h
 bookingSchema.index({ salonId: 1, createdAt: -1 }); // ? Recent bookings per salon
 bookingSchema.index({ paymentStatus: 1, bookingDate: 1 }); // ? Payment tracking
 bookingSchema.index({ salonId: 1, customerId: 1, bookingDate: -1 });
+
+// Keep sparse unique idempotency index safe by unsetting empty/null values.
+bookingSchema.pre('validate', function(next) {
+  if (typeof this.idempotencyKey === 'string') {
+    this.idempotencyKey = this.idempotencyKey.trim();
+  }
+
+  if (!this.idempotencyKey) {
+    this.idempotencyKey = undefined;
+  }
+
+  next();
+});
 
 // ==================== QUERY MIDDLEWARE - EXCLUDE DELETED ====================
 
