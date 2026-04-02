@@ -1,16 +1,16 @@
 /**
  * E2E Test: Authentication Flow
  * Tests login, registration, and session management
- * 
+ *
  * Critical Flow: User → Login/Register → Dashboard Access → Logout
  */
 
 import { test, expect, TEST_USERS } from './fixtures.js';
 
 test.describe('Authentication Flow', () => {
-  
+
   test.describe('Login', () => {
-    
+
     test.beforeEach(async ({ page }) => {
       await page.goto('/login/business');
     });
@@ -34,11 +34,10 @@ test.describe('Authentication Flow', () => {
     test('should show error for invalid credentials', async ({ page }) => {
       await page.fill('input#email, input[type="email"]', 'invalid@test.com');
       await page.fill('input#password, input[type="password"]', 'wrongpassword');
-      
+
       const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
-      
-      // Should show error message
+
       await expect(
         page.locator('[role="status"], .text-red-600')
           .filter({ hasText: /falsch|ungueltig|ungültig|invalid|zu viele anfragen|zu viele login-versuche/i })
@@ -49,23 +48,17 @@ test.describe('Authentication Flow', () => {
     test('should redirect to dashboard after successful login', async ({ page }) => {
       await page.fill('input#email, input[type="email"]', TEST_USERS.owner.email);
       await page.fill('input#password, input[type="password"]', TEST_USERS.owner.password);
-      
-      const submitButton = page.locator('button[type="submit"]');
-      
-      // Wait for navigation after login
+
       await Promise.all([
         page.waitForURL('**/dashboard**', { timeout: 10000 }).catch(() => {}),
-        submitButton.click()
+        page.click('button[type="submit"]')
       ]);
-      
-      // Check we're on dashboard or received success response
+
       const url = page.url();
-      const isOnDashboard = url.includes('dashboard');
       const hasError = await page.locator('.error, [role="alert"]').isVisible().catch(() => false);
-      
-      // Either we're on dashboard or login succeeded
+
       if (!hasError) {
-        expect(isOnDashboard || url.includes('login')).toBeTruthy();
+        expect(url.includes('dashboard') || url.includes('login')).toBeTruthy();
       }
     });
 
@@ -81,7 +74,7 @@ test.describe('Authentication Flow', () => {
   });
 
   test.describe('Registration', () => {
-    
+
     test.beforeEach(async ({ page }) => {
       await page.goto('/register');
     });
@@ -96,7 +89,6 @@ test.describe('Authentication Flow', () => {
       const emailInput = page.locator('input[name="email"], input[type="email"]');
       await emailInput.fill('invalid-email');
 
-      // Browser native validation should flag malformed email
       const emailIsValid = await emailInput.evaluate(el => el.checkValidity());
       expect(emailIsValid).toBeFalsy();
     });
@@ -106,15 +98,13 @@ test.describe('Authentication Flow', () => {
       await passwordInput.fill('weak');
       await page.locator('input[name="confirmPassword"]').fill('weak');
       await page.click('button[type="submit"]');
-      
-      // Should show password requirements
+
       await expect(
         page.getByText('Mind. 8 Zeichen')
       ).toBeVisible({ timeout: 3000 });
     });
 
     test('should show error for existing email', async ({ page }) => {
-      // Fill with existing user email
       await page.fill('input[name="firstName"]', 'Test');
       await page.fill('input[name="lastName"]', 'Owner');
       await page.fill('input[name="email"], input[type="email"]', TEST_USERS.owner.email);
@@ -124,11 +114,9 @@ test.describe('Authentication Flow', () => {
       await page.fill('input[name="password"], input[type="password"]', 'NewPassword123!');
       await page.fill('input[name="confirmPassword"]', 'NewPassword123!');
       await page.check('input[name="agreeToTerms"]');
-      
-      const submitButton = page.locator('button[type="submit"]');
-      await submitButton.click();
-      
-      // Should show "already exists" error
+
+      await page.click('button[type="submit"]');
+
       await expect(
         page.locator('.text-red-600, [role="status"]').filter({ hasText: /already|bereits|existiert|registriert|zu viele anfragen/i }).first()
       ).toBeVisible({ timeout: 5000 });
@@ -140,68 +128,47 @@ test.describe('Authentication Flow', () => {
     });
   });
 
+  // ─── Session Management (uses pre-authenticated storageState) ───────────────
   test.describe('Session Management', () => {
-    
-    test('should persist session across page reloads', async ({ page }) => {
-      // Login first
-      await page.goto('/login/business');
-      await page.fill('input#email, input[type="email"]', TEST_USERS.owner.email);
-      await page.fill('input#password, input[type="password"]', TEST_USERS.owner.password);
-      await page.click('button[type="submit"]');
+    test.use({
+      storageState: 'playwright/.auth/owner.json'
+    });
 
-      const rateLimited = await page.locator(':has-text("Zu viele Anfragen"), :has-text("Zu viele Login-Versuche")').first().isVisible({ timeout: 2000 }).catch(() => false);
-      if (rateLimited) {
-        expect(rateLimited).toBeTruthy();
-        return;
-      }
-      
-      // Wait for login to complete
-      await page.waitForTimeout(2000);
-      
-      // Reload the page
+    test('should persist session across page reloads', async ({ page }) => {
+      await page.goto('/dashboard');
+      await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
+
       await page.reload();
-      
-      // Check if still authenticated (not redirected to login)
-      const url = page.url();
-      const isAuthenticated = !url.includes('login') || url.includes('dashboard');
-      
-      // Should remain on authenticated page
-      expect(isAuthenticated).toBeTruthy();
+
+      await expect(page).toHaveURL(/\/dashboard/, { timeout: 8000 });
     });
 
     test('should logout successfully', async ({ page }) => {
-      // Login first
-      await page.goto('/login/business');
-      await page.fill('input#email, input[type="email"]', TEST_USERS.owner.email);
-      await page.fill('input#password, input[type="password"]', TEST_USERS.owner.password);
-      await page.click('button[type="submit"]');
-      
-      await page.waitForTimeout(2000);
-      
-      // Find and click logout button
+      await page.goto('/dashboard');
+
       const skipOnboarding = page.locator('button:has-text("Überspringen")').first();
-      if (await skipOnboarding.isVisible({ timeout: 1000 }).catch(() => false)) {
+      if (await skipOnboarding.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipOnboarding.click();
       }
 
-      const logoutButton = page.locator('button:has-text("Logout"), button:has-text("Abmelden"), a:has-text("Logout"), [data-testid="logout"]').first();
-      
-      if (await logoutButton.isVisible()) {
-        await logoutButton.click({ force: true });
-        
-        // Should redirect to login or home
-        await expect(page).toHaveURL(/\/(login|home|$)/, { timeout: 5000 });
-      }
+      const logoutButton = page
+        .locator('button:has-text("Logout"), button:has-text("Abmelden"), a:has-text("Logout"), [data-testid="logout"]')
+        .first();
+
+      await expect(logoutButton).toBeVisible({ timeout: 10000 });
+      await logoutButton.click({ force: true });
+
+      await expect(page).toHaveURL(/\/(login|home|$)/, { timeout: 8000 });
     });
 
     test('should redirect to login when accessing protected route without auth', async ({ page }) => {
-      // Clear any existing session
+      // Explicitly clear state for this one test
       await page.context().clearCookies();
-      
-      // Try to access protected route
+      await page.goto('/');
+      await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
+
       await page.goto('/dashboard');
-      
-      // Should redirect to login
+
       await expect(page).toHaveURL(/\/(login|auth)/, { timeout: 5000 });
     });
   });
