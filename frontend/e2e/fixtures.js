@@ -5,21 +5,23 @@
 
 import { test as base, expect } from '@playwright/test';
 
+const envOr = (name, fallback) => process.env[name] || fallback;
+
 // Test user credentials
 export const TEST_USERS = {
   owner: {
-    email: 'test-salon@jnbusiness.de',
-    password: 'TestPassword123!',
+    email: envOr('E2E_OWNER_EMAIL', 'test-salon@jnbusiness.de'),
+    password: envOr('E2E_OWNER_PASSWORD', 'TestPassword123!'),
     name: 'Test Owner'
   },
   customer: {
-    email: 'test-customer@jn-business-system.test',
-    password: 'TestCustomer123!',
+    email: envOr('E2E_CUSTOMER_EMAIL', 'test-customer@jn-business-system.test'),
+    password: envOr('E2E_CUSTOMER_PASSWORD', 'TestCustomer123!'),
     name: 'Test Customer'
   },
   ceo: {
-    email: 'ceo@jn-business-system.test',
-    password: 'TestCEO123!',
+    email: envOr('E2E_CEO_EMAIL', 'ceo@jn-business-system.test'),
+    password: envOr('E2E_CEO_PASSWORD', 'TestCEO123!'),
     name: 'Test CEO'
   }
 };
