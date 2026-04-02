@@ -18,6 +18,9 @@ const emailQueueSchema = new mongoose.Schema({
   sentAt: Date,
   status: String,
   attempts: Number,
+  maxAttempts: Number,
+  retryCount: Number,
+  priority: Number,
   error: String
 }, { timestamps: true });
 
@@ -41,7 +44,11 @@ const runSmokeTest = async () => {
       html: '<p>This is a smoke test email that should be processed immediately.</p>',
       type: 'notification',
       scheduledFor: new Date(), // Send now
-      status: 'pending'
+      status: 'pending',
+      attempts: 0,
+      maxAttempts: 3,
+      retryCount: 0,
+      priority: 5
     });
     console.log(`✅ Created test email: ${testEmail1._id}`);
 
@@ -55,7 +62,11 @@ const runSmokeTest = async () => {
       html: '<p>This email is scheduled for 1 hour from now.</p>',
       type: 'reminder',
       scheduledFor: futureDate,
-      status: 'pending'
+      status: 'pending',
+      attempts: 0,
+      maxAttempts: 3,
+      retryCount: 0,
+      priority: 5
     });
     console.log(`✅ Created scheduled email: ${testEmail2._id} (scheduled for ${futureDate.toISOString()})`);
 

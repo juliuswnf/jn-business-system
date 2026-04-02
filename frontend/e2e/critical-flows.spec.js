@@ -46,7 +46,7 @@ test.describe('Critical Access Flows', () => {
 });
 
 test.describe('Critical Owner Session and RBAC Flows', () => {
-  test.use({ storageState: 'playwright/.auth/owner.json' });
+  test.use({ storageState: 'playwright/.auth/owner-critical.json' });
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/dashboard');

@@ -7,13 +7,14 @@ import { test as setup, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const authFile = path.join(process.cwd(), 'playwright/.auth/owner.json');
+const authDir = path.join(process.cwd(), 'playwright/.auth');
+const ownerAuthFile = path.join(authDir, 'owner.json');
+const ownerDashboardAuthFile = path.join(authDir, 'owner-dashboard.json');
+const ownerCriticalAuthFile = path.join(authDir, 'owner-critical.json');
 
-setup('authenticate owner account', async ({ page }) => {
+const loginOwnerAndPersistState = async (page, outputFile) => {
   const ownerEmail = process.env.E2E_OWNER_EMAIL || 'test-salon@jnbusiness.de';
   const ownerPassword = process.env.E2E_OWNER_PASSWORD || 'TestPassword123!';
-
-  await fs.mkdir(path.dirname(authFile), { recursive: true });
 
   await page.goto('/login/business');
   await page.fill('input#email, input[type="email"]', ownerEmail);
@@ -46,5 +47,25 @@ setup('authenticate owner account', async ({ page }) => {
     await skipOnboarding.click({ force: true });
   }
 
-  await page.context().storageState({ path: authFile });
+  await page.context().storageState({ path: outputFile });
+};
+
+setup('authenticate owner account', async ({ browser }) => {
+  await fs.mkdir(authDir, { recursive: true });
+
+  const dashboardContext = await browser.newContext();
+  const dashboardPage = await dashboardContext.newPage();
+  await loginOwnerAndPersistState(dashboardPage, ownerDashboardAuthFile);
+  await dashboardContext.close();
+
+  const criticalContext = await browser.newContext();
+  const criticalPage = await criticalContext.newPage();
+  await loginOwnerAndPersistState(criticalPage, ownerCriticalAuthFile);
+  await criticalContext.close();
+
+  // Backward-compatible default owner state for existing specs.
+  const defaultContext = await browser.newContext();
+  const defaultPage = await defaultContext.newPage();
+  await loginOwnerAndPersistState(defaultPage, ownerAuthFile);
+  await defaultContext.close();
 });
