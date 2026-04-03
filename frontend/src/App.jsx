@@ -705,7 +705,9 @@ function App() {
           path="/ceo/dashboard"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEODashboard /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEODashboard /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -713,7 +715,9 @@ function App() {
           path="/ceo/settings"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOSettings /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOSettings /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -721,7 +725,9 @@ function App() {
           path="/ceo/analytics"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOAnalytics /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOAnalytics /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -729,7 +735,9 @@ function App() {
           path="/ceo/email-campaigns"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOEmailCampaigns /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOEmailCampaigns /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -737,7 +745,9 @@ function App() {
           path="/ceo/payments"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOPayments /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOPayments /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -745,7 +755,9 @@ function App() {
           path="/ceo/support"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOSupportTickets /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOSupportTickets /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -753,7 +765,9 @@ function App() {
           path="/ceo/audit-log"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOAuditLog /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOAuditLog /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -761,7 +775,9 @@ function App() {
           path="/ceo/lifecycle-emails"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOLifecycleEmails /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOLifecycleEmails /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -769,7 +785,9 @@ function App() {
           path="/ceo/feature-flags"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOFeatureFlags /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOFeatureFlags /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -777,7 +795,9 @@ function App() {
           path="/ceo/backups"
           element={
             <ProtectedRoute requiredRole="ceo">
-              <LazyPage><CEOBackups /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><CEOBackups /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />

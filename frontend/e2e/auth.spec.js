@@ -71,6 +71,19 @@ test.describe('Authentication Flow', () => {
       const resetLink = page.locator('a:has-text("Forgot"), a:has-text("Passwort vergessen"), a[href*="reset"], a[href*="forgot"]');
       await expect(resetLink).toBeVisible();
     });
+
+    test('should redirect employee login to employee dashboard', async ({ page }) => {
+      await page.goto('/login/employee');
+      await page.fill('input#email, input[type="email"]', TEST_USERS.employee.email);
+      await page.fill('input#password, input[type="password"]', TEST_USERS.employee.password);
+
+      await Promise.all([
+        page.waitForURL('**/employee/dashboard**', { timeout: 10000 }).catch(() => {}),
+        page.click('button[type="submit"]')
+      ]);
+
+      await expect(page).toHaveURL(/\/employee\/dashboard/, { timeout: 10000 });
+    });
   });
 
   test.describe('Registration', () => {

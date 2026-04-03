@@ -61,7 +61,8 @@ api.interceptors.response.use(
     // Skip redirect for login/register endpoints - let the component handle the error
     const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
                            originalRequest?.url?.includes('/auth/register') ||
-                           originalRequest?.url?.includes('/auth/ceo-login');
+                           originalRequest?.url?.includes('/auth/ceo-login') ||
+                           originalRequest?.url?.includes('/auth/employee-login');
 
     if (isAuthEndpoint) {
       // Don't redirect for login failures - let the login form show the error

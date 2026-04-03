@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { authAPI, bookingAPI, employeeAPI, api } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
+import { Calendar, Euro, Hash, Clock, RefreshCw } from 'lucide-react';
 
 export default function Dashboard() {
   const [employee, setEmployee] = useState(null);
@@ -20,10 +21,8 @@ export default function Dashboard() {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
 
     try {
-      // Fetch employee profile
       const profileRes = await api.get('/auth/profile');
       if (profileRes.data.success) {
         const profileData = profileRes.data;
@@ -34,7 +33,6 @@ export default function Dashboard() {
         });
       }
 
-      // Fetch today's bookings for this employee
       const today = new Date().toISOString().split('T')[0];
       const bookingsRes = await api.get(`/bookings?date=${today}&limit=20`);
       if (bookingsRes.data.success && bookingsRes.data.bookings) {
@@ -51,23 +49,18 @@ export default function Dashboard() {
         setStats(prev => ({ ...prev, upcomingCount: formattedBookings.length }));
       }
 
-      // Try to fetch employee stats if available
       try {
-        // ? SECURITY FIX: Use central api instance
         const statsRes = await api.get('/employees/my-stats');
-        if (statsRes.data) {
+        if (statsRes.data?.success) {
           const statsData = statsRes.data;
-          if (statsData.success) {
-            setStats(prev => ({
-              ...prev,
-              monthlyEarnings: statsData.stats?.monthlyEarnings || 0,
-              totalBookings: statsData.stats?.totalBookings || 0
-            }));
-          }
+          setStats(prev => ({
+            ...prev,
+            monthlyEarnings: statsData.stats?.monthlyEarnings || 0,
+            totalBookings: statsData.stats?.totalBookings || 0
+          }));
         }
       } catch {
-        // Stats endpoint may not exist yet - that's okay
-        // Employee stats not available - not an error
+        // Stats endpoint may not exist yet
       }
 
     } catch (err) {
@@ -78,140 +71,111 @@ export default function Dashboard() {
     }
   };
 
-  const StatCard = ({ icon, label, value, color }) => (
-    <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-6 hover:border-zinc-200 transition">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-zinc-700 text-sm mb-2">{label}</p>
-          <p className="text-3xl font-bold text-zinc-900">{value}</p>
-        </div>
-        <div className={`text-4xl p-4 rounded-lg ${color}`}>
-          {icon}
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-zinc-200 border-t-zinc-900"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-12">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-center max-w-md mx-auto">
+          <p className="text-red-700 text-sm">{error}</p>
+          <button
+            onClick={fetchData}
+            className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white text-sm font-medium transition"
+          >
+            Erneut versuchen
+          </button>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  const statCards = [
+    { icon: <Calendar className="w-5 h-5 text-zinc-600" />, label: 'Heutige Termine', value: stats.upcomingCount },
+    { icon: <Euro className="w-5 h-5 text-zinc-600" />, label: 'Monatsverdienst', value: `${stats.monthlyEarnings}€` },
+    { icon: <Hash className="w-5 h-5 text-zinc-600" />, label: 'Gesamt-Buchungen', value: stats.totalBookings }
+  ];
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-zinc-200 sticky top-0 z-40 bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-1">Mein Kontrollpanel</h1>
-              <p className="text-zinc-700 text-sm">
-                Willkommen zurück{employee ? `, ${employee.name}` : ''}!
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-zinc-500 text-sm capitalize">{employee?.role || 'Mitarbeiter'}</p>
-            </div>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900">
+            Willkommen{employee ? `, ${employee.name}` : ''}
+          </h1>
+          <p className="text-sm text-zinc-500 mt-1">Deine heutige Übersicht</p>
         </div>
+        <button
+          onClick={fetchData}
+          className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-500 hover:text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:border-zinc-300 transition"
+        >
+          <RefreshCw size={14} />
+          Aktualisieren
+        </button>
       </div>
 
-      {/* Loading State */}
-      {loading && (
-        <div className="max-w-7xl mx-auto px-6 py-12 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700 mx-auto"></div>
-          <p className="text-zinc-700 mt-4">Lade Daten...</p>
-        </div>
-      )}
-
-      {/* Error State */}
-      {error && !loading && (
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-            <p className="text-red-600">{error}</p>
-            <button
-              onClick={fetchData}
-              className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-zinc-900"
-            >
-              Erneut versuchen
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
-      {!loading && !error && (
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          {/* Stats Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <StatCard icon="" label="Heutige Termine" value={stats.upcomingCount} color="bg-blue-900" />
-            <StatCard icon="" label="Monatsverdienst" value={`${stats.monthlyEarnings}€`} color="bg-green-50" />
-            <StatCard icon="" label="Gesamt-Buchungen" value={stats.totalBookings} color="bg-zinc-50" />
-          </div>
-
-          {/* Today's Bookings */}
-          <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">Heutige Termine</h2>
-              <span className="px-3 py-1 rounded-full bg-zinc-50 text-zinc-600 text-sm font-medium">
-                {upcomingBookings.length} Termine
-              </span>
-            </div>
-
-            {upcomingBookings.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-zinc-700">Keine Termine für heute</p>
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {statCards.map((card, i) => (
+          <div key={i} className="bg-white border border-zinc-200 rounded-xl p-5 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] text-zinc-500 font-medium">{card.label}</span>
+              <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
+                {card.icon}
               </div>
-            ) : (
-              <div className="space-y-3">
-                {upcomingBookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="p-4 rounded-lg bg-zinc-50 hover:bg-zinc-100 transition"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="font-semibold text-zinc-900">{booking.customer}</p>
-                        <p className="text-zinc-700 text-sm">{booking.service}</p>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-zinc-600">
-                          <span>{booking.time}</span>
-                          <span>{booking.duration}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          booking.status === 'Bestätigt'
-                            ? 'bg-green-500/20 text-green-600'
-                            : 'bg-yellow-500/20 text-yellow-600'
-                        }`}>
-                          {booking.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mt-12 grid md:grid-cols-2 gap-6">
-            <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-6 hover:border-zinc-200 transition">
-              <h3 className="text-xl font-bold mb-3">Zeitplan verwalten</h3>
-              <p className="text-zinc-700 mb-4">Verfügbarkeit und freie Tage einstellen</p>
-              <button className="w-full px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition">
-                Zeitplan öffnen
-              </button>
             </div>
-
-            <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-6 hover:border-zinc-200 transition">
-              <h3 className="text-xl font-bold mb-3">Aktualisieren</h3>
-              <p className="text-zinc-700 mb-4">Termine neu laden</p>
-              <button
-                onClick={fetchData}
-                className="w-full px-4 py-2 border border-zinc-200 text-zinc-900 rounded-lg font-medium hover:bg-zinc-100 transition"
-              >
-                Daten aktualisieren
-              </button>
-            </div>
+            <p className="text-2xl font-bold text-zinc-900">{card.value}</p>
           </div>
+        ))}
+      </div>
+
+      {/* Bookings */}
+      <div className="bg-white border border-zinc-200 rounded-xl">
+        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-zinc-900">Heutige Termine</h2>
+          <span className="text-[13px] text-zinc-400 font-medium">
+            {upcomingBookings.length} Termine
+          </span>
         </div>
-      )}
+
+        {upcomingBookings.length === 0 ? (
+          <div className="text-center py-12">
+            <Calendar className="w-10 h-10 text-zinc-300 mx-auto mb-3" />
+            <p className="text-sm text-zinc-500">Keine Termine für heute</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-100">
+            {upcomingBookings.map((booking) => (
+              <div key={booking.id} className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-zinc-50/50 transition">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-zinc-900">{booking.customer}</p>
+                  <p className="text-[13px] text-zinc-500">{booking.service}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="flex items-center gap-1.5 text-sm text-zinc-700 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                    {booking.time}
+                  </p>
+                  <p className="text-xs text-zinc-400 mt-0.5">{booking.duration}</p>
+                </div>
+                <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium ${
+                  booking.status === 'Bestätigt'
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'bg-amber-50 text-amber-700'
+                }`}>
+                  {booking.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
