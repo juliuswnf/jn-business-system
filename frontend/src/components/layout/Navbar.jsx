@@ -33,13 +33,17 @@ const Navbar = () => {
     if (!user) return '/dashboard';
     if (user.role === 'customer') return '/customer/dashboard';
     if (user.role === 'ceo') return '/ceo/dashboard';
+    if (user.role === 'employee') return '/employee/dashboard';
+    if (user.role === 'admin') return '/admin/dashboard';
     return '/dashboard'; // salon_owner / business
   };
 
   const getSettingsPath = () => {
     if (!user) return '/dashboard/settings';
     if (user.role === 'customer') return '/customer/dashboard'; // customers use same page
-    if (user.role === 'ceo') return '/ceo/dashboard';
+    if (user.role === 'ceo') return '/ceo/settings';
+    if (user.role === 'employee') return '/employee/dashboard';
+    if (user.role === 'admin') return '/admin/dashboard';
     return '/dashboard/settings';
   };
 

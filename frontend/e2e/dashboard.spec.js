@@ -9,25 +9,6 @@
  */
 
 import { test, expect } from './fixtures.js';
-<<<<<<< HEAD
-
-test.use({
-  storageState: 'playwright/.auth/owner.json'
-});
-
-test.describe('Dashboard & Booking Management', () => {
-
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/dashboard');
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
-
-    // Dismiss onboarding modal if present
-    const skipOnboarding = page
-      .locator('button:has-text("Überspringen"), [role="button"]:has-text("Überspringen"), button:has-text("Skip")')
-      .first();
-    if (await skipOnboarding.isVisible({ timeout: 3000 }).catch(() => false)) {
-=======
-
 test.describe('Dashboard & Booking Management', () => {
 
   test.use({ storageState: 'playwright/.auth/owner-dashboard.json' });
@@ -39,7 +20,6 @@ test.describe('Dashboard & Booking Management', () => {
     // Close onboarding walkthrough if present to avoid click interception
     const skipOnboarding = page.locator('button:has-text("Überspringen")').first();
     if (await skipOnboarding.isVisible({ timeout: 1000 }).catch(() => false)) {
->>>>>>> dfd340e (feat: enhance booking process with idempotency key handling and CSRF token generation)
       await skipOnboarding.click();
     }
   });
@@ -205,13 +185,8 @@ test.describe('Dashboard & Booking Management', () => {
       ];
 
       for (const item of navItems) {
-<<<<<<< HEAD
-        const navLink = page.locator(`a:has-text("${item.link}"), [href*="${item.url}"]`).first();
-
-=======
         const navLink = page.locator(`a[href="${item.href}"]`).first();
-        
->>>>>>> dfd340e (feat: enhance booking process with idempotency key handling and CSRF token generation)
+
         if (await navLink.isVisible({ timeout: 1000 }).catch(() => false)) {
           await navLink.click();
           await page.waitForLoadState('networkidle');

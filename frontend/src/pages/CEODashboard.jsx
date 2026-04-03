@@ -1,74 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import UserMenu from '../components/common/UserMenu';
 import { api, API_URL } from '../utils/api';
 import { captureError } from '../utils/errorTracking';
+import { AlertTriangle, Users, CreditCard, Building2, Server, BarChart3, RefreshCw, Play, Square } from 'lucide-react';
 
 const BACKEND_ORIGIN = API_URL.replace(/\/api\/?$/, '');
-
-// Icons als SVG Components
-const DashboardIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-  </svg>
-);
-
-const ErrorIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-  </svg>
-);
-
-const UsersIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-  </svg>
-);
-
-const SubscriptionIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-  </svg>
-);
-
-const CustomersIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-  </svg>
-);
-
-const ServerIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
-  </svg>
-);
-
-const PlayIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
-
-const StopIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-  </svg>
-);
-
-const RefreshIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-  </svg>
-);
 
 const CEODashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Stats State
   const [stats, setStats] = useState({
     totalCustomers: 0,
     starterAbos: 0,
@@ -76,43 +17,31 @@ const CEODashboard = () => {
     trialAbos: 0,
     totalRevenue: 0
   });
-
-  // Error Logs State
   const [errors, setErrors] = useState([]);
-
-  // Customers State (Unternehmen die das Tool kaufen)
   const [customers, setCustomers] = useState([]);
-
-  // Subscriptions State
   const [subscriptions, setSubscriptions] = useState([]);
 
-  // Fetch all data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
 
-      // ✅ FIX: Tokens are in HTTP-only cookies, sent automatically
       try {
-        // Fetch stats
         const statsRes = await api.get('/ceo/stats');
         if (statsRes.data.success) {
           setStats(statsRes.data.stats);
         }
 
-        // Fetch errors
         const errorsRes = await api.get('/ceo/errors?limit=50');
         if (errorsRes.data.success) {
           setErrors(errorsRes.data.errors || []);
         }
 
-        // Fetch customers
         const customersRes = await api.get('/ceo/customers?limit=100');
         if (customersRes.data.success) {
           setCustomers(customersRes.data.customers || []);
         }
 
-        // Fetch subscriptions
         const subsRes = await api.get('/ceo/ceo-subscriptions?limit=100');
         if (subsRes.data.success) {
           setSubscriptions(subsRes.data.subscriptions || []);
@@ -129,9 +58,7 @@ const CEODashboard = () => {
     fetchData();
   }, []);
 
-  // Mark error as resolved
   const markErrorAsResolved = async (errorId) => {
-    // ? SECURITY FIX: Use central api instance
     try {
       const response = await api.patch(`/ceo/errors/${errorId}/resolve`, { notes: 'Vom CEO Kontrollpanel als gelöst markiert' });
 
@@ -144,30 +71,27 @@ const CEODashboard = () => {
   };
 
   const navItems = [
-    { id: 'overview', label: 'Übersicht', icon: DashboardIcon },
-    { id: 'errors', label: 'Fehlermeldungen', icon: ErrorIcon, badge: errors.filter(e => !e.resolved).length },
-    { id: 'customers', label: 'Kunden', icon: CustomersIcon },
-    { id: 'subscriptions', label: 'Abonnements', icon: SubscriptionIcon },
-    { id: 'system', label: 'System Control', icon: ServerIcon },
+    { id: 'overview', label: 'Übersicht', icon: BarChart3 },
+    { id: 'errors', label: 'Fehler', icon: AlertTriangle, badge: errors.filter(e => !e.resolved).length },
+    { id: 'customers', label: 'Unternehmen', icon: Building2 },
+    { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
+    { id: 'system', label: 'System', icon: Server },
   ];
 
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-zinc-300 border-t-blue-600"></div>
         </div>
       );
     }
 
     if (error) {
       return (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
-          <div className="flex items-center justify-center gap-2 text-red-600 text-xl mb-2">
-            <ErrorIcon />
-            <span>Fehler</span>
-          </div>
-          <p className="text-zinc-500">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+          <p className="text-red-700 text-sm">{error}</p>
         </div>
       );
     }
@@ -189,169 +113,43 @@ const CEODashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-zinc-200 flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-zinc-200">
-          <Link to="/" className="flex items-center gap-3" aria-label="Zurück zur Startseite - JN Business System">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
-              <span className="text-zinc-900 font-bold text-sm">CEO</span>
-            </div>
-            <div>
-              <span className="text-zinc-900 font-semibold block">JN Business System</span>
-              <span className="text-xs text-zinc-700">CEO Portal</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-1">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
-                    activeTab === item.id
-                      ? 'bg-gradient-to-r from-red-500/20 to-orange-500/20 text-white border-l-2 border-red-500'
-                      : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'
-                  }`}
-                >
-                  <item.icon />
-                  <span className="flex-1">{item.label}</span>
-                  {item.badge > 0 && (
-                    <span className="px-2 py-0.5 bg-red-500 text-zinc-900 text-xs rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* User Info */}
-        <div className="p-4 border-t border-zinc-200">
-          <div className="flex items-center gap-3 px-4 py-3 bg-zinc-50/50 rounded-lg">
-            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center text-zinc-900 font-semibold">
-              J
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-zinc-900">Julius</p>
-              <p className="text-xs text-zinc-700">CEO</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white/50 border-b border-zinc-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900">
-                {navItems.find(item => item.id === activeTab)?.label || 'Kontrollpanel'}
-              </h1>
-              <p className="text-zinc-700 text-sm mt-1">
-                Willkommen im CEO Control Center
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Quick Tools Dropdown */}
-              <div className="relative group">
-                <button className="flex items-center gap-2 px-3 py-2 text-zinc-500 hover:text-zinc-900 transition rounded-lg hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                  </svg>
-                  <span className="text-sm">Tools</span>
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div className="absolute right-0 top-full mt-1 w-56 bg-zinc-50 border border-zinc-200 rounded-lg shadow-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                  <div className="py-2">
-                    <Link to="/ceo/analytics" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Analytics - Detaillierte Statistiken ansehen">
-                      <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                      <span className="text-sm">Analytics</span>
-                    </Link>
-                    <Link to="/ceo/email-campaigns" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="E-Mail-Kampagnen verwalten">
-                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-sm">E-Mail Kampagnen</span>
-                    </Link>
-                    <Link to="/ceo/payments" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Zahlungen und Transaktionen">
-                      <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="text-sm">Payments</span>
-                    </Link>
-                    <div className="border-t border-zinc-200 my-2"></div>
-                    <Link to="/ceo/support" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Support-Tickets bearbeiten">
-                      <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
-                      <span className="text-sm">Support Tickets</span>
-                    </Link>
-                    <Link to="/ceo/audit-log" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Audit-Log - Systemaktivitäten einsehen">
-                      <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span className="text-sm">Audit Log</span>
-                    </Link>
-                    <Link to="/ceo/lifecycle-emails" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Lifecycle-E-Mails konfigurieren">
-                      <svg className="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-sm">Lifecycle E-Mails</span>
-                    </Link>
-                    <div className="border-t border-zinc-200 my-2"></div>
-                    <Link to="/ceo/feature-flags" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Feature-Flags aktivieren oder deaktivieren">
-                      <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                      </svg>
-                      <span className="text-sm">Feature Flags</span>
-                    </Link>
-                    <Link to="/ceo/backups" className="flex items-center gap-3 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition" aria-label="Backups verwalten und wiederherstellen">
-                      <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                      </svg>
-                      <span className="text-sm">Backups</span>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              <Link
-                to="/ceo/settings"
-                className="p-2 text-zinc-500 hover:text-zinc-900 transition rounded-lg hover:bg-zinc-100"
-                title="Einstellungen"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </Link>
-              <span className="flex items-center gap-1.5 text-red-600 text-sm font-medium px-3 py-1 bg-red-500/10 rounded-full border border-red-500/20">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
-                CEO Modus
-              </span>
-              <UserMenu />
-            </div>
-          </div>
-        </header>
-
-        {/* Content */}
-        <main className="flex-1 p-6 overflow-auto">
-          {renderContent()}
-        </main>
+    <div className="space-y-6">
+      {/* Page header */}
+      <div>
+        <h1 className="text-2xl font-bold text-zinc-900">CEO Dashboard</h1>
+        <p className="text-sm text-zinc-500 mt-1">System-Übersicht und Verwaltung</p>
       </div>
+
+      {/* Tab Bar */}
+      <div className="flex items-center gap-1 bg-white border border-zinc-200 rounded-xl p-1">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all ${
+                activeTab === item.id
+                  ? 'bg-zinc-900 text-white shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50'
+              }`}
+            >
+              <Icon size={15} />
+              <span>{item.label}</span>
+              {item.badge > 0 && (
+                <span className={`px-1.5 py-0.5 text-[11px] rounded-full font-semibold ${
+                  activeTab === item.id ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab Content */}
+      {renderContent()}
     </div>
   );
 };
@@ -371,169 +169,125 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
     : 0;
 
   return (
-    <div className="space-y-8">
-      {/* Error Alert - Only show if there are unresolved errors */}
+    <div className="space-y-6">
+      {/* Error Alert */}
       {unresolvedErrors > 0 && (
-        <div className="bg-gradient-to-r from-red-900/40 to-red-800/20 border border-red-500/40 rounded-2xl p-5 flex items-center gap-5">
-          <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center">
-            <svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-5 flex items-center gap-5">
+          <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+            <AlertTriangle className="w-6 h-6 text-red-600" />
           </div>
           <div className="flex-1">
-            <h3 className="font-bold text-red-600 text-lg">System-Alarme</h3>
-            <p className="text-red-600/70 text-sm">{unresolvedErrors} ungelöste {unresolvedErrors === 1 ? 'Meldung erfordert' : 'Meldungen erfordern'} Ihre Aufmerksamkeit</p>
+            <h3 className="font-semibold text-red-800">System-Alarme</h3>
+            <p className="text-red-600 text-sm">{unresolvedErrors} ungelöste {unresolvedErrors === 1 ? 'Meldung erfordert' : 'Meldungen erfordern'} Ihre Aufmerksamkeit</p>
           </div>
           <button
             onClick={() => setActiveTab('errors')}
-            className="px-5 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition shadow-sm shadow-red-500/20"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition"
           >
             Jetzt prüfen
           </button>
         </div>
       )}
 
-      {/* Hero Revenue Section */}
-      <div className="bg-gradient-to-br from-emerald-900/30 via-green-900/20 to-teal-900/30 border border-emerald-500/30 rounded-3xl p-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="relative">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-emerald-300/80 text-sm font-medium uppercase tracking-wider mb-2">Monatlicher Umsatz</p>
-              <div className="flex items-baseline gap-3">
-                <span className="text-6xl font-black text-zinc-900">€{stats.totalRevenue.toLocaleString('de-DE')}</span>
-                <span className="text-emerald-400 text-lg font-medium">/ Monat</span>
-              </div>
-              <p className="text-zinc-700 text-sm mt-3">
-                {stats.starterAbos} Starter × €29 + {stats.proAbos} Pro × €69
-              </p>
+      {/* Revenue Hero */}
+      <div className="bg-white border border-zinc-200 rounded-xl p-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-zinc-500 text-sm font-medium uppercase tracking-wider mb-1">Monatlicher Umsatz</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-zinc-900">€{stats.totalRevenue.toLocaleString('de-DE')}</span>
+              <span className="text-zinc-400 text-sm">/ Monat</span>
             </div>
-            <div className="hidden lg:flex flex-col items-end gap-2">
-              <div className="px-4 py-2 bg-emerald-500/20 rounded-xl border border-emerald-500/30">
-                <span className="text-emerald-400 font-bold text-lg">{totalPaidCustomers}</span>
-                <span className="text-emerald-300/70 text-sm ml-2">Zahlende Kunden</span>
-              </div>
-              <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                <span className="text-zinc-900 font-bold text-lg">€{avgRevenue}</span>
-                <span className="text-zinc-500 text-sm ml-2">Ø pro Kunde</span>
-              </div>
+            <p className="text-zinc-500 text-sm mt-2">
+              {stats.starterAbos} Starter × €29 + {stats.proAbos} Pro × €69
+            </p>
+          </div>
+          <div className="hidden lg:flex flex-col items-end gap-2">
+            <div className="px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-200">
+              <span className="text-emerald-700 font-semibold">{totalPaidCustomers}</span>
+              <span className="text-emerald-600 text-sm ml-1.5">Zahlende Kunden</span>
+            </div>
+            <div className="px-3 py-1.5 bg-zinc-50 rounded-lg border border-zinc-200">
+              <span className="text-zinc-900 font-semibold">€{avgRevenue}</span>
+              <span className="text-zinc-500 text-sm ml-1.5">Ø pro Kunde</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Grid - 2x2 Layout */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Total Customers */}
-        <div className="bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-500/30 rounded-2xl p-6 relative overflow-hidden group hover:border-blue-400/50 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
-          <div className="relative">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <p className="text-blue-300/80 text-xs font-medium uppercase tracking-wider">Gesamt Kunden</p>
-            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.totalCustomers}</p>
-            <p className="text-blue-400/60 text-xs mt-2">Registrierte Unternehmen</p>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+          <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
+            <Users className="w-5 h-5 text-blue-600" />
           </div>
+          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Gesamt Kunden</p>
+          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.totalCustomers}</p>
+          <p className="text-zinc-400 text-xs mt-1">Registrierte Unternehmen</p>
         </div>
 
-        {/* Starter Subscriptions */}
-        <div className="bg-gradient-to-br from-violet-900/40 to-purple-800/20 border border-violet-500/30 rounded-2xl p-6 relative overflow-hidden group hover:border-violet-400/50 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
-          <div className="relative">
-            <div className="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <p className="text-violet-300/80 text-xs font-medium uppercase tracking-wider">Starter</p>
-            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.starterAbos}</p>
-            <p className="text-violet-400/60 text-xs mt-2">€{stats.starterAbos * 29}/Monat</p>
+        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+          <div className="w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center mb-3">
+            <BarChart3 className="w-5 h-5 text-violet-600" />
           </div>
+          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Starter</p>
+          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.starterAbos}</p>
+          <p className="text-zinc-400 text-xs mt-1">€{stats.starterAbos * 29}/Monat</p>
         </div>
 
-        {/* Pro Subscriptions */}
-        <div className="bg-gradient-to-br from-amber-900/40 to-orange-800/20 border border-amber-500/30 rounded-2xl p-6 relative overflow-hidden group hover:border-amber-400/50 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
-          <div className="relative">
-            <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-              </svg>
-            </div>
-            <p className="text-amber-300/80 text-xs font-medium uppercase tracking-wider">Pro</p>
-            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.proAbos}</p>
-            <p className="text-amber-400/60 text-xs mt-2">€{stats.proAbos * 69}/Monat</p>
+        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+          <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center mb-3">
+            <CreditCard className="w-5 h-5 text-amber-600" />
           </div>
+          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Pro</p>
+          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.proAbos}</p>
+          <p className="text-zinc-400 text-xs mt-1">€{stats.proAbos * 69}/Monat</p>
         </div>
 
-        {/* Testphase Accounts */}
-        <div className="bg-gradient-to-br from-cyan-900/40 to-teal-800/20 border border-cyan-500/30 rounded-2xl p-6 relative overflow-hidden group hover:border-cyan-400/50 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
-          <div className="relative">
-            <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <p className="text-cyan-300/80 text-xs font-medium uppercase tracking-wider">Testphase</p>
-            <p className="text-4xl font-black text-zinc-900 mt-1">{stats.trialAbos}</p>
-            <p className="text-cyan-400/60 text-xs mt-2">In Testphase</p>
+        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+          <div className="w-10 h-10 bg-cyan-50 rounded-lg flex items-center justify-center mb-3">
+            <RefreshCw className="w-5 h-5 text-cyan-600" />
           </div>
+          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Testphase</p>
+          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.trialAbos}</p>
+          <p className="text-zinc-400 text-xs mt-1">In Testphase</p>
         </div>
       </div>
 
-      {/* Bottom Row - Metrics + System Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Conversion Rate */}
-        <div className="bg-white/80 border border-zinc-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-zinc-700 text-sm font-medium">Conversion Rate</p>
-            <div className="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
+      {/* Bottom Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-zinc-500 text-sm font-medium">Conversion Rate</p>
           </div>
-          <p className="text-4xl font-black text-zinc-900">{conversionRate}%</p>
-          <div className="mt-3 h-2 bg-zinc-50 rounded-full overflow-hidden">
+          <p className="text-3xl font-bold text-zinc-900">{conversionRate}%</p>
+          <div className="mt-3 h-2 bg-zinc-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-1000"
+              className="h-full bg-blue-600 rounded-full transition-all duration-1000"
               style={{ width: `${conversionRate}%` }}
             ></div>
           </div>
-          <p className="text-zinc-700 text-xs mt-2">Testphase → Zahlender Kunde</p>
+          <p className="text-zinc-400 text-xs mt-2">Testphase → Zahlender Kunde</p>
         </div>
 
-        {/* Avg Revenue */}
-        <div className="bg-white/80 border border-zinc-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-zinc-700 text-sm font-medium">Ø Umsatz pro Kunde</p>
-            <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-zinc-500 text-sm font-medium">Ø Umsatz pro Kunde</p>
           </div>
-          <p className="text-4xl font-black text-zinc-900">€{avgRevenue}</p>
-          <p className="text-zinc-700 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
+          <p className="text-3xl font-bold text-zinc-900">€{avgRevenue}</p>
+          <p className="text-zinc-400 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
         </div>
 
-        {/* System Status */}
-        <div className="bg-white/80 border border-zinc-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-zinc-700 text-sm font-medium">System Status</p>
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-              </span>
-            </div>
+        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-zinc-500 text-sm font-medium">System Status</p>
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
           </div>
-          <p className="text-4xl font-black text-green-600">Online</p>
-          <p className="text-zinc-700 text-xs mt-3">Alle Dienste aktiv</p>
+          <p className="text-3xl font-bold text-green-600">Online</p>
+          <p className="text-zinc-400 text-xs mt-3">Alle Dienste aktiv</p>
         </div>
       </div>
     </div>
@@ -1010,7 +764,7 @@ const CustomersTab = ({ customers }) => {
                         ? 'bg-green-500/20 text-green-600'
                         : customer.status === 'trial'
                         ? 'bg-orange-500/20 text-orange-400'
-                        : 'bg-gray-500/20 text-zinc-500'
+                        : 'bg-zinc-500/20 text-zinc-500'
                     }`}>
                       {customer.status === 'active' ? 'Aktiv' : customer.status === 'trial' ? 'Testphase' : 'Inaktiv'}
                     </span>
@@ -1307,7 +1061,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-500"></div>
+                <div className="w-3 h-3 rounded-full bg-zinc-500"></div>
                 <span className="text-zinc-500 text-sm">Total</span>
               </div>
               <span className="text-zinc-900 font-semibold">{subscriptions.length}</span>
@@ -1562,7 +1316,7 @@ const SystemControlTab = () => {
       case 'stopped': return 'bg-red-500';
       case 'starting': return 'bg-yellow-500 animate-pulse';
       case 'error': return 'bg-red-600';
-      default: return 'bg-gray-500';
+      default: return 'bg-zinc-500';
     }
   };
 
@@ -1631,7 +1385,7 @@ const SystemControlTab = () => {
               {allStarting ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
               ) : (
-                <PlayIcon />
+                <Play size={16} />
               )}
               {allStarting ? 'Startet...' : 'Alle Starten'}
             </button>
@@ -1647,7 +1401,7 @@ const SystemControlTab = () => {
               {allStopping ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-400 border-t-transparent"></div>
               ) : (
-                <StopIcon />
+                <Square size={16} />
               )}
               {allStopping ? 'Stoppt...' : 'Alle Stoppen'}
             </button>
@@ -1706,7 +1460,7 @@ const SystemControlTab = () => {
                       {actionLoading[service.id] === 'starting' ? (
                         <div className="animate-spin rounded-full h-3 w-3 border-2 border-green-400 border-t-transparent"></div>
                       ) : (
-                        <PlayIcon />
+                        <Play size={14} />
                       )}
                     </button>
                     <button
@@ -1714,7 +1468,7 @@ const SystemControlTab = () => {
                       disabled={actionLoading[service.id] || isStopped}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1 ${
                         isStopped
-                          ? 'bg-zinc-50 text-zinc-500 cursor-not-allowed'
+                          ? 'bg-zinc-50 text-zinc-400 cursor-not-allowed'
                           : actionLoading[service.id] === 'stopping'
                           ? 'bg-red-500/20 text-red-600 cursor-wait'
                           : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
@@ -1723,15 +1477,15 @@ const SystemControlTab = () => {
                       {actionLoading[service.id] === 'stopping' ? (
                         <div className="animate-spin rounded-full h-3 w-3 border-2 border-red-400 border-t-transparent"></div>
                       ) : (
-                        <StopIcon />
+                        <Square size={14} />
                       )}
                     </button>
                     <button
                       onClick={() => checkServiceStatus(service.id)}
-                      className="px-2 py-1.5 rounded-lg text-sm bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition"
+                      className="px-2 py-1.5 rounded-lg text-sm bg-zinc-50 text-zinc-400 hover:text-zinc-700 transition"
                       title="Status aktualisieren"
                     >
-                      <RefreshIcon />
+                      <RefreshCw size={14} />
                     </button>
                   </div>
                 </div>
@@ -1760,7 +1514,7 @@ const SystemControlTab = () => {
             {logs.length === 0 ? (
               <div className="text-zinc-500 flex items-center justify-center h-full">
                 <div className="text-center">
-                  <svg className="w-8 h-8 mx-auto mb-2 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 mx-auto mb-2 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Keine Logs vorhanden...
@@ -1770,7 +1524,7 @@ const SystemControlTab = () => {
               logs.map((log, index) => (
                 <div
                   key={index}
-                  className={`py-1.5 border-b border-gray-900 last:border-0 ${
+                  className={`py-1.5 border-b border-zinc-900 last:border-0 ${
                     log.type === 'error' ? 'text-red-600' :
                     log.type === 'success' ? 'text-green-600' :
                     'text-zinc-500'

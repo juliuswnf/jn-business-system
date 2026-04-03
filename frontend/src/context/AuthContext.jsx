@@ -22,11 +22,15 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       const currentPath = window.location.pathname || '/';
       const isProtectedPath = PROTECTED_PATH_PREFIXES.some((prefix) => currentPath.startsWith(prefix));
+      const hasCookieHint = document.cookie
+        .split('; ')
+        .some((row) => row.startsWith('XSRF-TOKEN='));
       const hasAuthHint = Boolean(
         localStorage.getItem('jnUser') ||
         localStorage.getItem('user') ||
         localStorage.getItem('jnAuthToken') ||
-        localStorage.getItem('token')
+        localStorage.getItem('token') ||
+        hasCookieHint
       );
 
       // On public pages without auth hints, skip profile check to avoid expected 401 noise on hard refresh

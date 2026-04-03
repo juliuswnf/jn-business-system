@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import { authAPI, localizeApiMessage } from '../../utils/api';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -12,7 +12,6 @@ const EmployeeLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const notification = useNotification();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +30,18 @@ const EmployeeLogin = () => {
         // No need to store in localStorage
 
         notification.success('Anmeldung erfolgreich');
-        navigate('/employee/dashboard');
+
+        const role = data.user?.role || 'employee';
+        if (role === 'customer') {
+          window.location.replace('/customer/dashboard');
+        } else if (role === 'ceo') {
+          window.location.replace('/ceo/dashboard');
+        } else if (role === 'employee') {
+          // Force a full reload so AuthContext initializes from secure cookies.
+          window.location.replace('/employee/dashboard');
+        } else {
+          window.location.replace('/dashboard');
+        }
         return;
       } else {
         const msg = localizeApiMessage(data.message, 'Anmeldung fehlgeschlagen');

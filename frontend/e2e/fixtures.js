@@ -19,6 +19,11 @@ export const TEST_USERS = {
     password: envOr('E2E_CUSTOMER_PASSWORD', 'TestCustomer123!'),
     name: 'Test Customer'
   },
+  employee: {
+    email: envOr('E2E_EMPLOYEE_EMAIL', 'barber.employee@demo.jn-business-system.de'),
+    password: envOr('E2E_EMPLOYEE_PASSWORD', 'Demo@12345'),
+    name: 'Test Employee'
+  },
   ceo: {
     email: envOr('E2E_CEO_EMAIL', 'ceo@jn-business-system.test'),
     password: envOr('E2E_CEO_PASSWORD', 'TestCEO123!'),
