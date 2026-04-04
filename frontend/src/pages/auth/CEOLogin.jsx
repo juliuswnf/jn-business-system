@@ -39,11 +39,14 @@ const CEOLogin = () => {
 
       // CEO Login response received
 
-        // SUCCESS - Login complete
-        // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-        if (data.success) {
-          // Tokens are automatically sent by browser with withCredentials: true
-          // No need to store in localStorage
+      // SUCCESS - Login complete
+      // ? SECURITY FIX: Tokens are now in HTTP-only cookies
+      if (data.success) {
+        // Tokens are automatically sent by browser with withCredentials: true
+        // No need to store in localStorage
+
+        // Defensive cleanup: avoid stale post-logout flag blocking auth init on next route.
+        sessionStorage.removeItem('jn:skipAuthInitOnce');
 
         notification.success(data.message || 'Zugang autorisiert');
 

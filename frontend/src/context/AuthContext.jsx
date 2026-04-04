@@ -33,19 +33,25 @@ export const AuthProvider = ({ children }) => {
         hasCookieHint
       );
 
-      // On public pages without auth hints, skip profile check to avoid expected 401 noise on hard refresh
-      if (!isProtectedPath && !hasAuthHint) {
-        if (isMounted) {
-          setUser(null);
-          isAuthenticatedSet(false);
-          setIsLoading(false);
-        }
-        return;
-      }
-
       const shouldSkipInitOnce = sessionStorage.getItem(SKIP_AUTH_INIT_ONCE_KEY) === '1';
       if (shouldSkipInitOnce) {
+        // Always clear the one-time flag immediately to avoid carrying it into the next navigation.
         sessionStorage.removeItem(SKIP_AUTH_INIT_ONCE_KEY);
+
+        // Only skip profile init on public routes (post-logout convenience).
+        // Never skip on protected routes, otherwise login redirects can bounce back to /login.
+        if (!isProtectedPath) {
+          if (isMounted) {
+            setUser(null);
+            isAuthenticatedSet(false);
+            setIsLoading(false);
+          }
+          return;
+        }
+      }
+
+      // On public pages without auth hints, skip profile check to avoid expected 401 noise on hard refresh
+      if (!isProtectedPath && !hasAuthHint) {
         if (isMounted) {
           setUser(null);
           isAuthenticatedSet(false);

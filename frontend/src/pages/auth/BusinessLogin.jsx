@@ -37,6 +37,9 @@ const BusinessLogin = () => {
         // Tokens are automatically sent by browser with withCredentials: true
         // No need to store in localStorage
 
+        // Defensive cleanup: avoid stale post-logout flag blocking auth init on next route.
+        sessionStorage.removeItem('jn:skipAuthInitOnce');
+
         // Auth data saved, redirecting
 
         // Redirect based on role
