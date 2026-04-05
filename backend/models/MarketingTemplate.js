@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import logger from '../utils/logger.js';
 
 const MarketingTemplateSchema = new mongoose.Schema(
   {
@@ -259,7 +260,7 @@ MarketingTemplateSchema.statics.seedTemplates = async function() {
     );
   }
 
-  console.log('✅ Marketing templates seeded successfully');
+  logger.info('✅ Marketing templates seeded successfully');
   return templates.length;
 };
 

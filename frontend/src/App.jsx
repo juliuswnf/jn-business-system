@@ -24,6 +24,10 @@ const Register = lazy(() => import('./pages/auth/Register'));
 const EmployeeLogin = lazy(() => import('./pages/auth/EmployeeLogin'));
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const ChangePassword = lazy(() => import('./pages/auth/ChangePassword'));
+const TwoFASetup = lazy(() => import('./pages/auth/TwoFASetup'));
+const TwoFAVerify = lazy(() => import('./pages/auth/TwoFAVerify'));
+const SessionManagement = lazy(() => import('./pages/auth/SessionManagement'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Demo = lazy(() => import('./pages/Demo'));
 const Checkout = lazy(() => import('./pages/Checkout'));
@@ -120,10 +124,13 @@ const LazyPage = ({ children }) => (
   </Suspense>
 );
 
+const CEO_DEVICE_KEY = 'jn_ceo_device';
+const CEO_DEVICE_TOKEN = 'jn-mb-2026';
+
 /**
  * Global Keyboard Shortcuts Handler
- * Ctrl+Shift+C = Opens hidden CEO Login (works on ALL pages now for easier access)
- * Security: Route still requires CEO role to access dashboard
+ * Ctrl+Shift+C = stamps device token + opens hidden CEO Login
+ * Without the token the /_.admin route is invisible to outsiders
  */
 const KeyboardShortcuts = () => {
   const navigate = useNavigate();
@@ -131,11 +138,11 @@ const KeyboardShortcuts = () => {
   useEffect(() => {
     const handleKeyPress = (e) => {
       // Ctrl+Shift+C -> CEO Login (case insensitive)
-      // Works on any page for convenience - route is protected anyway
       if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
         e.preventDefault();
         e.stopPropagation();
-        // Navigate to hidden CEO login
+        // Stamp this device as authorised, then navigate
+        localStorage.setItem(CEO_DEVICE_KEY, CEO_DEVICE_TOKEN);
         navigate('/_.admin');
       }
     };
@@ -145,6 +152,17 @@ const KeyboardShortcuts = () => {
   }, [navigate]);
 
   return null;
+};
+
+/**
+ * Gate that hides /_.admin from anyone whose browser has no device token.
+ * Pressing Ctrl+Shift+C sets the token permanently in localStorage.
+ */
+const CEODeviceRoute = ({ children }) => {
+  if (localStorage.getItem(CEO_DEVICE_KEY) !== CEO_DEVICE_TOKEN) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
 };
 
 const LegacyBookingRouteRedirect = () => {
@@ -255,6 +273,10 @@ function App() {
         <Route path="/register/customer" element={<AppLayout><LazyPage><CustomerRegister /></LazyPage></AppLayout>} />
         <Route path="/forgot-password" element={<AppLayout><LazyPage><ForgotPassword /></LazyPage></AppLayout>} />
         <Route path="/reset-password" element={<AppLayout><LazyPage><ResetPassword /></LazyPage></AppLayout>} />
+        <Route path="/change-password" element={<AppLayout><ProtectedRoute><LazyPage><ChangePassword /></LazyPage></ProtectedRoute></AppLayout>} />
+        <Route path="/2fa-setup" element={<AppLayout><ProtectedRoute><LazyPage><TwoFASetup /></LazyPage></ProtectedRoute></AppLayout>} />
+        <Route path="/2fa-verify" element={<AppLayout><LazyPage><TwoFAVerify /></LazyPage></AppLayout>} />
+        <Route path="/sessions" element={<AppLayout><ProtectedRoute><LazyPage><SessionManagement /></LazyPage></ProtectedRoute></AppLayout>} />
         <Route path="/impressum" element={<AppLayout><LazyPage><Impressum /></LazyPage></AppLayout>} />
         <Route path="/datenschutz" element={<AppLayout><LazyPage><Datenschutz /></LazyPage></AppLayout>} />
         <Route path="/agb" element={<AppLayout><LazyPage><AGB /></LazyPage></AppLayout>} />
@@ -267,7 +289,7 @@ function App() {
         {/* ==================== HIDDEN CEO LOGIN ==================== */}
         {/* SECURITY: Only accessible via Ctrl+Shift+C on home page */}
         {/* Route uses non-obvious path that won't be guessed */}
-        <Route path="/_.admin" element={<CEOLogin />} />
+        <Route path="/_.admin" element={<CEODeviceRoute><CEOLogin /></CEODeviceRoute>} />
 
         {/* ==================== ONBOARDING ==================== */}
         <Route

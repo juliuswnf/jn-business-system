@@ -185,7 +185,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
                           </span>
                         )}
                         {hasFeature && isUpgrade && (
-                          <span className="inline-block text-xs font-bold bg-gray-900 text-gray-900 px-2 py-1 rounded mb-2">
+                          <span className="inline-block text-xs font-bold bg-gray-900 text-white px-2 py-1 rounded mb-2">
                             EMPFOHLEN
                           </span>
                         )}

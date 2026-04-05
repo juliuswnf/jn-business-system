@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { ceoAPI } from '../../utils/api';
+import { formatDateTimeDE } from '../../utils/helpers';
 
 const Backups = () => {
   const [backups, setBackups] = useState([]);
@@ -137,14 +138,6 @@ const Backups = () => {
     } catch (err) {
       showMessage('Fehler beim Speichern des Zeitplans', 'error');
     }
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('de-DE', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
   };
 
   const formatSize = (bytes) => {
@@ -286,7 +279,7 @@ const Backups = () => {
                       <div>
                         <p className="text-gray-900 font-medium">{backup.name}</p>
                         <p className="text-gray-400 text-sm">
-                          {formatDate(backup.createdAt)} • {backup.sizeFormatted || formatSize(backup.size)}
+                          {formatDateTimeDE(backup.createdAt)} • {backup.sizeFormatted || formatSize(backup.size)}
                           {backup.duration && ` • ${backup.duration}s`}
                         </p>
                       </div>

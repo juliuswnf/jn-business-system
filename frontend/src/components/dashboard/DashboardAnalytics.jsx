@@ -133,7 +133,7 @@ export default function DashboardAnalytics() {
                 </div>
               </div>
 
-              <div className="revenue-table">
+              <div className="revenue-table" style={{overflowX:'auto'}}>
                 <table>
                   <thead>
                     <tr>
@@ -173,7 +173,7 @@ export default function DashboardAnalytics() {
                 </div>
               </div>
 
-              <div className="forecast-table">
+              <div className="forecast-table" style={{overflowX:'auto'}}>
                 <h3>Prognose nächste 12 Monate</h3>
                 <table>
                   <thead>

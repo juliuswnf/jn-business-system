@@ -250,13 +250,13 @@ export default function Booking() {
     <div className="min-h-screen bg-white text-gray-900">
       {/* Page Header */}
       <div className="border-b border-gray-100 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight mb-1">Neuen Termin buchen</h1>
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 md:py-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-xl md:text-2xl font-semibold tracking-tight mb-0.5">Neuen Termin buchen</h1>
               <p className="text-gray-600 text-sm">Wähle einen Salon und buche deinen Termin</p>
             </div>
-            <div className="text-right">
+            <div className="text-right shrink-0 hidden sm:block">
               <p className="text-sm text-gray-600">Angemeldet als:</p>
               <p className="font-semibold">{customerProfile.name}</p>
             </div>
@@ -265,9 +265,9 @@ export default function Booking() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-12">
         {/* Progress Bar - 4 Steps */}
-        <div className="mb-12">
+        <div className="mb-6 md:mb-12">
           <div className="flex items-center justify-between">
             {stepLabels.map(({ step, label }, index) => (
               <div key={step} className="flex items-center flex-1">
@@ -291,7 +291,7 @@ export default function Booking() {
 
         {/* Step 0: Salon Selection */}
         {bookingStep === 0 && (
-          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8 mb-8">
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 md:p-8 mb-4 md:mb-8">
             <h2 className="text-xl font-semibold tracking-tight mb-2">Wähle einen Anbieter</h2>
             <p className="text-gray-600 mb-6">Suche nach einem Anbieter in deiner Nähe</p>
 
@@ -304,7 +304,7 @@ export default function Booking() {
 
         {/* Step 1: Service Selection */}
         {bookingStep === 1 && (
-          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8 mb-8">
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 md:p-8 mb-4 md:mb-8">
             <div className="mb-6">
               <p className="text-sm text-gray-600 mb-1">Ausgewählter Salon</p>
               <h3 className="text-xl font-semibold">{bookingData.salonName}</h3>
@@ -356,7 +356,7 @@ export default function Booking() {
 
         {/* Step 2: Date & Time Selection */}
         {bookingStep === 2 && (
-          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8 mb-8">
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 md:p-8 mb-4 md:mb-8">
             <div className="mb-6">
               <p className="text-sm text-gray-600 mb-1">{bookingData.salonName}</p>
               <p className="text-gray-600">{bookingData.service}</p>
@@ -403,7 +403,7 @@ export default function Booking() {
                       key={slot}
                       onClick={() => !isBooked && setBookingData(prev => ({ ...prev, time: slot }))}
                       disabled={isBooked}
-                      className={`py-2 px-3 rounded-xl font-medium transition ${
+                      className={`py-2 px-3 rounded-xl font-medium transition min-h-[44px] flex items-center justify-center text-sm ${
                         isBooked
                           ? 'bg-gray-50 text-gray-600 cursor-not-allowed line-through'
                           : bookingData.time === slot
@@ -450,7 +450,7 @@ export default function Booking() {
 
         {/* Step 3: Confirmation */}
         {bookingStep === 3 && (
-          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8 mb-8">
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 md:p-8 mb-4 md:mb-8">
             <h2 className="text-xl font-semibold tracking-tight mb-6">Termin-Übersicht</h2>
 
             <div className="space-y-4 mb-8 p-6 bg-gray-50 bg-opacity-50 rounded-xl">
@@ -471,9 +471,9 @@ export default function Booking() {
                 <span className="font-semibold">{bookingData.service}</span>
               </div>
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <div className="flex justify-between font-bold text-lg">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 font-bold text-base md:text-lg">
                   <span>Termin:</span>
-                  <span>{new Date(bookingData.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })} um {bookingData.time} Uhr</span>
+                  <span className="sm:text-right">{new Date(bookingData.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })} um {bookingData.time} Uhr</span>
                 </div>
               </div>
               {bookingData.note && (

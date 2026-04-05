@@ -201,7 +201,8 @@ function PackagesTab({ packages }) {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Inaktive Packages ({inactivePackages.length})
           </h2>
-          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-gray-100 rounded-2xl">
+            <div className="overflow-x-auto rounded-2xl">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -238,6 +239,7 @@ function PackagesTab({ packages }) {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       )}
@@ -343,7 +345,8 @@ function MembershipsTab({ memberships, onCancel }) {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Inaktive Memberships ({inactiveMemberships.length})
           </h2>
-          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-gray-100 rounded-2xl">
+            <div className="overflow-x-auto rounded-2xl">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -380,6 +383,7 @@ function MembershipsTab({ memberships, onCancel }) {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       )}

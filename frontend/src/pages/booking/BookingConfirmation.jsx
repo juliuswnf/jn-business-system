@@ -70,7 +70,7 @@ export default function BookingConfirmation() {
     <div className="min-h-screen bg-white text-gray-900">
       {/* Success Header */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-50 border border-green-100 rounded-2xl mb-5">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
@@ -82,10 +82,10 @@ export default function BookingConfirmation() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-12">
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
           {/* Booking Details */}
-          <div className="p-8 md:p-12">
+          <div className="p-4 md:p-8 lg:p-12">
             <div className="mb-8">
               <h2 className="text-xl font-semibold tracking-tight mb-6 flex items-center gap-3">
                 <Calendar className="w-6 h-6 text-green-600" />
@@ -174,7 +174,7 @@ export default function BookingConfirmation() {
           </div>
 
           {/* Action Buttons */}
-          <div className="bg-white px-8 md:px-12 py-6 border-t border-gray-100">
+          <div className="bg-white px-4 md:px-8 lg:px-12 py-4 md:py-6 border-t border-gray-100">
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 to="/"

@@ -286,26 +286,25 @@ export default function PublicBooking() {
   ];
 
   const StepIndicator = () => (
-    <div className="flex items-center justify-between mb-6 md:mb-8 overflow-x-auto px-2">
+    <div className="flex items-center justify-between mb-6 md:mb-8">
       {stepLabels.map((step, index) => (
-        <div key={step.step} className="flex items-center min-w-0">
-          <div className="flex items-center">
+        <div key={step.step} className="flex items-center">
+          <div className="flex flex-col items-center gap-1">
             <div
               className={`
                 flex items-center justify-center
-                h-8 w-8 md:h-10 md:w-10
-                rounded-full
-                text-sm md:text-base
+                h-9 w-9
+                rounded-full text-sm font-semibold
                 transition
-                ${bookingStep === step.step ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'}
+                ${bookingStep === step.step ? 'bg-gray-900 text-white' : bookingStep > step.step ? 'bg-gray-200 text-gray-500' : 'bg-gray-100 text-gray-400'}
               `}
             >
-              {index + 1}
+              {bookingStep > step.step ? '✓' : index + 1}
             </div>
-            <span className="ml-2 text-xs md:text-sm hidden sm:inline">{step.label}</span>
+            <span className="text-[10px] md:text-xs font-medium text-gray-500 leading-none">{step.label}</span>
           </div>
           {index < stepLabels.length - 1 && (
-            <div className="w-8 md:w-12 h-px bg-gray-300 mx-2" />
+            <div className="w-6 sm:w-10 md:w-14 h-px bg-gray-200 mx-1 sm:mx-2 mb-4" />
           )}
         </div>
       ))}
@@ -411,7 +410,7 @@ export default function PublicBooking() {
             <p className="text-sm text-gray-400">Zeit auswählen *</p>
             <h3 className="text-lg md:text-xl font-semibold">Verfügbare Slots</h3>
           </div>
-          <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 max-h-96 overflow-y-auto">
+          <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 max-h-80 overflow-y-auto pr-1">
             {timeSlots.map(slot => {
               const isBooked = bookedSlots.includes(slot);
               const isSelected = bookingData.time === slot;
@@ -421,9 +420,9 @@ export default function PublicBooking() {
                   onClick={() => !isBooked && handleTimeSelect(slot)}
                   disabled={isBooked}
                   className={`
-                    rounded-2xl px-3 py-2 text-sm md:text-base transition
-                    ${isBooked ? 'bg-gray-200 text-gray-500 line-through' : ''}
-                    ${isSelected && !isBooked ? 'bg-gray-50 text-gray-800 border-2 border-gray-200 ring-2 ring-gray-100 font-semibold' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-gray-200'}
+                    rounded-xl px-2 py-3 text-sm font-medium transition touch-manipulation min-h-[48px]
+                    ${isBooked ? 'bg-gray-100 text-gray-400 line-through cursor-not-allowed' : ''}
+                    ${isSelected && !isBooked ? 'bg-gray-900 text-white font-semibold' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-gray-400 text-gray-900'}
                   `}
                 >
                   {slot}
@@ -442,11 +441,11 @@ export default function PublicBooking() {
   };
 
   const BookingActions = () => (
-    <div className="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+    <div className="flex flex-col-reverse sm:flex-row gap-3 mt-8 pt-4 border-t border-gray-100">
       {bookingStep > 0 && (
         <button
           onClick={() => setBookingStep(prev => Math.max(prev - 1, 0))}
-          className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl border border-gray-300 bg-white text-black hover:bg-gray-100 touch-manipulation"
+          className="w-full sm:w-auto px-6 py-3.5 text-base font-semibold rounded-2xl border border-gray-200 bg-white text-gray-900 hover:bg-gray-50 touch-manipulation active:scale-[0.98] transition"
         >
           Zurück
         </button>
@@ -465,7 +464,7 @@ export default function PublicBooking() {
           (bookingStep === 2 && (!bookingData.customerName || !bookingData.customerEmail || !bookingData.customerPhone)) ||
           submitting
         }
-        className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl bg-gray-900 text-gray-900 hover:bg-gray-900 disabled:opacity-60 disabled:cursor-not-allowed touch-manipulation"
+        className="w-full sm:w-auto px-6 py-3.5 text-base font-semibold rounded-2xl bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation active:scale-[0.98] transition"
       >
         {bookingStep === 3 ? (submitting ? 'Wird gebucht...' : 'Termin buchen') : 'Weiter'}
       </button>
@@ -473,7 +472,7 @@ export default function PublicBooking() {
   );
 
   const ServiceGrid = () => (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       {services.map(service => {
         const isSelected = bookingData.serviceId === service.id;
         return (
@@ -481,8 +480,8 @@ export default function PublicBooking() {
             key={service.id}
             onClick={() => handleServiceSelect(service)}
             className={`
-              w-full text-left rounded-2xl p-4 md:p-5 shadow-sm transition
-              ${isSelected ? 'border-2 border-gray-200 bg-gray-50' : 'border border-gray-200 bg-white hover:border-gray-200'}
+              w-full text-left rounded-2xl p-4 md:p-5 transition touch-manipulation active:scale-[0.99]
+              ${isSelected ? 'border-2 border-gray-900 bg-gray-50 shadow-sm' : 'border border-gray-200 bg-white hover:border-gray-400'}
             `}
           >
             <div className="flex items-center justify-between mb-3">
@@ -502,26 +501,26 @@ export default function PublicBooking() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-6 md:px-8 md:py-10 lg:px-12 lg:py-12 text-gray-900">
-      <div className="w-full mx-auto max-w-full md:max-w-4xl space-y-6">
-        <header className="bg-white text-gray-900 rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8 flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-gray-400">Öffentlicher Termin</p>
-              <h1 className="text-2xl font-semibold tracking-tight">Neuen Termin buchen</h1>
-              <p className="text-sm text-gray-600 mt-1">Wähle deinen Wunsch-Salon und buche in wenigen Schritten.</p>
+      <div className="w-full mx-auto max-w-full md:max-w-4xl space-y-4 md:space-y-6">
+        <header className="bg-white text-gray-900 rounded-2xl border border-gray-200 shadow-sm p-5 md:p-8 flex flex-col gap-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-400">Online Buchung</p>
+              <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">{salonInfo?.name || 'Termin buchen'}</h1>
+              <p className="text-sm text-gray-500 mt-0.5">Buche in wenigen Schritten deinen Termin.</p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Ausgewählter Salon</p>
-              <p className="text-lg font-semibold">{salonInfo?.name || 'Salon'}</p>
+            <div className="shrink-0 w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center text-white font-bold text-lg">
+              {(salonInfo?.name || 'S').charAt(0).toUpperCase()}
             </div>
           </div>
           {!isAuthenticated && (
-            <div className="bg-gray-50 bg-opacity-70 border border-gray-100 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row gap-3">
+            <div className="border border-gray-100 rounded-2xl p-4 flex flex-col gap-2.5">
+              <p className="text-xs text-gray-500 font-medium">Schneller buchen mit Konto</p>
               <Link
                 to={`/login?redirect=${encodeURIComponent(currentPathWithQuery)}`}
-                className="flex-1 text-center px-4 py-3 bg-white text-black rounded-full font-semibold hover:bg-gray-100 touch-manipulation"
+                className="w-full text-center px-4 py-3 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 touch-manipulation active:scale-[0.98] transition"
               >
-                Mit Anmeldung fortfahren
+                Mit Konto anmelden
               </Link>
               <button
                 type="button"
@@ -529,15 +528,15 @@ export default function PublicBooking() {
                   const el = document.getElementById('booking-start');
                   el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="flex-1 text-center px-4 py-3 border border-gray-200 text-gray-900 rounded-full font-semibold hover:bg-gray-100 touch-manipulation"
+                className="w-full text-center px-4 py-3 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 touch-manipulation active:scale-[0.98] transition"
               >
-                Ohne Anmeldung fortfahren
+                Ohne Anmeldung buchen
               </button>
             </div>
           )}
         </header>
 
-        <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8" id="booking-start">
+        <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-8" id="booking-start">
           <StepIndicator />
 
           {bookingStep === 0 && (

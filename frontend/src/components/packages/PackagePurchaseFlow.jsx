@@ -101,7 +101,7 @@ function PackageList({ packages, onSelect }) {
               </div>
             )}
 
-            <div className="p-8">
+            <div className="p-4 md:p-8">
               {/* Icon */}
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-6">
                 <PackageIcon className="w-8 h-8 text-white" />

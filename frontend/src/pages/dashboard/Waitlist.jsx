@@ -10,6 +10,8 @@ export default function Waitlist() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('active'); // active, matched, expired
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [editForm, setEditForm] = useState({ preferredDate: '', preferredTime: '', notes: '' });
 
   // Fetch waitlist
   useEffect(() => {
@@ -55,6 +57,27 @@ export default function Waitlist() {
     return 'Niedrig';
   };
 
+  const handleEditOpen = (entry) => {
+    setEditingEntry(entry);
+    setEditForm({
+      preferredDate: entry.preferredDate ? entry.preferredDate.split('T')[0] : '',
+      preferredTime: entry.preferredTime || '',
+      notes: entry.notes || ''
+    });
+  };
+
+  const handleEditSave = async () => {
+    if (!editingEntry) return;
+    try {
+      await api.put(`/waitlist/${editingEntry._id}`, editForm);
+      toast.success('Eintrag aktualisiert');
+      setEditingEntry(null);
+      fetchWaitlist();
+    } catch (err) {
+      toast.error('Fehler beim Aktualisieren');
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!confirm('Möchten Sie diesen Eintrag wirklich löschen?')) return;
 
@@ -80,7 +103,7 @@ export default function Waitlist() {
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="bg-gray-900 hover:bg-gray-900 text-gray-900 px-4 py-2 rounded-xl transition"
+          className="bg-gray-900 hover:bg-gray-900 text-white px-4 py-2 rounded-xl transition"
         >
           + Kunde hinzufügen
         </button>
@@ -145,7 +168,8 @@ export default function Waitlist() {
           Keine Einträge in der Warteliste
         </div>
       ) : (
-        <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-gray-50 rounded-xl border border-gray-200">
+          <div className="overflow-x-auto rounded-xl">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -204,6 +228,7 @@ export default function Waitlist() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button
+                        onClick={() => handleEditOpen(entry)}
                         className="p-1 hover:bg-gray-100 rounded transition"
                         title="Bearbeiten"
                       >
@@ -222,6 +247,59 @@ export default function Waitlist() {
               ))}
             </tbody>
           </table>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingEntry && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl max-w-md w-full shadow-xl">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Eintrag bearbeiten</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bevorzugtes Datum</label>
+                <input
+                  type="date"
+                  value={editForm.preferredDate}
+                  onChange={e => setEditForm(f => ({ ...f, preferredDate: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bevorzugte Uhrzeit</label>
+                <input
+                  type="time"
+                  value={editForm.preferredTime}
+                  onChange={e => setEditForm(f => ({ ...f, preferredTime: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notizen</label>
+                <textarea
+                  value={editForm.notes}
+                  onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-gray-900"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleEditSave}
+                className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition"
+              >
+                Speichern
+              </button>
+              <button
+                onClick={() => setEditingEntry(null)}
+                className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-200 transition"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

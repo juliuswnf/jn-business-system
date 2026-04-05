@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { ceoAPI } from '../../utils/api';
+import { formatDateTimeDE } from '../../utils/helpers';
 
 const EmailCampaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -141,14 +142,6 @@ const EmailCampaigns = () => {
     return <span className={`px-2 py-1 rounded text-xs font-medium ${styles[status] || 'bg-gray-500/20 text-gray-500'}`}>{labels[status] || status}</span>;
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('de-DE', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -241,8 +234,8 @@ const EmailCampaigns = () => {
                       </div>
                       <p className="text-gray-400 text-sm mt-1">{campaign.subject}</p>
                       <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                        <span>Erstellt: {formatDate(campaign.createdAt)}</span>
-                        {campaign.sentAt && <span>Gesendet: {formatDate(campaign.sentAt)}</span>}
+                        <span>Erstellt: {formatDateTimeDE(campaign.createdAt)}</span>
+                        {campaign.sentAt && <span>Gesendet: {formatDateTimeDE(campaign.sentAt)}</span>}
                         {campaign.sent > 0 && (
                           <>
                             <span>📧 {campaign.sent} gesendet</span>
@@ -366,12 +359,12 @@ const EmailCampaigns = () => {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-500">Erstellt</span>
-                <span className="text-gray-900">{formatDate(selectedCampaign.createdAt)}</span>
+                <span className="text-gray-900">{formatDateTimeDE(selectedCampaign.createdAt)}</span>
               </div>
               {selectedCampaign.sentAt && (
                 <div className="flex justify-between py-2 border-b border-gray-200">
                   <span className="text-gray-500">Gesendet</span>
-                  <span className="text-gray-900">{formatDate(selectedCampaign.sentAt)}</span>
+                  <span className="text-gray-900">{formatDateTimeDE(selectedCampaign.sentAt)}</span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-b border-gray-200">

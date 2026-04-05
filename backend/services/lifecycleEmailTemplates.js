@@ -116,7 +116,7 @@ export const getLifecycleEmailTemplate = (emailType, data) => {
 
 herzlich willkommen bei JN Business System! 👋
 
-Dein 30-Tage-Test für **${salonName}** ist jetzt aktiv. Hier sind deine nächsten Schritte:
+Dein **14-Tage-Test** für **${salonName}** ist jetzt aktiv. Hier sind deine nächsten Schritte:
 
 **In 5 Minuten startklar:**
 
@@ -172,10 +172,10 @@ Julius`
 
     // ==================== DAY 7: MID-TRIAL ====================
     midtrial_day7: createEmailTemplate(
-      `⏰ ${userName}, noch 23 Tage Trial – brauchst du Unterstützung?`,
+      `⏰ ${userName}, noch 7 Tage Trial – brauchst du Unterstützung?`,
       `Hallo ${userName},
 
-eine Woche ist rum! Dein Test läuft noch **23 Tage**.
+eine Woche ist rum! Dein Test läuft noch **7 Tage**.
 
 **Wie kann ich dir helfen?**
 
@@ -200,12 +200,12 @@ Fragen? Einfach antworten!
 Julius`
     ),
 
-    // ==================== DAY 23: URGENCY ====================
-    urgency_day23: createEmailTemplate(
-      `⚠️ ${userName}, nur noch 7 Tage bis dein Test endet`,
+    // ==================== DAY 12: URGENCY ====================
+    urgency_day12: createEmailTemplate(
+      `⚠️ ${userName}, nur noch 2 Tage bis dein Test endet`,
       `Hallo ${userName},
 
-dein 30-Tage-Test für **${salonName}** endet in **7 Tagen**.
+dein 14-Tage-Test für **${salonName}** endet in **2 Tagen**.
 
 **Hast du schon alle Features getestet?**
 
@@ -217,13 +217,13 @@ dein 30-Tage-Test für **${salonName}** endet in **7 Tagen**.
 
 **Jetzt upgraden und profitieren:**
 
-🎁 **Starter** – €49/Monat
+🎁 **Starter** – €129/Monat
 Für Solo-Studios mit bis zu 500 Buchungen
 
-🎁 **Professional** – €99/Monat
+🎁 **Professional** – €249/Monat
 Für wachsende Studios mit Team
 
-🎁 **Enterprise** – €199/Monat
+🎁 **Enterprise** – €599/Monat
 Für große Ketten mit mehreren Standorten
 
 ${ctaButton('Plan auswählen →', pricingUrl)}
@@ -235,12 +235,12 @@ Fragen zum passenden Plan? Schreib mir!
 Julius`
     ),
 
-    // ==================== DAY 30: FINAL CALL ====================
-    expiry_day30: createEmailTemplate(
+    // ==================== DAY 14: FINAL CALL ====================
+    expiry_day14: createEmailTemplate(
       `🚨 ${userName}, dein Test endet HEUTE`,
       `Hallo ${userName},
 
-dein 30-Tage-Test für **${salonName}** endet **heute um Mitternacht**.
+dein 14-Tage-Test für **${salonName}** endet **heute um Mitternacht**.
 
 **Ab morgen:**
 ❌ Kein Zugriff mehr auf dein Dashboard
@@ -259,8 +259,8 @@ Danke, dass du JN Business System ausprobiert hast!
 Julius`
     ),
 
-    // ==================== DAY 31: POST-EXPIRY DISCOUNT ====================
-    expired_day31: createEmailTemplate(
+    // ==================== DAY 15: POST-EXPIRY DISCOUNT ====================
+    expired_day15: createEmailTemplate(
       `🎁 ${userName}, exklusiv für dich: 20% Rabatt`,
       `Hallo ${userName},
 
@@ -285,8 +285,8 @@ Einfach auf diese E-Mail antworten.
 Julius`
     ),
 
-    // ==================== DAY 45: WIN-BACK ====================
-    winback_day45: createEmailTemplate(
+    // ==================== DAY 21: WIN-BACK ====================
+    winback_day21: createEmailTemplate(
       `👋 ${userName}, wir vermissen dich!`,
       `Hallo ${userName},
 
@@ -320,11 +320,11 @@ JN Business System`
 export const getEmailSchedule = () => [
   { type: 'welcome_day1', day: 1, description: 'Welcome + Setup Guide' },
   { type: 'engagement_day3', day: 3, description: 'Engagement check' },
-  { type: 'midtrial_day7', day: 7, description: 'Mid-trial support' },
-  { type: 'urgency_day23', day: 23, description: 'Urgency reminder' },
-  { type: 'expiry_day30', day: 30, description: 'Trial expiry' },
-  { type: 'expired_day31', day: 31, description: 'Post-expiry discount' },
-  { type: 'winback_day45', day: 45, description: 'Win-back campaign' }
+  { type: 'midtrial_day7', day: 7, description: 'Mid-trial support (7 days left)' },
+  { type: 'urgency_day12', day: 12, description: 'Urgency reminder (2 days left)' },
+  { type: 'expiry_day14', day: 14, description: 'Trial expiry today' },
+  { type: 'expired_day15', day: 15, description: 'Post-expiry discount' },
+  { type: 'winback_day21', day: 21, description: 'Win-back campaign' }
 ];
 
 export default {

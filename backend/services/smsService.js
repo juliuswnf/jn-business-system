@@ -21,20 +21,30 @@ let redisAvailable = false;
 
 // Initialize Redis (if available)
 if (process.env.REDIS_URL) {
-  redisClient = createClient({ url: process.env.REDIS_URL });
+  redisClient = createClient({
+    url: process.env.REDIS_URL,
+    socket: {
+      // Stop retrying after 3 failed attempts — fall back to in-memory
+      reconnectStrategy: (retries) => retries > 3 ? false : Math.min(retries * 1000, 5000)
+    }
+  });
 
+  let redisErrorLogged = false;
   redisClient.on('error', (err) => {
-    logger.error('Redis connection error:', err);
+    if (!redisErrorLogged) {
+      logger.warn('⚠️ Redis unavailable, falling back to in-memory rate limiting:', err.message);
+      redisErrorLogged = true;
+    }
     redisAvailable = false;
   });
 
   redisClient.on('connect', () => {
+    redisErrorLogged = false;
     logger.info('✅ Redis connected for SMS rate limiting');
     redisAvailable = true;
   });
 
-  redisClient.connect().catch(_err => {
-    logger.warn('⚠️ Redis not available, using in-memory rate limiting (not production-safe)');
+  redisClient.connect().catch(() => {
     redisAvailable = false;
   });
 } else {

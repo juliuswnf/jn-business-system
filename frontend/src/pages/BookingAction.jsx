@@ -119,7 +119,7 @@ const BookingAction = () => {
           <button
             onClick={handleAction}
             disabled={actionLoading || !booking}
-            className="w-full px-4 py-3 bg-gray-900 text-gray-900 font-semibold rounded-2xl hover:bg-gray-900 transition touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 bg-gray-900 text-white font-semibold rounded-2xl hover:bg-gray-900 transition touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {actionLoading ? 'Wird verarbeitet…' : actionLabel}
           </button>

@@ -117,7 +117,7 @@ export default function BAAManagement() {
         </div>
         <button
           onClick={() => setShowUploadModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
         >
           <Upload className="w-5 h-5" />
           Upload BAA
@@ -286,7 +286,7 @@ export default function BAAManagement() {
                     {(baa.status === 'expiring_soon' || baa.status === 'expired') && (
                       <button
                         onClick={() => handleRenewBaa(baa._id)}
-                        className="px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors text-sm"
+                        className="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors text-sm"
                       >
                         Renew BAA
                       </button>
@@ -385,7 +385,7 @@ export default function BAAManagement() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
                 >
                   Upload BAA
                 </button>

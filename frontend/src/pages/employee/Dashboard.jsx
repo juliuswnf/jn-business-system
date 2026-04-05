@@ -121,16 +121,16 @@ export default function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {statCards.map((card, i) => (
-          <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[13px] text-gray-400 font-medium">{card.label}</span>
-              <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center">
+          <div key={i} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] text-gray-400 font-medium leading-tight">{card.label}</span>
+              <div className="w-7 h-7 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
                 {card.icon}
               </div>
             </div>
-            <p className="text-3xl font-semibold text-gray-900 tracking-tight">{card.value}</p>
+            <p className="text-2xl font-semibold text-gray-900 tracking-tight">{card.value}</p>
           </div>
         ))}
       </div>
@@ -152,19 +152,19 @@ export default function Dashboard() {
         ) : (
           <div className="divide-y divide-gray-100">
             {upcomingBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between gap-4 px-6 py-3.5 hover:bg-gray-50/60 transition-colors">
+              <div key={booking.id} className="flex items-start justify-between gap-3 px-4 py-4 hover:bg-gray-50/60 transition-colors min-h-[56px]">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-900">{booking.customer}</p>
-                  <p className="text-[13px] text-gray-400">{booking.service}</p>
+                  <p className="text-[13px] text-gray-400 mt-0.5">{booking.service}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="flex items-center gap-1.5 text-sm text-gray-700 font-medium">
+                  <p className="flex items-center gap-1 text-sm text-gray-700 font-medium">
                     <Clock className="w-3 h-3 text-gray-400" />
                     {booking.time}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">{booking.duration}</p>
                 </div>
-                <span className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                <span className={`shrink-0 self-start mt-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${
                   booking.status === 'Bestätigt'
                     ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
                     : 'bg-amber-50 text-amber-600 border border-amber-100'

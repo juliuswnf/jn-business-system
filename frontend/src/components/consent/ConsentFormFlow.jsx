@@ -295,7 +295,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
         </div>
         <button
           onClick={() => setShowSignModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
         >
           <FileSignature className="w-5 h-5" />
           Sign New Form
@@ -533,7 +533,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
                 >
                   Sign & Submit
                 </button>

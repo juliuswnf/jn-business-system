@@ -179,7 +179,7 @@ export default function Register() {
                 <span className="flex items-center justify-center w-6 h-6 rounded-xl bg-gray-100 text-gray-700 text-xs font-bold"><FiClipboard /></span>
                 Persönliche Daten
               </h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Vorname</label>
                   <input
@@ -279,7 +279,7 @@ export default function Register() {
                 <span className="flex items-center justify-center w-6 h-6 rounded-xl bg-gray-100 text-gray-700 text-xs font-bold"><FiLock /></span>
                 Zugangsdaten
               </h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Passwort</label>
                   <div className="relative">

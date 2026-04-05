@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { salonAPI } from '../utils/api';
 
+// Roles that own all features — skip the salon info fetch
+const CEO_ROLES = ['ceo', 'admin'];
+
+const getCurrentUserRole = () => {
+  try {
+    const raw = localStorage.getItem('jnUser') || localStorage.getItem('user');
+    return raw ? JSON.parse(raw)?.role : null;
+  } catch {
+    return null;
+  }
+};
+
 const TIER_ORDER = ['starter', 'professional', 'enterprise'];
 
 const FEATURE_TIER_REQUIREMENTS = {
@@ -51,6 +63,16 @@ export const usePlanAccess = () => {
     let isMounted = true;
 
     const loadTier = async () => {
+      // CEO/admin users own all features — skip salon API call
+      const role = getCurrentUserRole();
+      if (CEO_ROLES.includes(role)) {
+        if (isMounted) {
+          setCurrentTier('enterprise');
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         const response = await salonAPI.getInfo();
         const subscription = response?.data?.salon?.subscription;

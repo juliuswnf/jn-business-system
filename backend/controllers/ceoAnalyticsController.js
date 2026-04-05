@@ -461,20 +461,24 @@ export const getLifecycleEmailStats = async (req, res) => {
 
     // Get recently sent emails
     const recentlySent = await LifecycleEmail.find({ status: 'sent' })
-      .populate('salonId', 'name').lean().maxTimeMS(5000)
+      .populate('salonId', 'name')
       .populate('userId', 'name email')
       .sort({ sentAt: -1 })
-      .limit(20);
+      .limit(20)
+      .lean()
+      .maxTimeMS(5000);
 
     // Get upcoming emails
     const upcoming = await LifecycleEmail.find({
       status: 'pending',
-      scheduledFor: { $gte: new Date().lean().maxTimeMS(5000) }
+      scheduledFor: { $gte: new Date() }
     })
       .populate('salonId', 'name')
       .populate('userId', 'name email')
       .sort({ scheduledFor: 1 })
-      .limit(20);
+      .limit(20)
+      .lean()
+      .maxTimeMS(5000);
 
     res.status(200).json({
       success: true,

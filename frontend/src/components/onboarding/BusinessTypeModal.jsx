@@ -158,7 +158,7 @@ export default function BusinessTypeModal({ onSelect, onBack }) {
         </div>
 
         {/* Content */}
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           {/* Business Types Grid */}
           <motion.div
             variants={containerVariants}

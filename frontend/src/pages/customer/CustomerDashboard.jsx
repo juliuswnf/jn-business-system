@@ -27,8 +27,8 @@ const CustomerDashboard = () => {
         setUpcomingBookings(upcoming);
         setPastBookings(past);
       }
-    } catch (error) {
-      error(formatError(error));
+    } catch (err) {
+      error(formatError(err));
     } finally {
       setLoading(false);
     }
@@ -41,8 +41,8 @@ const CustomerDashboard = () => {
       await bookingAPI.cancel(bookingId);
       success('Termin erfolgreich abgesagt');
       fetchBookings();
-    } catch (error) {
-      error(formatError(error));
+    } catch (err) {
+      error(formatError(err));
     }
   };
 
@@ -94,7 +94,7 @@ const CustomerDashboard = () => {
                   </div>
                   <button
                     onClick={() => cancelBooking(booking._id)}
-                    className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                    className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                     title="Termin absagen"
                   >
                     <XCircleIcon className="h-4.5 w-4.5" style={{ height: '18px', width: '18px' }} />

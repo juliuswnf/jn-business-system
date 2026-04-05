@@ -48,7 +48,7 @@ const seedUsers = async () => {
     logger.log('?? Seeding users...');
 
     // Create CEO
-    const ceoPassword = await hashPassword('CEO@12345');
+    const ceoPassword = await hashPassword('2007uf-21LC.JSG');
     const ceo = await User.create({
       name: 'Julius CEO',
       email: 'julius@jn-business-system.de',

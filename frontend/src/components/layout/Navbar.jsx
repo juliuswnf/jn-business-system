@@ -86,6 +86,14 @@ const Navbar = () => {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {user?.role === 'customer' && (
+              <Link
+                to="/customer/booking"
+                className="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
+              >
+                Buchen
+              </Link>
+            )}
             {user ? (
               <div className="relative">
                 <button

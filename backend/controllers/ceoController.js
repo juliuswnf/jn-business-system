@@ -607,24 +607,30 @@ export const getCEOStats = async (req, res) => {
     // Gesamte Kunden (Salons/Unternehmen)
     const totalCustomers = await Salon.countDocuments();
 
-    // Starter Abos (planId enthält 'starter' oder subscription.planId)
+    // Starter Abos — via subscription.tier (authoritative field)
     const starterAbos = await Salon.countDocuments({
       'subscription.status': 'active',
       $or: [
-        { 'subscription.planId': { $regex: /starter/i } },
-        { 'subscription.planId': 'price_starter' },
-        { isPremium: false, 'subscription.status': 'active' }
+        { 'subscription.tier': 'starter' },
+        // Legacy fallback: salons before tier field was added
+        { 'subscription.tier': { $exists: false }, isPremium: false }
       ]
     });
 
-    // Pro Abos
-    const proAbos = await Salon.countDocuments({
+    // Professional Abos
+    const professionalAbos = await Salon.countDocuments({
       'subscription.status': 'active',
       $or: [
-        { 'subscription.planId': { $regex: /pro|premium/i } },
-        { 'subscription.planId': 'price_pro' },
-        { isPremium: true }
+        { 'subscription.tier': 'professional' },
+        // Legacy fallback
+        { 'subscription.tier': { $exists: false }, isPremium: true }
       ]
+    });
+
+    // Enterprise Abos
+    const enterpriseAbos = await Salon.countDocuments({
+      'subscription.status': 'active',
+      'subscription.tier': 'enterprise'
     });
 
     // Trial Abos
@@ -632,25 +638,8 @@ export const getCEOStats = async (req, res) => {
       'subscription.status': 'trial'
     });
 
-    // Berechne tatsächliche Starter/Pro basierend auf verfügbaren Daten
-    const activeSalons = await Salon.find({ 'subscription.status': 'active' }).lean().maxTimeMS(5000);
-    let calculatedStarter = 0;
-    let calculatedPro = 0;
-
-    activeSalons.forEach(salon => {
-      if (salon.isPremium || (salon.subscription?.planId && salon.subscription.planId.toLowerCase().includes('pro'))) {
-        calculatedPro++;
-      } else {
-        calculatedStarter++;
-      }
-    });
-
-    // Fallback: wenn keine planId gesetzt, alle aktiven als Starter zählen
-    const finalStarter = calculatedStarter || starterAbos || (activeSalons.length - calculatedPro);
-    const finalPro = calculatedPro || proAbos;
-
-    // MRR Berechnung (Monthly Recurring Revenue)
-    const totalRevenue = (finalStarter * PRICING.starter) + (finalPro * PRICING.pro);
+    // MRR Berechnung (Monthly Recurring Revenue) — alle 3 Tiers
+    const totalRevenue = (starterAbos * PRICING.starter) + (professionalAbos * PRICING.pro) + (enterpriseAbos * PRICING.enterprise);
 
     // Ungelöste Fehler
     const unresolvedErrors = await ErrorLog.countDocuments({ resolved: false });
@@ -659,8 +648,10 @@ export const getCEOStats = async (req, res) => {
       success: true,
       stats: {
         totalCustomers,
-        starterAbos: finalStarter,
-        proAbos: finalPro,
+        starterAbos,
+        professionalAbos,
+        enterpriseAbos,
+        proAbos: professionalAbos, // backward compat alias
         trialAbos,
         totalRevenue,
         unresolvedErrors
@@ -967,9 +958,10 @@ export const getCEOSubscriptions = async (req, res) => {
     let totalMRR = 0;
 
     const subscriptions = salons.map(s => {
-      const isPro = s.isPremium || (s.subscription?.planId && s.subscription.planId.toLowerCase().includes('pro'));
-      const planName = isPro ? 'Pro' : 'Starter';
-      const amount = s.subscription?.status === 'active' ? (isPro ? PRICING.pro : PRICING.starter) : 0;
+      // Use subscription.tier as authoritative source; fall back to isPremium for legacy records
+      const tier = s.subscription?.tier || (s.isPremium ? 'professional' : 'starter');
+      const planName = tier === 'enterprise' ? 'enterprise' : tier === 'professional' ? 'professional' : 'starter';
+      const amount = s.subscription?.status === 'active' ? (PRICING[tier] || PRICING.starter) : 0;
 
       if (s.subscription?.status === 'active') {
         totalMRR += amount;

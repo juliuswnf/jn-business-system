@@ -34,7 +34,7 @@ const ForgotPassword = () => {
     return (
       <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

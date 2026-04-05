@@ -74,7 +74,7 @@ function LoginSelection() {
                   className={`group relative overflow-hidden rounded-2xl border-2 ${option.borderColor} ${option.hoverBorder} ${option.hoverShadow} bg-gradient-to-br ${option.bgGradient} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl`}
                 >
                   {/* Content */}
-                  <div className="p-8 relative z-10">
+                  <div className="p-5 md:p-8 relative z-10">
                     {/* Icon */}
                     <div className={`mb-6 w-16 h-16 rounded-xl bg-gradient-to-br ${option.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className="w-8 h-8 text-black" />

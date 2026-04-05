@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api, API_URL } from '../utils/api';
 import { captureError } from '../utils/errorTracking';
+import { useNotification } from '../context/NotificationContext';
 import { AlertTriangle, Users, CreditCard, Building2, Server, BarChart3, RefreshCw, Play, Square } from 'lucide-react';
 
 const BACKEND_ORIGIN = API_URL.replace(/\/api\/?$/, '');
 
 const CEODashboard = () => {
+  const notification = useNotification();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +15,9 @@ const CEODashboard = () => {
   const [stats, setStats] = useState({
     totalCustomers: 0,
     starterAbos: 0,
-    proAbos: 0,
+    professionalAbos: 0,
+    enterpriseAbos: 0,
+    proAbos: 0, // backward compat
     trialAbos: 0,
     totalRevenue: 0
   });
@@ -160,7 +164,9 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
   const unresolvedErrors = errors.filter(e => !e.resolved).length;
 
   // Calculate metrics
-  const totalPaidCustomers = stats.starterAbos + stats.proAbos;
+  const professionalAbos = stats.professionalAbos || stats.proAbos || 0;
+  const enterpriseAbos = stats.enterpriseAbos || 0;
+  const totalPaidCustomers = stats.starterAbos + professionalAbos + enterpriseAbos;
   const conversionRate = stats.totalCustomers > 0
     ? Math.round((totalPaidCustomers / stats.totalCustomers) * 100)
     : 0;
@@ -199,7 +205,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               <span className="text-gray-400 text-sm">/ Monat</span>
             </div>
             <p className="text-gray-500 text-sm mt-2">
-              {stats.starterAbos} Starter × €29 + {stats.proAbos} Pro × €69
+              {stats.starterAbos}× €129 + {professionalAbos}× €249 + {enterpriseAbos}× €599
             </p>
           </div>
           <div className="hidden lg:flex flex-col items-end gap-2">
@@ -216,7 +222,7 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-3">
             <Users className="w-5 h-5 text-gray-700" />
@@ -232,16 +238,25 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
           </div>
           <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Starter</p>
           <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{stats.starterAbos}</p>
-          <p className="text-gray-400 text-xs mt-1">€{stats.starterAbos * 29}/Monat</p>
+          <p className="text-gray-400 text-xs mt-1">€{stats.starterAbos * 129}/Monat</p>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center mb-3">
             <CreditCard className="w-5 h-5 text-amber-600" />
           </div>
-          <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Pro</p>
-          <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{stats.proAbos}</p>
-          <p className="text-gray-400 text-xs mt-1">€{stats.proAbos * 69}/Monat</p>
+          <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Professional</p>
+          <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{professionalAbos}</p>
+          <p className="text-gray-400 text-xs mt-1">€{professionalAbos * 249}/Monat</p>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center mb-3">
+            <Building2 className="w-5 h-5 text-amber-600" />
+          </div>
+          <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Enterprise</p>
+          <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{enterpriseAbos}</p>
+          <p className="text-gray-400 text-xs mt-1">€{enterpriseAbos * 599}/Monat</p>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-5">
@@ -650,7 +665,8 @@ const CustomersTab = ({ customers }) => {
     if (filter === 'active') matchesFilter = c.status === 'active';
     else if (filter === 'trial') matchesFilter = c.status === 'trial';
     else if (filter === 'starter') matchesFilter = c.plan === 'starter';
-    else if (filter === 'pro') matchesFilter = c.plan === 'pro';
+    else if (filter === 'professional') matchesFilter = c.plan === 'professional';
+    else if (filter === 'enterprise') matchesFilter = c.plan === 'enterprise';
 
     const matchesSearch = searchTerm === '' ||
       c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -669,7 +685,8 @@ const CustomersTab = ({ customers }) => {
   const activeCount = customers.filter(c => c.status === 'active').length;
   const trialCount = customers.filter(c => c.status === 'trial').length;
   const starterCount = customers.filter(c => c.plan === 'starter').length;
-  const proCount = customers.filter(c => c.plan === 'pro').length;
+  const professionalCount = customers.filter(c => c.plan === 'professional').length;
+  const enterpriseCount = customers.filter(c => c.plan === 'enterprise').length;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -687,7 +704,8 @@ const CustomersTab = ({ customers }) => {
               { key: 'active', label: 'Aktiv', color: 'text-green-600' },
               { key: 'trial', label: 'Testphase', color: 'text-orange-400' },
               { key: 'starter', label: 'Starter', color: 'text-gray-500' },
-              { key: 'pro', label: 'Pro', color: 'text-purple-400' },
+              { key: 'professional', label: 'Professional', color: 'text-purple-400' },
+              { key: 'enterprise', label: 'Enterprise', color: 'text-amber-500' },
             ].map((f) => (
               <button
                 key={f.key}
@@ -749,11 +767,13 @@ const CustomersTab = ({ customers }) => {
                     <div className="flex items-center gap-3">
                       <h4 className="font-semibold text-gray-900 truncate">{customer.name || 'Unbekannt'}</h4>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        customer.plan === 'pro'
+                        customer.plan === 'enterprise'
+                          ? 'bg-amber-500/20 text-amber-500'
+                          : customer.plan === 'professional'
                           ? 'bg-purple-500/20 text-purple-400'
                           : 'bg-gray-50 text-gray-500'
                       }`}>
-                        {customer.plan === 'pro' ? 'Pro' : 'Starter'}
+                        {customer.plan === 'enterprise' ? 'Enterprise' : customer.plan === 'professional' ? 'Professional' : 'Starter'}
                       </span>
                     </div>
                     <p className="text-gray-400 text-sm truncate">{customer.email || '-'}</p>
@@ -796,8 +816,12 @@ const CustomersTab = ({ customers }) => {
               <p className="text-xs text-gray-500/70">Starter</p>
             </div>
             <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3 text-center">
-              <p className="text-xl font-semibold tracking-tight text-purple-400">{proCount}</p>
-              <p className="text-xs text-purple-400/70">Pro</p>
+              <p className="text-xl font-semibold tracking-tight text-purple-400">{professionalCount}</p>
+              <p className="text-xs text-purple-400/70">Professional</p>
+            </div>
+            <div className="col-span-2 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-center">
+              <p className="text-xl font-semibold tracking-tight text-amber-500">{enterpriseCount}</p>
+              <p className="text-xs text-amber-500/70">Enterprise</p>
             </div>
           </div>
         </div>
@@ -816,8 +840,11 @@ const CustomersTab = ({ customers }) => {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-400">Plan</span>
-                <span className={selectedCustomer.plan === 'pro' ? 'text-purple-400' : 'text-gray-500'}>
-                  {selectedCustomer.plan === 'pro' ? 'Pro' : 'Starter'}
+                <span className={
+                  selectedCustomer.plan === 'enterprise' ? 'text-amber-500' :
+                  selectedCustomer.plan === 'professional' ? 'text-purple-400' : 'text-gray-500'
+                }>
+                  {selectedCustomer.plan === 'enterprise' ? 'Enterprise' : selectedCustomer.plan === 'professional' ? 'Professional' : 'Starter'}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-200">
@@ -838,13 +865,17 @@ const CustomersTab = ({ customers }) => {
               )}
             </div>
             <div className="mt-4 space-y-2">
-              <button className="w-full px-4 py-2 bg-indigo-500/10 text-gray-900 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition flex items-center justify-center gap-2">
+              <button
+                onClick={() => notification.info(`Kunden-Editor für ${selectedCustomer.name} – folgt in Kürze`)}
+                className="w-full px-4 py-2 bg-indigo-500/10 text-gray-900 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition flex items-center justify-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
                 Bearbeiten
               </button>
-              <button className="w-full px-4 py-2 bg-gray-50 text-gray-500 rounded-lg text-sm font-medium hover:bg-gray-100 transition flex items-center justify-center gap-2">
+              <button
+                onClick={() => { window.location.href = `mailto:${selectedCustomer.email}`; }}
+                className="w-full px-4 py-2 bg-gray-50 text-gray-500 rounded-lg text-sm font-medium hover:bg-gray-100 transition flex items-center justify-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
@@ -873,15 +904,15 @@ const CustomersTab = ({ customers }) => {
           </div>
           <div className="mt-4 space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Starter → Pro</span>
+              <span className="text-gray-500 text-sm">Starter → Professional/Enterprise</span>
               <span className="text-purple-400 font-semibold">
-                {starterCount > 0 ? Math.round((proCount / (starterCount + proCount)) * 100) : 0}%
+                {starterCount > 0 ? Math.round(((professionalCount + enterpriseCount) / (starterCount + professionalCount + enterpriseCount)) * 100) : 0}%
               </span>
             </div>
             <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-purple-500 to-pink-400 rounded-full"
-                style={{ width: `${starterCount > 0 ? (proCount / (starterCount + proCount)) * 100 : 0}%` }}
+                style={{ width: `${starterCount > 0 ? ((professionalCount + enterpriseCount) / (starterCount + professionalCount + enterpriseCount)) * 100 : 0}%` }}
               />
             </div>
           </div>
@@ -975,7 +1006,9 @@ const SubscriptionsTab = ({ subscriptions }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      sub.plan === 'Pro'
+                      sub.plan === 'enterprise'
+                        ? 'bg-gradient-to-br from-amber-500 to-orange-500'
+                        : sub.plan === 'professional'
                         ? 'bg-gradient-to-br from-purple-500 to-pink-500'
                         : 'bg-gradient-to-br from-blue-500 to-blue-600'
                     }`}>
@@ -987,7 +1020,9 @@ const SubscriptionsTab = ({ subscriptions }) => {
                       <h4 className="font-semibold text-gray-900">{sub.customer || 'Unbekannt'}</h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          sub.plan === 'Pro'
+                          sub.plan === 'enterprise'
+                            ? 'bg-amber-500/20 text-amber-500'
+                            : sub.plan === 'professional'
                             ? 'bg-purple-500/20 text-purple-400'
                             : 'bg-gray-50 text-gray-500'
                         }`}>

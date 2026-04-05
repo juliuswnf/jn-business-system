@@ -341,7 +341,7 @@ export default function WorkflowProjectEditor() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 disabled:opacity-50"
+                className="px-6 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 disabled:opacity-50"
               >
                 {loading ? 'Speichere...' : (isEdit ? 'Aktualisieren' : 'Erstellen')}
               </button>

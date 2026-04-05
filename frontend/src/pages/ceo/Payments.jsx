@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { ceoAPI } from '../../utils/api';
+import { formatDateTimeDE } from '../../utils/helpers';
 
 const Payments = () => {
   const [transactions, setTransactions] = useState([]);
@@ -90,14 +91,6 @@ const Payments = () => {
       style: 'currency',
       currency: 'EUR'
     }).format(amount || 0);
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('de-DE', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
   };
 
   const getStatusBadge = (status) => {
@@ -227,7 +220,7 @@ const Payments = () => {
                   <tbody className="divide-y divide-gray-200">
                     {transactions.map((trans) => (
                       <tr key={trans._id} className="hover:bg-gray-100/30 transition">
-                        <td className="p-4 text-gray-500 text-sm">{formatDate(trans.createdAt)}</td>
+                        <td className="p-4 text-gray-500 text-sm">{formatDateTimeDE(trans.createdAt)}</td>
                         <td className="p-4">
                           <p className="text-gray-900">{trans.customerName || trans.customerEmail || 'Unbekannt'}</p>
                           <p className="text-gray-400 text-xs">{trans.salonName || ''}</p>
@@ -303,7 +296,7 @@ const Payments = () => {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-500">Datum</span>
-                <span className="text-gray-900">{formatDate(selectedTransaction.createdAt)}</span>
+                <span className="text-gray-900">{formatDateTimeDE(selectedTransaction.createdAt)}</span>
               </div>
               {selectedTransaction.stripePaymentId && (
                 <div className="flex justify-between py-2 border-b border-gray-200">
