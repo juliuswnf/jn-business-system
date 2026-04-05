@@ -110,16 +110,16 @@ const BusinessOwnerDashboard = () => {
     const statusMap = {
       pending: { label: 'Ausstehend', color: 'bg-yellow-500/20 text-yellow-600' },
       confirmed: { label: 'Bestätigt', color: 'bg-green-500/20 text-green-600' },
-      completed: { label: 'Abgeschlossen', color: 'bg-blue-500/20 text-blue-400' },
+      completed: { label: 'Abgeschlossen', color: 'bg-gray-50 text-gray-500' },
       cancelled: { label: 'Abgesagt', color: 'bg-red-500/20 text-red-600' }
     };
-    return statusMap[status] || { label: status, color: 'bg-gray-500/20 text-zinc-500' };
+    return statusMap[status] || { label: status, color: 'bg-gray-500/20 text-gray-500' };
   };
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-zinc-900 mb-8">Mein Kontrollpanel</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-8">Mein Kontrollpanel</h1>
 
         {loading ? (
           <div className="flex items-center justify-center h-64">
@@ -133,22 +133,22 @@ const BusinessOwnerDashboard = () => {
             </div>
 
             {/* Today's Bookings */}
-            <div className="bg-white border border-zinc-200 rounded-xl p-6 mb-8">
-              <h2 className="text-xl font-semibold text-zinc-900 mb-4">Heutige Termine</h2>
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Heutige Termine</h2>
               {todaysBookings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2"></div>
-                  <p className="text-zinc-500">Keine Termine für heute</p>
+                  <p className="text-gray-500">Keine Termine für heute</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {todaysBookings.map(booking => (
-                    <div key={booking.id} className="border border-zinc-200 rounded-lg p-4 hover:bg-zinc-100/30 transition">
+                    <div key={booking.id} className="border border-gray-100 rounded-2xl p-4 hover:bg-gray-100/30 transition">
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="font-medium text-zinc-900">{booking.customer}</p>
-                          <p className="text-zinc-500">{booking.service}</p>
-                          <p className="text-zinc-400 text-sm">{booking.time}</p>
+                          <p className="font-medium text-gray-900">{booking.customer}</p>
+                          <p className="text-gray-500">{booking.service}</p>
+                          <p className="text-gray-400 text-sm">{booking.time}</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusDisplay(booking.status).color}`}>
                           {getStatusDisplay(booking.status).label}
@@ -161,22 +161,22 @@ const BusinessOwnerDashboard = () => {
             </div>
 
             {/* Upcoming Bookings */}
-            <div className="bg-white border border-zinc-200 rounded-xl p-6 mb-8">
-              <h2 className="text-xl font-semibold text-zinc-900 mb-4">Kommende Termine</h2>
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Kommende Termine</h2>
               {upcomingBookings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2">📋</div>
-                  <p className="text-zinc-500">Keine kommenden Termine</p>
+                  <p className="text-gray-500">Keine kommenden Termine</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {upcomingBookings.map(booking => (
-                    <div key={booking.id} className="border border-zinc-200 rounded-lg p-4 hover:bg-zinc-100/30 transition">
+                    <div key={booking.id} className="border border-gray-100 rounded-2xl p-4 hover:bg-gray-100/30 transition">
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="font-medium text-zinc-900">{booking.customer}</p>
-                          <p className="text-zinc-500">{booking.service}</p>
-                          <p className="text-zinc-400 text-sm">{booking.time}</p>
+                          <p className="font-medium text-gray-900">{booking.customer}</p>
+                          <p className="text-gray-500">{booking.service}</p>
+                          <p className="text-gray-400 text-sm">{booking.time}</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusDisplay(booking.status).color}`}>
                           {getStatusDisplay(booking.status).label}
@@ -189,27 +189,27 @@ const BusinessOwnerDashboard = () => {
             </div>
 
             {/* Services Management */}
-            <div className="bg-white border border-zinc-200 rounded-xl p-6 mb-8">
-              <h2 className="text-xl font-semibold text-zinc-900 mb-4">Services verwalten</h2>
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Services verwalten</h2>
               {services.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2">💇</div>
-                  <p className="text-zinc-500">Noch keine Services angelegt</p>
+                  <p className="text-gray-500">Noch keine Services angelegt</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {services.map(service => (
-                    <div key={service.id} className="border border-zinc-200 rounded-lg p-4 hover:bg-zinc-100/30 transition">
+                    <div key={service.id} className="border border-gray-100 rounded-2xl p-4 hover:bg-gray-100/30 transition">
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="font-medium text-zinc-900">{service.name}</p>
-                          <p className="text-zinc-500">{service.price}€, {service.duration} Min.</p>
+                          <p className="font-medium text-gray-900">{service.name}</p>
+                          <p className="text-gray-500">{service.price}€, {service.duration} Min.</p>
                         </div>
                         <div className="flex gap-2">
-                          <button className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 transition text-sm">
+                          <button className="px-4 py-2 bg-gray-50 text-gray-500 rounded-xl hover:bg-gray-50 transition text-sm">
                             Bearbeiten
                           </button>
-                          <button className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition text-sm">
+                          <button className="px-4 py-2 bg-red-500/10 text-red-600 rounded-xl hover:bg-red-500/20 transition text-sm">
                             Löschen
                           </button>
                         </div>
@@ -218,25 +218,25 @@ const BusinessOwnerDashboard = () => {
                   ))}
                 </div>
               )}
-              <button className="mt-4 px-4 py-2 bg-zinc-50 text-zinc-600 rounded-lg hover:bg-zinc-100 transition">
+              <button className="mt-4 px-4 py-2 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition">
                 + Service hinzufügen
               </button>
             </div>
 
             {/* Widget Code */}
-            <div className="bg-white border border-zinc-200 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-zinc-900 mb-4">Widget Code</h2>
-              <p className="text-zinc-500 text-sm mb-4">Kopieren Sie diesen Code und fügen Sie ihn in Ihre Website ein:</p>
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Widget Code</h2>
+              <p className="text-gray-500 text-sm mb-4">Kopieren Sie diesen Code und fügen Sie ihn in Ihre Website ein:</p>
               <div className="space-y-4">
                 <textarea
                   readOnly
                   value={widgetCode || 'Widget Code wird generiert...'}
-                  className="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-lg font-mono text-sm text-zinc-600 resize-none"
+                  className="w-full p-3 bg-gray-50 border border-gray-100 rounded-2xl font-mono text-sm text-gray-600 resize-none"
                   rows={3}
                 />
                 <button
                   onClick={() => copyToClipboard(widgetCode)}
-                  className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-600 text-zinc-900 rounded-lg hover:from-red-600 hover:to-orange-700 transition font-medium"
+                  className="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition font-medium"
                 >
                   📋 Code kopieren
                 </button>

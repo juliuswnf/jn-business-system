@@ -20,7 +20,7 @@ const MetricBox = ({
   const isPositive = change && change >= 0;
 
   return (
-    <div className={`p-4 bg-gray-50 rounded-lg ${className}`}>
+    <div className={`p-4 bg-gray-50 rounded-xl ${className}`}>
       <p className="text-gray-600 text-sm font-medium mb-2">{label}</p>
       
       <div className="flex items-baseline gap-2">

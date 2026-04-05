@@ -74,7 +74,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-zinc-200 border-t-zinc-900"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-zinc-900"></div>
       </div>
     );
   }
@@ -86,7 +86,7 @@ export default function Dashboard() {
           <p className="text-red-700 text-sm">{error}</p>
           <button
             onClick={fetchData}
-            className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white text-sm font-medium transition"
+            className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-white text-sm font-medium transition"
           >
             Erneut versuchen
           </button>
@@ -96,26 +96,26 @@ export default function Dashboard() {
   }
 
   const statCards = [
-    { icon: <Calendar className="w-5 h-5 text-zinc-600" />, label: 'Heutige Termine', value: stats.upcomingCount },
-    { icon: <Euro className="w-5 h-5 text-zinc-600" />, label: 'Monatsverdienst', value: `${stats.monthlyEarnings}€` },
-    { icon: <Hash className="w-5 h-5 text-zinc-600" />, label: 'Gesamt-Buchungen', value: stats.totalBookings }
+    { icon: <Calendar className="w-4 h-4 text-gray-500" />, label: 'Heutige Termine', value: stats.upcomingCount },
+    { icon: <Euro className="w-4 h-4 text-gray-500" />, label: 'Monatsverdienst', value: `${stats.monthlyEarnings}€` },
+    { icon: <Hash className="w-4 h-4 text-gray-500" />, label: 'Gesamt-Buchungen', value: stats.totalBookings }
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
             Willkommen{employee ? `, ${employee.name}` : ''}
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">Deine heutige Übersicht</p>
+          <p className="text-sm text-gray-400 mt-1">Deine heutige Übersicht</p>
         </div>
         <button
           onClick={fetchData}
-          className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-500 hover:text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:border-zinc-300 transition"
+          className="flex items-center gap-1.5 px-3 py-2 text-[13px] text-gray-500 hover:text-gray-700 bg-white border border-gray-100 rounded-2xl hover:border-gray-300 transition-colors"
         >
-          <RefreshCw size={14} />
+          <RefreshCw size={13} />
           Aktualisieren
         </button>
       </div>
@@ -123,51 +123,51 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {statCards.map((card, i) => (
-          <div key={i} className="bg-white border border-zinc-200 rounded-xl p-5 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] text-zinc-500 font-medium">{card.label}</span>
-              <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
+          <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[13px] text-gray-400 font-medium">{card.label}</span>
+              <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center">
                 {card.icon}
               </div>
             </div>
-            <p className="text-2xl font-bold text-zinc-900">{card.value}</p>
+            <p className="text-3xl font-semibold text-gray-900 tracking-tight">{card.value}</p>
           </div>
         ))}
       </div>
 
       {/* Bookings */}
-      <div className="bg-white border border-zinc-200 rounded-xl">
-        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-zinc-900">Heutige Termine</h2>
-          <span className="text-[13px] text-zinc-400 font-medium">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm">
+        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-900">Heutige Termine</h2>
+          <span className="text-[13px] text-gray-400 font-medium">
             {upcomingBookings.length} Termine
           </span>
         </div>
 
         {upcomingBookings.length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="w-10 h-10 text-zinc-300 mx-auto mb-3" />
-            <p className="text-sm text-zinc-500">Keine Termine für heute</p>
+          <div className="text-center py-14">
+            <Calendar className="w-9 h-9 text-gray-200 mx-auto mb-3" />
+            <p className="text-sm text-gray-400">Keine Termine für heute</p>
           </div>
         ) : (
-          <div className="divide-y divide-zinc-100">
+          <div className="divide-y divide-gray-100">
             {upcomingBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-zinc-50/50 transition">
+              <div key={booking.id} className="flex items-center justify-between gap-4 px-6 py-3.5 hover:bg-gray-50/60 transition-colors">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-zinc-900">{booking.customer}</p>
-                  <p className="text-[13px] text-zinc-500">{booking.service}</p>
+                  <p className="text-sm font-medium text-gray-900">{booking.customer}</p>
+                  <p className="text-[13px] text-gray-400">{booking.service}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="flex items-center gap-1.5 text-sm text-zinc-700 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                  <p className="flex items-center gap-1.5 text-sm text-gray-700 font-medium">
+                    <Clock className="w-3 h-3 text-gray-400" />
                     {booking.time}
                   </p>
-                  <p className="text-xs text-zinc-400 mt-0.5">{booking.duration}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{booking.duration}</p>
                 </div>
-                <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium ${
+                <span className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ${
                   booking.status === 'Bestätigt'
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'bg-amber-50 text-amber-700'
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                    : 'bg-amber-50 text-amber-600 border border-amber-100'
                 }`}>
                   {booking.status}
                 </span>

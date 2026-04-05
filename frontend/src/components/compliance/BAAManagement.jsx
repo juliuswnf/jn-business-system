@@ -48,7 +48,7 @@ export default function BAAManagement() {
       case 'active': return 'text-green-600 bg-green-100';
       case 'expiring_soon': return 'text-yellow-600 bg-yellow-100';
       case 'expired': return 'text-red-600 bg-red-100';
-      case 'pending': return 'text-blue-600 bg-blue-100';
+      case 'pending': return 'text-gray-700 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
@@ -99,7 +99,7 @@ export default function BAAManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -110,14 +110,14 @@ export default function BAAManagement() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Shield className="w-8 h-8 text-blue-600" />
+            <Shield className="w-8 h-8 text-gray-700" />
             HIPAA Compliance Kontrollpanel
           </h1>
           <p className="text-gray-600 mt-2">Manage Business Associate Agreements and compliance status</p>
         </div>
         <button
           onClick={() => setShowUploadModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
         >
           <Upload className="w-5 h-5" />
           Upload BAA
@@ -127,9 +127,9 @@ export default function BAAManagement() {
       {/* Compliance Status Cards */}
       {complianceStatus && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-100 rounded-lg">
+              <div className="p-2 bg-green-100 rounded-xl">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
               <div>
@@ -139,9 +139,9 @@ export default function BAAManagement() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-yellow-100 rounded-lg">
+              <div className="p-2 bg-yellow-100 rounded-xl">
                 <AlertTriangle className="w-6 h-6 text-yellow-600" />
               </div>
               <div>
@@ -151,10 +151,10 @@ export default function BAAManagement() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Lock className="w-6 h-6 text-blue-600" />
+              <div className="p-2 bg-gray-100 rounded-xl">
+                <Lock className="w-6 h-6 text-gray-700" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Encryption Active</p>
@@ -165,10 +165,10 @@ export default function BAAManagement() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="p-2 bg-gray-100 rounded-xl">
+                <Users className="w-6 h-6 text-gray-700" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Trained Staff</p>
@@ -182,7 +182,7 @@ export default function BAAManagement() {
       )}
 
       {/* HIPAA Compliance Checklist */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">HIPAA Compliance Checklist</h2>
         <div className="space-y-3">
           <ChecklistItem
@@ -217,19 +217,19 @@ export default function BAAManagement() {
       </div>
 
       {/* BAA List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Business Associate Agreements</h2>
         </div>
 
         <div className="divide-y divide-gray-200">
           {baas.length === 0 ? (
-            <div className="p-12 text-center text-zinc-400">
-              <FileText className="w-12 h-12 mx-auto mb-4 text-zinc-500" />
+            <div className="p-12 text-center text-gray-400">
+              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-500" />
               <p>No BAAs uploaded yet</p>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                className="mt-4 text-gray-700 hover:text-gray-700 font-medium"
               >
                 Upload your first BAA
               </button>
@@ -239,7 +239,7 @@ export default function BAAManagement() {
               <div key={baa._id} className="p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg ${getStatusColor(baa.status)}`}>
+                    <div className={`p-3 rounded-xl ${getStatusColor(baa.status)}`}>
                       {getStatusIcon(baa.status)}
                     </div>
                     <div>
@@ -258,14 +258,14 @@ export default function BAAManagement() {
                       </div>
 
                       {baa.status === 'expiring_soon' && (
-                        <div className="mt-3 flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-3 py-2 rounded-lg inline-flex">
+                        <div className="mt-3 flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-3 py-2 rounded-xl inline-flex">
                           <AlertTriangle className="w-4 h-4" />
                           <span>Expires in {baa.daysUntilExpiration} days</span>
                         </div>
                       )}
 
                       {baa.status === 'expired' && (
-                        <div className="mt-3 flex items-center gap-2 text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg inline-flex">
+                        <div className="mt-3 flex items-center gap-2 text-sm text-red-700 bg-red-50 px-3 py-2 rounded-xl inline-flex">
                           <XCircle className="w-4 h-4" />
                           <span>Expired {Math.abs(baa.daysUntilExpiration)} days ago</span>
                         </div>
@@ -277,7 +277,7 @@ export default function BAAManagement() {
                     <a
                       href={baa.documentUrl}
                       download
-                      className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
                       title="Download BAA"
                     >
                       <Download className="w-5 h-5" />
@@ -286,7 +286,7 @@ export default function BAAManagement() {
                     {(baa.status === 'expiring_soon' || baa.status === 'expired') && (
                       <button
                         onClick={() => handleRenewBaa(baa._id)}
-                        className="px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                        className="px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors text-sm"
                       >
                         Renew BAA
                       </button>
@@ -302,7 +302,7 @@ export default function BAAManagement() {
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-none max-w-md w-full p-6">
+          <div className="bg-white rounded-xl shadow-sm max-w-md w-full p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Upload BAA Document</h3>
             
             <form onSubmit={handleUploadBaa} className="space-y-4">
@@ -314,7 +314,7 @@ export default function BAAManagement() {
                   type="text"
                   name="associateName"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., Cloud Storage Provider Inc."
                 />
               </div>
@@ -326,7 +326,7 @@ export default function BAAManagement() {
                 <select
                   name="associateType"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select type...</option>
                   <option value="cloud_storage">Cloud Storage Provider</option>
@@ -346,7 +346,7 @@ export default function BAAManagement() {
                   type="date"
                   name="signedDate"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -358,7 +358,7 @@ export default function BAAManagement() {
                   type="date"
                   name="expirationDate"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -371,7 +371,7 @@ export default function BAAManagement() {
                   name="document"
                   accept=".pdf,.doc,.docx"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -379,13 +379,13 @@ export default function BAAManagement() {
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
                 >
                   Upload BAA
                 </button>
@@ -405,7 +405,7 @@ function ChecklistItem({ label, completed }) {
   return (
     <div className="flex items-center gap-3">
       <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-        completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-zinc-500'
+        completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
       }`}>
         {completed ? (
           <CheckCircle className="w-4 h-4" />

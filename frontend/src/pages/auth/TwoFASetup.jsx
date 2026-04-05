@@ -63,11 +63,11 @@ const TwoFASetup = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="rounded-lg bg-zinc-50 border border-zinc-200 p-8 text-center">
-            <div className="w-12 h-12 border-4 border-zinc-200 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-zinc-500">Setting up 2FA...</p>
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8 text-center">
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-500">Setting up 2FA...</p>
           </div>
         </div>
       </div>
@@ -76,13 +76,13 @@ const TwoFASetup = () => {
 
   if (step === 'verify') {
     return (
-      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="rounded-lg bg-zinc-50 border border-zinc-200 p-8">
-            <h1 className="text-3xl font-bold text-zinc-900 mb-8 text-center">Setup 2FA</h1>
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-8 text-center">Setup 2FA</h1>
             
-            <div className="bg-zinc-50 rounded-lg p-6 mb-8 text-center">
-              <p className="text-sm text-zinc-400 mb-4">Scan with your authenticator app:</p>
+            <div className="bg-gray-50 rounded-xl p-6 mb-8 text-center">
+              <p className="text-sm text-gray-400 mb-4">Scan with your authenticator app:</p>
               {qrCode && (
                 <img
                   src={qrCode}
@@ -95,14 +95,14 @@ const TwoFASetup = () => {
 
             <form onSubmit={handleVerify} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-zinc-900 mb-2">Verification Code</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Verification Code</label>
                 <input
                   type="text"
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
                   maxLength="6"
-                  className="w-full px-4 py-3 rounded-lg bg-zinc-50 border border-zinc-200 hover:border-zinc-300 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 text-zinc-900 placeholder:text-zinc-400 text-center text-2xl tracking-widest"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-100 text-gray-900 placeholder:text-gray-400 text-center text-2xl tracking-widest"
                   required
                 />
               </div>
@@ -110,7 +110,7 @@ const TwoFASetup = () => {
               <button
                 type="submit"
                 disabled={verifying}
-                className="w-full py-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 shadow-sm shadow-zinc-200"
+                className="w-full py-3 rounded-xl bg-gray-900 hover:bg-gray-900 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 shadow-sm shadow-gray-100"
               >
                 {verifying ? '⏳ Verifying...' : '✓ Verify & Continue'}
               </button>
@@ -122,16 +122,16 @@ const TwoFASetup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="rounded-lg bg-zinc-50 border border-zinc-200 p-8">
+        <div className="rounded-xl bg-gray-50 border border-gray-200 p-8">
           <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-zinc-900 mb-4 text-center">2FA aktiviert</h1>
-          <p className="text-zinc-400 text-center mb-6">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4 text-center">2FA aktiviert</h1>
+          <p className="text-gray-400 text-center mb-6">
             Speichern Sie Ihre Backup-Codes an einem sicheren Ort. Sie können diese verwenden, falls Sie den Zugriff auf Ihre Authenticator-App verlieren.
           </p>
 
-          <div className="bg-zinc-50 rounded-lg p-6 mb-8">
+          <div className="bg-gray-50 rounded-xl p-6 mb-8">
             <div className="space-y-2">
               {backupCodes.map((code, index) => (
                 <div key={index} className="flex items-center justify-between text-sm">
@@ -148,14 +148,14 @@ const TwoFASetup = () => {
               navigator.clipboard.writeText(text);
               showNotification('Backup codes copied to clipboard!', 'success');
             }}
-            className="w-full py-3 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-900 font-semibold border border-zinc-200 transition duration-300 mb-4"
+            className="w-full py-3 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-900 font-semibold border border-gray-200 transition duration-300 mb-4"
           >
             📋 Copy Codes
           </button>
 
           <button
             onClick={() => navigate('/login')}
-            className="w-full py-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-semibold transition duration-300 shadow-sm shadow-zinc-200"
+            className="w-full py-3 rounded-xl bg-gray-900 hover:bg-gray-900 text-white font-semibold transition duration-300 shadow-sm shadow-gray-100"
           >
             ✓ Done
           </button>

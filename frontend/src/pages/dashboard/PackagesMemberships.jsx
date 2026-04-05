@@ -58,7 +58,7 @@ export default function PackagesMemberships() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -67,38 +67,38 @@ export default function PackagesMemberships() {
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2">Packages & Memberships</h1>
-        <p className="text-zinc-500">Verwalte Packages und wiederkehrende Memberships</p>
+        <h1 className="text-2xl md:text-2xl font-semibold tracking-tight text-gray-900 mb-2">Packages & Memberships</h1>
+        <p className="text-gray-500">Verwalte Packages und wiederkehrende Memberships</p>
       </div>
 
       {/* Tabs */}
-      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden mb-6">
-        <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden mb-6">
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <svg className="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
-            <span className="font-semibold text-zinc-900">Verwaltung</span>
+            <span className="font-semibold text-gray-900">Verwaltung</span>
           </div>
         </div>
         <div className="p-6">
           <div className="flex space-x-2">
             <button
               onClick={() => setActiveTab('packages')}
-              className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
+              className={`px-6 py-2 rounded-xl font-semibold transition-colors ${
                 activeTab === 'packages'
-                  ? 'bg-cyan-500 text-black'
-                  : 'bg-zinc-50 border border-zinc-200 text-zinc-600 hover:border-cyan-500/30'
+                  ? 'bg-gray-900 text-black'
+                  : 'bg-gray-50 border border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
               <Package className="w-4 h-4 inline mr-2" /> Packages ({packages.length})
             </button>
             <button
               onClick={() => setActiveTab('memberships')}
-              className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
+              className={`px-6 py-2 rounded-xl font-semibold transition-colors ${
                 activeTab === 'memberships'
-                  ? 'bg-cyan-500 text-black'
-                  : 'bg-zinc-50 border border-zinc-200 text-zinc-600 hover:border-cyan-500/30'
+                  ? 'bg-gray-900 text-black'
+                  : 'bg-gray-50 border border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
               <Gem className="w-4 h-4 inline mr-2" /> Memberships ({memberships.length})
@@ -122,7 +122,7 @@ function PackagesTab({ packages }) {
     const colors = {
       active: 'bg-green-500/20 text-green-600',
       expired: 'bg-red-500/20 text-red-600',
-      completed: 'bg-gray-500/20 text-zinc-600',
+      completed: 'bg-gray-500/20 text-gray-600',
       cancelled: 'bg-red-500/20 text-red-600'
     };
     return colors[status] || colors.active;
@@ -136,9 +136,9 @@ function PackagesTab({ packages }) {
       {/* Active Packages */}
       {activePackages.length > 0 && (
         <div className="mb-8">
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-            <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
-              <h2 className="text-xl font-semibold text-zinc-900">
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">
                 Aktive Packages ({activePackages.length})
               </h2>
             </div>
@@ -149,30 +149,30 @@ function PackagesTab({ packages }) {
                     key={pkg._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-zinc-50 border border-green-500/50 rounded-lg p-6 hover:border-green-500/70 transition"
+                    className="bg-gray-50 border border-green-500/50 rounded-xl p-6 hover:border-green-500/70 transition"
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center justify-center">
+                      <div className="w-12 h-12 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center justify-center">
                         <Package className="w-6 h-6 text-green-600" />
                       </div>
                       <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(pkg.status)}`}>
                         {pkg.status}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-zinc-900 mb-2">{pkg.name}</h3>
-                    <div className="text-sm text-zinc-500 mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{pkg.name}</h3>
+                    <div className="text-sm text-gray-500 mb-4">
                       {pkg.customerId?.firstName} {pkg.customerId?.lastName}
                       <br />
                       {pkg.customerId?.phone}
                     </div>
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-zinc-500">Credits:</span>
-                        <span className="font-medium text-zinc-900">
+                        <span className="text-gray-500">Credits:</span>
+                        <span className="font-medium text-gray-900">
                           {pkg.creditsRemaining}/{pkg.creditsTotal}
                         </span>
                       </div>
-                      <div className="w-full bg-zinc-50 rounded-full h-2">
+                      <div className="w-full bg-gray-50 rounded-full h-2">
                         <div
                           className="bg-green-500 h-2 rounded-full"
                           style={{
@@ -182,7 +182,7 @@ function PackagesTab({ packages }) {
                       </div>
                     </div>
                     {pkg.validUntil && (
-                      <div className="text-sm text-zinc-500 flex items-center gap-2">
+                      <div className="text-sm text-gray-500 flex items-center gap-2">
                         <Clock className="w-4 h-4" />
                         Gültig bis: {new Date(pkg.validUntil).toLocaleDateString('de-DE')}
                       </div>
@@ -201,20 +201,20 @@ function PackagesTab({ packages }) {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Inaktive Packages ({inactivePackages.length})
           </h2>
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Package
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Kunde
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Credits
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Status
                   </th>
                 </tr>
@@ -226,7 +226,7 @@ function PackagesTab({ packages }) {
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {pkg.customerId?.firstName} {pkg.customerId?.lastName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-zinc-500">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {pkg.creditsRemaining}/{pkg.creditsTotal}
                     </td>
                     <td className="px-6 py-4">
@@ -243,8 +243,8 @@ function PackagesTab({ packages }) {
       )}
 
       {packages.length === 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-          <p className="text-zinc-400">Noch keine Packages vorhanden</p>
+        <div className="bg-white border border-gray-100 rounded-2xl p-12 text-center">
+          <p className="text-gray-400">Noch keine Packages vorhanden</p>
         </div>
       )}
     </div>
@@ -264,12 +264,12 @@ function MembershipsTab({ memberships, onCancel }) {
 
   const getPlanIcon = (plan) => {
     const icons = {
-      basic: <Gem className="w-5 h-5 text-zinc-500" />,
-      premium: <Gem className="w-5 h-5 text-cyan-400" />,
+      basic: <Gem className="w-5 h-5 text-gray-500" />,
+      premium: <Gem className="w-5 h-5 text-gray-900" />,
       vip: <Gem className="w-5 h-5 text-yellow-600" />,
       custom: <Gem className="w-5 h-5 text-green-600" />
     };
-    return icons[plan] || <Gem className="w-5 h-5 text-zinc-500" />;
+    return icons[plan] || <Gem className="w-5 h-5 text-gray-500" />;
   };
 
   const activeMemberships = memberships.filter(m => m.status === 'active');
@@ -289,10 +289,10 @@ function MembershipsTab({ memberships, onCancel }) {
                 key={membership._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white border-2 border-green-500 rounded-lg p-6"
+                className="bg-white border-2 border-green-500 rounded-xl p-6"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center justify-center">
                     {getPlanIcon(membership.plan)}
                   </div>
                   <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(membership.status)}`}>
@@ -300,26 +300,26 @@ function MembershipsTab({ memberships, onCancel }) {
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{membership.name}</h3>
-                <div className="text-sm text-zinc-500 mb-4">
+                <div className="text-sm text-gray-500 mb-4">
                   {membership.customerId?.firstName} {membership.customerId?.lastName}
                   <br />
                   {membership.customerId?.phone}
                 </div>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Preis:</span>
+                    <span className="text-gray-500">Preis:</span>
                     <span className="font-medium">{membership.priceMonthly}€/Monat</span>
                   </div>
                   {membership.creditsMonthly > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-zinc-500">Credits:</span>
+                      <span className="text-gray-500">Credits:</span>
                       <span className="font-medium">
                         {membership.creditsUsedThisMonth}/{membership.creditsMonthly}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Nächste Abrechnung:</span>
+                    <span className="text-gray-500">Nächste Abrechnung:</span>
                     <span className="font-medium">
                       {new Date(membership.nextBillingDate).toLocaleDateString('de-DE')}
                     </span>
@@ -327,7 +327,7 @@ function MembershipsTab({ memberships, onCancel }) {
                 </div>
                 <button
                   onClick={() => onCancel(membership._id, 'User request')}
-                  className="w-full bg-red-100 text-red-800 py-2 px-4 rounded-lg hover:bg-red-200 text-sm"
+                  className="w-full bg-red-100 text-red-800 py-2 px-4 rounded-xl hover:bg-red-200 text-sm"
                 >
                   Kündigen
                 </button>
@@ -343,20 +343,20 @@ function MembershipsTab({ memberships, onCancel }) {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Inaktive Memberships ({inactiveMemberships.length})
           </h2>
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Membership
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Kunde
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Plan
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     Status
                   </th>
                 </tr>
@@ -368,7 +368,7 @@ function MembershipsTab({ memberships, onCancel }) {
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {membership.customerId?.firstName} {membership.customerId?.lastName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-zinc-500">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {getPlanIcon(membership.plan)} {membership.plan}
                     </td>
                     <td className="px-6 py-4">
@@ -385,8 +385,8 @@ function MembershipsTab({ memberships, onCancel }) {
       )}
 
       {memberships.length === 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-          <p className="text-zinc-400">Noch keine Memberships vorhanden</p>
+        <div className="bg-white border border-gray-100 rounded-2xl p-12 text-center">
+          <p className="text-gray-400">Noch keine Memberships vorhanden</p>
         </div>
       )}
     </div>

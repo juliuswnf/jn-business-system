@@ -34,7 +34,7 @@ export default function MobileHeader() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => navigate('/dashboard/help')}
-              className="relative p-2 rounded-lg touch-manipulation active:bg-gray-100"
+              className="relative p-2 rounded-xl touch-manipulation active:bg-gray-100"
             >
               <BellIcon className="w-6 h-6 text-gray-700" />
               {notificationCount > 0 && (
@@ -45,7 +45,7 @@ export default function MobileHeader() {
             </button>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-lg touch-manipulation active:bg-gray-100"
+              className="p-2 rounded-xl touch-manipulation active:bg-gray-100"
             >
               {showMenu ? <XMarkIcon className="w-6 h-6 text-gray-700" /> : <Bars3Icon className="w-6 h-6 text-gray-700" />}
             </button>
@@ -63,18 +63,18 @@ export default function MobileHeader() {
             className="
               fixed right-0 top-0 bottom-0 z-50
               w-72 max-w-[85vw]
-              bg-zinc-700 shadow-xl
+              bg-white border-l border-gray-100 shadow-xl
               overflow-y-auto
               md:hidden
             "
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-zinc-600">
+            <div className="p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <UserCircleIcon className="w-12 h-12 text-zinc-300" />
+                <UserCircleIcon className="w-12 h-12 text-gray-400" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white truncate">{user?.name || 'User'}</p>
-                  <p className="text-xs text-zinc-300 truncate">{user?.email || 'keine Email'}</p>
+                  <p className="font-semibold text-gray-900 truncate">{user?.name || 'User'}</p>
+                  <p className="text-xs text-gray-500 truncate">{user?.email || 'keine Email'}</p>
                 </div>
               </div>
             </div>
@@ -92,10 +92,10 @@ export default function MobileHeader() {
                 Einstellungen
               </MenuButton>
             </div>
-            <div className="sticky bottom-0 w-full bg-zinc-700 p-4">
+            <div className="sticky bottom-0 w-full bg-white border-t border-gray-100 p-4">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium !bg-red-600 !text-white hover:!bg-red-700 border-0 ring-0 outline-none focus:ring-0 focus:outline-none appearance-none touch-manipulation"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium !bg-red-600 !text-white hover:!bg-red-700 border-0 ring-0 outline-none focus:ring-0 focus:outline-none appearance-none touch-manipulation"
               >
                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
                 Abmelden
@@ -112,7 +112,7 @@ function MenuButton({ onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left py-3 px-4 rounded-lg text-zinc-300 font-medium touch-manipulation active:bg-white/10 transition-colors"
+      className="w-full text-left py-3 px-4 rounded-xl text-gray-700 font-medium touch-manipulation active:bg-gray-50 transition-colors"
     >
       {children}
     </button>

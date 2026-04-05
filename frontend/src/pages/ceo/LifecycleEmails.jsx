@@ -58,7 +58,7 @@ const LifecycleEmails = () => {
   const getEmailTypeColor = (type) => {
     const colors = {
       'welcome_day1': 'bg-green-100 text-green-800',
-      'engagement_day3': 'bg-blue-100 text-blue-800',
+      'engagement_day3': 'bg-gray-100 text-gray-800',
       'midtrial_day7': 'bg-purple-100 text-purple-800',
       'urgency_day23': 'bg-yellow-100 text-yellow-800',
       'expiry_day30': 'bg-red-100 text-red-800',
@@ -71,7 +71,7 @@ const LifecycleEmails = () => {
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center min-h-[400px]">
-        <RefreshCcw className="w-8 h-8 animate-spin text-blue-600" />
+        <RefreshCcw className="w-8 h-8 animate-spin text-gray-700" />
       </div>
     );
   }
@@ -97,14 +97,14 @@ const LifecycleEmails = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Automatische E-Mail-Strecke</h1>
-          <p className="text-zinc-500 mt-1">
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900">Automatische E-Mail-Strecke</h1>
+          <p className="text-gray-500 mt-1">
             Automatisierte E-Mails für Nutzer in der Testphase und bessere Abschlussrate
           </p>
         </div>
         <button
           onClick={fetchStats}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-gray-900 rounded-lg hover:bg-gray-900 transition-colors"
         >
           <RefreshCcw className="w-4 h-4" />
           Aktualisieren
@@ -115,12 +115,12 @@ const LifecycleEmails = () => {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Mail className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <Mail className="w-6 h-6 text-gray-700" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats?.stats?.total || 0}</p>
-              <p className="text-sm text-zinc-400">Gesamt geplant</p>
+              <p className="text-xl font-semibold tracking-tight text-gray-900">{stats?.stats?.total || 0}</p>
+              <p className="text-sm text-gray-400">Gesamt geplant</p>
             </div>
           </div>
         </div>
@@ -131,8 +131,8 @@ const LifecycleEmails = () => {
               <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats?.stats?.sent || 0}</p>
-              <p className="text-sm text-zinc-400">Gesendet</p>
+              <p className="text-xl font-semibold tracking-tight text-gray-900">{stats?.stats?.sent || 0}</p>
+              <p className="text-sm text-gray-400">Gesendet</p>
             </div>
           </div>
         </div>
@@ -143,8 +143,8 @@ const LifecycleEmails = () => {
               <Clock className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats?.stats?.pending || 0}</p>
-              <p className="text-sm text-zinc-400">Ausstehend</p>
+              <p className="text-xl font-semibold tracking-tight text-gray-900">{stats?.stats?.pending || 0}</p>
+              <p className="text-sm text-gray-400">Ausstehend</p>
             </div>
           </div>
         </div>
@@ -155,8 +155,8 @@ const LifecycleEmails = () => {
               <XCircle className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats?.stats?.failed || 0}</p>
-              <p className="text-sm text-zinc-400">Fehlgeschlagen</p>
+              <p className="text-xl font-semibold tracking-tight text-gray-900">{stats?.stats?.failed || 0}</p>
+              <p className="text-sm text-gray-400">Fehlgeschlagen</p>
             </div>
           </div>
         </div>
@@ -167,8 +167,8 @@ const LifecycleEmails = () => {
               <TrendingUp className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats?.stats?.sendRate || 0}%</p>
-              <p className="text-sm text-zinc-400">Senderate</p>
+              <p className="text-xl font-semibold tracking-tight text-gray-900">{stats?.stats?.sendRate || 0}%</p>
+              <p className="text-sm text-gray-400">Senderate</p>
             </div>
           </div>
         </div>
@@ -183,12 +183,12 @@ const LifecycleEmails = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">E-Mail Typ</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Gesendet</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Gesamt</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Senderate</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Conversions</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">Conv. Rate</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">E-Mail Typ</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase">Gesendet</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase">Gesamt</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase">Senderate</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase">Conversions</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase">Conv. Rate</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -200,7 +200,7 @@ const LifecycleEmails = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center text-gray-900 font-medium">{email.sent}</td>
-                  <td className="px-6 py-4 text-center text-zinc-400">{email.total}</td>
+                  <td className="px-6 py-4 text-center text-gray-400">{email.total}</td>
                   <td className="px-6 py-4 text-center">
                     <span className={`font-medium ${email.sendRate >= 80 ? 'text-green-600' : email.sendRate >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
                       {email.sendRate}%
@@ -208,7 +208,7 @@ const LifecycleEmails = () => {
                   </td>
                   <td className="px-6 py-4 text-center text-gray-900 font-medium">{email.conversions}</td>
                   <td className="px-6 py-4 text-center">
-                    <span className={`font-medium ${email.conversionRate >= 10 ? 'text-green-600' : email.conversionRate >= 5 ? 'text-yellow-600' : 'text-zinc-500'}`}>
+                    <span className={`font-medium ${email.conversionRate >= 10 ? 'text-green-600' : email.conversionRate >= 5 ? 'text-yellow-600' : 'text-gray-500'}`}>
                       {email.conversionRate}%
                     </span>
                   </td>
@@ -228,7 +228,7 @@ const LifecycleEmails = () => {
           </div>
           <div className="max-h-[400px] overflow-y-auto">
             {stats?.recentlySent?.length === 0 ? (
-              <div className="p-6 text-center text-zinc-400">
+              <div className="p-6 text-center text-gray-400">
                 Noch keine E-Mails gesendet
               </div>
             ) : (
@@ -243,9 +243,9 @@ const LifecycleEmails = () => {
                         <p className="mt-1 text-sm font-medium text-gray-900 truncate">
                           {email.salon}
                         </p>
-                        <p className="text-xs text-zinc-400 truncate">{email.user}</p>
+                        <p className="text-xs text-gray-400 truncate">{email.user}</p>
                       </div>
-                      <div className="text-xs text-zinc-500 whitespace-nowrap ml-2">
+                      <div className="text-xs text-gray-500 whitespace-nowrap ml-2">
                         {email.sentAt ? new Date(email.sentAt).toLocaleDateString('de-DE', {
                           day: '2-digit',
                           month: '2-digit',
@@ -264,12 +264,12 @@ const LifecycleEmails = () => {
         {/* Upcoming */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-blue-600" />
+            <Calendar className="w-5 h-5 text-gray-700" />
             <h2 className="text-lg font-semibold text-gray-900">Geplante E-Mails</h2>
           </div>
           <div className="max-h-[400px] overflow-y-auto">
             {stats?.upcoming?.length === 0 ? (
-              <div className="p-6 text-center text-zinc-400">
+              <div className="p-6 text-center text-gray-400">
                 Keine E-Mails geplant
               </div>
             ) : (
@@ -284,9 +284,9 @@ const LifecycleEmails = () => {
                         <p className="mt-1 text-sm font-medium text-gray-900 truncate">
                           {email.salon}
                         </p>
-                        <p className="text-xs text-zinc-400 truncate">{email.user}</p>
+                        <p className="text-xs text-gray-400 truncate">{email.user}</p>
                       </div>
-                      <div className="text-xs text-zinc-500 whitespace-nowrap ml-2 flex items-center gap-1">
+                      <div className="text-xs text-gray-500 whitespace-nowrap ml-2 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {email.scheduledFor ? new Date(email.scheduledFor).toLocaleDateString('de-DE', {
                           day: '2-digit',
@@ -305,9 +305,9 @@ const LifecycleEmails = () => {
       </div>
 
       {/* Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2">📧 E-Mail-Ablauf</h3>
-        <div className="text-sm text-blue-800 space-y-1">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <h3 className="font-semibold text-gray-900 mb-2">📧 E-Mail-Ablauf</h3>
+        <div className="text-sm text-gray-800 space-y-1">
           <p><strong>Tag 1:</strong> Willkommen + Setup-Guide</p>
           <p><strong>Tag 3:</strong> &quot;Hast du schon deinen ersten Termin erstellt?&quot;</p>
           <p><strong>Tag 7:</strong> &quot;Noch 23 Tage Testphase – brauchst du Hilfe?&quot;</p>

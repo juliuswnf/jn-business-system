@@ -177,7 +177,7 @@ const CEOSettings = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-zinc-200 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
@@ -188,15 +188,15 @@ const CEOSettings = () => {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-zinc-900">CEO Settings</h1>
-                  <p className="text-xs text-zinc-400">System-Konfiguration</p>
+                  <h1 className="text-lg font-bold text-gray-900">CEO Settings</h1>
+                  <p className="text-xs text-gray-400">System-Konfiguration</p>
                 </div>
               </Link>
             </div>
             <div className="flex items-center gap-4">
               <Link 
                 to="/ceo/dashboard" 
-                className="px-4 py-2 text-zinc-500 hover:text-zinc-900 transition flex items-center gap-2"
+                className="px-4 py-2 text-gray-500 hover:text-gray-900 transition flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -213,7 +213,7 @@ const CEOSettings = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <nav className="bg-white/50 border border-zinc-200 rounded-xl p-2 sticky top-24">
+            <nav className="bg-white/50 border border-gray-200 rounded-xl p-2 sticky top-24">
               {sections.map((section) => (
                 <button
                   key={section.id}
@@ -221,7 +221,7 @@ const CEOSettings = () => {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition ${
                     activeSection === section.id
                       ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-white border border-indigo-500/30'
-                      : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100/50'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100/50'
                   }`}
                 >
                   {renderIcon(section.icon)}
@@ -236,18 +236,18 @@ const CEOSettings = () => {
             {/* Profile Section */}
             {activeSection === 'profile' && (
               <div className="space-y-6">
-                <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-6">Profil</h2>
+                <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Profil</h2>
                   
                   {/* Avatar */}
                   <div className="flex items-center gap-6 mb-8">
-                    <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold">
+                    <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-semibold tracking-tight">
                       {profile.name?.charAt(0) || 'C'}
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-zinc-900">{profile.name || 'CEO'}</h3>
-                      <p className="text-zinc-400">{profile.email}</p>
-                      <button className="mt-2 px-4 py-2 bg-zinc-50 text-zinc-500 rounded-lg text-sm hover:bg-zinc-100 transition">
+                      <h3 className="text-lg font-semibold text-gray-900">{profile.name || 'CEO'}</h3>
+                      <p className="text-gray-400">{profile.email}</p>
+                      <button className="mt-2 px-4 py-2 bg-gray-50 text-gray-500 rounded-lg text-sm hover:bg-gray-100 transition">
                         Avatar ändern
                       </button>
                     </div>
@@ -256,30 +256,30 @@ const CEOSettings = () => {
                   {/* Form */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-zinc-500 mb-2">Name</label>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">Name</label>
                       <input
                         type="text"
                         value={profile.name}
                         onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 transition"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-500 mb-2">E-Mail</label>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">E-Mail</label>
                       <input
                         type="email"
                         value={profile.email}
                         onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 transition"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-500 mb-2">Telefon</label>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">Telefon</label>
                       <input
                         type="tel"
                         value={profile.phone}
                         onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 transition"
                         placeholder="+49..."
                       />
                     </div>
@@ -311,7 +311,7 @@ const CEOSettings = () => {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-zinc-900">Zwei-Faktor-Authentifizierung</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Zwei-Faktor-Authentifizierung</h3>
                         <p className="text-green-600 text-sm">Aktiviert und geschützt</p>
                       </div>
                     </div>
@@ -322,35 +322,35 @@ const CEOSettings = () => {
                 </div>
 
                 {/* Change Password */}
-                <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-6">Passwort ändern</h2>
+                <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Passwort ändern</h2>
                   
                   <div className="space-y-4 max-w-md">
                     <div>
-                      <label className="block text-sm font-medium text-zinc-500 mb-2">Aktuelles Passwort</label>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">Aktuelles Passwort</label>
                       <input
                         type="password"
                         value={security.currentPassword}
                         onChange={(e) => setSecurity({ ...security, currentPassword: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 transition"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-500 mb-2">Neues Passwort</label>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">Neues Passwort</label>
                       <input
                         type="password"
                         value={security.newPassword}
                         onChange={(e) => setSecurity({ ...security, newPassword: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 transition"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-500 mb-2">Passwort bestätigen</label>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">Passwort bestätigen</label>
                       <input
                         type="password"
                         value={security.confirmPassword}
                         onChange={(e) => setSecurity({ ...security, confirmPassword: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 transition"
                       />
                     </div>
                     <button
@@ -364,8 +364,8 @@ const CEOSettings = () => {
                 </div>
 
                 {/* Active Sessions */}
-                <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-4">Aktive Sitzungen</h2>
+                <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Aktive Sitzungen</h2>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-4 bg-white/30 rounded-lg">
                       <div className="flex items-center gap-4">
@@ -375,8 +375,8 @@ const CEOSettings = () => {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-zinc-900 font-medium">Aktuelle Sitzung</p>
-                          <p className="text-zinc-400 text-sm">Windows • Chrome • Jetzt aktiv</p>
+                          <p className="text-gray-900 font-medium">Aktuelle Sitzung</p>
+                          <p className="text-gray-400 text-sm">Windows • Chrome • Jetzt aktiv</p>
                         </div>
                       </div>
                       <span className="px-2 py-1 bg-green-500/20 text-green-600 rounded text-xs">Aktiv</span>
@@ -391,8 +391,8 @@ const CEOSettings = () => {
 
             {/* Notifications Section */}
             {activeSection === 'notifications' && (
-              <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                <h2 className="text-xl font-semibold text-zinc-900 mb-6">E-Mail Benachrichtigungen</h2>
+              <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">E-Mail Benachrichtigungen</h2>
                 
                 <div className="space-y-4">
                   {[
@@ -405,13 +405,13 @@ const CEOSettings = () => {
                   ].map((item) => (
                     <div key={item.key} className="flex items-center justify-between p-4 bg-white/30 rounded-lg">
                       <div>
-                        <p className="text-zinc-900 font-medium">{item.label}</p>
-                        <p className="text-zinc-400 text-sm">{item.desc}</p>
+                        <p className="text-gray-900 font-medium">{item.label}</p>
+                        <p className="text-gray-400 text-sm">{item.desc}</p>
                       </div>
                       <button
                         onClick={() => setNotifications({ ...notifications, [item.key]: !notifications[item.key] })}
                         className={`w-12 h-6 rounded-full transition-all ${
-                          notifications[item.key] ? 'bg-indigo-500' : 'bg-zinc-300'
+                          notifications[item.key] ? 'bg-indigo-500' : 'bg-gray-300'
                         }`}
                       >
                         <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -427,20 +427,20 @@ const CEOSettings = () => {
             {/* System Section */}
             {activeSection === 'system' && (
               <div className="space-y-6">
-                <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-6">System-Einstellungen</h2>
+                <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">System-Einstellungen</h2>
                   
                   <div className="space-y-6">
                     {/* Maintenance Mode */}
                     <div className="flex items-center justify-between p-4 bg-white/30 rounded-lg">
                       <div>
-                        <p className="text-zinc-900 font-medium">Wartungsmodus</p>
-                        <p className="text-zinc-400 text-sm">Zeigt allen Nutzern eine Wartungsseite an</p>
+                        <p className="text-gray-900 font-medium">Wartungsmodus</p>
+                        <p className="text-gray-400 text-sm">Zeigt allen Nutzern eine Wartungsseite an</p>
                       </div>
                       <button
                         onClick={() => setSystemSettings({ ...systemSettings, maintenanceMode: !systemSettings.maintenanceMode })}
                         className={`w-12 h-6 rounded-full transition-all ${
-                          systemSettings.maintenanceMode ? 'bg-orange-500' : 'bg-zinc-300'
+                          systemSettings.maintenanceMode ? 'bg-orange-500' : 'bg-gray-300'
                         }`}
                       >
                         <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -452,13 +452,13 @@ const CEOSettings = () => {
                     {/* Debug Mode */}
                     <div className="flex items-center justify-between p-4 bg-white/30 rounded-lg">
                       <div>
-                        <p className="text-zinc-900 font-medium">Debug-Modus</p>
-                        <p className="text-zinc-400 text-sm">Erweiterte Fehlerausgaben aktivieren</p>
+                        <p className="text-gray-900 font-medium">Debug-Modus</p>
+                        <p className="text-gray-400 text-sm">Erweiterte Fehlerausgaben aktivieren</p>
                       </div>
                       <button
                         onClick={() => setSystemSettings({ ...systemSettings, debugMode: !systemSettings.debugMode })}
                         className={`w-12 h-6 rounded-full transition-all ${
-                          systemSettings.debugMode ? 'bg-indigo-500' : 'bg-zinc-300'
+                          systemSettings.debugMode ? 'bg-indigo-500' : 'bg-gray-300'
                         }`}
                       >
                         <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -469,25 +469,25 @@ const CEOSettings = () => {
 
                     {/* IP Whitelist */}
                     <div className="p-4 bg-white/30 rounded-lg">
-                      <p className="text-zinc-900 font-medium mb-2">CEO IP-Whitelist</p>
-                      <p className="text-zinc-400 text-sm mb-3">Komma-getrennte Liste von erlaubten IPs für CEO-Login</p>
+                      <p className="text-gray-900 font-medium mb-2">CEO IP-Whitelist</p>
+                      <p className="text-gray-400 text-sm mb-3">Komma-getrennte Liste von erlaubten IPs für CEO-Login</p>
                       <input
                         type="text"
                         value={systemSettings.ipWhitelist}
                         onChange={(e) => setSystemSettings({ ...systemSettings, ipWhitelist: e.target.value })}
                         placeholder="z.B. 192.168.1.1, 10.0.0.1"
-                        className="w-full px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 font-mono text-sm focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 font-mono text-sm focus:outline-none focus:border-indigo-500 transition"
                       />
                     </div>
 
                     {/* Session Timeout */}
                     <div className="p-4 bg-white/30 rounded-lg">
-                      <p className="text-zinc-900 font-medium mb-2">Session Timeout</p>
-                      <p className="text-zinc-400 text-sm mb-3">Automatische Abmeldung nach Inaktivität (Tage)</p>
+                      <p className="text-gray-900 font-medium mb-2">Session Timeout</p>
+                      <p className="text-gray-400 text-sm mb-3">Automatische Abmeldung nach Inaktivität (Tage)</p>
                       <select
                         value={systemSettings.sessionTimeout}
                         onChange={(e) => setSystemSettings({ ...systemSettings, sessionTimeout: parseInt(e.target.value) })}
-                        className="px-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-indigo-500 transition"
+                        className="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 transition"
                       >
                         <option value={7}>7 Tage</option>
                         <option value={14}>14 Tage</option>
@@ -504,8 +504,8 @@ const CEOSettings = () => {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-zinc-900 font-medium">Cache leeren</p>
-                        <p className="text-zinc-400 text-sm">Löscht alle gecachten Daten</p>
+                        <p className="text-gray-900 font-medium">Cache leeren</p>
+                        <p className="text-gray-400 text-sm">Löscht alle gecachten Daten</p>
                       </div>
                       <button className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition">
                         Cache leeren
@@ -513,8 +513,8 @@ const CEOSettings = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-zinc-900 font-medium">Alle Logs löschen</p>
-                        <p className="text-zinc-400 text-sm">Löscht alle System-Logs</p>
+                        <p className="text-gray-900 font-medium">Alle Logs löschen</p>
+                        <p className="text-gray-400 text-sm">Löscht alle System-Logs</p>
                       </div>
                       <button className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition">
                         Logs löschen
@@ -529,40 +529,40 @@ const CEOSettings = () => {
             {activeSection === 'billing' && (
               <div className="space-y-6">
                 <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-4">Plattform-Einnahmen</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Plattform-Einnahmen</h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white/30 rounded-lg p-4 text-center">
-                      <p className="text-3xl font-bold text-green-600">€0</p>
-                      <p className="text-zinc-400 text-sm">Diesen Monat</p>
+                      <p className="text-2xl font-semibold tracking-tight text-green-600">€0</p>
+                      <p className="text-gray-400 text-sm">Diesen Monat</p>
                     </div>
                     <div className="bg-white/30 rounded-lg p-4 text-center">
-                      <p className="text-3xl font-bold text-zinc-900">0</p>
-                      <p className="text-zinc-400 text-sm">Zahlende Kunden</p>
+                      <p className="text-2xl font-semibold tracking-tight text-gray-900">0</p>
+                      <p className="text-gray-400 text-sm">Zahlende Kunden</p>
                     </div>
                     <div className="bg-white/30 rounded-lg p-4 text-center">
-                      <p className="text-3xl font-bold text-zinc-900">€0</p>
-                      <p className="text-zinc-400 text-sm">Lifetime Revenue</p>
+                      <p className="text-2xl font-semibold tracking-tight text-gray-900">€0</p>
+                      <p className="text-gray-400 text-sm">Lifetime Revenue</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-4">Stripe Integration</h2>
+                <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Stripe Integration</h2>
                   <div className="flex items-center gap-4 p-4 bg-white/30 rounded-lg">
                     <div className="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-                      <svg className="w-6 h-6 text-zinc-900" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="w-6 h-6 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <p className="text-zinc-900 font-medium">Stripe Dashboard</p>
-                      <p className="text-zinc-400 text-sm">Zahlungen und Abonnements verwalten</p>
+                      <p className="text-gray-900 font-medium">Stripe Dashboard</p>
+                      <p className="text-gray-400 text-sm">Zahlungen und Abonnements verwalten</p>
                     </div>
                     <a 
                       href="https://dashboard.stripe.com" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="px-4 py-2 bg-indigo-500 text-zinc-900 rounded-lg hover:bg-indigo-600 transition"
+                      className="px-4 py-2 bg-indigo-500 text-gray-900 rounded-lg hover:bg-indigo-600 transition"
                     >
                       Öffnen
                     </a>
@@ -574,35 +574,35 @@ const CEOSettings = () => {
             {/* API Section */}
             {activeSection === 'api' && (
               <div className="space-y-6">
-                <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-6">API Konfiguration</h2>
+                <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">API Konfiguration</h2>
                   
                   <div className="space-y-4">
                     <div className="p-4 bg-white/30 rounded-lg">
-                      <p className="text-zinc-900 font-medium mb-2">API Base URL</p>
-                      <code className="block px-4 py-3 bg-white rounded-lg text-zinc-900 font-mono text-sm">
+                      <p className="text-gray-900 font-medium mb-2">API Base URL</p>
+                      <code className="block px-4 py-3 bg-white rounded-lg text-gray-900 font-mono text-sm">
                         {API_URL}
                       </code>
                     </div>
 
                     <div className="p-4 bg-white/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-zinc-900 font-medium">API Key</p>
-                        <button className="text-zinc-900 text-sm hover:text-indigo-300">
+                        <p className="text-gray-900 font-medium">API Key</p>
+                        <button className="text-gray-900 text-sm hover:text-indigo-300">
                           Neu generieren
                         </button>
                       </div>
-                      <code className="block px-4 py-3 bg-white rounded-lg text-zinc-400 font-mono text-sm">
+                      <code className="block px-4 py-3 bg-white rounded-lg text-gray-400 font-mono text-sm">
                         ••••••••••••••••••••••••••••••••
                       </code>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white/50 border border-zinc-200 rounded-xl p-6">
-                  <h2 className="text-xl font-semibold text-zinc-900 mb-4">Webhooks</h2>
-                  <p className="text-zinc-400 mb-4">Keine Webhooks konfiguriert</p>
-                  <button className="px-4 py-2 bg-indigo-500/10 text-zinc-900 rounded-lg hover:bg-indigo-500/20 transition">
+                <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Webhooks</h2>
+                  <p className="text-gray-400 mb-4">Keine Webhooks konfiguriert</p>
+                  <button className="px-4 py-2 bg-indigo-500/10 text-gray-900 rounded-lg hover:bg-indigo-500/20 transition">
                     + Webhook hinzufügen
                   </button>
                 </div>

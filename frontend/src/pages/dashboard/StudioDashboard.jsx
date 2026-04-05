@@ -95,10 +95,10 @@ function DefaultSalonDashboard() {
 
   if (loading) return <LoadingSpinner />;
   const statCards = [
-    { title: 'Heute', value: stats.todayBookings, icon: <Calendar className="w-5 h-5 text-zinc-600" /> },
-    { title: 'Diese Woche', value: stats.weekBookings, icon: <Users className="w-5 h-5 text-zinc-600" /> },
-    { title: 'Bewertung', value: stats.avgRating.toFixed(1), icon: <Star className="w-5 h-5 text-zinc-600" /> },
-    { title: 'Services', value: stats.activeServices, icon: <Briefcase className="w-5 h-5 text-zinc-600" /> }
+    { title: 'Heute', value: stats.todayBookings, icon: <Calendar className="w-5 h-5 text-gray-600" /> },
+    { title: 'Diese Woche', value: stats.weekBookings, icon: <Users className="w-5 h-5 text-gray-600" /> },
+    { title: 'Bewertung', value: stats.avgRating.toFixed(1), icon: <Star className="w-5 h-5 text-gray-600" /> },
+    { title: 'Services', value: stats.activeServices, icon: <Briefcase className="w-5 h-5 text-gray-600" /> }
   ];
 
   return (
@@ -119,7 +119,7 @@ function DefaultSalonDashboard() {
                 {bookingLimits.used} / {bookingLimits.limit} ({bookingLimits.planType === 'trial' ? 'Testphase' : 'Plan'})
               </p>
             </div>
-            <Link to="/pricing" className="text-[13px] font-medium text-zinc-900 hover:text-zinc-600">
+            <Link to="/pricing" className="text-[13px] font-medium text-gray-900 hover:text-gray-600">
               Upgrade →
             </Link>
           </div>
@@ -127,37 +127,37 @@ function DefaultSalonDashboard() {
       )}
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-zinc-900">Willkommen, {studioName}</h1>
-        <p className="text-sm text-zinc-500">Deine Übersicht für heute.</p>
+        <h1 className="text-xl font-semibold tracking-tight text-gray-900">Willkommen, {studioName}</h1>
+        <p className="text-sm text-gray-500">Deine Übersicht für heute.</p>
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
-          <div key={card.title} className="bg-white border border-zinc-200 rounded-xl p-5 flex flex-col gap-3">
+          <div key={card.title} className="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-[13px] text-zinc-500 font-medium">{card.title}</span>
-              <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
+              <span className="text-[13px] text-gray-500 font-medium">{card.title}</span>
+              <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center">
                 {card.icon}
               </div>
             </div>
-            <p className="text-2xl font-bold text-zinc-900">{card.value}</p>
+            <p className="text-xl font-semibold tracking-tight text-gray-900">{card.value}</p>
           </div>
         ))}
       </div>
 
-      <section className="bg-white rounded-xl border border-zinc-200">
-        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between">
+      <section className="bg-white rounded-xl border border-gray-200">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-zinc-900">Heutige Termine</h2>
-            <p className="text-xs text-zinc-400 mt-0.5">{recentBookings.length} Buchungen</p>
+            <h2 className="text-base font-semibold text-gray-900">Heutige Termine</h2>
+            <p className="text-xs text-gray-400 mt-0.5">{recentBookings.length} Buchungen</p>
           </div>
-          <Link to="/dashboard/bookings" className="text-[13px] text-zinc-500 hover:text-zinc-900 font-medium flex items-center gap-1">
+          <Link to="/dashboard/bookings" className="text-[13px] text-gray-500 hover:text-gray-900 font-medium flex items-center gap-1">
             Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
-        <div className="divide-y divide-zinc-100">
+        <div className="divide-y divide-gray-100">
           {recentBookings.length === 0 ? (
-            <div className="text-sm text-zinc-400 text-center py-10">Noch keine Buchungen.</div>
+            <div className="text-sm text-gray-400 text-center py-10">Noch keine Buchungen.</div>
           ) : isMobile ? (
             recentBookings.slice(0, 4).map((booking) => (
               <MobileBookingCard key={booking._id} booking={booking} onUpdate={fetchDashboardData} />
@@ -166,18 +166,18 @@ function DefaultSalonDashboard() {
             recentBookings.map((booking) => (
               <div
                 key={booking._id}
-                className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-zinc-50/50 transition"
+                className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-gray-50/50 transition"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-zinc-900 text-sm">{booking.customerName}</p>
-                  <p className="text-[13px] text-zinc-500">{booking.serviceName || booking.service?.name || 'Service'}</p>
+                  <p className="font-medium text-gray-900 text-sm">{booking.customerName}</p>
+                  <p className="text-[13px] text-gray-500">{booking.serviceName || booking.service?.name || 'Service'}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="flex items-center gap-1.5 text-sm text-zinc-700 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                  <p className="flex items-center gap-1.5 text-sm text-gray-700 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-gray-400" />
                     {new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                   </p>
-                  <p className="text-xs text-zinc-400 mt-0.5">
+                  <p className="text-xs text-gray-400 mt-0.5">
                     {new Date(booking.bookingDate).toLocaleDateString('de-DE')}
                   </p>
                 </div>
@@ -189,25 +189,25 @@ function DefaultSalonDashboard() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-zinc-900">Schnellaktionen</h2>
+        <h2 className="text-base font-semibold text-gray-900">Schnellaktionen</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { title: 'Neuer Service', desc: 'Service hinzufügen', link: '/dashboard/services', icon: <Plus className="w-5 h-5 text-zinc-600" /> },
-            { title: 'Mitarbeiter', desc: 'Team verwalten', link: '/dashboard/employees', icon: <Users className="w-5 h-5 text-zinc-600" /> },
-            { title: 'Buchungs-Widget', desc: 'Online buchen', link: '/dashboard/widget', icon: <Briefcase className="w-5 h-5 text-zinc-600" /> },
-            { title: 'Einstellungen', desc: 'Studio anpassen', link: '/dashboard/settings', icon: <Settings className="w-5 h-5 text-zinc-600" /> }
+            { title: 'Neuer Service', desc: 'Service hinzufügen', link: '/dashboard/services', icon: <Plus className="w-5 h-5 text-gray-600" /> },
+            { title: 'Mitarbeiter', desc: 'Team verwalten', link: '/dashboard/employees', icon: <Users className="w-5 h-5 text-gray-600" /> },
+            { title: 'Buchungs-Widget', desc: 'Online buchen', link: '/dashboard/widget', icon: <Briefcase className="w-5 h-5 text-gray-600" /> },
+            { title: 'Einstellungen', desc: 'Studio anpassen', link: '/dashboard/settings', icon: <Settings className="w-5 h-5 text-gray-600" /> }
           ].map((action) => (
             <Link
               key={action.title}
               to={action.link}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white border border-zinc-200 hover:border-zinc-300 hover:shadow-sm transition group"
+              className="flex items-center gap-3 p-4 rounded-xl bg-white border border-gray-200 hover:border-gray-300 hover:shadow-sm transition group"
             >
-              <div className="w-10 h-10 rounded-lg bg-zinc-50 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
                 {action.icon}
               </div>
               <div>
-                <p className="text-sm font-medium text-zinc-900">{action.title}</p>
-                <p className="text-xs text-zinc-400">{action.desc}</p>
+                <p className="text-sm font-medium text-gray-900">{action.title}</p>
+                <p className="text-xs text-gray-400">{action.desc}</p>
               </div>
             </Link>
           ))}
@@ -223,7 +223,7 @@ function getStatusBadge(status) {
   const badges = {
     confirmed: { text: 'Bestätigt', bg: 'bg-emerald-50 text-emerald-700' },
     pending: { text: 'Ausstehend', bg: 'bg-amber-50 text-amber-700' },
-    completed: { text: 'Abgeschlossen', bg: 'bg-blue-50 text-blue-700' },
+    completed: { text: 'Abgeschlossen', bg: 'bg-gray-50 text-gray-700' },
     cancelled: { text: 'Storniert', bg: 'bg-red-50 text-red-700' },
     no_show: { text: 'Nicht erschienen', bg: 'bg-orange-50 text-orange-700' }
   };

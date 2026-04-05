@@ -61,47 +61,47 @@ const CEODashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900">CEO Dashboard</h1>
-          <p className="text-zinc-500 mt-2">System Overview - {user.name}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">CEO Dashboard</h1>
+          <p className="text-gray-500 mt-2">System Overview - {user.name}</p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-zinc-500">Unternehmen</p>
-                <p className="text-3xl font-bold text-zinc-900">{stats.totalSalons}</p>
+                <p className="text-sm text-gray-500">Unternehmen</p>
+                <p className="text-2xl font-semibold tracking-tight text-gray-900">{stats.totalSalons}</p>
               </div>
-              <BuildingStorefrontIcon className="h-12 w-12 text-blue-500" />
+              <BuildingStorefrontIcon className="h-12 w-12 text-gray-600" />
             </div>
           </div>
 
-          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-zinc-500">Total Users</p>
-                <p className="text-3xl font-bold text-zinc-900">{stats.totalUsers}</p>
+                <p className="text-sm text-gray-500">Total Users</p>
+                <p className="text-2xl font-semibold tracking-tight text-gray-900">{stats.totalUsers}</p>
               </div>
               <UsersIcon className="h-12 w-12 text-green-500" />
             </div>
           </div>
 
-          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-zinc-500">Monthly Revenue</p>
-                <p className="text-3xl font-bold text-zinc-900">€{stats.monthlyRevenue}</p>
+                <p className="text-sm text-gray-500">Monthly Revenue</p>
+                <p className="text-2xl font-semibold tracking-tight text-gray-900">€{stats.monthlyRevenue}</p>
               </div>
               <CurrencyEuroIcon className="h-12 w-12 text-yellow-500" />
             </div>
           </div>
 
-          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-zinc-500">Active Subs</p>
-                <p className="text-3xl font-bold text-zinc-900">{stats.activeSubscriptions}</p>
+                <p className="text-sm text-gray-500">Active Subs</p>
+                <p className="text-2xl font-semibold tracking-tight text-gray-900">{stats.activeSubscriptions}</p>
               </div>
               <ChartBarIcon className="h-12 w-12 text-purple-500" />
             </div>
@@ -114,7 +114,7 @@ const CEODashboard = () => {
           {atRiskSummary.total > 0 && (
             <div className="bg-gradient-to-br from-red-900/30 to-zinc-50 rounded-lg p-6 border border-red-500/30">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                   <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
                   Churn-Risiko Studios
                 </h2>
@@ -128,11 +128,11 @@ const CEODashboard = () => {
               
               <div className="flex gap-4 mb-4">
                 <div className="bg-red-500/20 rounded-lg px-4 py-2">
-                  <p className="text-2xl font-bold text-red-600">{atRiskSummary.highRisk}</p>
+                  <p className="text-xl font-semibold tracking-tight text-red-600">{atRiskSummary.highRisk}</p>
                   <p className="text-xs text-red-600">Hohes Risiko</p>
                 </div>
                 <div className="bg-yellow-500/20 rounded-lg px-4 py-2">
-                  <p className="text-2xl font-bold text-yellow-600">{atRiskSummary.total - atRiskSummary.highRisk}</p>
+                  <p className="text-xl font-semibold tracking-tight text-yellow-600">{atRiskSummary.total - atRiskSummary.highRisk}</p>
                   <p className="text-xs text-yellow-600">Beobachten</p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ const CEODashboard = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-zinc-900">{studio.name}</p>
+                        <p className="font-medium text-gray-900">{studio.name}</p>
                         <p className="text-xs opacity-75">{studio.riskFactors?.join(' • ')}</p>
                       </div>
                       <span className="text-xs font-semibold px-2 py-1 rounded bg-white/30">
@@ -159,27 +159,27 @@ const CEODashboard = () => {
           )}
 
           {/* Management Actions */}
-          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
-            <h2 className="text-xl font-semibold text-zinc-900 mb-4">System Management</h2>
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">System Management</h2>
             <div className="grid grid-cols-2 gap-4">
-              <Link to="/ceo/companies" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-blue-500 transition-colors">
-                <BuildingStorefrontIcon className="h-6 w-6 text-blue-500 mr-3" />
-                <span className="font-medium text-zinc-900">Unternehmen</span>
+              <Link to="/ceo/companies" className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-200 transition-colors">
+                <BuildingStorefrontIcon className="h-6 w-6 text-gray-600 mr-3" />
+                <span className="font-medium text-gray-900">Unternehmen</span>
               </Link>
 
-              <Link to="/ceo/users" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-green-500 transition-colors">
+              <Link to="/ceo/users" className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-green-500 transition-colors">
                 <UsersIcon className="h-6 w-6 text-green-500 mr-3" />
-                <span className="font-medium text-zinc-900">Users</span>
+                <span className="font-medium text-gray-900">Users</span>
               </Link>
 
-              <Link to="/ceo/payments" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-yellow-500 transition-colors">
+              <Link to="/ceo/payments" className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-yellow-500 transition-colors">
                 <CurrencyEuroIcon className="h-6 w-6 text-yellow-500 mr-3" />
-                <span className="font-medium text-zinc-900">Billing</span>
+                <span className="font-medium text-gray-900">Billing</span>
               </Link>
 
-              <Link to="/ceo/analytics" className="flex items-center p-4 bg-white border border-zinc-200 rounded-lg hover:border-purple-500 transition-colors">
+              <Link to="/ceo/analytics" className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-purple-500 transition-colors">
                 <ChartBarIcon className="h-6 w-6 text-purple-500 mr-3" />
-                <span className="font-medium text-zinc-900">Analytics</span>
+                <span className="font-medium text-gray-900">Analytics</span>
               </Link>
             </div>
           </div>

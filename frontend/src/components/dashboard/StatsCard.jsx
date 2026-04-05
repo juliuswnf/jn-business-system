@@ -24,9 +24,9 @@ const StatsCard = ({
   icon: Icon,
   trend = null,
   trendText = 'vs last period',
-  backgroundColor = 'bg-blue-50',
-  textColor = 'text-blue-600',
-  iconColor = 'text-blue-500',
+  backgroundColor = 'bg-gray-50',
+  textColor = 'text-gray-700',
+  iconColor = 'text-gray-600',
   onClick = null,
   className = ''
 }) => {
@@ -37,7 +37,7 @@ const StatsCard = ({
   return (
     <div
       onClick={onClick}
-      className={`${backgroundColor} rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow ${
+      className={`${backgroundColor} rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
     >
@@ -64,7 +64,7 @@ const StatsCard = ({
               <span className={`${trendColor} text-xs font-semibold`}>
                 {isTrendPositive ? '+' : ''}{trend}%
               </span>
-              <span className="text-zinc-400 text-xs">{trendText}</span>
+              <span className="text-gray-400 text-xs">{trendText}</span>
             </div>
           )}
         </div>

@@ -39,7 +39,7 @@ const PaymentProvider = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 py-12 px-4">
+    <div className="min-h-screen bg-white text-gray-900 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-center">Payment</h1>
 
@@ -52,17 +52,17 @@ const PaymentProvider = () => {
         )}
 
         {paymentState.status === 'processing' && (
-          <div className="bg-blue-900 border border-blue-600 rounded-lg p-8 text-center">
-            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="bg-gray-900 border border-gray-100 rounded-2xl p-8 text-center">
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-lg">Processing payment...</p>
-            <p className="text-zinc-900 mt-2">Amount: ${paymentState.amount}</p>
+            <p className="text-gray-900 mt-2">Amount: ${paymentState.amount}</p>
           </div>
         )}
 
         {paymentState.status === 'success' && (
-          <div className="bg-green-50 border border-green-600 rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">✓ Payment Successful!</h2>
-            <p className="text-zinc-900 mb-6">Order ID: {paymentState.orderId}</p>
+          <div className="bg-green-50 border border-green-600 rounded-xl p-8 text-center">
+            <h2 className="text-xl font-semibold tracking-tight mb-4">✓ Payment Successful!</h2>
+            <p className="text-gray-900 mb-6">Order ID: {paymentState.orderId}</p>
             <p className="text-lg mb-6">Amount Paid: ${paymentState.amount}</p>
             <a
               href="/customer/booking"
@@ -74,8 +74,8 @@ const PaymentProvider = () => {
         )}
 
         {paymentState.status === 'error' && (
-          <div className="bg-red-50 border border-red-600 rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">✗ Payment Failed</h2>
+          <div className="bg-red-50 border border-red-600 rounded-xl p-8 text-center">
+            <h2 className="text-xl font-semibold tracking-tight mb-4">✗ Payment Failed</h2>
             <p className="text-red-600 mb-6">{paymentState.errorMessage}</p>
             <button
               onClick={() => setPaymentState({ status: 'idle', amount: 0, orderId: null, errorMessage: null })}

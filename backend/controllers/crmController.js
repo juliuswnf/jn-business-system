@@ -96,7 +96,7 @@ export const getCustomers = async (req, res) => {
     aggregation.push({ $skip: skip });
     aggregation.push({ $limit: parseInt(limit, 10) });
 
-    const customers = await Booking.aggregate(aggregation).maxTimeMS(5000);
+    const customers = await Booking.aggregate(aggregation).option({ maxTimeMS: 5000 });
 
     // Get total count
     const countAggregation = [
@@ -104,7 +104,7 @@ export const getCustomers = async (req, res) => {
       { $group: { _id: '$customerEmail' } },
       { $count: 'total' }
     ];
-    const countResult = await Booking.aggregate(countAggregation).maxTimeMS(5000);
+    const countResult = await Booking.aggregate(countAggregation).option({ maxTimeMS: 5000 });
     const totalCount = countResult[0]?.total || 0;
 
     res.status(200).json({
@@ -256,7 +256,7 @@ export const getCRMStats = async (req, res) => {
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     // Total unique customers
-    const totalCustomers = await Booking.distinct('customerEmail', { salonId }).maxTimeMS(5000);
+    const totalCustomers = await Booking.distinct('customerEmail', { salonId });
 
     // New customers this month
     const newThisMonth = await Booking.aggregate([
@@ -264,7 +264,7 @@ export const getCRMStats = async (req, res) => {
       { $group: { _id: '$customerEmail', firstBooking: { $min: '$bookingDate' } } },
       { $match: { firstBooking: { $gte: startOfMonth } } },
       { $count: 'count' }
-    ]).maxTimeMS(5000);
+    ]).option({ maxTimeMS: 5000 });
 
     // New customers last month
     const newLastMonth = await Booking.aggregate([
@@ -272,7 +272,7 @@ export const getCRMStats = async (req, res) => {
       { $group: { _id: '$customerEmail', firstBooking: { $min: '$bookingDate' } } },
       { $match: { firstBooking: { $gte: startOfLastMonth, $lte: endOfLastMonth } } },
       { $count: 'count' }
-    ]).maxTimeMS(5000);
+    ]).option({ maxTimeMS: 5000 });
 
     // Customer tiers breakdown
     const tierBreakdown = await Booking.aggregate([
@@ -299,7 +299,7 @@ export const getCRMStats = async (req, res) => {
         }
       },
       { $group: { _id: '$tier', count: { $sum: 1 } } }
-    ]).maxTimeMS(5000);
+    ]).option({ maxTimeMS: 5000 });
 
     const tiers = { vip: 0, gold: 0, regular: 0, new: 0 };
     tierBreakdown.forEach(t => { tiers[t._id] = t.count; });
@@ -309,7 +309,7 @@ export const getCRMStats = async (req, res) => {
       { $match: { salonId, status: 'completed' } },
       { $group: { _id: '$customerEmail', totalSpent: { $sum: '$totalPrice' } } },
       { $group: { _id: null, avgLTV: { $avg: '$totalSpent' } } }
-    ]).maxTimeMS(5000);
+    ]).option({ maxTimeMS: 5000 });
 
     // Top 5 customers by revenue
     const topCustomers = await Booking.aggregate([
@@ -324,7 +324,7 @@ export const getCRMStats = async (req, res) => {
       },
       { $sort: { totalSpent: -1 } },
       { $limit: 5 }
-    ]).maxTimeMS(5000);
+    ]).option({ maxTimeMS: 5000 });
 
     res.status(200).json({
       success: true,

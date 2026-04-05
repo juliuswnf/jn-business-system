@@ -90,14 +90,14 @@ export default function WidgetSetup() {
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2">Widget Setup</h1>
+        <h1 className="text-2xl md:text-2xl font-semibold tracking-tight text-gray-900 mb-2">Widget Setup</h1>
         <p className="text-slate-400 text-sm md:text-base">
           Konfiguriere dein Buchungs-Widget und bette es in deine Website ein
         </p>
         <div className="mt-4">
           <Link
             to="/dashboard/widget/live-preview"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 hover:bg-gray-900 text-white transition"
           >
             <Eye className="w-4 h-4" />
             Live Preview auf separater Seite öffnen
@@ -109,19 +109,19 @@ export default function WidgetSetup() {
         {/* Configuration Panel */}
         <div className="space-y-6">
           {/* Colors */}
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-            <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center">
-                  <Palette className="w-5 h-5 text-zinc-500" />
+                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+                  <Palette className="w-5 h-5 text-gray-500" />
                 </div>
-                <h2 className="text-lg font-semibold text-zinc-900">Farben</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Farben</h2>
               </div>
             </div>
             <div className="p-4 md:p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Primärfarbe</label>
+                  <label className="block text-sm text-gray-400 mb-2">Primärfarbe</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
@@ -133,13 +133,13 @@ export default function WidgetSetup() {
                       type="text"
                       value={config.primaryColor}
                       onChange={(e) => setConfig({ ...config, primaryColor: e.target.value })}
-                      className="flex-1 px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
+                      className="flex-1 px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Hintergrund</label>
+                  <label className="block text-sm text-gray-400 mb-2">Hintergrund</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
@@ -151,13 +151,13 @@ export default function WidgetSetup() {
                       type="text"
                       value={config.backgroundColor}
                       onChange={(e) => setConfig({ ...config, backgroundColor: e.target.value })}
-                      className="flex-1 px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
+                      className="flex-1 px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Akzentfarbe</label>
+                  <label className="block text-sm text-gray-400 mb-2">Akzentfarbe</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
@@ -169,7 +169,7 @@ export default function WidgetSetup() {
                       type="text"
                       value={config.accentColor}
                       onChange={(e) => setConfig({ ...config, accentColor: e.target.value })}
-                      className="flex-1 px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
+                      className="flex-1 px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm"
                     />
                   </div>
                 </div>
@@ -178,41 +178,41 @@ export default function WidgetSetup() {
           </div>
 
           {/* Text Settings */}
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-            <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center">
-                  <Type className="w-5 h-5 text-zinc-500" />
+                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+                  <Type className="w-5 h-5 text-gray-500" />
                 </div>
-                <h2 className="text-lg font-semibold text-zinc-900">Texte</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Texte</h2>
               </div>
             </div>
             <div className="p-4 md:p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Überschrift</label>
+                  <label className="block text-sm text-gray-400 mb-2">Überschrift</label>
                   <input
                     type="text"
                     value={config.headerText}
                     onChange={(e) => setConfig({ ...config, headerText: e.target.value })}
-                    className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900"
                     placeholder="Online Terminbuchung"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Button-Text</label>
+                  <label className="block text-sm text-gray-400 mb-2">Button-Text</label>
                   <input
                     type="text"
                     value={config.buttonText}
                     onChange={(e) => setConfig({ ...config, buttonText: e.target.value })}
-                    className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900"
                     placeholder="Termin buchen"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Border Radius (px)</label>
+                  <label className="block text-sm text-gray-400 mb-2">Border Radius (px)</label>
                   <input
                     type="range"
                     min="0"
@@ -221,40 +221,40 @@ export default function WidgetSetup() {
                     onChange={(e) => setConfig({ ...config, borderRadius: e.target.value })}
                     className="w-full"
                   />
-                  <span className="text-zinc-500 text-sm">{config.borderRadius}px</span>
+                  <span className="text-gray-500 text-sm">{config.borderRadius}px</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Services Selection */}
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-            <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center">
-                  <Image className="w-5 h-5 text-zinc-500" />
+                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+                  <Image className="w-5 h-5 text-gray-500" />
                 </div>
-                <h2 className="text-lg font-semibold text-zinc-900">Services auswählen</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Services auswählen</h2>
               </div>
             </div>
             <div className="p-4 md:p-6">
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {services.length === 0 ? (
-                  <p className="text-zinc-500 text-sm">Keine Services verfügbar</p>
+                  <p className="text-gray-500 text-sm">Keine Services verfügbar</p>
                 ) : (
                   services.map((service) => (
                     <label
                       key={service._id}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-zinc-50 hover:bg-zinc-100 cursor-pointer transition"
+                      className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer transition"
                     >
                       <input
                         type="checkbox"
                         checked={config.selectedServices.includes(service._id)}
                         onChange={() => toggleService(service._id)}
-                        className="w-4 h-4 rounded border-zinc-200 bg-zinc-100 text-blue-500 focus:ring-blue-500"
+                        className="w-4 h-4 rounded border-gray-200 bg-gray-100 text-gray-600 focus:ring-gray-100"
                       />
-                      <span className="text-zinc-900">{service.name}</span>
-                      <span className="text-zinc-500 text-sm ml-auto">{service.duration} Min</span>
+                      <span className="text-gray-900">{service.name}</span>
+                      <span className="text-gray-500 text-sm ml-auto">{service.duration} Min</span>
                     </label>
                   ))
                 )}
@@ -263,33 +263,33 @@ export default function WidgetSetup() {
           </div>
 
           {/* Embed Code */}
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-            <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center">
-                  <Code className="w-5 h-5 text-zinc-500" />
+                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+                  <Code className="w-5 h-5 text-gray-500" />
                 </div>
-                <h2 className="text-lg font-semibold text-zinc-900">Embed Code</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Embed Code</h2>
               </div>
             </div>
             <div className="p-4 md:p-6">
               <div className="relative">
-                <pre className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 text-sm text-zinc-300 overflow-x-auto">
+                <pre className="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm text-gray-300 overflow-x-auto">
                   <code>{embedCode}</code>
                 </pre>
                 <button
                   onClick={handleCopy}
-                  className="absolute top-3 right-3 p-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 transition"
+                  className="absolute top-3 right-3 p-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition"
                 >
                   {copied ? (
                     <Check className="w-4 h-4 text-green-600" />
                   ) : (
-                    <Copy className="w-4 h-4 text-zinc-400" />
+                    <Copy className="w-4 h-4 text-gray-400" />
                   )}
                 </button>
               </div>
 
-              <p className="mt-3 text-sm text-zinc-500">
+              <p className="mt-3 text-sm text-gray-500">
                 Kopiere diesen Code und füge ihn in deine Website ein, wo das Widget erscheinen soll.
               </p>
             </div>
@@ -298,7 +298,7 @@ export default function WidgetSetup() {
           {/* Save Button */}
           <button
             onClick={handleSave}
-            className="w-full py-3 px-6 rounded-full bg-white text-black font-semibold hover:bg-zinc-200 transition"
+            className="w-full py-3 px-6 rounded-full bg-white text-black font-semibold hover:bg-gray-200 transition"
           >
             Konfiguration speichern
           </button>
@@ -306,19 +306,19 @@ export default function WidgetSetup() {
 
         {/* Live Preview */}
         <div className="xl:sticky xl:top-8 xl:self-start">
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-            <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-zinc-500" />
+                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center">
+                  <Eye className="w-5 h-5 text-gray-500" />
                 </div>
-                <h2 className="text-lg font-semibold text-zinc-900">Live Preview</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Live Preview</h2>
               </div>
             </div>
             <div className="p-4 md:p-6">
               {/* Widget Preview */}
               <div
-                className="border border-zinc-200 overflow-hidden"
+                className="border border-gray-200 overflow-hidden"
                 style={{
                   backgroundColor: config.backgroundColor,
                   borderRadius: `${config.borderRadius}px`
@@ -336,7 +336,7 @@ export default function WidgetSetup() {
                     {services.filter(s => config.selectedServices.includes(s._id)).slice(0, 3).map((service) => (
                       <div
                         key={service._id}
-                        className="p-3 rounded-lg border"
+                        className="p-3 rounded-xl border"
                         style={{
                           borderColor: config.accentColor + '40',
                           borderRadius: `${Math.max(4, config.borderRadius - 4)}px`
@@ -368,7 +368,7 @@ export default function WidgetSetup() {
                 </div>
               </div>
 
-              <p className="mt-4 text-xs text-zinc-500 text-center">
+              <p className="mt-4 text-xs text-gray-500 text-center">
                 So wird dein Widget auf deiner Website aussehen
               </p>
             </div>

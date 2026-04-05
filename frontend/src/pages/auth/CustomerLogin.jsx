@@ -80,22 +80,22 @@ const CustomerLogin = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-1">Kundenlogin</h1>
-          <p className="text-zinc-500">Melden Sie sich an, um Ihre Termine zu verwalten</p>
+          <h1 className="text-2xl font-semibold tracking-tight mb-1">Kundenlogin</h1>
+          <p className="text-gray-500">Melden Sie sich an, um Ihre Termine zu verwalten</p>
         </div>
 
         <div className="card p-6">
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-500 rounded-lg text-red-600 text-sm">
+            <div className="mb-4 p-4 bg-red-50 border border-red-500 rounded-xl text-red-600 text-sm">
               <span className="font-medium">Fehler:</span> {error}
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-2">E‑Mail Adresse</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">E‑Mail Adresse</label>
               <input
                 type="email"
                 id="email"
@@ -108,7 +108,7 @@ const CustomerLogin = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-zinc-700 mb-2">Passwort</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Passwort</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -122,7 +122,7 @@ const CustomerLogin = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-700 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                   aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
                 >
                   {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
@@ -136,11 +136,11 @@ const CustomerLogin = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-600 bg-zinc-50 text-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-0 focus:ring-offset-white cursor-pointer transition-colors"
+                  className="w-4 h-4 rounded border-gray-600 bg-gray-50 text-gray-900 focus:ring-2 focus:ring-gray-100 focus:ring-offset-0 focus:ring-offset-white cursor-pointer transition-colors"
                 />
-                <span className="ml-2 text-zinc-500 group-hover:text-zinc-600 transition-colors">Angemeldet bleiben</span>
+                <span className="ml-2 text-gray-500 group-hover:text-gray-600 transition-colors">Angemeldet bleiben</span>
               </label>
-              <Link to="/forgot-password?role=customer" className="text-zinc-700 hover:text-zinc-900 transition-colors">Passwort vergessen?</Link>
+              <Link to="/forgot-password?role=customer" className="text-gray-700 hover:text-gray-900 transition-colors">Passwort vergessen?</Link>
             </div>
 
             <button
@@ -154,11 +154,11 @@ const CustomerLogin = () => {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-zinc-500">Noch kein Konto? <Link to="/register/customer" className="text-zinc-900 font-semibold">Jetzt registrieren</Link></p>
+          <p className="text-gray-500">Noch kein Konto? <Link to="/register/customer" className="text-gray-900 font-semibold">Jetzt registrieren</Link></p>
         </div>
 
         <div className="mt-4 text-center">
-          <Link to="/login" className="text-sm text-zinc-400 hover:text-zinc-500">← Zurück zur Auswahl</Link>
+          <Link to="/login" className="text-sm text-gray-400 hover:text-gray-500">← Zurück zur Auswahl</Link>
         </div>
       </div>
     </div>

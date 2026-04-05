@@ -16,7 +16,8 @@ import {
   Edit,
   Trash2,
   BarChart3,
-  Users
+  Users,
+  Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -110,7 +111,7 @@ const Marketing = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -119,11 +120,11 @@ const Marketing = () => {
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2 flex items-center gap-3">
-          <Mail className="w-8 h-8 text-cyan-500" />
+        <h1 className="text-2xl md:text-2xl font-semibold tracking-tight text-gray-900 mb-2 flex items-center gap-3">
+          <Mail className="w-8 h-8 text-gray-900" />
           Marketing Automation
         </h1>
-        <p className="text-zinc-500">Automatische SMS-Kampagnen für mehr Umsatz</p>
+        <p className="text-gray-500">Automatische SMS-Kampagnen für mehr Umsatz</p>
       </div>
 
       {/* Stats Cards */}
@@ -161,52 +162,52 @@ const Marketing = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4 mb-8"
+          className="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-8"
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-cyan-400">
+              <h3 className="font-semibold text-gray-900">
                 {limits.tier.charAt(0).toUpperCase() + limits.tier.slice(1)} Tier
               </h3>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-gray-600">
                 {limits.activeCampaigns} / {limits.maxActiveCampaigns} aktive Kampagnen ·
                 {' '}{limits.smsUsed} / {limits.smsLimit} SMS diesen Monat
               </p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-cyan-400">{limits.smsRemaining}</div>
-              <div className="text-sm text-zinc-600">SMS übrig</div>
+              <div className="text-xl font-semibold tracking-tight text-gray-900">{limits.smsRemaining}</div>
+              <div className="text-sm text-gray-600">SMS übrig</div>
             </div>
           </div>
         </motion.div>
       )}
 
       {/* Tabs */}
-      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden mb-6">
-        <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden mb-6">
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <MessageSquare className="w-6 h-6 text-zinc-500" />
-            <span className="font-semibold text-zinc-900">Marketing</span>
+            <MessageSquare className="w-6 h-6 text-gray-500" />
+            <span className="font-semibold text-gray-900">Marketing</span>
           </div>
         </div>
         <div className="p-6">
           <div className="flex space-x-2 mb-6">
             <button
               onClick={() => setActiveTab('templates')}
-              className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
+              className={`px-6 py-2 rounded-xl font-semibold transition-colors ${
                 activeTab === 'templates'
-                  ? 'bg-cyan-500 text-black'
-                  : 'bg-zinc-50 border border-zinc-200 text-zinc-600 hover:border-cyan-500/30'
+                  ? 'bg-gray-900 text-black'
+                  : 'bg-gray-50 border border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
               <FileText className="w-4 h-4 inline mr-2" /> Templates
             </button>
             <button
               onClick={() => setActiveTab('campaigns')}
-              className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
+              className={`px-6 py-2 rounded-xl font-semibold transition-colors ${
                 activeTab === 'campaigns'
-                  ? 'bg-cyan-500 text-black'
-                  : 'bg-zinc-50 border border-zinc-200 text-zinc-600 hover:border-cyan-500/30'
+                  ? 'bg-gray-900 text-black'
+                  : 'bg-gray-50 border border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
               <Rocket className="w-4 h-4 inline mr-2" /> Meine Kampagnen ({(campaigns || []).length})
@@ -229,42 +230,42 @@ const Marketing = () => {
 
       {/* Campaigns Tab */}
       {activeTab === 'campaigns' && (
-        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-          <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-sm overflow-hidden">
+          <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
             <div className="flex items-center gap-3">
-              <MessageSquare className="w-6 h-6 text-zinc-500" />
-              <span className="font-semibold text-zinc-900">Meine Kampagnen</span>
+              <MessageSquare className="w-6 h-6 text-gray-500" />
+              <span className="font-semibold text-gray-900">Meine Kampagnen</span>
             </div>
           </div>
           <div className="p-6">
             {(campaigns || []).length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-zinc-50 border border-zinc-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MessageSquare className="w-8 h-8 text-zinc-500" />
+                <div className="w-16 h-16 bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-8 h-8 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-semibold text-zinc-900 mb-2">Keine Kampagnen</h3>
-                <p className="text-zinc-500 mb-6">Erstelle deine erste Marketing-Kampagne</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Keine Kampagnen</h3>
+                <p className="text-gray-500 mb-6">Erstelle deine erste Marketing-Kampagne</p>
                 <button
                   onClick={() => setActiveTab('templates')}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-black px-6 py-2 rounded-lg font-semibold transition"
+                  className="bg-gray-900 hover:bg-gray-900 text-black px-6 py-2 rounded-xl font-semibold transition"
                 >
                   Templates ansehen
                 </button>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-zinc-200">
-                  <thead className="bg-zinc-50/50">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50/50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Typ</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Stats</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">ROI</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-zinc-500 uppercase">Aktionen</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stats</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aktionen</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-zinc-50 divide-y divide-zinc-200">
+                  <tbody className="bg-gray-50 divide-y divide-gray-200">
                     {(campaigns || []).map((campaign) => (
                       <CampaignRow
                         key={campaign._id}
@@ -292,9 +293,9 @@ const Marketing = () => {
 // Stat Card Component
 const StatCard = ({ icon, label, value, subtext, color }) => {
   const colors = {
-    blue: 'bg-cyan-500/10 text-cyan-400',
+    blue: 'bg-gray-50 text-gray-900',
     green: 'bg-green-500/10 text-green-600',
-    purple: 'bg-purple-500/10 text-purple-400',
+    purple: 'bg-gray-100/10 text-gray-700',
     orange: 'bg-yellow-500/10 text-yellow-600'
   };
 
@@ -302,16 +303,16 @@ const StatCard = ({ icon, label, value, subtext, color }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-zinc-50 border border-zinc-200 rounded-lg p-6"
+      className="bg-gray-50 border border-gray-100 rounded-2xl p-6"
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${colors[color]}`}>
+        <div className={`p-3 rounded-xl ${colors[color]}`}>
           {icon}
         </div>
       </div>
-      <div className="text-2xl font-bold text-zinc-900 mb-1">{value}</div>
-      <div className="text-sm text-zinc-500">{label}</div>
-      {subtext && <div className="text-xs text-zinc-400 mt-1">{subtext}</div>}
+      <div className="text-xl font-semibold tracking-tight text-gray-900 mb-1">{value}</div>
+      <div className="text-sm text-gray-500">{label}</div>
+      {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </motion.div>
   );
 };
@@ -322,7 +323,7 @@ const TemplateCard = ({ template, onActivate, canActivate }) => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-zinc-50 border border-zinc-200 rounded-lg hover:border-cyan-500/30 transition p-6"
+      className="bg-gray-50 border border-gray-100 rounded-2xl hover:border-gray-300 transition p-6"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="text-4xl">{template.icon}</div>
@@ -334,31 +335,31 @@ const TemplateCard = ({ template, onActivate, canActivate }) => {
         )}
       </div>
 
-      <h3 className="text-lg font-semibold text-zinc-900 mb-2">{template.name}</h3>
-      <p className="text-sm text-zinc-500 mb-4">{template.description}</p>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">{template.name}</h3>
+      <p className="text-sm text-gray-500 mb-4">{template.description}</p>
 
       <div className="space-y-2 mb-4">
         <div className="flex justify-between text-sm">
-          <span className="text-zinc-500">Tier:</span>
-          <span className="font-medium text-zinc-900 capitalize">{template.tier}</span>
+          <span className="text-gray-500">Tier:</span>
+          <span className="font-medium text-gray-900 capitalize">{template.tier}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-zinc-500">ROI:</span>
+          <span className="text-gray-500">ROI:</span>
           <span className="font-medium text-green-600">{template.estimatedROI}%</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-zinc-500">Conversion:</span>
-          <span className="font-medium text-cyan-400">{template.estimatedConversionRate}%</span>
+          <span className="text-gray-500">Conversion:</span>
+          <span className="font-medium text-gray-900">{template.estimatedConversionRate}%</span>
         </div>
       </div>
 
       <button
         onClick={() => onActivate(template)}
         disabled={!canActivate}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition ${
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold transition ${
           canActivate
-            ? 'bg-cyan-500 text-black hover:bg-cyan-600'
-            : 'bg-zinc-50 text-zinc-400 cursor-not-allowed'
+            ? 'bg-gray-900 text-black hover:bg-gray-900'
+            : 'bg-gray-50 text-gray-400 cursor-not-allowed'
         }`}
       >
         <Plus className="w-4 h-4" />
@@ -373,16 +374,16 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
   const statusColors = {
     active: 'bg-green-500/20 text-green-600',
     paused: 'bg-yellow-500/20 text-yellow-600',
-    draft: 'bg-gray-500/20 text-zinc-500'
+    draft: 'bg-gray-500/20 text-gray-500'
   };
 
   return (
-    <tr className="hover:bg-zinc-100/50 transition">
+    <tr className="hover:bg-gray-100/50 transition">
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-medium text-zinc-900">{campaign.name}</div>
+        <div className="text-sm font-medium text-gray-900">{campaign.name}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-zinc-500 capitalize">
+        <div className="text-sm text-gray-500 capitalize">
           {campaign.type?.replace('_', ' ') || 'N/A'}
         </div>
       </td>
@@ -392,10 +393,10 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-zinc-900">
+        <div className="text-sm text-gray-900">
           {campaign.stats?.totalSent || 0} versendet
         </div>
-        <div className="text-xs text-zinc-500">
+        <div className="text-xs text-gray-500">
           {campaign.stats?.totalBooked || 0} conversions
         </div>
       </td>
@@ -403,7 +404,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
         <div className="text-sm font-medium text-green-600">
           {campaign.roi || 0}%
         </div>
-        <div className="text-xs text-zinc-500">
+        <div className="text-xs text-gray-500">
           {campaign.stats?.totalRevenue?.toFixed(0) || 0}€
         </div>
       </td>
@@ -411,7 +412,7 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => onToggleStatus(campaign)}
-            className="text-zinc-500 hover:text-cyan-400 transition"
+            className="text-gray-500 hover:text-gray-900 transition"
             title={campaign.status === 'active' ? 'Pausieren' : 'Aktivieren'}
           >
             {campaign.status === 'active' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -419,14 +420,14 @@ const CampaignRow = ({ campaign, onToggleStatus, onRun, onEdit, onDelete, onView
           <button
             onClick={() => onRun(campaign)}
             disabled={campaign.status !== 'active'}
-            className="text-cyan-400 hover:text-cyan-300 disabled:text-zinc-500 transition"
+            className="text-gray-900 hover:text-gray-900 disabled:text-gray-500 transition"
             title="Manuell ausführen"
           >
             <Activity className="w-4 h-4" />
           </button>
           <button
             onClick={onViewAnalytics}
-            className="text-purple-400 hover:text-purple-300 transition"
+            className="text-gray-700 hover:text-gray-700 transition"
             title="Analytics"
           >
             <BarChart3 className="w-4 h-4" />

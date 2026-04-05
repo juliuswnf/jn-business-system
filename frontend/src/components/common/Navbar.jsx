@@ -71,14 +71,14 @@ export default function Navbar() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-slate-300 dark:text-slate-300 hover:text-accent dark:hover:text-accent hover:bg-secondary dark:hover:bg-slate-900/50 transition duration-200"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-slate-300 dark:text-slate-300 hover:text-accent dark:hover:text-accent hover:bg-secondary dark:hover:bg-slate-900/50 transition duration-200"
               >
                 <span className="text-sm hidden sm:inline">{user.name || 'Account'}</span>
                 <ChevronDownIcon className={`w-4 h-4 transition duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-secondary dark:bg-slate-900 border border-accent/20 dark:border-accent/10 rounded-lg shadow-lg shadow-accent/10 overflow-hidden animate-slide-in">
+                <div className="absolute right-0 mt-2 w-56 bg-secondary dark:bg-slate-900 border border-accent/20 dark:border-accent/10 rounded-xl shadow-lg shadow-accent/10 overflow-hidden animate-slide-in">
                   {user.role === 'ceo' && (
                     <Link
                       to="/ceo/dashboard"
@@ -129,7 +129,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/register"
-                className="px-4 sm:px-6 py-2 bg-accent hover:bg-accent-light text-primary font-semibold rounded-lg transition duration-200 shadow-lg shadow-accent/20 text-sm sm:text-base"
+                className="px-4 sm:px-6 py-2 bg-accent hover:bg-accent-light text-primary font-semibold rounded-xl transition duration-200 shadow-lg shadow-accent/20 text-sm sm:text-base"
               >
                 Get Started
               </Link>

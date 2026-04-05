@@ -259,10 +259,10 @@ export default function PublicBooking() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700 mx-auto"></div>
-          <p className="text-zinc-600 mt-4">Lade Buchungsoptionen...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-100 mx-auto"></div>
+          <p className="text-gray-600 mt-4">Lade Buchungsoptionen...</p>
         </div>
       </div>
     );
@@ -270,7 +270,7 @@ export default function PublicBooking() {
 
   if (!salonSlug) {
     return (
-      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600">Kein Salon angegeben. Bitte verwenden Sie einen gültigen Buchungslink.</p>
         </div>
@@ -297,7 +297,7 @@ export default function PublicBooking() {
                 rounded-full
                 text-sm md:text-base
                 transition
-                ${bookingStep === step.step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}
+                ${bookingStep === step.step ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'}
               `}
             >
               {index + 1}
@@ -365,10 +365,10 @@ export default function PublicBooking() {
         <div className="order-1">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-zinc-400">Datum wählen *</p>
+              <p className="text-sm text-gray-400">Datum wählen *</p>
               <h3 className="text-lg md:text-xl font-semibold">Kalender</h3>
             </div>
-            <span className="text-xs text-zinc-500">{salonInfo?.name || 'Salon'}</span>
+            <span className="text-xs text-gray-500">{salonInfo?.name || 'Salon'}</span>
           </div>
           {isMobile ? (
             <input
@@ -376,7 +376,7 @@ export default function PublicBooking() {
               min={toLocalDateString(new Date())}
               value={bookingData.date}
               onChange={(e) => handleDateSelect(e.target.value)}
-              className={`w-full p-4 text-lg border-2 rounded-2xl bg-white focus:border-blue-500 transition touch-manipulation ${bookingData.date ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}`}
+              className={`w-full p-4 text-lg border-2 rounded-2xl bg-white focus:border-gray-200 transition touch-manipulation ${bookingData.date ? 'border-gray-200 ring-2 ring-gray-100' : 'border-gray-200'}`}
             />
           ) : (
             <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
@@ -392,13 +392,13 @@ export default function PublicBooking() {
                     onClick={() => handleDateSelect(dateStr)}
                     className={`flex flex-col items-center rounded-2xl text-center px-2 py-3 text-sm transition ${
                       isActive
-                        ? 'bg-blue-50 text-blue-800 border-2 border-blue-500 ring-2 ring-blue-200'
-                        : 'bg-white text-gray-800 border border-gray-200 hover:border-blue-500'
+                        ? 'bg-gray-50 text-gray-800 border-2 border-gray-200 ring-2 ring-gray-100'
+                        : 'bg-white text-gray-800 border border-gray-200 hover:border-gray-200'
                     }`}
                   >
                     <span className="text-xs uppercase tracking-wider">{dayName}</span>
                     <span className="text-lg font-bold">{dayNum}</span>
-                    <span className="text-xs text-zinc-400">{monthName}</span>
+                    <span className="text-xs text-gray-400">{monthName}</span>
                   </button>
                 );
               })}
@@ -408,7 +408,7 @@ export default function PublicBooking() {
 
         <div className="order-2">
           <div className="mb-4">
-            <p className="text-sm text-zinc-400">Zeit auswählen *</p>
+            <p className="text-sm text-gray-400">Zeit auswählen *</p>
             <h3 className="text-lg md:text-xl font-semibold">Verfügbare Slots</h3>
           </div>
           <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 max-h-96 overflow-y-auto">
@@ -422,8 +422,8 @@ export default function PublicBooking() {
                   disabled={isBooked}
                   className={`
                     rounded-2xl px-3 py-2 text-sm md:text-base transition
-                    ${isBooked ? 'bg-gray-200 text-zinc-500 line-through' : ''}
-                    ${isSelected && !isBooked ? 'bg-blue-50 text-blue-800 border-2 border-blue-500 ring-2 ring-blue-200 font-semibold' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-blue-500'}
+                    ${isBooked ? 'bg-gray-200 text-gray-500 line-through' : ''}
+                    ${isSelected && !isBooked ? 'bg-gray-50 text-gray-800 border-2 border-gray-200 ring-2 ring-gray-100 font-semibold' : isBooked ? '' : 'bg-white border border-gray-200 hover:border-gray-200'}
                   `}
                 >
                   {slot}
@@ -432,7 +432,7 @@ export default function PublicBooking() {
             })}
           </div>
           {availabilityHint && (
-            <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+            <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800">
               {availabilityHint}
             </div>
           )}
@@ -465,7 +465,7 @@ export default function PublicBooking() {
           (bookingStep === 2 && (!bookingData.customerName || !bookingData.customerEmail || !bookingData.customerPhone)) ||
           submitting
         }
-        className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl bg-blue-600 text-zinc-900 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed touch-manipulation"
+        className="w-full sm:w-auto py-3 text-base font-semibold rounded-2xl bg-gray-900 text-gray-900 hover:bg-gray-900 disabled:opacity-60 disabled:cursor-not-allowed touch-manipulation"
       >
         {bookingStep === 3 ? (submitting ? 'Wird gebucht...' : 'Termin buchen') : 'Weiter'}
       </button>
@@ -482,17 +482,17 @@ export default function PublicBooking() {
             onClick={() => handleServiceSelect(service)}
             className={`
               w-full text-left rounded-2xl p-4 md:p-5 shadow-sm transition
-              ${isSelected ? 'border-2 border-blue-500 bg-blue-50' : 'border border-gray-200 bg-white hover:border-blue-500'}
+              ${isSelected ? 'border-2 border-gray-200 bg-gray-50' : 'border border-gray-200 bg-white hover:border-gray-200'}
             `}
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base md:text-lg font-semibold">{service.name}</h3>
-              <span className="text-sm text-zinc-400">{service.duration}</span>
+              <span className="text-sm text-gray-400">{service.duration}</span>
             </div>
-            <p className="text-sm text-zinc-500 mb-4">{service.description || 'Beschreibung folgt'}</p>
+            <p className="text-sm text-gray-500 mb-4">{service.description || 'Beschreibung folgt'}</p>
             <div className="flex items-center justify-between text-sm md:text-base">
-              <span className="text-zinc-400">Dauer</span>
-              <span className="font-semibold text-blue-600">{service.price}</span>
+              <span className="text-gray-400">Dauer</span>
+              <span className="font-semibold text-gray-700">{service.price}</span>
             </div>
           </button>
         );
@@ -503,20 +503,20 @@ export default function PublicBooking() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-6 md:px-8 md:py-10 lg:px-12 lg:py-12 text-gray-900">
       <div className="w-full mx-auto max-w-full md:max-w-4xl space-y-6">
-        <header className="bg-white text-zinc-900 rounded-2xl border border-zinc-200 shadow-sm p-6 md:p-8 flex flex-col gap-4">
+        <header className="bg-white text-gray-900 rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8 flex flex-col gap-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-300">Öffentlicher Termin</p>
-              <h1 className="text-3xl font-bold">Neuen Termin buchen</h1>
-              <p className="text-sm text-zinc-600 mt-1">Wähle deinen Wunsch-Salon und buche in wenigen Schritten.</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-400">Öffentlicher Termin</p>
+              <h1 className="text-2xl font-semibold tracking-tight">Neuen Termin buchen</h1>
+              <p className="text-sm text-gray-600 mt-1">Wähle deinen Wunsch-Salon und buche in wenigen Schritten.</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-zinc-500">Ausgewählter Salon</p>
+              <p className="text-sm text-gray-500">Ausgewählter Salon</p>
               <p className="text-lg font-semibold">{salonInfo?.name || 'Salon'}</p>
             </div>
           </div>
           {!isAuthenticated && (
-            <div className="bg-zinc-50 bg-opacity-70 border border-zinc-200 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row gap-3">
+            <div className="bg-gray-50 bg-opacity-70 border border-gray-100 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row gap-3">
               <Link
                 to={`/login?redirect=${encodeURIComponent(currentPathWithQuery)}`}
                 className="flex-1 text-center px-4 py-3 bg-white text-black rounded-full font-semibold hover:bg-gray-100 touch-manipulation"
@@ -529,7 +529,7 @@ export default function PublicBooking() {
                   const el = document.getElementById('booking-start');
                   el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="flex-1 text-center px-4 py-3 border border-zinc-200 text-zinc-900 rounded-full font-semibold hover:bg-zinc-100 touch-manipulation"
+                className="flex-1 text-center px-4 py-3 border border-gray-200 text-gray-900 rounded-full font-semibold hover:bg-gray-100 touch-manipulation"
               >
                 Ohne Anmeldung fortfahren
               </button>
@@ -543,15 +543,15 @@ export default function PublicBooking() {
           {bookingStep === 0 && (
             <div className="space-y-8">
               <div className="space-y-2">
-                <p className="text-sm text-zinc-400">Salon</p>
+                <p className="text-sm text-gray-400">Salon</p>
                 <h2 className="text-2xl font-semibold">{salonInfo?.name || 'Salon'}</h2>
-                <p className="text-sm text-zinc-400">{salonInfo?.address?.street || 'Adresse folgt'}</p>
+                <p className="text-sm text-gray-400">{salonInfo?.address?.street || 'Adresse folgt'}</p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold">Welcher Service interessiert dich?</h3>
-                  <span className="text-sm text-zinc-400">{services.length} Services verfügbar</span>
+                  <span className="text-sm text-gray-400">{services.length} Services verfügbar</span>
                 </div>
                 <ServiceGrid />
               </div>
@@ -563,12 +563,12 @@ export default function PublicBooking() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-zinc-400">Service</p>
-                  <h2 className="text-2xl font-bold">{bookingData.service || 'Bitte wählen'}</h2>
+                  <p className="text-sm text-gray-400">Service</p>
+                  <h2 className="text-xl font-semibold tracking-tight">{bookingData.service || 'Bitte wählen'}</h2>
                 </div>
                 <button
                   onClick={() => setBookingStep(0)}
-                  className="text-sm text-blue-500 underline"
+                  className="text-sm text-gray-600 underline"
                 >
                   Service ändern
                 </button>
@@ -581,48 +581,48 @@ export default function PublicBooking() {
           {bookingStep === 2 && (
             <div className="space-y-6">
               <div>
-                <p className="text-sm text-zinc-400">Termin</p>
-                <h2 className="text-2xl font-bold">
+                <p className="text-sm text-gray-400">Termin</p>
+                <h2 className="text-xl font-semibold tracking-tight">
                   {bookingData.date ? `${new Date(bookingData.date).toLocaleDateString('de-DE')} um ${bookingData.time}` : 'Datum & Uhrzeit auswählen'}
                 </h2>
               </div>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-zinc-500">Vollständiger Name *</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-500">Vollständiger Name *</label>
                   <input
                     type="text"
                     name="customerName"
                     value={bookingData.customerName}
                     onChange={handleInputChange}
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none touch-manipulation"
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-gray-200 focus:outline-none touch-manipulation"
                     placeholder="Max Mustermann"
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-zinc-500">E-Mail Adresse *</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-500">E-Mail Adresse *</label>
                   <input
                     type="email"
                     name="customerEmail"
                     value={bookingData.customerEmail}
                     onChange={handleInputChange}
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none touch-manipulation"
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-gray-200 focus:outline-none touch-manipulation"
                     placeholder="email@beispiel.de"
                   />
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-sm font-medium text-zinc-500">Telefonnummer *</label>
+                <label className="block mb-2 text-sm font-medium text-gray-500">Telefonnummer *</label>
                 <input
                   type="tel"
                   name="customerPhone"
                   value={bookingData.customerPhone}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none touch-manipulation"
+                  className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-base focus:border-gray-200 focus:outline-none touch-manipulation"
                   placeholder="+49 123 456789"
                 />
               </div>
-              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-start gap-3 text-sm text-blue-700">
-                <FiInfo className="mt-1 text-blue-600" />
+              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 flex items-start gap-3 text-sm text-gray-700">
+                <FiInfo className="mt-1 text-gray-700" />
                 <p>Du erhältst die Buchungsbestätigung direkt per E-Mail.</p>
               </div>
               <BookingActions />
@@ -632,27 +632,27 @@ export default function PublicBooking() {
           {bookingStep === 3 && (
             <div className="space-y-6">
               <div>
-                <p className="text-sm text-zinc-400">Dein Termin</p>
-                <h2 className="text-2xl font-bold">Übersicht & Zahlung</h2>
+                <p className="text-sm text-gray-400">Dein Termin</p>
+                <h2 className="text-xl font-semibold tracking-tight">Übersicht & Zahlung</h2>
               </div>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
-                  <p className="text-sm text-zinc-400">Salon</p>
+                  <p className="text-sm text-gray-400">Salon</p>
                   <p className="font-semibold">{salonInfo?.name || 'Salon'}</p>
                 </div>
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
-                  <p className="text-sm text-zinc-400">Service</p>
+                  <p className="text-sm text-gray-400">Service</p>
                   <p className="font-semibold">{bookingData.service}</p>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
-                <p className="text-sm text-zinc-400">Kontaktdaten</p>
+                <p className="text-sm text-gray-400">Kontaktdaten</p>
                 <p className="font-semibold">{bookingData.customerName}</p>
-                <p className="text-sm text-zinc-400">{bookingData.customerEmail}</p>
-                <p className="text-sm text-zinc-400">{bookingData.customerPhone}</p>
+                <p className="text-sm text-gray-400">{bookingData.customerEmail}</p>
+                <p className="text-sm text-gray-400">{bookingData.customerPhone}</p>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
-                <p className="text-sm text-zinc-400">Termin</p>
+                <p className="text-sm text-gray-400">Termin</p>
                 <p className="font-semibold">
                   {bookingData.date ? `${new Date(bookingData.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}` : '-'}{' '}
                   um {bookingData.time || '-'} Uhr

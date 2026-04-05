@@ -60,7 +60,7 @@ export default function HelpTooltip({
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
         onClick={() => setIsVisible(!isVisible)}
-        className="ml-1.5 text-zinc-400 hover:text-zinc-600 transition-colors focus:outline-none"
+        className="ml-1.5 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
       >
         <IconComponent />
       </button>
@@ -70,11 +70,11 @@ export default function HelpTooltip({
         <div
           className={`absolute z-50 ${positionClasses[position]} w-64 pointer-events-none`}
         >
-          <div className="bg-zinc-50 border border-zinc-200 rounded-lg shadow-none p-3">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl shadow-sm p-3">
             {title && (
-              <div className="font-medium text-zinc-900 text-sm mb-1">{title}</div>
+              <div className="font-medium text-gray-900 text-sm mb-1">{title}</div>
             )}
-            <div className="text-zinc-600 text-sm leading-relaxed">{content}</div>
+            <div className="text-gray-600 text-sm leading-relaxed">{content}</div>
           </div>
           {/* Arrow */}
           <div className={`absolute w-0 h-0 border-4 ${arrowClasses[position]}`} />
@@ -90,10 +90,10 @@ export default function HelpTooltip({
  */
 export function FeatureHighlight({ children, label = 'Neu', color = 'indigo' }) {
   const colorClasses = {
-    indigo: 'bg-indigo-500/20 text-zinc-900 border-indigo-500/50',
+    indigo: 'bg-gray-100 text-gray-900 border-gray-200',
     green: 'bg-green-500/20 text-green-400 border-green-500/50',
     yellow: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
-    purple: 'bg-purple-500/20 text-purple-400 border-purple-500/50',
+    purple: 'bg-gray-100 text-gray-500 border-gray-200/50',
   };
 
   return (
@@ -123,10 +123,10 @@ export function InfoBanner({
   if (dismissed) return null;
 
   const typeStyles = {
-    info: 'bg-blue-500/10 border-blue-500/30 text-blue-300',
+    info: 'bg-gray-100 border-gray-200 text-gray-600',
     success: 'bg-green-500/10 border-green-500/30 text-green-300',
     warning: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300',
-    tip: 'bg-purple-500/10 border-purple-500/30 text-purple-300',
+    tip: 'bg-gray-100 border-gray-200 text-gray-600',
   };
 
   const iconByType = {
@@ -194,9 +194,9 @@ export function InfoBanner({
  */
 export function SetupChecklist({ items, onItemClick }) {
   return (
-    <div className="bg-white rounded-xl border border-zinc-200 p-4">
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
       <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-        <svg className="w-4 h-4 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
         </svg>
         Setup-Checkliste
@@ -206,10 +206,10 @@ export function SetupChecklist({ items, onItemClick }) {
           <button
             key={index}
             onClick={() => onItemClick?.(item)}
-            className={`w-full flex items-center gap-3 p-2 rounded-lg text-sm text-left transition-colors ${
+            className={`w-full flex items-center gap-3 p-2 rounded-xl text-sm text-left transition-colors ${
               item.completed
-                ? 'text-zinc-400'
-                : 'text-zinc-600 hover:bg-zinc-50'
+                ? 'text-gray-400'
+                : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${

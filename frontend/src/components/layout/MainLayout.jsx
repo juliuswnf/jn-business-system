@@ -23,7 +23,7 @@ const MainLayout = ({ children, requiredRole = null }) => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex">
+    <div className="min-h-screen bg-white text-gray-900 flex">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

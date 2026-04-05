@@ -54,7 +54,7 @@ export default function Sidebar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`block px-4 py-3 rounded-lg transition duration-200 ${
+                className={`block px-4 py-3 rounded-xl transition duration-200 ${
                   isActive(item.path)
                     ? 'bg-accent text-primary dark:bg-accent dark:text-black font-semibold'
                     : 'text-slate-300 dark:text-slate-400 hover:text-accent dark:hover:text-accent hover:bg-secondary dark:hover:bg-slate-900/50'

@@ -63,6 +63,8 @@ const CEOAuditLog = lazy(() => import('./pages/ceo/AuditLog'));
 const CEOLifecycleEmails = lazy(() => import('./pages/ceo/LifecycleEmails'));
 const CEOFeatureFlags = lazy(() => import('./pages/ceo/FeatureFlags'));
 const CEOBackups = lazy(() => import('./pages/ceo/Backups'));
+const CEOCompanies = lazy(() => import('./pages/ceo/Companies'));
+const CEOUsers = lazy(() => import('./pages/ceo/Users'));
 const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
 
 // Marketing Automation
@@ -103,9 +105,9 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Loading spinner for lazy components
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-black">
+  <div className="min-h-screen flex items-center justify-center bg-white">
     <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
       <p className="text-gray-400 mt-4">Laden...</p>
     </div>
   </div>
@@ -160,9 +162,9 @@ const ProtectedRoute = ({ children, requiredRole, allowedRoles }) => {
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-900 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p>Lade...</p>
         </div>
       </div>
@@ -210,9 +212,9 @@ const TierRoute = ({ children, requiredTier = 'starter', bypassRoles = ['ceo', '
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-900 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p>Lade Planrechte...</p>
         </div>
       </div>
@@ -797,6 +799,26 @@ function App() {
             <ProtectedRoute requiredRole="ceo">
               <DashboardLayout>
                 <LazyPage><CEOBackups /></LazyPage>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ceo/companies"
+          element={
+            <ProtectedRoute requiredRole="ceo">
+              <DashboardLayout>
+                <LazyPage><CEOCompanies /></LazyPage>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ceo/users"
+          element={
+            <ProtectedRoute requiredRole="ceo">
+              <DashboardLayout>
+                <LazyPage><CEOUsers /></LazyPage>
               </DashboardLayout>
             </ProtectedRoute>
           }

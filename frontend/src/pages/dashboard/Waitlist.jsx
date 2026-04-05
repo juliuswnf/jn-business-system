@@ -73,14 +73,14 @@ export default function Waitlist() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-zinc-900">Warteliste</h1>
-          <p className="text-zinc-400 mt-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Warteliste</h1>
+          <p className="text-gray-400 mt-1">
             Kunden, die auf freie Termine warten
           </p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-zinc-900 px-4 py-2 rounded-lg transition"
+          className="bg-gray-900 hover:bg-gray-900 text-gray-900 px-4 py-2 rounded-xl transition"
         >
           + Kunde hinzufügen
         </button>
@@ -88,33 +88,33 @@ export default function Waitlist() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-zinc-50 p-4 rounded-lg border border-zinc-200">
-          <div className="flex items-center gap-2 text-zinc-400 mb-1">
+        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+          <div className="flex items-center gap-2 text-gray-400 mb-1">
             <Users size={16} />
             <span className="text-sm">Gesamt</span>
           </div>
-          <p className="text-2xl font-bold text-zinc-900">{stats.total}</p>
+          <p className="text-xl font-semibold tracking-tight text-gray-900">{stats.total}</p>
         </div>
-        <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg">
+        <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
           <div className="flex items-center gap-2 text-red-500 mb-1">
             <AlertCircle size={16} />
             <span className="text-sm">Hohe Priorität</span>
           </div>
-          <p className="text-2xl font-bold text-red-500">{stats.highPriority}</p>
+          <p className="text-xl font-semibold tracking-tight text-red-500">{stats.highPriority}</p>
         </div>
-        <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg">
+        <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl">
           <div className="flex items-center gap-2 text-yellow-500 mb-1">
             <Clock size={16} />
             <span className="text-sm">Mittlere Priorität</span>
           </div>
-          <p className="text-2xl font-bold text-yellow-500">{stats.mediumPriority}</p>
+          <p className="text-xl font-semibold tracking-tight text-yellow-500">{stats.mediumPriority}</p>
         </div>
-        <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg">
+        <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-xl">
           <div className="flex items-center gap-2 text-green-500 mb-1">
             <CheckCircle size={16} />
             <span className="text-sm">Niedrige Priorität</span>
           </div>
-          <p className="text-2xl font-bold text-green-500">{stats.lowPriority}</p>
+          <p className="text-xl font-semibold tracking-tight text-green-500">{stats.lowPriority}</p>
         </div>
       </div>
 
@@ -124,10 +124,10 @@ export default function Waitlist() {
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-lg transition ${
+            className={`px-4 py-2 rounded-xl transition ${
               filter === status
-                ? 'bg-blue-600 text-white'
-                : 'bg-zinc-50 text-zinc-400 hover:bg-zinc-100'
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
             }`}
           >
             {status === 'active' && 'Aktiv'}
@@ -139,45 +139,45 @@ export default function Waitlist() {
 
       {/* Waitlist Table */}
       {loading ? (
-        <div className="text-center py-12 text-zinc-400">Laden...</div>
+        <div className="text-center py-12 text-gray-400">Laden...</div>
       ) : waitlist.length === 0 ? (
-        <div className="text-center py-12 text-zinc-400">
+        <div className="text-center py-12 text-gray-400">
           Keine Einträge in der Warteliste
         </div>
       ) : (
-        <div className="bg-zinc-50 rounded-lg border border-zinc-200 overflow-hidden">
+        <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
           <table className="w-full">
-            <thead className="bg-zinc-50">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Kunde</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Service</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Bevorzugte Zeit</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Priorität</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-400">Erstellt</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-zinc-400">Aktionen</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Kunde</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Service</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Bevorzugte Zeit</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Priorität</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Status</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Erstellt</th>
+                <th className="text-right px-4 py-3 text-sm font-medium text-gray-400">Aktionen</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-200">
+            <tbody className="divide-y divide-gray-200">
               {waitlist.map((entry) => (
                 <motion.tr
                   key={entry._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="hover:bg-zinc-100/50 transition"
+                  className="hover:bg-gray-100/50 transition"
                 >
                   <td className="px-4 py-3">
                     <div>
-                      <p className="text-zinc-900 font-medium">
+                      <p className="text-gray-900 font-medium">
                         {entry.customerId?.firstName} {entry.customerId?.lastName}
                       </p>
-                      <p className="text-xs text-zinc-400">{entry.customerId?.phone}</p>
+                      <p className="text-xs text-gray-400">{entry.customerId?.phone}</p>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-zinc-300">
+                  <td className="px-4 py-3 text-gray-300">
                     {entry.preferredService?.name}
                   </td>
-                  <td className="px-4 py-3 text-zinc-300">
+                  <td className="px-4 py-3 text-gray-300">
                     {entry.preferredDate && new Date(entry.preferredDate).toLocaleDateString('de-DE')}
                     {entry.preferredTime && ` um ${entry.preferredTime}`}
                   </td>
@@ -192,22 +192,22 @@ export default function Waitlist() {
                       <span className="text-green-500">● Aktiv</span>
                     )}
                     {entry.status === 'matched' && (
-                      <span className="text-blue-500">● Gematcht</span>
+                      <span className="text-gray-600">● Gematcht</span>
                     )}
                     {entry.status === 'expired' && (
-                      <span className="text-zinc-500">● Abgelaufen</span>
+                      <span className="text-gray-500">● Abgelaufen</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-zinc-400 text-sm">
+                  <td className="px-4 py-3 text-gray-400 text-sm">
                     {new Date(entry.createdAt).toLocaleDateString('de-DE')}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        className="p-1 hover:bg-zinc-100 rounded transition"
+                        className="p-1 hover:bg-gray-100 rounded transition"
                         title="Bearbeiten"
                       >
-                        <Edit size={16} className="text-zinc-400" />
+                        <Edit size={16} className="text-gray-400" />
                       </button>
                       <button
                         onClick={() => handleDelete(entry._id)}
@@ -228,12 +228,12 @@ export default function Waitlist() {
       {/* Add Form Modal (TODO: Implement) */}
       {showAddForm && (
         <div className="fixed inset-0 bg-white/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-50 p-6 rounded-lg max-w-md w-full">
-            <h2 className="text-xl font-bold text-zinc-900 mb-4">Kunde zur Warteliste hinzufügen</h2>
-            <p className="text-zinc-400 mb-4">Feature wird noch implementiert...</p>
+          <div className="bg-gray-50 p-6 rounded-xl max-w-md w-full">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Kunde zur Warteliste hinzufügen</h2>
+            <p className="text-gray-400 mb-4">Feature wird noch implementiert...</p>
             <button
               onClick={() => setShowAddForm(false)}
-              className="bg-zinc-50 hover:bg-zinc-100 text-zinc-900 px-4 py-2 rounded-lg w-full"
+              className="bg-gray-50 hover:bg-gray-100 text-gray-900 px-4 py-2 rounded-xl w-full"
             >
               Schließen
             </button>

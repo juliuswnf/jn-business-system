@@ -156,38 +156,38 @@ export default function Pricing() {
         keywords="Preise, Buchungssystem Kosten, Business Software Preis, Unternehmenssoftware"
         url="/pricing"
       />
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-20">
 
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4">Preise</h1>
-          <p className="text-zinc-700 text-xl max-w-2xl mx-auto">
+          <p className="text-gray-700 text-xl max-w-2xl mx-auto">
             Transparente Preise. Keine versteckten Kosten.
             <br />
-            <span className="text-zinc-900 font-medium">Sie behalten 100% Ihrer Einnahmen.</span>
+            <span className="text-gray-900 font-medium">Sie behalten 100% Ihrer Einnahmen.</span>
           </p>
         </div>
 
         {/* Toggle */}
         <div className="flex items-center justify-center gap-4 mb-16">
-          <span className={yearly ? 'text-zinc-700' : 'text-zinc-900 font-medium'}>
+          <span className={yearly ? 'text-gray-700' : 'text-gray-900 font-medium'}>
             Monatlich
           </span>
           <button
             onClick={() => setYearly(!yearly)}
             className={`w-14 h-7 rounded-full relative transition-colors ${
-              yearly ? 'bg-zinc-700' : 'bg-zinc-300'
+              yearly ? 'bg-gray-900' : 'bg-gray-300'
             }`}
             aria-label="Toggle billing cycle"
           >
             <div
-              className={`w-5 h-5 bg-white border border-zinc-300 rounded-full absolute top-1 transition-all ${
+              className={`w-5 h-5 bg-white border border-gray-300 rounded-full absolute top-1 transition-all ${
                 yearly ? 'left-8' : 'left-1'
               }`}
             />
           </button>
-          <span className={yearly ? 'text-zinc-900 font-medium' : 'text-zinc-700'}>
+          <span className={yearly ? 'text-gray-900 font-medium' : 'text-gray-700'}>
             Jährlich
           </span>
           {yearly && (
@@ -198,19 +198,19 @@ export default function Pricing() {
         </div>
 
         {/* Enterprise Testphase Banner */}
-        <div className="max-w-4xl mx-auto mb-12 bg-zinc-50 border-2 border-zinc-300 rounded-xl p-6 text-center shadow-none">
+        <div className="max-w-4xl mx-auto mb-12 bg-white border border-gray-100 rounded-2xl shadow-sm p-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <h3 className="text-xl font-bold">14 Tage Enterprise-Testphase</h3>
+            <h3 className="text-lg font-semibold">14 Tage Enterprise-Testphase</h3>
           </div>
-          <p className="text-zinc-700 mb-4">
+          <p className="text-gray-500 text-sm mb-5">
             Testen Sie alle Enterprise-Funktionen 14 Tage kostenlos – inkl. 50 SMS. Danach wählen Sie Ihren Plan.
           </p>
           <Link
             to="/register?trial=enterprise"
-            className="inline-block px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-black font-bold rounded-lg hover:scale-105 transition-transform shadow-sm"
+            className="inline-block px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-900 transition"
           >
             Jetzt Enterprise kostenlos testen
           </Link>
@@ -221,15 +221,15 @@ export default function Pricing() {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`border rounded-xl p-8 relative ${
+              className={`border rounded-2xl p-8 relative shadow-sm ${
                 plan.popular
-                  ? 'border-zinc-900 bg-white shadow-sm scale-105'
-                  : 'border-zinc-200 bg-zinc-50/50'
+                  ? 'border-gray-900 bg-white'
+                  : 'border-gray-100 bg-white'
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-block text-xs font-bold bg-white text-black px-4 py-1.5 rounded-full">
+                  <span className="inline-block text-xs font-bold bg-gray-900 text-white px-3 py-1 rounded-xl">
                     BELIEBT
                   </span>
                 </div>
@@ -237,15 +237,15 @@ export default function Pricing() {
 
               {plan.badge && (
                 <div className="absolute -top-4 right-4">
-                  <span className="inline-block text-xs font-bold bg-white text-black px-4 py-1.5 rounded-full shadow-sm">
+                  <span className="inline-block text-xs font-bold bg-gray-900 text-white px-3 py-1 rounded-xl">
                     {plan.badge}
                   </span>
                 </div>
               )}
 
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">{plan.name}</h2>
-                <p className="text-zinc-700 text-sm">{plan.description}</p>
+                <h2 className="text-xl font-semibold tracking-tight mb-2">{plan.name}</h2>
+                <p className="text-gray-700 text-sm">{plan.description}</p>
               </div>
 
               <div className="mb-8">
@@ -255,9 +255,9 @@ export default function Pricing() {
                       <span className="text-5xl font-bold">
                         €{plan.yearlyMonthlyCost.toFixed(0)}
                       </span>
-                      <span className="text-zinc-700">/ Monat</span>
+                      <span className="text-gray-700">/ Monat</span>
                     </div>
-                    <p className="text-sm text-zinc-400 mt-2">
+                    <p className="text-sm text-gray-400 mt-2">
                       €{plan.yearlyPrice} jährlich (spare €{calculateSavings(plan)})
                     </p>
                   </>
@@ -265,9 +265,9 @@ export default function Pricing() {
                   <>
                     <div className="flex items-baseline gap-2">
                       <span className="text-5xl font-bold">€{plan.price}</span>
-                      <span className="text-zinc-700">/ Monat</span>
+                      <span className="text-gray-700">/ Monat</span>
                     </div>
-                    <p className="text-sm text-zinc-400 mt-2">
+                    <p className="text-sm text-gray-400 mt-2">
                       Monatlich kündbar
                     </p>
                   </>
@@ -276,10 +276,10 @@ export default function Pricing() {
 
               <Link
                 to={`/register?plan=${plan.id}${yearly ? '&billing=yearly' : ''}`}
-                className={`block w-full py-4 rounded-lg text-center font-semibold transition mb-8 ${
+                className={`block w-full py-4 rounded-xl text-center font-semibold transition mb-8 ${
                   plan.popular
                     ? 'bg-white text-black hover:bg-gray-100'
-                    : 'bg-zinc-50 text-zinc-900 hover:bg-zinc-100'
+                    : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 {plan.id === 'enterprise' ? 'Enterprise testen' : 'Jetzt starten'}
@@ -290,13 +290,11 @@ export default function Pricing() {
                   <li
                     key={idx}
                     className={`flex items-start gap-3 text-sm ${
-                      feature.highlight ? 'bg-blue-500/10 border border-blue-500/30 rounded-lg p-2 -mx-2' : ''
+                      feature.highlight ? 'bg-gray-50 border border-gray-100 rounded-2xl p-2 -mx-2' : ''
                     }`}
                   >
                     <svg
-                      className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                        feature.highlight ? 'text-blue-500' : 'text-blue-500'
-                      }`}
+                      className={`w-5 h-5 flex-shrink-0 mt-0.5 text-gray-600`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -304,21 +302,21 @@ export default function Pricing() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div className="flex-1">
-                      <div className={feature.bold ? 'font-semibold text-zinc-900' : 'text-zinc-700'}>
+                      <div className={feature.bold ? 'font-semibold text-gray-900' : 'text-gray-700'}>
                         {feature.name}
                         {feature.value && (
-                          <span className="ml-1 text-zinc-900 font-medium">
+                          <span className="ml-1 text-gray-900 font-medium">
                             ({feature.value})
                           </span>
                         )}
                         {feature.highlight && (
-                          <span className="ml-2 text-xs text-blue-500 font-bold">
-                            PREMIUM
+                          <span className="ml-2 text-xs text-gray-400 font-medium">
+                            NEU
                           </span>
                         )}
                       </div>
                       {feature.description && (
-                        <div className="text-xs text-zinc-600 mt-1">
+                        <div className="text-xs text-gray-600 mt-1">
                           {feature.description}
                         </div>
                       )}
@@ -328,11 +326,11 @@ export default function Pricing() {
               </ul>
 
               {plan.notIncluded && plan.notIncluded.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-zinc-200">
-                  <p className="text-xs text-zinc-600 mb-2">Nicht enthalten:</p>
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <p className="text-xs text-gray-600 mb-2">Nicht enthalten:</p>
                   <ul className="space-y-2">
                     {plan.notIncluded.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs text-zinc-600">
+                      <li key={idx} className="flex items-start gap-2 text-xs text-gray-600">
                         <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -347,16 +345,16 @@ export default function Pricing() {
         </div>
 
         {/* SMS Callout */}
-        <div className="max-w-4xl mx-auto mb-20 bg-zinc-50 border border-zinc-200 rounded-xl p-8 hover:border-zinc-400 transition-all duration-300">
+        <div className="max-w-4xl mx-auto mb-20 bg-white border border-gray-100 rounded-2xl shadow-sm p-8 hover:border-gray-200 transition-all duration-300">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold mb-2">Nachrichten per SMS nur in Enterprise</h3>
-              <p className="text-zinc-600 mb-4">
+              <p className="text-gray-600 mb-4">
                 Weniger vergessene Termine durch automatische Nachrichten 2 Stunden und 1 Tag vor dem Termin.
                 Inklusive 500 Nachrichten pro Monat (mehr bei größerem Team: +50 Nachrichten pro Mitarbeiter).
               </p>
@@ -365,25 +363,25 @@ export default function Pricing() {
                   <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-zinc-700">2h & 24h Erinnerungen</span>
+                  <span className="text-gray-700">2h & 24h Erinnerungen</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-zinc-700">Prioritäts-System</span>
+                  <span className="text-gray-700">Prioritäts-System</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-zinc-700">Überschreitung möglich (€0.05 pro Nachricht)</span>
+                  <span className="text-gray-700">Überschreitung möglich (€0.05 pro Nachricht)</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-zinc-700">Email-Fallback automatisch</span>
+                  <span className="text-gray-700">Email-Fallback automatisch</span>
                 </div>
               </div>
             </div>
@@ -393,9 +391,9 @@ export default function Pricing() {
         {/* All Plans Include */}
         <div className="mb-20">
           <div className="flex items-center justify-center mb-12">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
-            <h2 className="text-2xl font-bold mx-8">In allen Plänen enthalten</h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+            <div className="flex-1 h-px bg-gray-100"></div>
+            <h2 className="text-lg font-semibold tracking-tight mx-6">In allen Plänen enthalten</h2>
+            <div className="flex-1 h-px bg-gray-100"></div>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -408,7 +406,7 @@ export default function Pricing() {
               'Tägliche Backups',
               'Kostenlose Einrichtung',
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-zinc-700">
+              <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
@@ -421,20 +419,20 @@ export default function Pricing() {
         {/* FAQ */}
         <div className="max-w-2xl mx-auto mb-20">
           <div className="flex items-center justify-center mb-12">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
-            <h2 className="text-2xl font-bold mx-8">Häufige Fragen</h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+            <div className="flex-1 h-px bg-gray-100"></div>
+            <h2 className="text-lg font-semibold tracking-tight mx-6">Häufige Fragen</h2>
+            <div className="flex-1 h-px bg-gray-100"></div>
           </div>
           <div className="space-y-2">
             {faq.map((item, i) => (
-              <div key={i} className="border border-zinc-200 rounded-lg">
+              <div key={i} className="border border-gray-100 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-4 text-left"
                 >
                   <span className="text-sm font-medium">{item.q}</span>
                   <svg
-                    className={`w-4 h-4 text-zinc-400 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 text-gray-400 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -444,7 +442,7 @@ export default function Pricing() {
                 </button>
                 {openFaq === i && (
                   <div className="px-4 pb-4">
-                    <p className="text-sm text-zinc-700">{item.a}</p>
+                    <p className="text-sm text-gray-700">{item.a}</p>
                   </div>
                 )}
               </div>
@@ -453,22 +451,22 @@ export default function Pricing() {
         </div>
 
         {/* CTA */}
-        <div className="text-center border border-zinc-200 rounded-lg p-8">
+        <div className="text-center border border-gray-100 rounded-2xl shadow-sm p-8">
           <h2 className="text-xl font-semibold mb-2">Noch Fragen?</h2>
-          <p className="text-zinc-700 text-sm mb-6">
+          <p className="text-gray-700 text-sm mb-6">
             Schreiben Sie uns - wir antworten innerhalb von 24 Stunden.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <a
               href="mailto:support@jn-business-system.de"
-              className="px-5 py-2 bg-zinc-200 hover:bg-zinc-300 border border-zinc-300 rounded text-sm transition"
+              className="px-5 py-2.5 bg-gray-900 text-white hover:bg-gray-900 rounded-xl text-sm font-medium transition"
               aria-label="Support kontaktieren per E-Mail"
             >
               E-Mail schreiben
             </a>
             <Link
               to="/demo"
-              className="px-5 py-2 bg-zinc-200 text-zinc-900 hover:bg-zinc-300 border border-zinc-300 rounded text-sm transition"
+              className="px-5 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl text-sm font-medium transition"
               aria-label="Demo-Video ansehen"
             >
               Demo ansehen

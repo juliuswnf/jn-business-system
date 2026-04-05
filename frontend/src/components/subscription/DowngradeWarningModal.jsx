@@ -97,7 +97,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
 
   return (
     <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-none max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-sm max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-start">
@@ -157,8 +157,8 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
           </div>
 
           {/* Timing Options */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-900 mb-3">
+          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+            <h4 className="font-semibold text-gray-900 mb-3">
               🗓️ Wann soll das Downgrade wirksam werden?
             </h4>
             <div className="space-y-3">
@@ -204,7 +204,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
                 type="checkbox"
                 checked={confirmed}
                 onChange={(e) => setConfirmed(e.target.checked)}
-                className="mt-1 mr-3 h-5 w-5 text-indigo-600 focus:ring-zinc-900 border-gray-300 rounded"
+                className="mt-1 mr-3 h-5 w-5 text-gray-700 focus:ring-zinc-900 border-gray-300 rounded"
               />
               <span className="text-sm text-gray-700">
                 Ich habe verstanden, dass ich die oben aufgeführten Funktionen verlieren werde und
@@ -215,7 +215,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
               <div className="flex items-start">
                 <svg
                   className="w-5 h-5 text-red-600 mt-0.5 mr-2"
@@ -241,7 +241,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
             <button
               onClick={handleDowngrade}
               disabled={!confirmed || loading}
-              className={`flex-1 py-3 px-6 rounded-lg font-semibold text-zinc-900 transition-all ${
+              className={`flex-1 py-3 px-6 rounded-xl font-semibold text-gray-900 transition-all ${
                 !confirmed || loading
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-red-600 hover:bg-red-700'
@@ -278,7 +278,7 @@ const DowngradeWarningModal = ({ currentTier, newTier, onConfirm, onCancel }) =>
             <button
               onClick={onCancel}
               disabled={loading}
-              className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="px-6 py-3 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
               Abbrechen
             </button>

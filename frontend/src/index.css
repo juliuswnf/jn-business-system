@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base styles for the monochrome design system */
+/* Base styles for the design system */
 @layer base {
   html {
     @apply scroll-smooth;
@@ -10,11 +10,11 @@
 
   body {
     background-color: #fff;
-    @apply text-zinc-900 font-sans antialiased leading-relaxed;
+    @apply text-gray-900 font-sans antialiased leading-relaxed;
   }
 
   h1, h2, h3, h4 {
-    @apply text-zinc-900 tracking-tight;
+    @apply text-gray-900 tracking-tight;
   }
 
   h1 {
@@ -30,36 +30,24 @@
   }
 
   input, textarea, select {
-    @apply font-sans bg-zinc-50 border border-zinc-200 text-zinc-900 rounded-lg;
+    @apply font-sans bg-white border border-gray-200 text-gray-900 rounded-xl;
   }
 
   button {
-    @apply transition duration-200 text-zinc-900 font-semibold;
+    @apply transition duration-200 text-gray-900 font-semibold;
   }
 
   a {
-    @apply transition duration-200 text-zinc-900;
+    @apply transition duration-200 text-gray-900;
   }
 
   input::placeholder,
   textarea::placeholder {
-    @apply text-zinc-400;
-  }
-
-  :where(button[class*='px-'], a[class*='px-'][class*='py-'][class*='rounded']) {
-    @apply bg-zinc-200 text-zinc-900 border border-zinc-300 rounded-full;
-  }
-
-  :where(button[class*='px-'], a[class*='px-'][class*='py-'][class*='rounded']):hover {
-    @apply bg-zinc-300 border-zinc-400;
-  }
-
-  :where(button[class*='px-'], a[class*='px-'][class*='py-'][class*='rounded']):focus-visible {
-    @apply outline-none ring-2 ring-zinc-500 ring-offset-2 ring-offset-white;
+    @apply text-gray-400;
   }
 
   :where(input, textarea, select):focus-visible {
-    @apply outline-none ring-2 ring-zinc-500 ring-offset-2 ring-offset-white border-zinc-400;
+    @apply outline-none ring-2 ring-gray-200 ring-offset-2 ring-offset-white border-gray-300;
   }
 
   button:disabled,
@@ -68,55 +56,38 @@
   }
 }
 
-/* Components adjusted for monochrome theme */
+/* Component classes */
 @layer components {
   /* Primary CTA */
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 rounded-full bg-zinc-200 text-zinc-900 border border-zinc-300 font-semibold;
-  }
-
-  .btn-primary:hover {
-    @apply bg-zinc-300 border-zinc-400;
-    transform: translateY(-1px);
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-800 transition;
   }
 
   /* Secondary CTA - outlined */
   .btn-outline {
-    @apply inline-flex items-center justify-center px-6 py-3 rounded-full border border-zinc-300 text-zinc-900 font-semibold bg-zinc-100;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold bg-white hover:bg-gray-50 transition;
   }
 
   /* Cards */
   .card {
-    @apply rounded-2xl bg-zinc-50 border border-zinc-200 p-6 shadow-none;
+    @apply rounded-2xl bg-white border border-gray-100 p-6 shadow-sm;
   }
 
   .card-hover {
-    @apply rounded-xl bg-zinc-50 border border-zinc-200 p-6 transition;
-  }
-
-  .card-hover:hover {
-    @apply border-zinc-300;
-    transform: translateY(-4px);
+    @apply rounded-2xl bg-white border border-gray-100 p-6 shadow-sm transition hover:border-gray-300;
   }
 
   /* Form Inputs */
   .input-field {
-    @apply w-full px-4 py-3 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-900 transition;
+    @apply w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-gray-100 focus:border-gray-300;
   }
 
   .input-field::placeholder {
-    color: rgb(161 161 170);
+    color: rgb(156 163 175);
   }
 
   .input-error {
-    @apply border-red-500;
-  }
-
-  /* Gradient text accent */
-  .gradient-text {
-    background: linear-gradient(90deg, rgba(168,85,247,1) 0%, rgba(236,72,153,1) 50%, rgba(6,182,212,1) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    @apply border-red-400;
   }
 }
 

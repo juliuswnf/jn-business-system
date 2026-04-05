@@ -149,9 +149,9 @@ export default function WorkflowProjectEditor() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-zinc-50 border border-zinc-200 rounded-lg p-8"
+          className="bg-gray-50 border border-gray-100 rounded-2xl p-8"
         >
-          <h1 className="text-2xl font-bold text-zinc-900 mb-6">
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-6">
             {isEdit ? 'Projekt bearbeiten' : 'Neues Projekt'}
           </h1>
 
@@ -159,14 +159,14 @@ export default function WorkflowProjectEditor() {
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Kunde *
                 </label>
                 <select
                   required
                   value={formData.customerId}
                   onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 focus:ring-2 focus:ring-gray-100"
                 >
                   <option value="">Kunde wählen...</option>
                   {customers.map((customer) => (
@@ -178,15 +178,15 @@ export default function WorkflowProjectEditor() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-900 mb-2">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                   Branche *
                 </label>
-                <div className="bg-zinc-50 border border-zinc-200 rounded-lg overflow-hidden">
+                <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden">
                   <select
                     required
                     value={formData.industry}
                     onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                    className="w-full px-4 py-3 bg-zinc-50 border-0 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 rounded-lg"
+                    className="w-full px-4 py-3 bg-gray-50 border-0 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-100 rounded-xl"
                   >
                     <option value="">Branche wählen...</option>
                     {industries.map((industry) => (
@@ -201,7 +201,7 @@ export default function WorkflowProjectEditor() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Typ
                 </label>
                 <input
@@ -209,18 +209,18 @@ export default function WorkflowProjectEditor() {
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                   placeholder="z.B. Behandlung, Projekt, Plan"
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-500 focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Artist/Mitarbeiter
                 </label>
                 <select
                   value={formData.artistId}
                   onChange={(e) => setFormData({ ...formData, artistId: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 focus:ring-2 focus:ring-gray-100"
                 >
                   <option value="">Mitarbeiter wählen...</option>
                   {employees.map((emp) => (
@@ -233,7 +233,7 @@ export default function WorkflowProjectEditor() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Projekt-Name *
               </label>
               <input
@@ -242,26 +242,26 @@ export default function WorkflowProjectEditor() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="z.B. Behandlungsserie, Projekt-Name"
-                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-500 focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:ring-2 focus:ring-gray-100"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Beschreibung
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-500 focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:ring-2 focus:ring-gray-100"
                 placeholder="Beschreibung des Projekts..."
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Anzahl Sessions *
                 </label>
                 <input
@@ -270,12 +270,12 @@ export default function WorkflowProjectEditor() {
                   min="1"
                   value={formData.totalSessions}
                   onChange={(e) => setFormData({ ...formData, totalSessions: parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Gesamtpreis (€)
                 </label>
                 <input
@@ -284,14 +284,14 @@ export default function WorkflowProjectEditor() {
                   step="0.01"
                   value={formData.totalPrice}
                   onChange={(e) => setFormData({ ...formData, totalPrice: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 focus:ring-2 focus:ring-gray-100"
                 />
               </div>
             </div>
 
             {/* Checklist */}
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Checklist
               </label>
               <div className="flex gap-2 mb-2">
@@ -300,13 +300,13 @@ export default function WorkflowProjectEditor() {
                   value={checklistItem}
                   onChange={(e) => setChecklistItem(e.target.value)}
                   placeholder="z.B. Vorbereitung, Materialien, etc."
-                  className="flex-1 px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-500 focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:ring-2 focus:ring-gray-100"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
                 />
                 <button
                   type="button"
                   onClick={addChecklistItem}
-                  className="px-4 py-2 bg-zinc-50 text-zinc-900 rounded-lg hover:bg-zinc-100 border border-zinc-200"
+                  className="px-4 py-2 bg-gray-50 text-gray-900 rounded-xl hover:bg-gray-100 border border-gray-200"
                 >
                   Hinzufügen
                 </button>
@@ -314,8 +314,8 @@ export default function WorkflowProjectEditor() {
               {formData.checklist.length > 0 && (
                 <ul className="space-y-2">
                   {formData.checklist.map((item, index) => (
-                    <li key={index} className="flex items-center justify-between bg-zinc-50 p-2 rounded border border-zinc-200">
-                      <span className="text-sm text-zinc-300">✓ {typeof item === 'string' ? item : item.item}</span>
+                    <li key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200">
+                      <span className="text-sm text-gray-300">✓ {typeof item === 'string' ? item : item.item}</span>
                       <button
                         type="button"
                         onClick={() => removeChecklistItem(index)}
@@ -330,18 +330,18 @@ export default function WorkflowProjectEditor() {
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex justify-end gap-4 pt-4 border-t border-zinc-200">
+            <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
               <button
                 type="button"
                 onClick={() => navigate('/dashboard/workflow-projects')}
-                className="px-6 py-2 border border-zinc-200 text-zinc-300 rounded-lg hover:bg-zinc-100"
+                className="px-6 py-2 border border-gray-200 text-gray-300 rounded-xl hover:bg-gray-100"
               >
                 Abbrechen
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-6 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 disabled:opacity-50"
               >
                 {loading ? 'Speichere...' : (isEdit ? 'Aktualisieren' : 'Erstellen')}
               </button>

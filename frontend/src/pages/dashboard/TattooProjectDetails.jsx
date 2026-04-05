@@ -61,13 +61,13 @@ const TattooProjectDetails = () => {
 
   if (loading) {
     return <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-      <div className="text-zinc-500">Lädt Projekt...</div>
+      <div className="text-gray-500">Lädt Projekt...</div>
     </div>;
   }
 
   if (!project) {
     return <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-      <div className="text-zinc-500">Projekt nicht gefunden</div>
+      <div className="text-gray-500">Projekt nicht gefunden</div>
     </div>;
   }
 
@@ -75,20 +75,20 @@ const TattooProjectDetails = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-xl shadow p-6 mb-6">
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-zinc-500 mt-1">{project.bodyPart} • {project.style}</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{project.name}</h1>
+              <p className="text-gray-500 mt-1">{project.bodyPart} • {project.style}</p>
               <div className="flex items-center gap-4 mt-4">
                 <div>
-                  <span className="text-sm text-zinc-400">Kunde:</span>
+                  <span className="text-sm text-gray-400">Kunde:</span>
                   <span className="ml-2 font-medium">
                     {project.customerId?.firstName} {project.customerId?.lastName}
                   </span>
                 </div>
                 <div>
-                  <span className="text-sm text-zinc-400">Artist:</span>
+                  <span className="text-sm text-gray-400">Artist:</span>
                   <span className="ml-2 font-medium">
                     {project.artistId ? `${project.artistId.firstName} ${project.artistId.lastName}` : '-'}
                   </span>
@@ -120,42 +120,42 @@ const TattooProjectDetails = () => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-gray-900">{project.progress}%</span>
+                  <span className="text-xl font-semibold tracking-tight text-gray-900">{project.progress}%</span>
                 </div>
               </div>
-              <p className="text-sm text-zinc-500 mt-2">Fortschritt</p>
+              <p className="text-sm text-gray-500 mt-2">Fortschritt</p>
             </div>
           </div>
 
           {/* Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t">
             <div>
-              <p className="text-sm text-zinc-400">Sessions</p>
-              <p className="text-xl md:text-2xl font-bold text-gray-900">
+              <p className="text-sm text-gray-400">Sessions</p>
+              <p className="text-xl md:text-xl font-semibold tracking-tight text-gray-900">
                 {project.completedSessions}/{project.totalSessions}
               </p>
             </div>
             <div>
-              <p className="text-sm text-zinc-400">Geschätzt</p>
-              <p className="text-2xl font-bold text-gray-900">€{(project.estimatedPrice / 100).toFixed(2)}</p>
+              <p className="text-sm text-gray-400">Geschätzt</p>
+              <p className="text-xl font-semibold tracking-tight text-gray-900">€{(project.estimatedPrice / 100).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-zinc-400">Tatsächlich</p>
-              <p className="text-2xl font-bold text-green-600">€{(project.actualPrice / 100).toFixed(2)}</p>
+              <p className="text-sm text-gray-400">Tatsächlich</p>
+              <p className="text-xl font-semibold tracking-tight text-green-600">€{(project.actualPrice / 100).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-zinc-400">Status</p>
+              <p className="text-sm text-gray-400">Status</p>
               <p className="text-lg font-bold text-gray-900 capitalize">{project.status.replace('_', ' ')}</p>
             </div>
           </div>
         </div>
 
         {/* Sessions Timeline */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-xl shadow p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">📅 Sessions Timeline</h2>
 
           {sessions.length === 0 ? (
-            <p className="text-zinc-400">Keine Sessions geplant. Erstelle die erste Session!</p>
+            <p className="text-gray-400">Keine Sessions geplant. Erstelle die erste Session!</p>
           ) : (
             <div className="space-y-4">
               {sessions.map((session, index) => (
@@ -171,29 +171,29 @@ const TattooProjectDetails = () => {
 
           <Link
             to={`/dashboard/tattoo/sessions/new?projectId=${id}`}
-            className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
+            className="mt-4 inline-block px-4 py-2 bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-100"
           >
             + Neue Session planen
           </Link>
         </div>
 
         {/* Photo Gallery */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-xl shadow p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">📸 Photo Gallery</h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {sessions.flatMap(session => session.photos || []).length === 0 ? (
-              <p className="text-zinc-400 col-span-4">Keine Fotos hochgeladen</p>
+              <p className="text-gray-400 col-span-4">Keine Fotos hochgeladen</p>
             ) : (
               sessions.flatMap(session =>
                 (session.photos || []).map((photo, idx) => (
-                  <div key={`${session._id}-${idx}`} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                  <div key={`${session._id}-${idx}`} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100">
                     <img
                       src={photo.url}
                       alt={`Session ${session.sessionNumber}`}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-50 text-zinc-900 text-xs p-2">
+                    <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-50 text-gray-900 text-xs p-2">
                       Session {session.sessionNumber}
                     </div>
                   </div>
@@ -204,11 +204,11 @@ const TattooProjectDetails = () => {
         </div>
 
         {/* Consents */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">📝 Einverständniserklärungen</h2>
 
           {consents.length === 0 ? (
-            <p className="text-zinc-400">Keine Consents vorhanden</p>
+            <p className="text-gray-400">Keine Consents vorhanden</p>
           ) : (
             <div className="space-y-2">
               {consents.map(consent => (
@@ -222,7 +222,7 @@ const TattooProjectDetails = () => {
                     </span>
                   </div>
                   {consent.signedAt && (
-                    <span className="text-sm text-zinc-400">
+                    <span className="text-sm text-gray-400">
                       Unterschrieben: {new Date(consent.signedAt).toLocaleDateString('de-DE')}
                     </span>
                   )}
@@ -248,7 +248,7 @@ const TattooProjectDetails = () => {
 // Session Card Component
 const SessionCard = ({ session, isLast, onComplete }) => {
   const statusColors = {
-    scheduled: 'bg-blue-100 text-blue-800',
+    scheduled: 'bg-gray-100 text-gray-800',
     in_progress: 'bg-yellow-100 text-yellow-800',
     completed: 'bg-green-100 text-green-800',
     cancelled: 'bg-red-100 text-red-800'
@@ -259,7 +259,7 @@ const SessionCard = ({ session, isLast, onComplete }) => {
       <div className="flex flex-col items-center">
         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
           session.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'
-        } text-zinc-900 font-bold`}>
+        } text-gray-900 font-bold`}>
           {session.sessionNumber}
         </div>
         {!isLast && <div className="w-0.5 h-12 bg-gray-300" />}
@@ -269,9 +269,9 @@ const SessionCard = ({ session, isLast, onComplete }) => {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium text-gray-900">Session {session.sessionNumber}</h3>
-            {session.phase && <p className="text-sm text-zinc-500">{session.phase}</p>}
+            {session.phase && <p className="text-sm text-gray-500">{session.phase}</p>}
             {session.scheduledDate && (
-              <p className="text-sm text-zinc-400 mt-1">
+              <p className="text-sm text-gray-400 mt-1">
                 {new Date(session.scheduledDate).toLocaleDateString('de-DE', {
                   day: '2-digit',
                   month: 'short',
@@ -288,13 +288,13 @@ const SessionCard = ({ session, isLast, onComplete }) => {
         </div>
 
         {session.notes && (
-          <p className="text-sm text-zinc-500 mt-2">{session.notes}</p>
+          <p className="text-sm text-gray-500 mt-2">{session.notes}</p>
         )}
 
         {session.status === 'scheduled' && (
           <button
             onClick={onComplete}
-            className="mt-2 text-sm text-zinc-900 hover:text-indigo-800 font-medium"
+            className="mt-2 text-sm text-gray-900 hover:text-gray-700 font-medium"
           >
             Session abschließen →
           </button>
@@ -314,7 +314,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+        className="bg-white rounded-xl p-6 max-w-md w-full mx-4"
       >
         <h3 className="text-xl font-bold mb-4">Session {session.sessionNumber} abschließen</h3>
 
@@ -329,7 +329,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
               max="100"
               value={progress}
               onChange={(e) => setProgress(parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+              className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
             />
           </div>
 
@@ -342,7 +342,7 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Was wurde gemacht? Wie lief die Session?"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+              className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
             />
           </div>
         </div>
@@ -350,13 +350,13 @@ const CompleteSessionModal = ({ session, onClose, onComplete }) => {
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50"
           >
             Abbrechen
           </button>
           <button
             onClick={() => onComplete(session._id, progress, notes)}
-            className="px-4 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
+            className="px-4 py-2 bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-100"
           >
             Abschließen
           </button>

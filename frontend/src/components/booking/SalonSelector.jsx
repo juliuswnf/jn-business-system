@@ -75,27 +75,27 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
     <div className={className}>
       {/* Search Bar */}
       <div className="relative mb-6">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 w-5 h-5" />
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
         <input
           type="text"
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Salon suchen (Name, Stadt...)"
-          className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-gray-500 focus:border-zinc-500 focus:outline-none transition"
+          className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:border-gray-500 focus:outline-none transition"
         />
       </div>
 
       {/* Salon List */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-700 mx-auto"></div>
-          <p className="text-zinc-500 mt-4">Lade Salons...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700 mx-auto"></div>
+          <p className="text-gray-500 mt-4">Lade Salons...</p>
         </div>
       ) : filteredSalons.length === 0 ? (
         <div className="text-center py-12">
-          <FiScissors className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-500">Keine Salons gefunden</p>
-          <p className="text-zinc-400 text-sm mt-1">
+          <FiScissors className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500">Keine Salons gefunden</p>
+          <p className="text-gray-400 text-sm mt-1">
             {searchQuery ? 'Versuche es mit einem anderen Suchbegriff' : 'Aktuell sind keine Salons verfügbar'}
           </p>
         </div>
@@ -105,10 +105,10 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
             <button
               key={salon._id}
               onClick={() => onSelect(salon)}
-              className={`p-4 rounded-lg border-2 cursor-pointer transition text-left ${
+              className={`p-4 rounded-xl border-2 cursor-pointer transition text-left ${
                 selectedSalonId === salon._id
-                  ? 'border-zinc-900 bg-white shadow-sm'
-                  : 'border-zinc-200 hover:border-zinc-200 bg-zinc-50 hover:bg-zinc-750'
+                  ? 'border-gray-900 bg-white shadow-sm'
+                  : 'border-gray-200 hover:border-gray-200 bg-gray-50 hover:bg-gray-750'
               }`}
             >
               <div className="flex items-start justify-between gap-4">
@@ -116,7 +116,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
                   <h3 className="font-semibold text-lg mb-1 truncate">{salon.name}</h3>
                   
                   {/* Location */}
-                  <div className="flex items-center gap-2 text-sm text-zinc-500 mb-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                     <FiMapPin className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate">
                       {salon.address?.street && `${salon.address.street}, `}
@@ -126,7 +126,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
                   
                   {/* Service Count */}
                   {salon.serviceCount > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-zinc-500">
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
                       <FiScissors className="w-4 h-4" />
                       <span>{salon.serviceCount} {salon.serviceCount === 1 ? 'Service' : 'Services'}</span>
                     </div>
@@ -135,7 +135,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
                 
                 {/* Arrow Icon */}
                 <FiChevronRight className={`w-5 h-5 flex-shrink-0 transition ${
-                  selectedSalonId === salon._id ? 'text-zinc-900' : 'text-zinc-500'
+                  selectedSalonId === salon._id ? 'text-gray-900' : 'text-gray-500'
                 }`} />
               </div>
             </button>
@@ -145,7 +145,7 @@ const SalonSelector = ({ onSelect, selectedSalonId = null, className = '' }) => 
 
       {/* Results Count */}
       {!loading && filteredSalons.length > 0 && (
-        <div className="mt-4 text-center text-sm text-zinc-500">
+        <div className="mt-4 text-center text-sm text-gray-500">
           {filteredSalons.length} {filteredSalons.length === 1 ? 'Salon' : 'Salons'} gefunden
         </div>
       )}

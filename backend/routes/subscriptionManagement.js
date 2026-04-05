@@ -10,11 +10,12 @@ import {
   getSubscriptionStatus
 } from '../controllers/subscriptionManagementController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { checkSubscriptionStatus } from '../middleware/subscriptionMiddleware.js';
 
 const router = express.Router();
 
 // Use protect middleware for authentication
-const authenticateSalon = authMiddleware.protect;
+const authenticateSalon = [authMiddleware.protect, checkSubscriptionStatus];
 
 /**
  * Subscription Management Routes

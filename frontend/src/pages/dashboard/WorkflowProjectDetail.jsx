@@ -48,7 +48,7 @@ export default function WorkflowProjectDetail() {
   if (loading || !project) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -69,8 +69,8 @@ export default function WorkflowProjectDetail() {
 
   const getStatusColor = (status) => {
     const colors = {
-      draft: 'bg-zinc-50 text-zinc-300',
-      scheduled: 'bg-blue-500/20 text-blue-400',
+      draft: 'bg-gray-50 text-gray-300',
+      scheduled: 'bg-gray-50 text-gray-500',
       in_progress: 'bg-yellow-500/20 text-yellow-600',
       completed: 'bg-green-500/20 text-green-600',
       cancelled: 'bg-red-500/20 text-red-600',
@@ -85,7 +85,7 @@ export default function WorkflowProjectDetail() {
       <div className="mb-8">
         <button
           onClick={() => navigate('/dashboard/workflow-projects')}
-          className="text-blue-600 hover:text-blue-800 mb-4 flex items-center"
+          className="text-gray-700 hover:text-gray-800 mb-4 flex items-center"
         >
           ← Zurück zu Projekten
         </button>
@@ -93,13 +93,13 @@ export default function WorkflowProjectDetail() {
           <div className="flex items-center">
             <span className="text-5xl mr-4">{getIndustryIcon(project.industry)}</span>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-zinc-500">{project.description}</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{project.name}</h1>
+              <p className="text-gray-500">{project.description}</p>
             </div>
           </div>
           <button
             onClick={() => navigate(`/dashboard/workflow-projects/${id}/edit`)}
-            className="bg-blue-600 text-zinc-900 px-6 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-gray-900 text-gray-900 px-6 py-2 rounded-xl hover:bg-gray-900"
           >
             Bearbeiten
           </button>
@@ -107,32 +107,32 @@ export default function WorkflowProjectDetail() {
       </div>
 
       {/* Progress Circle */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Fortschritt</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-xl font-semibold tracking-tight text-gray-900">
                   {project.completedSessions}/{project.totalSessions}
                 </div>
-                <div className="text-sm text-zinc-500">Sessions</div>
+                <div className="text-sm text-gray-500">Sessions</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">{project.progress}%</div>
-                <div className="text-sm text-zinc-500">Fortschritt</div>
+                <div className="text-xl font-semibold tracking-tight text-gray-900">{project.progress}%</div>
+                <div className="text-sm text-gray-500">Fortschritt</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-xl font-semibold tracking-tight text-gray-900">
                   {project.totalPrice.toLocaleString()}€
                 </div>
-                <div className="text-sm text-zinc-500">Gesamtpreis</div>
+                <div className="text-sm text-gray-500">Gesamtpreis</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-xl font-semibold tracking-tight text-green-600">
                   {project.paidAmount.toLocaleString()}€
                 </div>
-                <div className="text-sm text-zinc-500">Bezahlt</div>
+                <div className="text-sm text-gray-500">Bezahlt</div>
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function WorkflowProjectDetail() {
                 y="60"
                 textAnchor="middle"
                 dy=".3em"
-                className="text-2xl font-bold fill-gray-900 transform rotate-90"
+                className="text-xl font-semibold tracking-tight fill-gray-900 transform rotate-90"
                 style={{ transformOrigin: '60px 60px' }}
               >
                 {project.progress}%
@@ -172,19 +172,19 @@ export default function WorkflowProjectDetail() {
       </div>
 
       {/* Sessions Timeline */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Sessions</h3>
           <button
             onClick={() => navigate(`/dashboard/workflow-projects/${id}/new-session`)}
-            className="bg-blue-600 text-zinc-900 px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+            className="bg-gray-900 text-gray-900 px-4 py-2 rounded-xl hover:bg-gray-900 text-sm"
           >
             + Neue Session
           </button>
         </div>
 
         {sessions.length === 0 ? (
-          <p className="text-zinc-400 text-center py-8">Noch keine Sessions geplant</p>
+          <p className="text-gray-400 text-center py-8">Noch keine Sessions geplant</p>
         ) : (
           <div className="space-y-4">
             {sessions.map((session, index) => (
@@ -204,19 +204,19 @@ export default function WorkflowProjectDetail() {
 
       {/* Photo Gallery */}
       {sessions.some(s => s.photos?.length > 0) && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Foto-Galerie</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {sessions
               .flatMap(s => s.photos || [])
               .map((photo, index) => (
-                <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
+                <div key={index} className="relative aspect-square rounded-xl overflow-hidden">
                   <img
                     src={photo.url}
                     alt={photo.caption || 'Project photo'}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-50 text-zinc-900 text-xs p-2">
+                  <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-50 text-gray-900 text-xs p-2">
                     {photo.type} - {photo.caption}
                   </div>
                 </div>
@@ -227,17 +227,17 @@ export default function WorkflowProjectDetail() {
 
       {/* Consents */}
       {project.consents?.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Einwilligungen</h3>
           <div className="space-y-2">
             {project.consents.map((consent) => (
               <div
                 key={consent._id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
               >
                 <div>
                   <div className="text-sm font-medium text-gray-900">{consent.type}</div>
-                  <div className="text-xs text-zinc-400">
+                  <div className="text-xs text-gray-400">
                     {consent.signedAt ? `Unterschrieben: ${new Date(consent.signedAt).toLocaleDateString('de-DE')}` : 'Ausstehend'}
                   </div>
                 </div>
@@ -276,7 +276,7 @@ function SessionCard({ session, index, onComplete }) {
 
   const getStatusColor = (status) => {
     const colors = {
-      scheduled: 'bg-blue-500/20 text-blue-400',
+      scheduled: 'bg-gray-50 text-gray-500',
       in_progress: 'bg-yellow-500/20 text-yellow-600',
       completed: 'bg-green-500/20 text-green-600',
       cancelled: 'bg-red-500/20 text-red-600',
@@ -290,28 +290,28 @@ function SessionCard({ session, index, onComplete }) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="flex items-center p-4 bg-zinc-50 rounded-lg border border-zinc-200"
+      className="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200"
     >
-      <div className="flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full text-xl font-bold text-blue-400 mr-4">
+      <div className="flex items-center justify-center w-12 h-12 bg-gray-50 rounded-full text-xl font-bold text-gray-500 mr-4">
         {session.sessionNumber}
       </div>
       <div className="flex-1">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
             <span className="text-2xl mr-2">{getStatusIcon(session.status)}</span>
-            <span className="font-medium text-zinc-900">{session.phase || 'Session'}</span>
+            <span className="font-medium text-gray-900">{session.phase || 'Session'}</span>
           </div>
           <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(session.status)}`}>
             {session.status}
           </span>
         </div>
         {session.scheduledDate && (
-          <div className="text-sm text-zinc-400 mb-1">
+          <div className="text-sm text-gray-400 mb-1">
             📅 {new Date(session.scheduledDate).toLocaleString('de-DE')}
           </div>
         )}
         {session.notes && (
-          <div className="text-sm text-zinc-400">📝 {session.notes}</div>
+          <div className="text-sm text-gray-400">📝 {session.notes}</div>
         )}
         {session.status === 'scheduled' && (
           <button
@@ -340,14 +340,14 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-zinc-50 border border-zinc-200 rounded-lg p-6 max-w-md w-full"
+        className="bg-gray-50 border border-gray-100 rounded-2xl p-6 max-w-md w-full"
       >
-        <h3 className="text-xl font-bold text-zinc-900 mb-4">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">
           Session {session.sessionNumber} abschließen
         </h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Fortschritt nach dieser Session: {progress}%
             </label>
             <input
@@ -360,14 +360,14 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Notizen (optional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-gray-100"
               placeholder="Was wurde gemacht? Wie war die Session?"
             />
           </div>
@@ -375,13 +375,13 @@ function CompleteSessionModal({ session, onClose, onComplete }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-zinc-50 text-zinc-300 py-2 px-4 rounded-lg hover:bg-zinc-100 border border-zinc-200"
+              className="flex-1 bg-gray-50 text-gray-300 py-2 px-4 rounded-xl hover:bg-gray-100 border border-gray-200"
             >
               Abbrechen
             </button>
             <button
               type="submit"
-              className="flex-1 bg-green-600 text-zinc-900 py-2 px-4 rounded-lg hover:bg-green-700"
+              className="flex-1 bg-green-600 text-gray-900 py-2 px-4 rounded-xl hover:bg-green-700"
             >
               Abschließen
             </button>

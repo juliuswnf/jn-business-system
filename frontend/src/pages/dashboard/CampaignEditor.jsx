@@ -126,7 +126,7 @@ const CampaignEditor = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -138,22 +138,22 @@ const CampaignEditor = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/dashboard/marketing')}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className="p-2 hover:bg-gray-100 rounded-xl"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
               {id ? 'Campaign bearbeiten' : 'Neue Campaign'}
             </h1>
-            <p className="text-zinc-500">Konfiguriere deine Marketing-Kampagne</p>
+            <p className="text-gray-500">Konfiguriere deine Marketing-Kampagne</p>
           </div>
         </div>
         <div className="flex gap-3">
           {id && (
             <button
               onClick={loadPreview}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
             >
               <Eye className="w-4 h-4" />
               Vorschau
@@ -162,7 +162,7 @@ const CampaignEditor = () => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+            className="flex items-center gap-2 px-6 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 disabled:bg-gray-400"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Speichert...' : 'Speichern'}
@@ -280,7 +280,7 @@ const CampaignEditor = () => {
               rows={4}
               maxLength={320}
             />
-            <div className="text-xs text-zinc-400 mb-4">
+            <div className="text-xs text-gray-400 mb-4">
               Variablen: {'{{customerName}}'}, {'{{salonName}}'}, {'{{discount}}'}, {'{{discountCode}}'}, {'{{bookingLink}}'}, {'{{validDays}}'}
             </div>
 
@@ -370,7 +370,7 @@ const CampaignEditor = () => {
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white rounded-lg shadow-sm p-6 sticky top-6"
+              className="bg-white rounded-xl shadow-sm p-6 sticky top-6"
             >
               <h3 className="text-lg font-semibold mb-4">📊 Vorschau</h3>
 
@@ -390,10 +390,10 @@ const CampaignEditor = () => {
               {preview.sampleMessage && (
                 <div className="mt-6">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Beispiel-SMS:</h4>
-                  <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-700 border border-gray-200">
+                  <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-700 border border-gray-200">
                     {preview.sampleMessage}
                   </div>
-                  <div className="text-xs text-zinc-400 mt-2 text-right">
+                  <div className="text-xs text-gray-400 mt-2 text-right">
                     {preview.sampleMessage.length} / 320 Zeichen
                   </div>
                 </div>
@@ -406,7 +406,7 @@ const CampaignEditor = () => {
                   </h4>
                   <div className="space-y-2">
                     {preview.recipients.map((r, i) => (
-                      <div key={i} className="text-xs text-zinc-500 bg-gray-50 p-2 rounded">
+                      <div key={i} className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
                         {r.name} ({r.phoneNumber})
                       </div>
                     ))}
@@ -426,7 +426,7 @@ const Section = ({ title, children }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-white rounded-lg shadow p-6"
+    className="bg-white rounded-xl shadow p-6"
   >
     <h2 className="text-xl font-semibold mb-4">{title}</h2>
     <div className="space-y-4">{children}</div>
@@ -438,7 +438,7 @@ const Input = ({ label, ...props }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <input
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      className="w-full px-4 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100 focus:border-transparent"
       {...props}
     />
   </div>
@@ -449,7 +449,7 @@ const Textarea = ({ label, ...props }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <textarea
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      className="w-full px-4 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100 focus:border-transparent"
       {...props}
     />
   </div>
@@ -460,7 +460,7 @@ const Select = ({ label, options, ...props }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <select
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      className="w-full px-4 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100 focus:border-transparent"
       {...props}
     >
       {options.map(opt => (
@@ -475,7 +475,7 @@ const Slider = ({ label, value, onChange, min, max, step, unit = '' }) => (
   <div>
     <div className="flex justify-between items-center mb-2">
       <label className="text-sm font-medium text-gray-700">{label}</label>
-      <span className="text-sm font-semibold text-blue-600">{value}{unit}</span>
+      <span className="text-sm font-semibold text-gray-700">{value}{unit}</span>
     </div>
     <input
       type="range"
@@ -484,9 +484,9 @@ const Slider = ({ label, value, onChange, min, max, step, unit = '' }) => (
       step={step}
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+      className="w-full h-2 bg-gray-200 rounded-xl appearance-none cursor-pointer accent-blue-600"
     />
-    <div className="flex justify-between text-xs text-zinc-400 mt-1">
+    <div className="flex justify-between text-xs text-gray-400 mt-1">
       <span>{min}{unit}</span>
       <span>{max}{unit}</span>
     </div>
@@ -495,10 +495,10 @@ const Slider = ({ label, value, onChange, min, max, step, unit = '' }) => (
 
 // Preview Stat Component
 const PreviewStat = ({ icon, label, value }) => (
-  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
     <div className="flex items-center gap-3">
-      <div className="text-blue-600">{icon}</div>
-      <span className="text-sm text-zinc-500">{label}</span>
+      <div className="text-gray-700">{icon}</div>
+      <span className="text-sm text-gray-500">{label}</span>
     </div>
     <span className="text-lg font-semibold text-gray-900">{value}</span>
   </div>

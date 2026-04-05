@@ -21,22 +21,6 @@ router.post(
   workflowController.enableWorkflow
 );
 
-// GET /api/workflows/:salonId - Get salon workflows
-router.get(
-  '/:salonId',
-  authMiddleware.protect,
-  authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
-  workflowController.getSalonWorkflows
-);
-
-// PUT /api/workflows/:salonId/:industry - Update workflow config
-router.put(
-  '/:salonId/:industry',
-  authMiddleware.protect,
-  authMiddleware.authorize('business', 'ceo', 'salon_owner'),
-  workflowController.updateWorkflowConfig
-);
-
 /**
  * ==================== PROJECT MANAGEMENT ====================
  * Manage workflow projects (tattoo projects, treatment plans, etc.)
@@ -250,5 +234,25 @@ router.post(
 
 // GET /api/portfolio/:salonId - Get portfolio (NO AUTH - Public)
 router.get('/portfolio/:salonId', workflowController.getPortfolio);
+
+/**
+ * ==================== SALON WORKFLOW CONFIG (Dynamic params - MUST be last) ====================
+ */
+
+// GET /api/workflows/:salonId - Get salon workflows
+router.get(
+  '/:salonId',
+  authMiddleware.protect,
+  authMiddleware.authorize('business', 'ceo', 'salon_owner', 'admin'),
+  workflowController.getSalonWorkflows
+);
+
+// PUT /api/workflows/:salonId/:industry - Update workflow config
+router.put(
+  '/:salonId/:industry',
+  authMiddleware.protect,
+  authMiddleware.authorize('business', 'ceo', 'salon_owner'),
+  workflowController.updateWorkflowConfig
+);
 
 export default router;

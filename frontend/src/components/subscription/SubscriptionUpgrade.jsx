@@ -93,11 +93,11 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
 
   if (availableTiers.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-sm">
+      <div className="max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-sm">
         <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100">
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100">
             <svg
-              className="h-10 w-10 text-indigo-600"
+              className="h-10 w-10 text-gray-700"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -118,7 +118,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
           </p>
           <button
             onClick={onCancel}
-            className="mt-6 px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
+            className="mt-6 px-6 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800"
           >
             Zurück
           </button>
@@ -128,7 +128,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-sm">
+    <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-sm">
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900">Plan-Upgrade</h2>
@@ -142,12 +142,12 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
         <label className="block text-sm font-medium text-gray-700 mb-3">
           Abrechnungszyklus
         </label>
-        <div className="flex items-center space-x-4 bg-gray-100 p-1 rounded-lg inline-flex">
+        <div className="flex items-center space-x-4 bg-gray-100 p-1 rounded-xl inline-flex">
           <button
             onClick={() => setBillingCycle('monthly')}
-            className={`px-6 py-2 rounded-lg font-medium transition-all ${
+            className={`px-6 py-2 rounded-xl font-medium transition-all ${
               billingCycle === 'monthly'
-                ? 'bg-white text-indigo-600 shadow-sm'
+                ? 'bg-white text-gray-700 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -155,9 +155,9 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
           </button>
           <button
             onClick={() => setBillingCycle('yearly')}
-            className={`px-6 py-2 rounded-lg font-medium transition-all ${
+            className={`px-6 py-2 rounded-xl font-medium transition-all ${
               billingCycle === 'yearly'
-                ? 'bg-white text-indigo-600 shadow-sm'
+                ? 'bg-white text-gray-700 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -173,10 +173,10 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
           <button
             key={tier}
             onClick={() => setSelectedTier(tier)}
-            className={`p-6 rounded-lg border-2 transition-all text-left ${
+            className={`p-6 rounded-xl border-2 transition-all text-left ${
               selectedTier === tier
-                ? 'border-indigo-600 bg-indigo-50'
-                : 'border-gray-200 hover:border-indigo-300'
+                ? 'border-gray-200 bg-gray-50'
+                : 'border-gray-200 hover:border-gray-200'
             }`}
           >
             {/* Tier Name & Price */}
@@ -192,10 +192,10 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
                 )}
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-indigo-600">
+                <div className="text-2xl font-bold text-gray-700">
                   €{prices[tier][billingCycle]}
                 </div>
-                <div className="text-sm text-zinc-400">
+                <div className="text-sm text-gray-400">
                   {billingCycle === 'yearly' ? '/ Jahr' : '/ Monat'}
                 </div>
               </div>
@@ -225,8 +225,8 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
 
             {/* Selected Indicator */}
             {selectedTier === tier && (
-              <div className="mt-4 pt-4 border-t border-indigo-200">
-                <div className="flex items-center text-indigo-600 font-semibold">
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center text-gray-700 font-semibold">
                   <svg
                     className="w-5 h-5 mr-2"
                     fill="currentColor"
@@ -248,10 +248,10 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
 
       {/* Prorated Amount */}
       {selectedTier && proratedAmount !== null && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
           <div className="flex items-start">
             <svg
-              className="w-5 h-5 text-blue-600 mt-0.5 mr-3"
+              className="w-5 h-5 text-gray-700 mt-0.5 mr-3"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -262,10 +262,10 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
               />
             </svg>
             <div>
-              <h4 className="text-sm font-semibold text-blue-900">
+              <h4 className="text-sm font-semibold text-gray-900">
                 Anteilige Abrechnung
               </h4>
-              <p className="text-sm text-blue-800 mt-1">
+              <p className="text-sm text-gray-700 mt-1">
                 Du wirst ca. <span className="font-bold">€{proratedAmount.toFixed(2)}</span> für
                 den verbleibenden Zeitraum berechnet. Der volle Betrag von €
                 {prices[selectedTier][billingCycle]} wird ab der nächsten Periode fällig.
@@ -277,7 +277,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
           <div className="flex items-start">
             <svg
               className="w-5 h-5 text-red-600 mt-0.5 mr-2"
@@ -303,10 +303,10 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
         <button
           onClick={handleUpgrade}
           disabled={!selectedTier || loading}
-          className={`flex-1 py-3 px-6 rounded-lg font-semibold text-zinc-900 transition-all ${
+          className={`flex-1 py-3 px-6 rounded-xl font-semibold text-gray-900 transition-all ${
             !selectedTier || loading
               ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-indigo-600 hover:bg-indigo-700'
+              : 'bg-gray-900 hover:bg-gray-800'
           }`}
         >
           {loading ? (
@@ -339,7 +339,7 @@ const SubscriptionUpgrade = ({ currentTier, onSuccess, onCancel }) => {
         </button>
         <button
           onClick={onCancel}
-          className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50"
+          className="px-6 py-3 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50"
         >
           Abbrechen
         </button>
