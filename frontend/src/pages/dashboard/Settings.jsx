@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Building2, Clock, Star, Mail, CreditCard, Bell, Save, ExternalLink, Palette, MapPin } from 'lucide-react';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
-import { salonAPI } from '../../utils/api';
+import { salonAPI, api } from '../../utils/api';
 import { Link } from 'react-router-dom';
 import NoShowKillerSettings from './Settings/NoShowKiller';
 import { useIsMobile } from '../../hooks/useMediaQuery';
@@ -342,7 +342,16 @@ export default function Settings() {
               </div>
 
               {!integrations.stripeConnected && (
-                <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-100 text-gray-900 rounded-xl transition">
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await api.post('/stripe-connect/create-account');
+                      if (res.data?.url) window.location.href = res.data.url;
+                    } catch {
+                      // StripeConnectAlert handles the full flow
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-xl transition">
                   <ExternalLink className="w-4 h-4" />
                   Mit Stripe verbinden
                 </button>

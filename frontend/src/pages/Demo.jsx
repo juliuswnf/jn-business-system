@@ -109,7 +109,7 @@ export default function Demo() {
             </div>
 
             {/* Widget Content */}
-            <div className="p-8">
+            <div className="p-4 md:p-8">
 
               {/* Salon badge */}
               {!done && (
@@ -340,7 +340,7 @@ export default function Demo() {
           </p>
 
           {/* CTA */}
-          <div className="mt-14 border border-gray-100 rounded-2xl p-8 text-center">
+          <div className="mt-14 border border-gray-100 rounded-2xl p-6 md:p-8 text-center">
             <h2 className="text-2xl font-semibold tracking-tight mb-2">Bereit loszulegen?</h2>
             <p className="text-gray-500 mb-6 text-sm">14 Tage Enterprise kostenlos – kein Kreditkarte erforderlich.</p>
             <Link

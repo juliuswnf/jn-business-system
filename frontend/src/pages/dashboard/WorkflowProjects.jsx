@@ -100,7 +100,7 @@ export default function WorkflowProjects() {
         </div>
         <button
           onClick={() => navigate('/dashboard/workflow-projects/new')}
-          className="bg-gray-900 text-gray-900 px-6 py-2 rounded-xl hover:bg-gray-900 transition-colors"
+          className="bg-gray-900 text-white px-6 py-2 rounded-xl hover:bg-gray-900 transition-colors"
         >
           + Neues Projekt
         </button>
@@ -196,13 +196,14 @@ export default function WorkflowProjects() {
           <p className="text-gray-400 mb-4">Noch keine Projekte vorhanden</p>
           <button
             onClick={() => navigate('/dashboard/workflow-projects/new')}
-            className="bg-gray-900 text-gray-900 px-6 py-2 rounded-xl hover:bg-gray-900 transition-colors"
+            className="bg-gray-900 text-white px-6 py-2 rounded-xl hover:bg-gray-900 transition-colors"
           >
             Erstes Projekt erstellen
           </button>
         </div>
       ) : (
-        <div className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden">
+        <div className="bg-gray-50 border border-gray-100 rounded-2xl">
+          <div className="overflow-x-auto rounded-2xl">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -306,6 +307,7 @@ export default function WorkflowProjects() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

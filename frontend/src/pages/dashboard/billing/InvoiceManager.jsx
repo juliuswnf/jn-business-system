@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 const sepaMandates = [
   { id: 'm1', customer: 'Anna Müller', iban: 'DE12 •••• •••• •••• 1234', since: '2025-11-10' },
@@ -69,7 +70,8 @@ export default function InvoiceManager() {
           <div className="space-y-4">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900"
+              onClick={() => toast('Rechnungserstellung wird in Kürze verfügbar sein.', { icon: '📋' })}
+              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition"
             >
               Neue Rechnung erstellen
             </button>
@@ -95,6 +97,7 @@ export default function InvoiceManager() {
                       <td className="px-3 py-2">
                         <button
                           type="button"
+                          onClick={() => toast('PDF-Download wird in Kürze verfügbar sein.', { icon: '📄' })}
                           className="text-xs font-medium text-gray-700 underline hover:text-gray-900"
                         >
                           PDF herunterladen

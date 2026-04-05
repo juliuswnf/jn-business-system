@@ -162,7 +162,7 @@ const CampaignEditor = () => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 disabled:bg-gray-400"
+            className="flex items-center gap-2 px-6 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 disabled:bg-gray-400"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Speichert...' : 'Speichern'}

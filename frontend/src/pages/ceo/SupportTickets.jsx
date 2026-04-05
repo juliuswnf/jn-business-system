@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { ceoAPI } from '../../utils/api';
+import { formatDateTimeDE } from '../../utils/helpers';
 
 const SupportTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -87,14 +88,6 @@ const SupportTickets = () => {
     } catch (err) {
       showMessage('Fehler beim Aktualisieren', 'error');
     }
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('de-DE', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
   };
 
   const getStatusBadge = (status) => {
@@ -227,7 +220,7 @@ const SupportTickets = () => {
                     <p className="text-gray-400 text-sm line-clamp-2 mb-2">{ticket.messages?.[0]?.content || ticket.description}</p>
                     <div className="flex items-center justify-between">
                       {getStatusBadge(ticket.status)}
-                      <span className="text-gray-500 text-xs">{formatDate(ticket.createdAt)}</span>
+                      <span className="text-gray-500 text-xs">{formatDateTimeDE(ticket.createdAt)}</span>
                     </div>
                   </button>
                 ))}
@@ -259,7 +252,7 @@ const SupportTickets = () => {
                       <div key={idx} className={`p-4 rounded-lg ${msg.sender === 'support' || msg.sender === 'ceo' ? 'bg-gray-50 border border-gray-300 ml-8' : 'bg-gray-50 mr-8'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-gray-900">{msg.sender === 'support' || msg.sender === 'ceo' ? 'Support Team' : selectedTicket.customerName || 'Kunde'}</span>
-                          <span className="text-xs text-gray-400">{formatDate(msg.createdAt)}</span>
+                          <span className="text-xs text-gray-400">{formatDateTimeDE(msg.createdAt)}</span>
                         </div>
                         <p className="text-gray-600 text-sm whitespace-pre-wrap">{msg.content}</p>
                       </div>

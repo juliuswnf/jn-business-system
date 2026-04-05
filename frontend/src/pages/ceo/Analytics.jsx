@@ -151,17 +151,24 @@ const Analytics = () => {
           <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6">Abonnements</h3>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
-                <span className="text-gray-900">Pro Plan (€69/Mo)</span>
+              <div className="flex items-center justify-between p-4 bg-amber-500/10 rounded-lg border border-amber-500/30">
+                <span className="text-gray-900">Enterprise Plan (€599/Mo)</span>
                 <div className="text-right">
-                  <p className="text-gray-900 font-bold">{formatCurrency((overview?.subscriptions?.pro || 0) * 69)}</p>
-                  <p className="text-gray-400 text-sm">{overview?.subscriptions?.pro || 0} Kunden</p>
+                  <p className="text-gray-900 font-bold">{formatCurrency((overview?.subscriptions?.enterprise || 0) * 599)}</p>
+                  <p className="text-gray-400 text-sm">{overview?.subscriptions?.enterprise || 0} Kunden</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
+                <span className="text-gray-900">Professional Plan (€249/Mo)</span>
+                <div className="text-right">
+                  <p className="text-gray-900 font-bold">{formatCurrency((overview?.subscriptions?.professional || 0) * 249)}</p>
+                  <p className="text-gray-400 text-sm">{overview?.subscriptions?.professional || 0} Kunden</p>
                 </div>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200/30">
-                <span className="text-gray-900">Starter Plan (€29/Mo)</span>
+                <span className="text-gray-900">Starter Plan (€129/Mo)</span>
                 <div className="text-right">
-                  <p className="text-gray-900 font-bold">{formatCurrency((overview?.subscriptions?.starter || 0) * 29)}</p>
+                  <p className="text-gray-900 font-bold">{formatCurrency((overview?.subscriptions?.starter || 0) * 129)}</p>
                   <p className="text-gray-400 text-sm">{overview?.subscriptions?.starter || 0} Kunden</p>
                 </div>
               </div>

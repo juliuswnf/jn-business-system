@@ -19,7 +19,7 @@ const unlockAndResetCEO = async () => {
     console.log('? Database connected');
 
     // Find and unlock CEO
-    const ceo = await User.findOne({ email: 'julius@jn-business-system.de' });
+    const ceo = await User.findOne({ email: 'julius@jn-automation.de' });
 
     if (!ceo) {
       console.log('? CEO not found');
@@ -32,7 +32,7 @@ const unlockAndResetCEO = async () => {
 
     // Reset password and unlock
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('CEO@12345', salt);
+    const hashedPassword = await bcrypt.hash('2007uf-21LC.JSG', salt);
 
     ceo.password = hashedPassword;
     ceo.loginAttempts = 0;

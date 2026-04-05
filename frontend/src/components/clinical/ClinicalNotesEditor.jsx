@@ -153,7 +153,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
             resetForm();
             setIsEditing(true);
           }}
-          className="flex items-center space-x-2 px-6 py-3 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
+          className="flex items-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
         >
           <FileText className="w-5 h-5" />
           <span>New Note</span>
@@ -367,7 +367,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                   <div className="flex space-x-4 pt-6 border-t">
                     <button
                       onClick={handleSave}
-                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
+                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
                     >
                       <Save className="w-5 h-5" />
                       <span>Save Note (Encrypted)</span>

@@ -47,8 +47,8 @@ const Checkout = ({ onPaymentStart, onPaymentSuccess, onPaymentError }) => {
 
       onPaymentSuccess();
       success('Payment processed successfully');
-    } catch (error) {
-      const msg = formatError(error);
+    } catch (err) {
+      const msg = formatError(err);
       onPaymentError(msg);
       error(msg);
     } finally {

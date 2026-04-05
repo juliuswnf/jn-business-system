@@ -99,7 +99,7 @@ export default function WorkflowProjectDetail() {
           </div>
           <button
             onClick={() => navigate(`/dashboard/workflow-projects/${id}/edit`)}
-            className="bg-gray-900 text-gray-900 px-6 py-2 rounded-xl hover:bg-gray-900"
+            className="bg-gray-900 text-white px-6 py-2 rounded-xl hover:bg-gray-900"
           >
             Bearbeiten
           </button>
@@ -177,7 +177,7 @@ export default function WorkflowProjectDetail() {
           <h3 className="text-lg font-semibold text-gray-900">Sessions</h3>
           <button
             onClick={() => navigate(`/dashboard/workflow-projects/${id}/new-session`)}
-            className="bg-gray-900 text-gray-900 px-4 py-2 rounded-xl hover:bg-gray-900 text-sm"
+            className="bg-gray-900 text-white px-4 py-2 rounded-xl hover:bg-gray-900 text-sm"
           >
             + Neue Session
           </button>

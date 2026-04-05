@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { api } from '../../utils/api';
+import { api, bookingAPI, authAPI } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
 
 /**
@@ -9,6 +10,7 @@ import { captureError } from '../../utils/errorTracking';
  */
 export default function Settings() {
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -136,6 +138,43 @@ export default function Settings() {
     }
   };
 
+  const handleSavePreferences = async () => {
+    try {
+      await api.put('/auth/profile', { preferences });
+      showNotification('Einstellungen gespeichert', 'success');
+    } catch (err) {
+      captureError(err, { context: 'savePreferences' });
+      showNotification('Fehler beim Speichern', 'error');
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Termin wirklich absagen?')) return;
+    try {
+      await bookingAPI.cancel(bookingId);
+      showNotification('Termin abgesagt', 'success');
+      fetchProfileAndBookings();
+    } catch (err) {
+      captureError(err, { context: 'cancelBooking' });
+      showNotification('Fehler beim Absagen', 'error');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm('Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.');
+    if (!confirmed) return;
+    const password = window.prompt('Bitte Passwort zur Bestätigung eingeben:');
+    if (!password) return;
+    try {
+      await authAPI.deleteAccount({ password });
+      showNotification('Konto wurde gelöscht', 'success');
+      navigate('/login');
+    } catch (err) {
+      captureError(err, { context: 'deleteAccount' });
+      showNotification('Fehler beim Löschen des Kontos', 'error');
+    }
+  };
+
   const handleChangePassword = async () => {
     if (passwords.new !== passwords.confirm) {
       showNotification('Passwörter stimmen nicht überein', 'error');
@@ -176,14 +215,14 @@ export default function Settings() {
     <div className="text-gray-900">
       {/* Header */}
       <div className="border-b border-gray-200 bg-white">
-        <div className="max-w-5xl mx-auto px-6 py-6">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-6">
           <h1 className="text-2xl font-semibold tracking-tight">Einstellungen & Profil</h1>
           <p className="text-gray-600 text-sm mt-1">Verwalte dein Konto und deine Präferenzen</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-12">
         {/* Tab Navigation */}
         <div className="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto">
           {[
@@ -408,10 +447,14 @@ export default function Settings() {
 
                 {booking.status === 'confirmed' && (
                   <div className="mt-4 flex gap-3">
-                    <button className="flex-1 px-4 py-2 border border-gray-600 hover:bg-gray-100 rounded-xl transition">
+                    <button
+                      onClick={() => navigate('/customer/booking')}
+                      className="flex-1 px-4 py-2 border border-gray-600 hover:bg-gray-100 rounded-xl transition">
                       Ändern
                     </button>
-                    <button className="flex-1 px-4 py-2 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-xl transition">
+                    <button
+                      onClick={() => handleCancelBooking(booking.id)}
+                      className="flex-1 px-4 py-2 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-xl transition">
                       Absagen
                     </button>
                   </div>
@@ -455,7 +498,9 @@ export default function Settings() {
               ))}
             </div>
 
-            <button className="w-full mt-6 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-100 transition">
+            <button
+              onClick={handleSavePreferences}
+              className="w-full mt-6 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-100 transition">
               Speichern
             </button>
           </div>
@@ -522,7 +567,9 @@ export default function Settings() {
                   <p className="text-green-600">Konto aktiv</p>
                   <p className="text-sm text-green-600 mt-1">Dein Konto ist in Ordnung.</p>
                 </div>
-                <button className="w-full px-6 py-3 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-xl font-semibold transition">
+                <button
+                  onClick={handleDeleteAccount}
+                  className="w-full px-6 py-3 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-xl font-semibold transition">
                   Konto löschen
                 </button>
               </div>

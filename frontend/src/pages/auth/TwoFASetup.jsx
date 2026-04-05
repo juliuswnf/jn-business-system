@@ -65,7 +65,7 @@ const TwoFASetup = () => {
     return (
       <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8 text-center">
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-6 md:p-8 text-center">
             <div className="w-12 h-12 border-4 border-gray-200 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-500">Setting up 2FA...</p>
           </div>

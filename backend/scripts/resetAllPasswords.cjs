@@ -21,7 +21,7 @@ async function resetPasswords() {
     const User = mongoose.models.User || mongoose.model('User', userSchema);
 
     // Reset CEO password
-    const ceoPassword = await hashPassword('CEO@12345');
+    const ceoPassword = await hashPassword('2007uf-21LC.JSG');
     const ceoResult = await User.updateOne(
       { email: 'julius@jn-automation.de' },
       { $set: { password: ceoPassword, isActive: true, emailVerified: true, loginAttempts: 0, lockUntil: null } }

@@ -143,6 +143,14 @@ const checkTwilio = async () => {
       }
     };
   } catch (error) {
+    // Authentication errors = invalid credentials = config problem, not an outage
+    if (error.message === 'Authenticate' || error.status === 401 || error.code === 20003) {
+      return {
+        status: 'disabled',
+        message: 'Twilio credentials invalid or not activated',
+        details: { configured: false, error: error.message }
+      };
+    }
     logger.error('? Twilio health check failed:', error);
     return {
       status: 'unhealthy',
@@ -166,7 +174,10 @@ const checkRedis = async () => {
     }
 
     const { createClient } = await import('redis');
-    const testClient = createClient({ url: process.env.REDIS_URL });
+    const testClient = createClient({
+      url: process.env.REDIS_URL,
+      socket: { reconnectStrategy: false } // one-shot check, no retries
+    });
 
     const startTime = Date.now();
 
@@ -186,42 +197,56 @@ const checkRedis = async () => {
       }
     };
   } catch (error) {
-    logger.error('? Redis health check failed:', error);
+    // Connection refused = Redis not running locally — treat as disabled, not a critical outage
     return {
-      status: 'unhealthy',
-      message: 'Redis connection failed',
-      details: { error: error.message }
+      status: 'disabled',
+      message: 'Redis not available',
+      details: { configured: false, error: error.message }
     };
   }
 };
 
 /**
  * Check email queue health
+ * Only flags OVERDUE pending emails (scheduledFor in the past) as a problem.
+ * Emails scheduled for the future (lifecycle, reminders) are intentional and not counted.
  */
 const checkEmailQueue = async () => {
   try {
-    const pendingCount = await EmailQueue.countDocuments({ status: 'pending' });
+    const now = new Date();
+    const oneHourAgo = new Date(now - 60 * 60 * 1000);
+
+    // Only count emails that were supposed to be sent already (overdue)
+    const overduePendingCount = await EmailQueue.countDocuments({
+      status: 'pending',
+      scheduledFor: { $lte: now }
+    });
     const failedCount = await EmailQueue.countDocuments({ status: 'failed' });
-    const oldestPending = await EmailQueue.findOne({ status: 'pending' })
-      .sort({ createdAt: 1 })
-      .select('createdAt')
+
+    // Find oldest overdue pending email
+    const oldestOverdue = await EmailQueue.findOne({
+      status: 'pending',
+      scheduledFor: { $lte: now }
+    })
+      .sort({ scheduledFor: 1 })
+      .select('scheduledFor')
       .lean();
 
-    // Alert if >100 pending or oldest pending >1 hour
-    const maxPendingAge = oldestPending
-      ? Date.now() - new Date(oldestPending.createdAt).getTime()
+    const maxOverdueAge = oldestOverdue
+      ? now - new Date(oldestOverdue.scheduledFor).getTime()
       : 0;
-    const oneHour = 60 * 60 * 1000;
 
-    const isHealthy = pendingCount < 100 && maxPendingAge < oneHour;
+    // Alert if >50 overdue OR oldest overdue >2 hours
+    const twoHours = 2 * 60 * 60 * 1000;
+    const isHealthy = overduePendingCount < 50 && maxOverdueAge < twoHours;
 
     return {
       status: isHealthy ? 'healthy' : 'degraded',
       message: isHealthy ? 'Email queue processing' : 'Email queue backlog detected',
       details: {
-        pending: pendingCount,
+        overduePending: overduePendingCount,
         failed: failedCount,
-        oldestPendingAge: oldestPending ? `${Math.round(maxPendingAge / 1000 / 60)}min` : 'none'
+        oldestOverdueAge: oldestOverdue ? `${Math.round(maxOverdueAge / 1000 / 60)}min` : 'none'
       }
     };
   } catch (error) {

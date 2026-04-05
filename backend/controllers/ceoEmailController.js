@@ -21,8 +21,10 @@ export const getAllCampaigns = async (req, res) => {
     // Get campaigns from email logs
     const campaigns = await EmailLog.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1).lean().maxTimeMS(5000) * limit)
-      .limit(parseInt(limit));
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean()
+      .maxTimeMS(5000);
 
     const total = await EmailLog.countDocuments(query);
 

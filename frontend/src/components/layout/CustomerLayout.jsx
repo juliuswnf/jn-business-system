@@ -30,7 +30,7 @@ const CustomerLayout = ({ children }) => {
                 )}
                 <Link
                   to={link.to}
-                  className={`px-3 py-3 text-sm whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                  className={`px-3.5 py-3.5 text-sm whitespace-nowrap transition-colors border-b-2 -mb-px min-h-[44px] flex items-center ${
                     isActive(link.to)
                       ? 'text-gray-900 font-medium border-gray-900'
                       : 'text-gray-500 hover:text-gray-900 font-normal border-transparent hover:border-gray-300'
@@ -46,7 +46,9 @@ const CustomerLayout = ({ children }) => {
 
       {/* Main Content */}
       <main className="text-gray-900">
-        {children}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {children}
+        </div>
       </main>
 
       {/* Footer */}

@@ -28,11 +28,11 @@ const lifecycleEmailSchema = new mongoose.Schema({
     enum: [
       'welcome_day1',      // Day 1: Welcome + Setup Guide
       'engagement_day3',   // Day 3: "Created your first appointment?"
-      'midtrial_day7',     // Day 7: "3 weeks trial left - need help?"
-      'urgency_day23',     // Day 23: "Only 7 days left"
-      'expiry_day30',      // Day 30: "Trial ends today - upgrade now"
-      'expired_day31',     // Day 31: "Your trial expired - get 20% off"
-      'winback_day45'      // Day 45: Win-back campaign
+      'midtrial_day7',     // Day 7: "Halfway through — 7 days left"
+      'urgency_day12',     // Day 12: "Only 2 days left"
+      'expiry_day14',      // Day 14: "Trial ends today - upgrade now"
+      'expired_day15',     // Day 15: "Your trial expired - get 20% off"
+      'winback_day21'      // Day 21: Win-back campaign
     ],
     required: true
   },
@@ -106,10 +106,10 @@ lifecycleEmailSchema.statics.scheduleForNewSalon = async function(salon, user) {
     { type: 'welcome_day1', days: 0 },      // Immediately (or within 1 hour)
     { type: 'engagement_day3', days: 3 },
     { type: 'midtrial_day7', days: 7 },
-    { type: 'urgency_day23', days: 23 },
-    { type: 'expiry_day30', days: 30 },
-    { type: 'expired_day31', days: 31 },
-    { type: 'winback_day45', days: 45 }
+    { type: 'urgency_day12', days: 12 },   // 2 days before trial end
+    { type: 'expiry_day14', days: 14 },    // Trial ends today
+    { type: 'expired_day15', days: 15 },   // Day after expiry
+    { type: 'winback_day21', days: 21 }    // Win-back
   ];
 
   const emails = [];

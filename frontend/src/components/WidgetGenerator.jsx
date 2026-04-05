@@ -21,7 +21,7 @@ const WidgetGenerator = ({ salonSlug }) => {
         />
         <button
           onClick={copyToClipboard}
-          className="px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900"
+          className="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900"
         >
           {copied ? 'Kopiert!' : 'Code kopieren'}
         </button>

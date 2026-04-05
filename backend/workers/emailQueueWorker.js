@@ -385,14 +385,26 @@ const cancelScheduledEmails = async (bookingId) => {
  */
 const cleanupOldEmails = async () => {
   try {
+    // Delete sent/failed/cancelled emails older than 30 days
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const result = await EmailQueue.deleteMany({
       status: { $in: ['sent', 'failed', 'cancelled'] },
       updatedAt: { $lt: thirtyDaysAgo }
     });
     if (result.deletedCount > 0) {
-      logger.log(`?? Cleaned up ${result.deletedCount} old email queue items`);
+      logger.log(`🧹 Cleaned up ${result.deletedCount} old email queue items`);
     }
+
+    // Auto-expire stuck pending emails: scheduledFor >2h ago and still pending
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    const expiredResult = await EmailQueue.updateMany(
+      { status: 'pending', scheduledFor: { $lt: twoHoursAgo } },
+      { $set: { status: 'failed', error: 'Auto-expired: pending >2h past scheduled time' } }
+    );
+    if (expiredResult.modifiedCount > 0) {
+      logger.log(`⏰ Auto-expired ${expiredResult.modifiedCount} stuck pending emails`);
+    }
+
     return result;
   } catch (error) {
     logger.error('Error cleaning up old emails:', error);

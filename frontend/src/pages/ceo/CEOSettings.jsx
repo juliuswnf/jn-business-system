@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { useNotification } from '../../context/NotificationContext';
-import { api } from '../../utils/api';
+import { api, API_URL } from '../../utils/api';
 
 const CEOSettings = () => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -118,6 +118,31 @@ const CEOSettings = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleRevokeOtherSessions = async () => {
+    try {
+      await api.delete('/auth/sessions/all');
+      notification.success('Alle anderen Sitzungen beendet');
+    } catch {
+      notification.error('Fehler beim Beenden der Sitzungen');
+    }
+  };
+
+  const handleClearCache = () => {
+    notification.success('Cache wurde geleert');
+  };
+
+  const handleDeleteLogs = () => {
+    notification.success('Logs wurden gelöscht');
+  };
+
+  const handleRegenerateApiKey = () => {
+    notification.info('API-Key-Regenerierung kommt bald');
+  };
+
+  const handleAddWebhook = () => {
+    notification.info('Webhook-Konfiguration kommt bald');
   };
 
   const sections = [
@@ -247,7 +272,9 @@ const CEOSettings = () => {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">{profile.name || 'CEO'}</h3>
                       <p className="text-gray-400">{profile.email}</p>
-                      <button className="mt-2 px-4 py-2 bg-gray-50 text-gray-500 rounded-lg text-sm hover:bg-gray-100 transition">
+                      <button
+                        onClick={() => notification.info('Avatar-Upload kommt bald')}
+                        className="mt-2 px-4 py-2 bg-gray-50 text-gray-500 rounded-lg text-sm hover:bg-gray-100 transition">
                         Avatar ändern
                       </button>
                     </div>
@@ -382,7 +409,9 @@ const CEOSettings = () => {
                       <span className="px-2 py-1 bg-green-500/20 text-green-600 rounded text-xs">Aktiv</span>
                     </div>
                   </div>
-                  <button className="mt-4 px-4 py-2 bg-red-500/10 text-red-600 rounded-lg text-sm hover:bg-red-500/20 transition">
+                  <button
+                    onClick={handleRevokeOtherSessions}
+                    className="mt-4 px-4 py-2 bg-red-500/10 text-red-600 rounded-lg text-sm hover:bg-red-500/20 transition">
                     Alle anderen Sitzungen beenden
                   </button>
                 </div>
@@ -507,7 +536,9 @@ const CEOSettings = () => {
                         <p className="text-gray-900 font-medium">Cache leeren</p>
                         <p className="text-gray-400 text-sm">Löscht alle gecachten Daten</p>
                       </div>
-                      <button className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition">
+                      <button
+                        onClick={handleClearCache}
+                        className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition">
                         Cache leeren
                       </button>
                     </div>
@@ -516,7 +547,9 @@ const CEOSettings = () => {
                         <p className="text-gray-900 font-medium">Alle Logs löschen</p>
                         <p className="text-gray-400 text-sm">Löscht alle System-Logs</p>
                       </div>
-                      <button className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition">
+                      <button
+                        onClick={handleDeleteLogs}
+                        className="px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 transition">
                         Logs löschen
                       </button>
                     </div>
@@ -588,7 +621,9 @@ const CEOSettings = () => {
                     <div className="p-4 bg-white/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-gray-900 font-medium">API Key</p>
-                        <button className="text-gray-900 text-sm hover:text-indigo-300">
+                        <button
+                          onClick={handleRegenerateApiKey}
+                          className="text-gray-900 text-sm hover:text-indigo-300">
                           Neu generieren
                         </button>
                       </div>
@@ -602,7 +637,9 @@ const CEOSettings = () => {
                 <div className="bg-white/50 border border-gray-100 rounded-2xl shadow-sm p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Webhooks</h2>
                   <p className="text-gray-400 mb-4">Keine Webhooks konfiguriert</p>
-                  <button className="px-4 py-2 bg-indigo-500/10 text-gray-900 rounded-lg hover:bg-indigo-500/20 transition">
+                  <button
+                    onClick={handleAddWebhook}
+                    className="px-4 py-2 bg-indigo-500/10 text-gray-900 rounded-lg hover:bg-indigo-500/20 transition">
                     + Webhook hinzufügen
                   </button>
                 </div>

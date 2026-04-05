@@ -17,7 +17,7 @@ const TwoFAVerify = () => {
     return (
       <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-8 text-center">
+          <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 md:p-8 text-center">
             <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-4">Ungültige Sitzung</h2>
             <p className="text-gray-500 mb-6">Bitte melden Sie sich erneut an.</p>
             <Link
