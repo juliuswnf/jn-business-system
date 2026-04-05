@@ -1,11 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import UserMenu from '../common/UserMenu';
+import Navbar from './Navbar';
 
-/**
- * CustomerLayout Component
- * Layout for customer-facing pages with navigation and UserMenu
- */
 const CustomerLayout = ({ children }) => {
   const location = useLocation();
 
@@ -20,76 +16,50 @@ const CustomerLayout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-zinc-700 border-b border-zinc-600 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
-                <span className="text-zinc-900 font-bold text-sm">JN</span>
-              </div>
-              <span className="text-white font-semibold text-lg hidden sm:block">JN Business System</span>
-            </Link>
+      {/* Shared Navbar — same on every page */}
+      <Navbar />
 
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
+      {/* Customer sub-navigation */}
+      <div className="bg-white border-b border-gray-100 sticky top-16 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide py-0">
+            {navLinks.map((link, idx) => (
+              <React.Fragment key={link.to}>
+                {idx > 0 && (
+                  <span className="w-px h-3.5 bg-gray-200 mx-1 shrink-0" aria-hidden="true" />
+                )}
                 <Link
-                  key={link.to}
                   to={link.to}
-                  className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                  className={`px-3 py-3 text-sm whitespace-nowrap transition-colors border-b-2 -mb-px ${
                     isActive(link.to)
-                      ? 'bg-zinc-600 text-white border-zinc-500'
-                      : 'text-gray-300 bg-zinc-700 border-zinc-700 hover:text-white hover:bg-zinc-600 hover:border-zinc-500'
+                      ? 'text-gray-900 font-medium border-gray-900'
+                      : 'text-gray-500 hover:text-gray-900 font-normal border-transparent hover:border-gray-300'
                   }`}
                 >
                   {link.label}
                 </Link>
-              ))}
-            </nav>
-
-            {/* User Menu */}
-            <UserMenu />
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-zinc-600">
-          <div className="px-4 py-2 flex gap-1 overflow-x-auto">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`px-3 py-1.5 rounded-lg border text-sm font-medium whitespace-nowrap transition-colors ${
-                  isActive(link.to)
-                    ? 'bg-zinc-600 text-white border-zinc-500'
-                    : 'text-gray-300 bg-zinc-700 border-zinc-700 hover:text-white hover:bg-zinc-600 hover:border-zinc-500'
-                }`}
-              >
-                {link.label}
-              </Link>
+              </React.Fragment>
             ))}
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="text-zinc-900">
+      <main className="text-gray-900">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-zinc-100 py-6 mt-auto">
+      <footer className="bg-white border-t border-gray-100 py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-zinc-400 text-sm">
+            <p className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} JN Business System. Alle Rechte vorbehalten.
             </p>
             <div className="flex items-center gap-4">
-              <Link to="/privacy" className="text-zinc-400 hover:text-zinc-900 text-sm">Datenschutz</Link>
-              <Link to="/terms" className="text-zinc-400 hover:text-zinc-900 text-sm">AGB</Link>
-              <Link to="/imprint" className="text-zinc-400 hover:text-zinc-900 text-sm">Impressum</Link>
+              <Link to="/privacy" className="text-gray-400 hover:text-gray-900 text-sm">Datenschutz</Link>
+              <Link to="/terms" className="text-gray-400 hover:text-gray-900 text-sm">AGB</Link>
+              <Link to="/imprint" className="text-gray-400 hover:text-gray-900 text-sm">Impressum</Link>
             </div>
           </div>
         </div>

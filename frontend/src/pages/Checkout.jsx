@@ -129,12 +129,12 @@ export default function Checkout() {
   const totalAmount = (price * 1.19).toFixed(2);
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 py-12">
+    <div className="min-h-screen bg-white text-gray-900 py-12">
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
         <Link
           to="/pricing"
-          className="inline-flex items-center gap-2 text-zinc-700 hover:text-zinc-900 mb-8 transition"
+          className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-8 transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -145,11 +145,11 @@ export default function Checkout() {
         <div className="grid md:grid-cols-2 gap-12">
           {/* Left: Plan Info */}
           <div>
-            <h1 className="text-3xl font-bold mb-2">{plan.name} Plan</h1>
-            <p className="text-zinc-700 mb-8">{plan.description}</p>
+            <h1 className="text-2xl font-semibold tracking-tight mb-2">{plan.name} Plan</h1>
+            <p className="text-gray-700 mb-8">{plan.description}</p>
 
             {/* Features */}
-            <div className="bg-zinc-50 rounded-lg p-5 border border-zinc-200 mb-6">
+            <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 mb-6">
               <h3 className="font-semibold mb-4">Was ist enthalten:</h3>
               <ul className="space-y-3">
                 {plan.features.map((feature, idx) => (
@@ -157,21 +157,21 @@ export default function Checkout() {
                     <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-zinc-700">{feature}</span>
+                    <span className="text-gray-700">{feature}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Testphase Info */}
-            <div className="bg-zinc-50 rounded-lg p-4 border border-zinc-200">
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
               <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 text-zinc-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <h4 className="font-medium text-zinc-900">Kostenlose Testphase</h4>
-                  <p className="text-sm text-zinc-700 mt-1">
+                  <h4 className="font-medium text-gray-900">Kostenlose Testphase</h4>
+                  <p className="text-sm text-gray-700 mt-1">
                     Du wirst erst nach Ablauf der Testphase belastet. Jederzeit kündbar.
                   </p>
                 </div>
@@ -180,20 +180,20 @@ export default function Checkout() {
           </div>
 
           {/* Right: Checkout Summary */}
-          <div className="bg-zinc-50 rounded-lg p-6 border border-zinc-200">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <h2 className="text-xl font-bold mb-6">Zusammenfassung</h2>
 
             {/* Price Breakdown */}
             <div className="space-y-3 mb-6">
-              <div className="flex justify-between text-zinc-700">
+              <div className="flex justify-between text-gray-700">
                 <span>{plan.name} Plan ({isYearly ? 'jährlich' : 'monatlich'})</span>
                 <span>€{price.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-zinc-700">
+              <div className="flex justify-between text-gray-700">
                 <span>MwSt. (19%)</span>
                 <span>€{vatAmount}</span>
               </div>
-              <div className="border-t border-zinc-200 pt-3 flex justify-between font-semibold text-lg">
+              <div className="border-t border-gray-200 pt-3 flex justify-between font-semibold text-lg">
                 <span>Gesamt nach Testphase</span>
                 <span>€{totalAmount}/Monat</span>
               </div>
@@ -203,7 +203,7 @@ export default function Checkout() {
             <div className="bg-green-50/20 border border-green-500/30 rounded-xl p-4 mb-6">
               <div className="flex items-center justify-between">
                 <span className="text-green-600">Heute zu zahlen:</span>
-                <span className="text-2xl font-bold text-green-600">€0,00</span>
+                <span className="text-xl font-semibold tracking-tight text-green-600">€0,00</span>
               </div>
               <p className="text-sm text-green-600/70 mt-1">
                 Erste Abbuchung nach 30 Tagen Testphase
@@ -223,7 +223,7 @@ export default function Checkout() {
               disabled={loading}
               className={`w-full py-3 rounded text-center font-medium transition mb-4 ${
                 loading
-                  ? 'bg-zinc-100 text-zinc-500 cursor-not-allowed'
+                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                   : 'bg-white text-black hover:bg-gray-100'
               }`}
             >
@@ -243,29 +243,29 @@ export default function Checkout() {
             </button>
 
             {!isLoggedIn && (
-              <p className="text-center text-zinc-700 text-sm mb-4">
+              <p className="text-center text-gray-700 text-sm mb-4">
                 Du hast bereits ein Konto?{' '}
-                                <Link to="/login" className="text-zinc-700 hover:text-zinc-900 hover:underline">
+                                <Link to="/login" className="text-gray-700 hover:text-gray-900 hover:underline">
                   Anmelden
                 </Link>
               </p>
             )}
 
             {/* Guarantee & Security */}
-            <div className="space-y-3 pt-4 border-t border-zinc-200">
-              <div className="flex items-center gap-3 text-sm text-zinc-400">
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <div className="flex items-center gap-3 text-sm text-gray-400">
                 <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 <span>30 Tage Geld-zurück-Garantie</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-zinc-400">
+              <div className="flex items-center gap-3 text-sm text-gray-400">
                 <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <span>Sichere Zahlung über Stripe</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-zinc-400">
+              <div className="flex items-center gap-3 text-sm text-gray-400">
                 <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -274,11 +274,11 @@ export default function Checkout() {
             </div>
 
             {/* Legal Links */}
-            <div className="mt-6 pt-4 border-t border-zinc-200 text-center text-xs text-zinc-500">
+            <div className="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-500">
               Mit dem Klick auf "Starten" akzeptierst du unsere{' '}
-              <Link to="/agb" className="text-zinc-400 hover:text-zinc-900 hover:underline">AGB</Link>
+              <Link to="/agb" className="text-gray-400 hover:text-gray-900 hover:underline">AGB</Link>
               {' '}und{' '}
-              <Link to="/datenschutz" className="text-zinc-400 hover:text-zinc-900 hover:underline">Datenschutzerklärung</Link>.
+              <Link to="/datenschutz" className="text-gray-400 hover:text-gray-900 hover:underline">Datenschutzerklärung</Link>.
             </div>
           </div>
         </div>

@@ -271,13 +271,13 @@ export default function OnboardingWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div className="min-h-screen bg-white text-gray-900">
       {/* Progress Bar */}
-      <div className="bg-zinc-50 border-b border-zinc-200">
+      <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold">Studio einrichten</h1>
-            <span className="text-sm text-zinc-500">Schritt {currentStep} von 6</span>
+            <span className="text-sm text-gray-500">Schritt {currentStep} von 6</span>
           </div>
           
           {/* Step Indicators */}
@@ -290,7 +290,7 @@ export default function OnboardingWizard() {
                     ? 'bg-green-500' 
                     : step.id === currentStep 
                     ? 'bg-white' 
-                    : 'bg-zinc-700'
+                    : 'bg-gray-900'
                 }`}
               />
             ))}
@@ -302,21 +302,21 @@ export default function OnboardingWizard() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Step Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-zinc-50 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
             {React.createElement(STEPS[currentStep - 1].icon, { className: 'w-8 h-8 text-white' })}
           </div>
-          <h2 className="text-2xl font-bold mb-2">{STEPS[currentStep - 1].title}</h2>
-          <p className="text-zinc-600">{STEPS[currentStep - 1].description}</p>
+          <h2 className="text-xl font-semibold tracking-tight mb-2">{STEPS[currentStep - 1].title}</h2>
+          <p className="text-gray-600">{STEPS[currentStep - 1].description}</p>
         </div>
 
         {/* Step Content */}
-        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 mb-8">
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 mb-8">
           
           {/* Step 1: Studio Info */}
           {currentStep === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Studio Name *
                 </label>
                 <input
@@ -324,11 +324,11 @@ export default function OnboardingWizard() {
                   value={studioInfo.name}
                   onChange={(e) => setStudioInfo(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="z.B. Hairstyle Studio München"
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:border-gray-900"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   E-Mail *
                 </label>
                 <input
@@ -336,11 +336,11 @@ export default function OnboardingWizard() {
                   value={studioInfo.email}
                   onChange={(e) => setStudioInfo(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="kontakt@deinstudio.de"
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:border-gray-900"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Telefon
                 </label>
                 <input
@@ -348,7 +348,7 @@ export default function OnboardingWizard() {
                   value={studioInfo.phone}
                   onChange={(e) => setStudioInfo(prev => ({ ...prev, phone: e.target.value }))}
                   placeholder="+49 89 123456"
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:border-gray-900"
                 />
               </div>
             </div>
@@ -358,7 +358,7 @@ export default function OnboardingWizard() {
           {currentStep === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Straße & Hausnummer
                 </label>
                 <input
@@ -366,12 +366,12 @@ export default function OnboardingWizard() {
                   value={address.street}
                   onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
                   placeholder="Musterstraße 123"
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:border-gray-900"
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     PLZ
                   </label>
                   <input
@@ -379,11 +379,11 @@ export default function OnboardingWizard() {
                     value={address.zip}
                     onChange={(e) => setAddress(prev => ({ ...prev, zip: e.target.value }))}
                     placeholder="80331"
-                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:border-gray-900"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Stadt *
                   </label>
                   <input
@@ -391,7 +391,7 @@ export default function OnboardingWizard() {
                     value={address.city}
                     onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
                     placeholder="München"
-                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:border-gray-900"
                   />
                 </div>
               </div>
@@ -403,7 +403,7 @@ export default function OnboardingWizard() {
             <div className="space-y-3">
               {openingHours.map((hours, index) => (
                 <div key={hours.day} className="flex items-center gap-4 py-2">
-                  <span className="w-28 text-sm text-zinc-700">{hours.day}</span>
+                  <span className="w-28 text-sm text-gray-700">{hours.day}</span>
                   
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -412,7 +412,7 @@ export default function OnboardingWizard() {
                       onChange={(e) => updateHours(index, 'closed', !e.target.checked)}
                       className="w-4 h-4 rounded"
                     />
-                    <span className="text-sm text-zinc-600">Geöffnet</span>
+                    <span className="text-sm text-gray-600">Geöffnet</span>
                   </label>
 
                   {!hours.closed && (
@@ -421,14 +421,14 @@ export default function OnboardingWizard() {
                         type="time"
                         value={hours.open}
                         onChange={(e) => updateHours(index, 'open', e.target.value)}
-                        className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
+                        className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm"
                       />
-                      <span className="text-zinc-500">-</span>
+                      <span className="text-gray-500">-</span>
                       <input
                         type="time"
                         value={hours.close}
                         onChange={(e) => updateHours(index, 'close', e.target.value)}
-                        className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
+                        className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm"
                       />
                     </>
                   )}
@@ -443,7 +443,7 @@ export default function OnboardingWizard() {
               {/* Quick Template */}
               <button
                 onClick={useTemplate}
-                className="w-full px-4 py-3 border border-dashed border-zinc-200 rounded-xl text-zinc-600 hover:text-zinc-900 hover:border-zinc-500 transition text-sm"
+                className="w-full px-4 py-3 border border-dashed border-gray-200 rounded-xl text-gray-600 hover:text-gray-900 hover:border-gray-500 transition text-sm"
               >
                 Beispiel-Services verwenden
               </button>
@@ -456,29 +456,29 @@ export default function OnboardingWizard() {
                     value={service.name}
                     onChange={(e) => updateService(index, 'name', e.target.value)}
                     placeholder="Service Name"
-                    className="col-span-5 px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm"
+                    className="col-span-5 px-3 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm"
                   />
                   <div className="col-span-3 flex items-center gap-1">
                     <input
                       type="number"
                       value={service.duration}
                       onChange={(e) => updateService(index, 'duration', parseInt(e.target.value) || 0)}
-                      className="w-16 px-2 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm text-center"
+                      className="w-16 px-2 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm text-center"
                     />
-                    <span className="text-xs text-zinc-500">min</span>
+                    <span className="text-xs text-gray-500">min</span>
                   </div>
                   <div className="col-span-3 flex items-center gap-1">
                     <input
                       type="number"
                       value={service.price}
                       onChange={(e) => updateService(index, 'price', parseFloat(e.target.value) || 0)}
-                      className="w-16 px-2 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 text-sm text-center"
+                      className="w-16 px-2 py-2 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 text-sm text-center"
                     />
-                    <span className="text-xs text-zinc-500">€</span>
+                    <span className="text-xs text-gray-500">€</span>
                   </div>
                   <button
                     onClick={() => removeService(index)}
-                    className="col-span-1 text-zinc-500 hover:text-red-600"
+                    className="col-span-1 text-gray-500 hover:text-red-600"
                   >
                     ×
                   </button>
@@ -487,7 +487,7 @@ export default function OnboardingWizard() {
 
               <button
                 onClick={addService}
-                className="w-full px-4 py-3 border border-dashed border-zinc-200 rounded-xl text-zinc-600 hover:text-zinc-900 hover:border-zinc-500 transition"
+                className="w-full px-4 py-3 border border-dashed border-gray-200 rounded-xl text-gray-600 hover:text-gray-900 hover:border-gray-500 transition"
               >
                 + Service hinzufügen
               </button>
@@ -497,16 +497,16 @@ export default function OnboardingWizard() {
           {/* Step 5: Google Reviews */}
           {currentStep === 5 && (
             <div className="space-y-4">
-              <div className="bg-zinc-50 rounded-xl p-4 mb-4">
-                <h4 className="font-medium text-zinc-900 mb-2">Wozu der Google Review Link?</h4>
-                <p className="text-sm text-zinc-600">
+              <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                <h4 className="font-medium text-gray-900 mb-2">Wozu der Google Review Link?</h4>
+                <p className="text-sm text-gray-600">
                   Nach jedem Termin senden wir automatisch eine E-Mail mit deinem Review-Link. 
                   Das erhöht deine Google-Bewertungen erheblich!
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Google Review Link
                 </label>
                 <input
@@ -514,7 +514,7 @@ export default function OnboardingWizard() {
                   value={googleReviewLink}
                   onChange={(e) => setGoogleReviewLink(e.target.value)}
                   placeholder="https://g.page/r/..."
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder-zinc-500 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
@@ -522,7 +522,7 @@ export default function OnboardingWizard() {
                 href="https://support.google.com/business/answer/7035772" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
+                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-400"
               >
                 Wie finde ich meinen Google Review Link?
                 <ExternalLink className="w-4 h-4" />
@@ -535,32 +535,32 @@ export default function OnboardingWizard() {
             <div className="space-y-4">
               <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-4">
                 <h4 className="font-medium text-green-600 mb-2">Fast geschafft!</h4>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-gray-600">
                   Kopiere diesen Code und füge ihn in deine Website ein, wo das Buchungsformular erscheinen soll.
                 </p>
               </div>
 
               <div className="relative">
-                <pre className="bg-zinc-50 rounded-xl p-4 text-sm text-zinc-700 overflow-x-auto">
+                <pre className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 overflow-x-auto">
                   {widgetCode || `<!-- JN Booking Widget -->
 <div id="jn-booking-widget" data-salon="${salonSlug || 'dein-studio'}"></div>
 <script src="${window.location.origin}/widget.js" async></script>`}
                 </pre>
                 <button
                   onClick={copyWidgetCode}
-                  className="absolute top-3 right-3 p-2 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition"
+                  className="absolute top-3 right-3 p-2 bg-gray-100 hover:bg-gray-200 rounded-xl transition"
                 >
                   {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
 
-              <div className="bg-zinc-50 rounded-xl p-4">
-                <h4 className="font-medium text-zinc-900 mb-2">Deine Buchungs-URL:</h4>
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Deine Buchungs-URL:</h4>
                 <a 
                   href={`/s/${salonSlug || 'dein-studio'}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 text-sm break-all"
+                  className="text-gray-500 hover:text-gray-400 text-sm break-all"
                 >
                   {window.location.origin}/s/{salonSlug || 'dein-studio'}
                 </a>
@@ -574,7 +574,7 @@ export default function OnboardingWizard() {
           <button
             onClick={handleBack}
             disabled={currentStep === 1}
-            className="flex items-center gap-2 px-6 py-3 text-zinc-600 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
+            className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
           >
             <ChevronLeft className="w-5 h-5" />
             Zurück
@@ -583,7 +583,7 @@ export default function OnboardingWizard() {
           <button
             onClick={handleNext}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-zinc-200 disabled:opacity-50 transition"
+            className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-200 disabled:opacity-50 transition"
           >
             {saving ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -606,7 +606,7 @@ export default function OnboardingWizard() {
           <div className="text-center mt-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="text-sm text-zinc-500 hover:text-zinc-700 transition"
+              className="text-sm text-gray-500 hover:text-gray-700 transition"
             >
               Später fortsetzen
             </button>

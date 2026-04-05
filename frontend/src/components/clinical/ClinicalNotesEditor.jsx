@@ -92,7 +92,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -143,7 +143,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-            <Lock className="w-8 h-8 mr-3 text-blue-500" />
+            <Lock className="w-8 h-8 mr-3 text-gray-600" />
             Clinical Notes
           </h1>
           <p className="text-gray-600">Encrypted patient records</p>
@@ -153,7 +153,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
             resetForm();
             setIsEditing(true);
           }}
-          className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-zinc-900 rounded-lg hover:bg-blue-600 transition-colors"
+          className="flex items-center space-x-2 px-6 py-3 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
         >
           <FileText className="w-5 h-5" />
           <span>New Note</span>
@@ -167,8 +167,8 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
             <h2 className="text-lg font-bold text-gray-900 mb-4">Patient History</h2>
             
             {notes.length === 0 ? (
-              <div className="text-center py-8 text-zinc-400">
-                <FileText className="w-16 h-16 mx-auto mb-4 text-zinc-600" />
+              <div className="text-center py-8 text-gray-400">
+                <FileText className="w-16 h-16 mx-auto mb-4 text-gray-600" />
                 <p>No clinical notes yet</p>
               </div>
             ) : (
@@ -177,9 +177,9 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                   <button
                     key={note._id}
                     onClick={() => handleViewNote(note)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                    className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                       selectedNote?._id === note._id
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'border-gray-200 bg-gray-50'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
@@ -192,11 +192,11 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                             year: 'numeric'
                           })}
                         </p>
-                        <p className="text-xs text-zinc-400 mt-1">
+                        <p className="text-xs text-gray-400 mt-1">
                           {note.practitionerId?.name || 'Unknown Practitioner'}
                         </p>
                       </div>
-                      <Lock className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                      <Lock className="w-4 h-4 text-gray-600 flex-shrink-0" />
                     </div>
                     {note.diagnosis && (
                       <p className="text-xs text-gray-600 line-clamp-2">
@@ -225,7 +225,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
               {selectedNote && !isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-blue-500 hover:text-blue-600 text-sm font-medium"
+                  className="text-gray-600 hover:text-gray-700 text-sm font-medium"
                 >
                   Edit Note
                 </button>
@@ -244,11 +244,11 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                       type="text"
                       value={formData.chiefComplaint}
                       onChange={(e) => setFormData({ ...formData, chiefComplaint: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Patient's main concern..."
                     />
                   ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl">
                       {formData.chiefComplaint || 'N/A'}
                     </p>
                   )}
@@ -264,11 +264,11 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                       value={formData.diagnosis}
                       onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Diagnosis and ICD codes..."
                     />
                   ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
                       {formData.diagnosis || 'N/A'}
                     </p>
                   )}
@@ -284,11 +284,11 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                       value={formData.treatmentPlan}
                       onChange={(e) => setFormData({ ...formData, treatmentPlan: e.target.value })}
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Recommended treatments and procedures..."
                     />
                   ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
                       {formData.treatmentPlan || 'N/A'}
                     </p>
                   )}
@@ -304,11 +304,11 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                       value={formData.medications}
                       onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Prescribed medications and dosages..."
                     />
                   ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
                       {formData.medications || 'N/A'}
                     </p>
                   )}
@@ -324,11 +324,11 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Additional observations, patient feedback, etc..."
                     />
                   ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
                       {formData.notes || 'N/A'}
                     </p>
                   )}
@@ -345,10 +345,10 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                       type="date"
                       value={formData.followUpDate}
                       onChange={(e) => setFormData({ ...formData, followUpDate: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl">
                       {formData.followUpDate 
                         ? new Date(formData.followUpDate).toLocaleDateString('de-DE', {
                             weekday: 'long',
@@ -367,14 +367,14 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                   <div className="flex space-x-4 pt-6 border-t">
                     <button
                       onClick={handleSave}
-                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-blue-500 text-zinc-900 rounded-lg hover:bg-blue-600 transition-colors"
+                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
                     >
                       <Save className="w-5 h-5" />
                       <span>Save Note (Encrypted)</span>
                     </button>
                     <button
                       onClick={resetForm}
-                      className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
                     >
                       Cancel
                     </button>
@@ -387,26 +387,26 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                     <h3 className="text-sm font-semibold text-gray-700 mb-3">Record Metadata</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-zinc-400">Created by</p>
+                        <p className="text-gray-400">Created by</p>
                         <p className="text-gray-900 font-medium flex items-center">
                           <User className="w-4 h-4 mr-1" />
                           {selectedNote.practitionerId?.name || 'Unknown'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-zinc-400">Visit Date</p>
+                        <p className="text-gray-400">Visit Date</p>
                         <p className="text-gray-900 font-medium">
                           {new Date(selectedNote.visitDate).toLocaleDateString('de-DE')}
                         </p>
                       </div>
                       <div>
-                        <p className="text-zinc-400">Last Modified</p>
+                        <p className="text-gray-400">Last Modified</p>
                         <p className="text-gray-900 font-medium">
                           {new Date(selectedNote.updatedAt).toLocaleDateString('de-DE')}
                         </p>
                       </div>
                       <div>
-                        <p className="text-zinc-400">Access Count</p>
+                        <p className="text-gray-400">Access Count</p>
                         <p className="text-gray-900 font-medium flex items-center">
                           <Eye className="w-4 h-4 mr-1" />
                           {selectedNote.accessCount || 0} times
@@ -417,8 +417,8 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                 )}
               </div>
             ) : (
-              <div className="text-center py-16 text-zinc-400">
-                <Lock className="w-24 h-24 mx-auto mb-4 text-zinc-600" />
+              <div className="text-center py-16 text-gray-400">
+                <Lock className="w-24 h-24 mx-auto mb-4 text-gray-600" />
                 <p className="text-lg">Select a note to view or create a new one</p>
               </div>
             )}

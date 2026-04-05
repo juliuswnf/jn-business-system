@@ -77,11 +77,11 @@ const ResetPassword = () => {
 
   if (verifying) {
     return (
-      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-xl border border-zinc-200 p-8 text-center">
-            <div className="w-12 h-12 border-4 border-gray-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-zinc-500">Reset-Link wird überprüft...</p>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+            <div className="w-10 h-10 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-500">Reset-Link wird überprüft...</p>
           </div>
         </div>
       </div>
@@ -90,28 +90,28 @@ const ResetPassword = () => {
 
   if (!tokenValid) {
     return (
-      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-xl border border-zinc-200 p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+            <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center">
               <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-zinc-900 mb-4">Ungültiger Link</h2>
-            <p className="text-zinc-500 mb-8">
+            <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-4">Ungültiger Link</h2>
+            <p className="text-gray-500 mb-8">
               Dieser Link zum Zurücksetzen des Passworts ist ungültig oder abgelaufen.
             </p>
             <Link
               to="/forgot-password"
-              className="inline-block px-8 py-3 rounded-lg bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
+              className="inline-block px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-900 transition"
             >
               Neuen Link anfordern
             </Link>
             <div className="mt-6">
               <Link
                 to="/login"
-                className="text-zinc-500 hover:text-zinc-900 transition"
+                className="text-gray-500 hover:text-gray-900 transition"
               >
                 ← Zurück zum Login
               </Link>
@@ -123,19 +123,19 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900 mb-2">Passwort zurücksetzen</h1>
-          <p className="text-zinc-500">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-2">Passwort zurücksetzen</h1>
+          <p className="text-gray-500">
             Geben Sie Ihr neues Passwort ein
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-zinc-200 p-8">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-zinc-600 mb-2">
+              <label className="block text-sm font-medium text-gray-600 mb-2">
                 Neues Passwort
               </label>
               <div className="relative">
@@ -144,12 +144,12 @@ const ResetPassword = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Mindestens 8 Zeichen"
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white border border-gray-100 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-100 focus:border-gray-300 transition"
                   required
                 />
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-700 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -167,7 +167,7 @@ const ResetPassword = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-600 mb-2">
+              <label className="block text-sm font-medium text-gray-600 mb-2">
                 Passwort bestätigen
               </label>
               <div className="relative">
@@ -176,12 +176,12 @@ const ResetPassword = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Passwort wiederholen"
-                  className="w-full px-4 py-3 pr-10 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                  className="w-full px-4 py-3 pr-10 bg-white border border-gray-100 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-100 focus:border-gray-300 transition"
                   required
                 />
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-700 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   aria-label={showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
                 >
@@ -202,16 +202,16 @@ const ResetPassword = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gray-900 text-white py-3 rounded-xl font-semibold hover:bg-gray-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Wird zurückgesetzt...' : 'Passwort zurücksetzen'}
             </button>
           </form>
 
-          <div className="mt-8 text-center text-sm text-zinc-500 border-t border-zinc-200 pt-6">
+          <div className="mt-8 text-center text-sm text-gray-500 border-t border-gray-200 pt-6">
             <p>
               Passwort doch bekannt?{' '}
-              <Link to="/login" className="text-zinc-900 hover:text-zinc-900 font-medium transition">
+              <Link to="/login" className="text-gray-900 hover:text-gray-900 font-medium transition">
                 Zurück zum Login
               </Link>
             </p>

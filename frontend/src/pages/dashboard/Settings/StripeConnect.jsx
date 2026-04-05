@@ -44,24 +44,24 @@ export default function StripeConnectSettings() {
 
   if (loading) {
     return (
-      <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
-        <div className="text-zinc-500">Laden...</div>
+      <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6">
+        <div className="text-gray-500">Laden...</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
-      <h2 className="text-2xl font-bold text-zinc-900 mb-6">Stripe-Konto Verbindung</h2>
+    <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6">
+      <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-6">Stripe-Konto Verbindung</h2>
 
       {!status?.hasAccount && (
         <>
-          <div className="bg-blue-900/20 border border-blue-600/50 rounded-lg p-4 mb-6">
+          <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
             <div className="flex items-start gap-3">
-              <FiAlertCircle className="text-blue-400 mt-0.5" size={20} />
+              <FiAlertCircle className="text-gray-500 mt-0.5" size={20} />
               <div>
-                <p className="font-medium text-blue-400 mb-2">Warum Stripe verbinden?</p>
-                <ul className="text-sm text-zinc-600 space-y-1">
+                <p className="font-medium text-gray-500 mb-2">Warum Stripe verbinden?</p>
+                <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Automatische Abrechnung bei Nichterscheinen</li>
                   <li>• Direkte Auszahlungen auf Ihr Bankkonto</li>
                   <li>• Sichere Zahlungsabwicklung über Stripe</li>
@@ -73,7 +73,7 @@ export default function StripeConnectSettings() {
 
           <button
             onClick={handleConnect}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-zinc-900 rounded-lg font-medium transition"
+            className="px-6 py-3 bg-gray-100 hover:bg-gray-100 text-gray-900 rounded-xl font-medium transition"
           >
             Stripe-Konto jetzt verbinden
           </button>
@@ -86,21 +86,21 @@ export default function StripeConnectSettings() {
             <span className="px-3 py-1 bg-yellow-600/20 text-yellow-600 rounded-full text-sm font-medium">
               Unvollständig
             </span>
-            <span className="text-zinc-500 text-sm">
+            <span className="text-gray-500 text-sm">
               Account-ID: {status.accountId?.slice(0, 15)}...
             </span>
           </div>
 
-          <div className="bg-yellow-50/20 border border-yellow-600/50 rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50/20 border border-yellow-600/50 rounded-xl p-4 mb-6">
             <p className="text-yellow-600 mb-1">Ihre Stripe-Einrichtung ist noch nicht abgeschlossen.</p>
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-gray-600">
               Sie können noch keine Zahlungen empfangen.
             </p>
           </div>
 
           <button
             onClick={handleRefresh}
-            className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-zinc-900 rounded-lg font-medium transition"
+            className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-gray-900 rounded-xl font-medium transition"
           >
             Einrichtung fortsetzen
           </button>
@@ -114,25 +114,25 @@ export default function StripeConnectSettings() {
               <FiCheckCircle size={16} />
               Aktiv
             </span>
-            <span className="text-zinc-500 text-sm">
+            <span className="text-gray-500 text-sm">
               Account-ID: {status.accountId?.slice(0, 15)}...
             </span>
           </div>
 
-          <div className="bg-green-50/20 border border-green-600/50 rounded-lg p-4 mb-6">
+          <div className="bg-green-50/20 border border-green-600/50 rounded-xl p-4 mb-6">
             <p className="font-medium text-green-600 mb-1 flex items-center gap-2">
               <FiCheckCircle size={18} />
               Stripe-Konto verbunden und aktiv
             </p>
-            <p className="text-sm text-zinc-600 mt-1">
+            <p className="text-sm text-gray-600 mt-1">
               Sie können jetzt Gebühren bei Nichterscheinen empfangen.
             </p>
           </div>
 
           <div className="space-y-2 text-sm mb-6">
-            <div className="flex justify-between items-center py-2 border-b border-zinc-200">
-              <span className="text-zinc-500">Zahlungen empfangen:</span>
-              <span className="font-medium text-zinc-900 flex items-center gap-2">
+            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+              <span className="text-gray-500">Zahlungen empfangen:</span>
+              <span className="font-medium text-gray-900 flex items-center gap-2">
                 {status.chargesEnabled ? (
                   <>
                     <FiCheckCircle className="text-green-600" size={16} />
@@ -146,9 +146,9 @@ export default function StripeConnectSettings() {
                 )}
               </span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-zinc-200">
-              <span className="text-zinc-500">Auszahlungen:</span>
-              <span className="font-medium text-zinc-900 flex items-center gap-2">
+            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+              <span className="text-gray-500">Auszahlungen:</span>
+              <span className="font-medium text-gray-900 flex items-center gap-2">
                 {status.payoutsEnabled ? (
                   <>
                     <FiCheckCircle className="text-green-600" size={16} />
@@ -164,14 +164,14 @@ export default function StripeConnectSettings() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-zinc-200">
-            <h4 className="font-medium text-zinc-900 mb-2">Stripe-Dashboard</h4>
-            <p className="text-sm text-zinc-500 mb-3">
+          <div className="pt-6 border-t border-gray-200">
+            <h4 className="font-medium text-gray-900 mb-2">Stripe-Dashboard</h4>
+            <p className="text-sm text-gray-500 mb-3">
               Verwalten Sie Ihre Auszahlungen und Transaktionen direkt bei Stripe.
             </p>
             <button
               onClick={() => window.open('https://dashboard.stripe.com', '_blank')}
-              className="px-4 py-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-900 rounded-lg text-sm font-medium transition flex items-center gap-2"
+              className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-xl text-sm font-medium transition flex items-center gap-2"
             >
               Stripe-Dashboard öffnen
               <FiExternalLink size={16} />

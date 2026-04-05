@@ -58,12 +58,12 @@ export default function FeatureGate({
         onClick={handleClick}
         className={`inline-flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors ${
           hasAccess
-            ? 'border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50'
-            : 'border-zinc-200 bg-zinc-50 text-zinc-700 hover:bg-zinc-100'
+            ? 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50'
+            : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
         } ${className}`}
       >
         <span>{children}</span>
-        {!hasAccess && <Lock className="h-4 w-4 text-zinc-500" />}
+        {!hasAccess && <Lock className="h-4 w-4 text-gray-500" />}
       </button>
 
       <UpgradePrompt

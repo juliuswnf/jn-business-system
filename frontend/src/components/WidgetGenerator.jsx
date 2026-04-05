@@ -17,11 +17,11 @@ const WidgetGenerator = ({ salonSlug }) => {
         <textarea
           readOnly
           value={widgetCode}
-          className="w-full p-3 border border-gray-300 rounded-lg font-mono text-sm"
+          className="w-full p-3 border border-gray-300 rounded-xl font-mono text-sm"
         />
         <button
           onClick={copyToClipboard}
-          className="px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700"
+          className="px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900"
         >
           {copied ? 'Kopiert!' : 'Code kopieren'}
         </button>

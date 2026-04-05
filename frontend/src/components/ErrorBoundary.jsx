@@ -48,15 +48,15 @@ class ErrorBoundary extends React.Component {
         <div className="min-h-[200px] flex items-center justify-center p-8">
           <div className="text-center max-w-md">
             <div className="text-6xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-zinc-900 mb-2">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-900 mb-2">
               Etwas ist schiefgelaufen
             </h2>
-            <p className="text-gray-600 dark:text-zinc-500 mb-4">
+            <p className="text-gray-600 dark:text-gray-500 mb-4">
               {this.props.message || 'Ein unerwarteter Fehler ist aufgetreten.'}
             </p>
             
             {import.meta.env.DEV && this.state.error && (
-              <details className="text-left bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-4 text-sm">
+              <details className="text-left bg-red-50 dark:bg-red-900/20 p-4 rounded-xl mb-4 text-sm">
                 <summary className="cursor-pointer text-red-600 dark:text-red-400 font-medium">
                   Fehlerdetails
                 </summary>
@@ -70,13 +70,13 @@ class ErrorBoundary extends React.Component {
             <div className="flex gap-3 justify-center">
               <button
                 onClick={this.handleRetry}
-                className="px-4 py-2 bg-purple-600 text-zinc-900 rounded-lg hover:bg-purple-700 transition"
+                className="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition"
               >
                 Erneut versuchen
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-50 transition"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-50 transition"
               >
                 Seite neu laden
               </button>
@@ -113,17 +113,17 @@ export const PageErrorBoundary = ({ children }) => (
     name="PageErrorBoundary"
     fallback={({ error, retry }) => (
       <div className="min-h-screen bg-gray-100 dark:bg-white flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-zinc-50 rounded-2xl shadow-none p-8 max-w-lg w-full text-center">
+        <div className="bg-white dark:bg-gray-50 rounded-2xl shadow-sm p-8 max-w-lg w-full text-center">
           <div className="text-7xl mb-6">🔧</div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-900 mb-3">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-900 mb-3">
             Seite konnte nicht geladen werden
           </h1>
-          <p className="text-gray-600 dark:text-zinc-500 mb-6">
+          <p className="text-gray-600 dark:text-gray-500 mb-6">
             Wir arbeiten daran, das Problem zu beheben. Bitte versuche es erneut.
           </p>
           
           {import.meta.env.DEV && error && (
-            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-6 text-left text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl mb-6 text-left text-sm">
               <p className="text-red-600 dark:text-red-400 font-mono">
                 {error.toString()}
               </p>
@@ -133,13 +133,13 @@ export const PageErrorBoundary = ({ children }) => (
           <div className="flex gap-4 justify-center">
             <button
               onClick={retry}
-              className="px-6 py-3 bg-purple-600 text-zinc-900 rounded-lg hover:bg-purple-700 transition font-medium"
+              className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition font-medium"
             >
               Erneut versuchen
             </button>
             <button
               onClick={() => window.location.href = '/'}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-100 transition"
+              className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-100 transition"
             >
               Zur Startseite
             </button>

@@ -82,7 +82,7 @@ const CEODashboard = () => {
     if (loading) {
       return (
         <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-zinc-300 border-t-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-600"></div>
         </div>
       );
     }
@@ -116,12 +116,12 @@ const CEODashboard = () => {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900">CEO Dashboard</h1>
-        <p className="text-sm text-zinc-500 mt-1">System-Übersicht und Verwaltung</p>
+        <h1 className="text-xl font-semibold tracking-tight text-gray-900">CEO Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">System-Übersicht und Verwaltung</p>
       </div>
 
       {/* Tab Bar */}
-      <div className="flex items-center gap-1 bg-white border border-zinc-200 rounded-xl p-1">
+      <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -130,8 +130,8 @@ const CEODashboard = () => {
               onClick={() => setActiveTab(item.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all ${
                 activeTab === item.id
-                  ? 'bg-zinc-900 text-white shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50'
+                  ? 'bg-gray-900 text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
             >
               <Icon size={15} />
@@ -190,15 +190,15 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
       )}
 
       {/* Revenue Hero */}
-      <div className="bg-white border border-zinc-200 rounded-xl p-6">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-zinc-500 text-sm font-medium uppercase tracking-wider mb-1">Monatlicher Umsatz</p>
+            <p className="text-gray-500 text-sm font-medium uppercase tracking-wider mb-1">Monatlicher Umsatz</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-zinc-900">€{stats.totalRevenue.toLocaleString('de-DE')}</span>
-              <span className="text-zinc-400 text-sm">/ Monat</span>
+              <span className="text-4xl font-bold text-gray-900">€{stats.totalRevenue.toLocaleString('de-DE')}</span>
+              <span className="text-gray-400 text-sm">/ Monat</span>
             </div>
-            <p className="text-zinc-500 text-sm mt-2">
+            <p className="text-gray-500 text-sm mt-2">
               {stats.starterAbos} Starter × €29 + {stats.proAbos} Pro × €69
             </p>
           </div>
@@ -207,9 +207,9 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
               <span className="text-emerald-700 font-semibold">{totalPaidCustomers}</span>
               <span className="text-emerald-600 text-sm ml-1.5">Zahlende Kunden</span>
             </div>
-            <div className="px-3 py-1.5 bg-zinc-50 rounded-lg border border-zinc-200">
-              <span className="text-zinc-900 font-semibold">€{avgRevenue}</span>
-              <span className="text-zinc-500 text-sm ml-1.5">Ø pro Kunde</span>
+            <div className="px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="text-gray-900 font-semibold">€{avgRevenue}</span>
+              <span className="text-gray-500 text-sm ml-1.5">Ø pro Kunde</span>
             </div>
           </div>
         </div>
@@ -217,77 +217,77 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-zinc-200 rounded-xl p-5">
-          <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
-            <Users className="w-5 h-5 text-blue-600" />
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-3">
+            <Users className="w-5 h-5 text-gray-700" />
           </div>
-          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Gesamt Kunden</p>
-          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.totalCustomers}</p>
-          <p className="text-zinc-400 text-xs mt-1">Registrierte Unternehmen</p>
+          <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Gesamt Kunden</p>
+          <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{stats.totalCustomers}</p>
+          <p className="text-gray-400 text-xs mt-1">Registrierte Unternehmen</p>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center mb-3">
             <BarChart3 className="w-5 h-5 text-violet-600" />
           </div>
-          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Starter</p>
-          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.starterAbos}</p>
-          <p className="text-zinc-400 text-xs mt-1">€{stats.starterAbos * 29}/Monat</p>
+          <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Starter</p>
+          <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{stats.starterAbos}</p>
+          <p className="text-gray-400 text-xs mt-1">€{stats.starterAbos * 29}/Monat</p>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center mb-3">
             <CreditCard className="w-5 h-5 text-amber-600" />
           </div>
-          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Pro</p>
-          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.proAbos}</p>
-          <p className="text-zinc-400 text-xs mt-1">€{stats.proAbos * 69}/Monat</p>
+          <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Pro</p>
+          <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{stats.proAbos}</p>
+          <p className="text-gray-400 text-xs mt-1">€{stats.proAbos * 69}/Monat</p>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-xl p-5">
-          <div className="w-10 h-10 bg-cyan-50 rounded-lg flex items-center justify-center mb-3">
-            <RefreshCw className="w-5 h-5 text-cyan-600" />
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-3">
+            <RefreshCw className="w-5 h-5 text-gray-900" />
           </div>
-          <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">Testphase</p>
-          <p className="text-3xl font-bold text-zinc-900 mt-1">{stats.trialAbos}</p>
-          <p className="text-zinc-400 text-xs mt-1">In Testphase</p>
+          <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Testphase</p>
+          <p className="text-2xl font-semibold tracking-tight text-gray-900 mt-1">{stats.trialAbos}</p>
+          <p className="text-gray-400 text-xs mt-1">In Testphase</p>
         </div>
       </div>
 
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-zinc-500 text-sm font-medium">Conversion Rate</p>
+            <p className="text-gray-500 text-sm font-medium">Conversion Rate</p>
           </div>
-          <p className="text-3xl font-bold text-zinc-900">{conversionRate}%</p>
-          <div className="mt-3 h-2 bg-zinc-100 rounded-full overflow-hidden">
+          <p className="text-2xl font-semibold tracking-tight text-gray-900">{conversionRate}%</p>
+          <div className="mt-3 h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-600 rounded-full transition-all duration-1000"
+              className="h-full bg-gray-900 rounded-full transition-all duration-1000"
               style={{ width: `${conversionRate}%` }}
             ></div>
           </div>
-          <p className="text-zinc-400 text-xs mt-2">Testphase → Zahlender Kunde</p>
+          <p className="text-gray-400 text-xs mt-2">Testphase → Zahlender Kunde</p>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-zinc-500 text-sm font-medium">Ø Umsatz pro Kunde</p>
+            <p className="text-gray-500 text-sm font-medium">Ø Umsatz pro Kunde</p>
           </div>
-          <p className="text-3xl font-bold text-zinc-900">€{avgRevenue}</p>
-          <p className="text-zinc-400 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
+          <p className="text-2xl font-semibold tracking-tight text-gray-900">€{avgRevenue}</p>
+          <p className="text-gray-400 text-xs mt-3">Monatlich pro zahlenden Kunden</p>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-xl p-5">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-zinc-500 text-sm font-medium">System Status</p>
+            <p className="text-gray-500 text-sm font-medium">System Status</p>
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
             </span>
           </div>
-          <p className="text-3xl font-bold text-green-600">Online</p>
-          <p className="text-zinc-400 text-xs mt-3">Alle Dienste aktiv</p>
+          <p className="text-2xl font-semibold tracking-tight text-green-600">Online</p>
+          <p className="text-gray-400 text-xs mt-3">Alle Dienste aktiv</p>
         </div>
       </div>
     </div>
@@ -296,21 +296,21 @@ const OverviewTab = ({ stats, errors, setActiveTab }) => {
 
 const StatCard = ({ title, value, iconType, color, subtitle }) => {
   const colors = {
-    blue: 'from-blue-500/10 to-blue-600/10 border-blue-500/20',
+    blue: 'from-blue-500/10 to-blue-600/10 border-gray-200/20',
     green: 'from-green-500/10 to-green-600/10 border-green-500/20',
     purple: 'from-purple-500/10 to-purple-600/10 border-purple-500/20',
     orange: 'from-orange-500/10 to-orange-600/10 border-orange-500/20',
   };
 
   const textColors = {
-    blue: 'text-blue-400',
+    blue: 'text-gray-500',
     green: 'text-green-600',
     purple: 'text-purple-400',
     orange: 'text-orange-400',
   };
 
   const iconColors = {
-    blue: 'text-blue-400/60',
+    blue: 'text-gray-500/60',
     green: 'text-green-600/60',
     purple: 'text-purple-400/60',
     orange: 'text-orange-400/60',
@@ -352,9 +352,9 @@ const StatCard = ({ title, value, iconType, color, subtitle }) => {
     <div className={`bg-gradient-to-br ${colors[color]} border rounded-xl p-5`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-zinc-700 text-sm">{title}</p>
-          <p className={`text-3xl font-bold ${textColors[color]} mt-1`}>{value}</p>
-          <p className="text-zinc-700 text-xs mt-1">{subtitle}</p>
+          <p className="text-gray-700 text-sm">{title}</p>
+          <p className={`text-2xl font-semibold tracking-tight ${textColors[color]} mt-1`}>{value}</p>
+          <p className="text-gray-700 text-xs mt-1">{subtitle}</p>
         </div>
         {renderIcon()}
       </div>
@@ -405,8 +405,8 @@ const ErrorsTab = ({ errors, onResolve }) => {
         {/* Header with Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
-            <h2 className="text-xl font-semibold text-zinc-900">System Fehlermeldungen</h2>
-            <p className="text-zinc-700 text-sm">Überwachen Sie alle Fehler und Warnungen</p>
+            <h2 className="text-xl font-semibold text-gray-900">System Fehlermeldungen</h2>
+            <p className="text-gray-700 text-sm">Überwachen Sie alle Fehler und Warnungen</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
@@ -423,7 +423,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   filter === f.key
                     ? 'bg-white text-black'
-                    : `bg-zinc-50/50 ${f.color || 'text-zinc-500'} hover:bg-zinc-100`
+                    : `bg-gray-50/50 ${f.color || 'text-gray-500'} hover:bg-gray-100`
                 }`}
               >
                 {f.label}
@@ -434,14 +434,14 @@ const ErrorsTab = ({ errors, onResolve }) => {
 
         {/* Error List */}
         {filteredErrors.length === 0 ? (
-          <div className="bg-white/50 border border-zinc-200 rounded-xl p-12 text-center">
+          <div className="bg-white/50 border border-gray-200 rounded-xl p-12 text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-full flex items-center justify-center">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-zinc-900">Keine Fehler</h3>
-            <p className="text-zinc-700 mt-2">
+            <h3 className="text-xl font-semibold text-gray-900">Keine Fehler</h3>
+            <p className="text-gray-700 mt-2">
               {filter === 'all' ? 'Alle Systeme laufen einwandfrei' : 'Keine Ergebnisse für diesen Filter'}
             </p>
           </div>
@@ -455,7 +455,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
                   selectedError?.id === error.id ? 'ring-2 ring-indigo-500' : ''
                 } ${
                   error.resolved
-                    ? 'border-zinc-200 opacity-60'
+                    ? 'border-gray-200 opacity-60'
                     : error.type === 'critical'
                     ? 'border-red-500/50'
                     : error.type === 'error'
@@ -488,10 +488,10 @@ const ErrorsTab = ({ errors, onResolve }) => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className={`font-medium ${error.resolved ? 'text-zinc-400' : 'text-zinc-900'}`}>
+                        <p className={`font-medium ${error.resolved ? 'text-gray-400' : 'text-gray-900'}`}>
                           {error.message}
                         </p>
-                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-zinc-400">
+                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-400">
                           <span>{formatTimestamp(error.timestamp)}</span>
                           {error.source && <span className="capitalize">• {error.source}</span>}
                           {error.salon && <span>• {error.salon.name}</span>}
@@ -520,8 +520,8 @@ const ErrorsTab = ({ errors, onResolve }) => {
       {/* Sidebar */}
       <div className="space-y-4">
         {/* Status Overview */}
-        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-zinc-700 uppercase tracking-wider mb-4">Status Übersicht</h3>
+        <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+          <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wider mb-4">Status Übersicht</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
               <div className="flex items-center gap-3">
@@ -532,7 +532,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
                 </div>
                 <span className="text-red-600 font-medium">Kritisch</span>
               </div>
-              <span className="text-2xl font-bold text-red-600">{criticalCount}</span>
+              <span className="text-xl font-semibold tracking-tight text-red-600">{criticalCount}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
               <div className="flex items-center gap-3">
@@ -543,7 +543,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
                 </div>
                 <span className="text-orange-400 font-medium">Fehler</span>
               </div>
-              <span className="text-2xl font-bold text-orange-400">{errorCount}</span>
+              <span className="text-xl font-semibold tracking-tight text-orange-400">{errorCount}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
               <div className="flex items-center gap-3">
@@ -554,7 +554,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
                 </div>
                 <span className="text-yellow-600 font-medium">Warnungen</span>
               </div>
-              <span className="text-2xl font-bold text-yellow-600">{warningCount}</span>
+              <span className="text-xl font-semibold tracking-tight text-yellow-600">{warningCount}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
               <div className="flex items-center gap-3">
@@ -565,34 +565,34 @@ const ErrorsTab = ({ errors, onResolve }) => {
                 </div>
                 <span className="text-green-600 font-medium">Gelöst</span>
               </div>
-              <span className="text-2xl font-bold text-green-600">{resolvedCount}</span>
+              <span className="text-xl font-semibold tracking-tight text-green-600">{resolvedCount}</span>
             </div>
           </div>
         </div>
 
         {/* Selected Error Details */}
         {selectedError && (
-          <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-zinc-700 uppercase tracking-wider mb-4">Details</h3>
+          <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+            <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wider mb-4">Details</h3>
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-zinc-700">Nachricht</p>
-                <p className="text-zinc-900 text-sm mt-1">{selectedError.message}</p>
+                <p className="text-xs text-gray-700">Nachricht</p>
+                <p className="text-gray-900 text-sm mt-1">{selectedError.message}</p>
               </div>
               <div>
-                <p className="text-xs text-zinc-700">Zeitpunkt</p>
-                <p className="text-zinc-900 text-sm mt-1">{formatTimestamp(selectedError.timestamp)}</p>
+                <p className="text-xs text-gray-700">Zeitpunkt</p>
+                <p className="text-gray-900 text-sm mt-1">{formatTimestamp(selectedError.timestamp)}</p>
               </div>
               {selectedError.source && (
                 <div>
-                  <p className="text-xs text-zinc-400">Quelle</p>
-                  <p className="text-zinc-900 text-sm mt-1 capitalize">{selectedError.source}</p>
+                  <p className="text-xs text-gray-400">Quelle</p>
+                  <p className="text-gray-900 text-sm mt-1 capitalize">{selectedError.source}</p>
                 </div>
               )}
               {selectedError.stack && (
                 <div>
-                  <p className="text-xs text-zinc-400">Stack Trace</p>
-                  <pre className="mt-1 p-2 bg-white/50 rounded-lg text-xs text-zinc-500 overflow-x-auto">
+                  <p className="text-xs text-gray-400">Stack Trace</p>
+                  <pre className="mt-1 p-2 bg-white/50 rounded-lg text-xs text-gray-500 overflow-x-auto">
                     {selectedError.stack}
                   </pre>
                 </div>
@@ -600,7 +600,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
               {!selectedError.resolved && (
                 <button
                   onClick={() => handleResolve(selectedError.id)}
-                  className="w-full mt-2 px-4 py-2 bg-green-500 text-zinc-900 rounded-lg font-medium hover:bg-green-600 transition"
+                  className="w-full mt-2 px-4 py-2 bg-green-500 text-gray-900 rounded-lg font-medium hover:bg-green-600 transition"
                 >
                   Als gelöst markieren
                 </button>
@@ -611,7 +611,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
 
         {/* Quick Actions */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-zinc-700 uppercase tracking-wider mb-3">Schnellaktionen</h3>
+          <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Schnellaktionen</h3>
           <div className="space-y-2">
             <button
               onClick={() => {
@@ -626,7 +626,7 @@ const ErrorsTab = ({ errors, onResolve }) => {
             </button>
             <button
               onClick={() => window.location.reload()}
-              className="w-full px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg text-sm font-medium hover:bg-blue-500/20 transition text-left flex items-center gap-2"
+              className="w-full px-4 py-2 bg-gray-50 text-gray-500 rounded-lg text-sm font-medium hover:bg-gray-50 transition text-left flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -678,15 +678,15 @@ const CustomersTab = ({ customers }) => {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
-            <h2 className="text-xl font-semibold text-zinc-900">Kunden</h2>
-            <p className="text-zinc-700 text-sm">Alle Unternehmen die JN Business System nutzen</p>
+            <h2 className="text-xl font-semibold text-gray-900">Kunden</h2>
+            <p className="text-gray-700 text-sm">Alle Unternehmen die JN Business System nutzen</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
               { key: 'all', label: 'Alle' },
               { key: 'active', label: 'Aktiv', color: 'text-green-600' },
               { key: 'trial', label: 'Testphase', color: 'text-orange-400' },
-              { key: 'starter', label: 'Starter', color: 'text-blue-400' },
+              { key: 'starter', label: 'Starter', color: 'text-gray-500' },
               { key: 'pro', label: 'Pro', color: 'text-purple-400' },
             ].map((f) => (
               <button
@@ -695,7 +695,7 @@ const CustomersTab = ({ customers }) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   filter === f.key
                     ? 'bg-white text-black'
-                    : `bg-zinc-50/50 ${f.color || 'text-zinc-500'} hover:bg-zinc-100`
+                    : `bg-gray-50/50 ${f.color || 'text-gray-500'} hover:bg-gray-100`
                 }`}
               >
                 {f.label}
@@ -706,7 +706,7 @@ const CustomersTab = ({ customers }) => {
 
         {/* Search */}
         <div className="relative">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -714,20 +714,20 @@ const CustomersTab = ({ customers }) => {
             placeholder="Suche nach Name oder Email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 transition"
+            className="w-full pl-12 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 transition"
           />
         </div>
 
         {/* Customer List */}
         {filteredCustomers.length === 0 ? (
-          <div className="bg-white/50 border border-zinc-200 rounded-xl p-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-zinc-50 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white/50 border border-gray-200 rounded-xl p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-zinc-900">Keine Kunden gefunden</h3>
-            <p className="text-zinc-400 mt-2">
+            <h3 className="text-xl font-semibold text-gray-900">Keine Kunden gefunden</h3>
+            <p className="text-gray-400 mt-2">
               {customers.length === 0 ? 'Es gibt noch keine registrierten Unternehmen.' : 'Keine Ergebnisse für diese Filterkriterien.'}
             </p>
           </div>
@@ -738,25 +738,25 @@ const CustomersTab = ({ customers }) => {
                 key={customer.id}
                 onClick={() => setSelectedCustomer(selectedCustomer?.id === customer.id ? null : customer)}
                 className={`bg-white/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-white ${
-                  selectedCustomer?.id === customer.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-zinc-200'
+                  selectedCustomer?.id === customer.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-gray-200'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0">
                     {customer.name?.charAt(0) || '?'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
-                      <h4 className="font-semibold text-zinc-900 truncate">{customer.name || 'Unbekannt'}</h4>
+                      <h4 className="font-semibold text-gray-900 truncate">{customer.name || 'Unbekannt'}</h4>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         customer.plan === 'pro'
                           ? 'bg-purple-500/20 text-purple-400'
-                          : 'bg-blue-500/20 text-blue-400'
+                          : 'bg-gray-50 text-gray-500'
                       }`}>
                         {customer.plan === 'pro' ? 'Pro' : 'Starter'}
                       </span>
                     </div>
-                    <p className="text-zinc-400 text-sm truncate">{customer.email || '-'}</p>
+                    <p className="text-gray-400 text-sm truncate">{customer.email || '-'}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -764,11 +764,11 @@ const CustomersTab = ({ customers }) => {
                         ? 'bg-green-500/20 text-green-600'
                         : customer.status === 'trial'
                         ? 'bg-orange-500/20 text-orange-400'
-                        : 'bg-zinc-500/20 text-zinc-500'
+                        : 'bg-gray-500/20 text-gray-500'
                     }`}>
                       {customer.status === 'active' ? 'Aktiv' : customer.status === 'trial' ? 'Testphase' : 'Inaktiv'}
                     </span>
-                    <p className="text-zinc-500 text-xs mt-1">seit {formatDate(customer.since)}</p>
+                    <p className="text-gray-500 text-xs mt-1">seit {formatDate(customer.since)}</p>
                   </div>
                 </div>
               </div>
@@ -780,23 +780,23 @@ const CustomersTab = ({ customers }) => {
       {/* Sidebar */}
       <div className="space-y-4">
         {/* Stats */}
-        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Übersicht</h3>
+        <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Übersicht</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+              <p className="text-xl font-semibold tracking-tight text-green-600">{activeCount}</p>
               <p className="text-xs text-green-600/70">Aktiv</p>
             </div>
             <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-orange-400">{trialCount}</p>
+              <p className="text-xl font-semibold tracking-tight text-orange-400">{trialCount}</p>
               <p className="text-xs text-orange-400/70">Testphase</p>
             </div>
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-blue-400">{starterCount}</p>
-              <p className="text-xs text-blue-400/70">Starter</p>
+            <div className="bg-gray-50 border border-gray-200/20 rounded-lg p-3 text-center">
+              <p className="text-xl font-semibold tracking-tight text-gray-500">{starterCount}</p>
+              <p className="text-xs text-gray-500/70">Starter</p>
             </div>
             <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-purple-400">{proCount}</p>
+              <p className="text-xl font-semibold tracking-tight text-purple-400">{proCount}</p>
               <p className="text-xs text-purple-400/70">Pro</p>
             </div>
           </div>
@@ -804,47 +804,47 @@ const CustomersTab = ({ customers }) => {
 
         {/* Selected Customer Details */}
         {selectedCustomer && (
-          <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Kundendetails</h3>
+          <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Kundendetails</h3>
             <div className="text-center mb-4">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-2xl">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-gray-900 font-bold text-2xl">
                 {selectedCustomer.name?.charAt(0) || '?'}
               </div>
-              <h4 className="font-semibold text-zinc-900 mt-3">{selectedCustomer.name}</h4>
-              <p className="text-zinc-400 text-sm">{selectedCustomer.email}</p>
+              <h4 className="font-semibold text-gray-900 mt-3">{selectedCustomer.name}</h4>
+              <p className="text-gray-400 text-sm">{selectedCustomer.email}</p>
             </div>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between py-2 border-b border-zinc-200">
-                <span className="text-zinc-400">Plan</span>
-                <span className={selectedCustomer.plan === 'pro' ? 'text-purple-400' : 'text-blue-400'}>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-400">Plan</span>
+                <span className={selectedCustomer.plan === 'pro' ? 'text-purple-400' : 'text-gray-500'}>
                   {selectedCustomer.plan === 'pro' ? 'Pro' : 'Starter'}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-zinc-200">
-                <span className="text-zinc-400">Status</span>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-400">Status</span>
                 <span className={selectedCustomer.status === 'active' ? 'text-green-600' : 'text-orange-400'}>
                   {selectedCustomer.status === 'active' ? 'Aktiv' : 'Testphase'}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-zinc-200">
-                <span className="text-zinc-400">Kunde seit</span>
-                <span className="text-zinc-900">{formatDate(selectedCustomer.since)}</span>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-400">Kunde seit</span>
+                <span className="text-gray-900">{formatDate(selectedCustomer.since)}</span>
               </div>
               {selectedCustomer.phone && (
-                <div className="flex justify-between py-2 border-b border-zinc-200">
-                  <span className="text-zinc-400">Telefon</span>
-                  <span className="text-zinc-900">{selectedCustomer.phone}</span>
+                <div className="flex justify-between py-2 border-b border-gray-200">
+                  <span className="text-gray-400">Telefon</span>
+                  <span className="text-gray-900">{selectedCustomer.phone}</span>
                 </div>
               )}
             </div>
             <div className="mt-4 space-y-2">
-              <button className="w-full px-4 py-2 bg-indigo-500/10 text-zinc-900 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition flex items-center justify-center gap-2">
+              <button className="w-full px-4 py-2 bg-indigo-500/10 text-gray-900 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition flex items-center justify-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
                 Bearbeiten
               </button>
-              <button className="w-full px-4 py-2 bg-zinc-50 text-zinc-500 rounded-lg text-sm font-medium hover:bg-zinc-100 transition flex items-center justify-center gap-2">
+              <button className="w-full px-4 py-2 bg-gray-50 text-gray-500 rounded-lg text-sm font-medium hover:bg-gray-100 transition flex items-center justify-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
@@ -856,15 +856,15 @@ const CustomersTab = ({ customers }) => {
 
         {/* Conversion Funnel */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-3">Conversion</h3>
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Conversion</h3>
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-zinc-500 text-sm">Testphase → Aktiv</span>
+              <span className="text-gray-500 text-sm">Testphase → Aktiv</span>
               <span className="text-green-600 font-semibold">
                 {trialCount > 0 ? Math.round((activeCount / (activeCount + trialCount)) * 100) : 0}%
               </span>
             </div>
-            <div className="h-2 bg-zinc-50 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
                 style={{ width: `${trialCount > 0 ? (activeCount / (activeCount + trialCount)) * 100 : 0}%` }}
@@ -873,12 +873,12 @@ const CustomersTab = ({ customers }) => {
           </div>
           <div className="mt-4 space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-zinc-500 text-sm">Starter → Pro</span>
+              <span className="text-gray-500 text-sm">Starter → Pro</span>
               <span className="text-purple-400 font-semibold">
                 {starterCount > 0 ? Math.round((proCount / (starterCount + proCount)) * 100) : 0}%
               </span>
             </div>
-            <div className="h-2 bg-zinc-50 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-purple-500 to-pink-400 rounded-full"
                 style={{ width: `${starterCount > 0 ? (proCount / (starterCount + proCount)) * 100 : 0}%` }}
@@ -924,8 +924,8 @@ const SubscriptionsTab = ({ subscriptions }) => {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <div>
-            <h2 className="text-xl font-semibold text-zinc-900">Abonnements</h2>
-            <p className="text-zinc-400 text-sm">Alle laufenden Subscriptions verwalten</p>
+            <h2 className="text-xl font-semibold text-gray-900">Abonnements</h2>
+            <p className="text-gray-400 text-sm">Alle laufenden Subscriptions verwalten</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
@@ -940,7 +940,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   filter === f.key
                     ? 'bg-white text-black'
-                    : `bg-zinc-50/50 ${f.color || 'text-zinc-500'} hover:bg-zinc-100`
+                    : `bg-gray-50/50 ${f.color || 'text-gray-500'} hover:bg-gray-100`
                 }`}
               >
                 {f.label}
@@ -951,14 +951,14 @@ const SubscriptionsTab = ({ subscriptions }) => {
 
         {/* Subscription List */}
         {filteredSubs.length === 0 ? (
-          <div className="bg-white/50 border border-zinc-200 rounded-xl p-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-zinc-50 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white/50 border border-gray-200 rounded-xl p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-zinc-900">Keine Abonnements</h3>
-            <p className="text-zinc-400 mt-2">
+            <h3 className="text-xl font-semibold text-gray-900">Keine Abonnements</h3>
+            <p className="text-gray-400 mt-2">
               {subscriptions.length === 0 ? 'Es gibt noch keine aktiven Abonnements.' : 'Keine Ergebnisse für diesen Filter.'}
             </p>
           </div>
@@ -969,7 +969,7 @@ const SubscriptionsTab = ({ subscriptions }) => {
                 key={sub.id}
                 onClick={() => setSelectedSub(selectedSub?.id === sub.id ? null : sub)}
                 className={`bg-white/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-white ${
-                  selectedSub?.id === sub.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-zinc-200'
+                  selectedSub?.id === sub.id ? 'ring-2 ring-indigo-500 border-indigo-500/50' : 'border-gray-200'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -977,31 +977,31 @@ const SubscriptionsTab = ({ subscriptions }) => {
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                       sub.plan === 'Pro'
                         ? 'bg-gradient-to-br from-purple-500 to-pink-500'
-                        : 'bg-gradient-to-br from-blue-500 to-cyan-500'
+                        : 'bg-gradient-to-br from-blue-500 to-blue-600'
                     }`}>
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                       </svg>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-zinc-900">{sub.customer || 'Unbekannt'}</h4>
+                      <h4 className="font-semibold text-gray-900">{sub.customer || 'Unbekannt'}</h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                           sub.plan === 'Pro'
                             ? 'bg-purple-500/20 text-purple-400'
-                            : 'bg-blue-500/20 text-blue-400'
+                            : 'bg-gray-50 text-gray-500'
                         }`}>
                           {sub.plan}
                         </span>
-                        <span className="text-zinc-400 text-sm">•</span>
-                        <span className="text-zinc-400 text-sm">seit {formatDate(sub.startDate)}</span>
+                        <span className="text-gray-400 text-sm">•</span>
+                        <span className="text-gray-400 text-sm">seit {formatDate(sub.startDate)}</span>
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`text-lg font-bold ${sub.amount > 0 ? 'text-green-600' : 'text-zinc-400'}`}>
+                    <p className={`text-lg font-bold ${sub.amount > 0 ? 'text-green-600' : 'text-gray-400'}`}>
                       {sub.amount > 0 ? `€${sub.amount}` : '€0'}
-                      <span className="text-xs font-normal text-zinc-400">/Mo</span>
+                      <span className="text-xs font-normal text-gray-400">/Mo</span>
                     </p>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       sub.status === 'active'
@@ -1024,77 +1024,77 @@ const SubscriptionsTab = ({ subscriptions }) => {
       <div className="space-y-4">
         {/* Revenue Stats */}
         <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Umsatz</h3>
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Umsatz</h3>
           <div className="text-center">
             <p className="text-4xl font-bold text-green-600">€{totalMRR}</p>
             <p className="text-green-600/70 text-sm">Monatlicher Umsatz (MRR)</p>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-4">
             <div className="bg-white/30 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-zinc-900">{activeCount}</p>
-              <p className="text-xs text-zinc-400">Zahlend</p>
+              <p className="text-xl font-bold text-gray-900">{activeCount}</p>
+              <p className="text-xs text-gray-400">Zahlend</p>
             </div>
             <div className="bg-white/30 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-zinc-900">€{avgRevenue}</p>
-              <p className="text-xs text-zinc-400">Ø/Kunde</p>
+              <p className="text-xl font-bold text-gray-900">€{avgRevenue}</p>
+              <p className="text-xs text-gray-400">Ø/Kunde</p>
             </div>
           </div>
         </div>
 
         {/* Status Distribution */}
-        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Status</h3>
+        <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Status</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-zinc-500 text-sm">Aktiv</span>
+                <span className="text-gray-500 text-sm">Aktiv</span>
               </div>
-              <span className="text-zinc-900 font-semibold">{activeCount}</span>
+              <span className="text-gray-900 font-semibold">{activeCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                <span className="text-zinc-500 text-sm">Testphase</span>
+                <span className="text-gray-500 text-sm">Testphase</span>
               </div>
-              <span className="text-zinc-900 font-semibold">{trialCount}</span>
+              <span className="text-gray-900 font-semibold">{trialCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-zinc-500"></div>
-                <span className="text-zinc-500 text-sm">Total</span>
+                <div className="w-3 h-3 rounded-full bg-gray-500"></div>
+                <span className="text-gray-500 text-sm">Total</span>
               </div>
-              <span className="text-zinc-900 font-semibold">{subscriptions.length}</span>
+              <span className="text-gray-900 font-semibold">{subscriptions.length}</span>
             </div>
           </div>
         </div>
 
         {/* Selected Subscription */}
         {selectedSub && (
-          <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-4">Details</h3>
+          <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Details</h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between py-2 border-b border-zinc-200">
-                <span className="text-zinc-400">Kunde</span>
-                <span className="text-zinc-900">{selectedSub.customer}</span>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-400">Kunde</span>
+                <span className="text-gray-900">{selectedSub.customer}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-zinc-200">
-                <span className="text-zinc-400">Plan</span>
-                <span className={selectedSub.plan === 'Pro' ? 'text-purple-400' : 'text-blue-400'}>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-400">Plan</span>
+                <span className={selectedSub.plan === 'Pro' ? 'text-purple-400' : 'text-gray-500'}>
                   {selectedSub.plan}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-zinc-200">
-                <span className="text-zinc-400">Betrag</span>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-400">Betrag</span>
                 <span className="text-green-600">€{selectedSub.amount}/Mo</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-zinc-200">
-                <span className="text-zinc-400">Start</span>
-                <span className="text-zinc-900">{formatDate(selectedSub.startDate)}</span>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-400">Start</span>
+                <span className="text-gray-900">{formatDate(selectedSub.startDate)}</span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-zinc-400">Nächste Abrechnung</span>
-                <span className="text-zinc-900">{formatDate(selectedSub.nextBilling)}</span>
+                <span className="text-gray-400">Nächste Abrechnung</span>
+                <span className="text-gray-900">{formatDate(selectedSub.nextBilling)}</span>
               </div>
             </div>
           </div>
@@ -1102,14 +1102,14 @@ const SubscriptionsTab = ({ subscriptions }) => {
 
         {/* Projections */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-5">
-          <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-3">Prognose</h3>
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Prognose</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-zinc-500 text-sm">ARR (Jährlich)</span>
-              <span className="text-zinc-900 font-bold">€{totalMRR * 12}</span>
+              <span className="text-gray-500 text-sm">ARR (Jährlich)</span>
+              <span className="text-gray-900 font-bold">€{totalMRR * 12}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-zinc-500 text-sm">Bei +10 Kunden/Mo</span>
+              <span className="text-gray-500 text-sm">Bei +10 Kunden/Mo</span>
               <span className="text-purple-400 font-bold">€{(totalMRR + (avgRevenue * 10)) * 12}</span>
             </div>
           </div>
@@ -1316,7 +1316,7 @@ const SystemControlTab = () => {
       case 'stopped': return 'bg-red-500';
       case 'starting': return 'bg-yellow-500 animate-pulse';
       case 'error': return 'bg-red-600';
-      default: return 'bg-zinc-500';
+      default: return 'bg-gray-500';
     }
   };
 
@@ -1333,7 +1333,7 @@ const SystemControlTab = () => {
 
   // Get type icon - returns SVG element
   const getTypeIcon = (type) => {
-    const iconClass = "w-6 h-6 text-zinc-500";
+    const iconClass = "w-6 h-6 text-gray-500";
     switch (type) {
       case 'database':
         return (
@@ -1369,8 +1369,8 @@ const SystemControlTab = () => {
         {/* Header Actions */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-zinc-900">Services</h2>
-            <p className="text-zinc-400 text-sm">Alle System-Komponenten im Überblick</p>
+            <h2 className="text-xl font-bold text-gray-900">Services</h2>
+            <p className="text-gray-400 text-sm">Alle System-Komponenten im Überblick</p>
           </div>
           <div className="flex gap-3">
             <button
@@ -1420,19 +1420,19 @@ const SystemControlTab = () => {
                 className={`bg-white/50 border rounded-xl p-5 transition-all ${
                   isRunning
                     ? 'border-green-500/30 shadow-sm shadow-green-500/10'
-                    : 'border-zinc-200 hover:border-zinc-200'
+                    : 'border-gray-200 hover:border-gray-200'
                 }`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      isRunning ? 'bg-green-500/20' : 'bg-zinc-50'
+                      isRunning ? 'bg-green-500/20' : 'bg-gray-50'
                     }`}>
                       {getTypeIcon(service.type)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-zinc-900">{service.name}</h3>
-                      <p className="text-zinc-400 text-sm">{service.description}</p>
+                      <h3 className="font-semibold text-gray-900">{service.name}</h3>
+                      <p className="text-gray-400 text-sm">{service.description}</p>
                     </div>
                   </div>
                 </div>
@@ -1441,9 +1441,9 @@ const SystemControlTab = () => {
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${getStatusColor(service.status)}`}></div>
-                      <span className="text-sm text-zinc-500">{getStatusText(service.status)}</span>
+                      <span className="text-sm text-gray-500">{getStatusText(service.status)}</span>
                     </div>
-                    <span className="text-xs text-zinc-500 font-mono">:{service.port}</span>
+                    <span className="text-xs text-gray-500 font-mono">:{service.port}</span>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -1451,7 +1451,7 @@ const SystemControlTab = () => {
                       disabled={actionLoading[service.id] || isRunning}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1 ${
                         isRunning
-                          ? 'bg-zinc-50 text-zinc-500 cursor-not-allowed'
+                          ? 'bg-gray-50 text-gray-500 cursor-not-allowed'
                           : actionLoading[service.id] === 'starting'
                           ? 'bg-green-500/20 text-green-600 cursor-wait'
                           : 'bg-green-500/10 text-green-600 hover:bg-green-500/20'
@@ -1468,7 +1468,7 @@ const SystemControlTab = () => {
                       disabled={actionLoading[service.id] || isStopped}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1 ${
                         isStopped
-                          ? 'bg-zinc-50 text-zinc-400 cursor-not-allowed'
+                          ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
                           : actionLoading[service.id] === 'stopping'
                           ? 'bg-red-500/20 text-red-600 cursor-wait'
                           : 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
@@ -1482,7 +1482,7 @@ const SystemControlTab = () => {
                     </button>
                     <button
                       onClick={() => checkServiceStatus(service.id)}
-                      className="px-2 py-1.5 rounded-lg text-sm bg-zinc-50 text-zinc-400 hover:text-zinc-700 transition"
+                      className="px-2 py-1.5 rounded-lg text-sm bg-gray-50 text-gray-400 hover:text-gray-700 transition"
                       title="Status aktualisieren"
                     >
                       <RefreshCw size={14} />
@@ -1495,26 +1495,26 @@ const SystemControlTab = () => {
         </div>
 
         {/* System Logs */}
-        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
+        <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <h3 className="font-semibold text-zinc-900">System Logs</h3>
+              <h3 className="font-semibold text-gray-900">System Logs</h3>
             </div>
             <button
               onClick={() => setLogs([])}
-              className="text-xs text-zinc-400 hover:text-zinc-500 px-2 py-1 rounded hover:bg-zinc-100"
+              className="text-xs text-gray-400 hover:text-gray-500 px-2 py-1 rounded hover:bg-gray-100"
             >
               Leeren
             </button>
           </div>
           <div className="bg-white rounded-xl p-4 h-56 overflow-y-auto font-mono text-xs scrollbar-thin">
             {logs.length === 0 ? (
-              <div className="text-zinc-500 flex items-center justify-center h-full">
+              <div className="text-gray-500 flex items-center justify-center h-full">
                 <div className="text-center">
-                  <svg className="w-8 h-8 mx-auto mb-2 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 mx-auto mb-2 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Keine Logs vorhanden...
@@ -1524,13 +1524,13 @@ const SystemControlTab = () => {
               logs.map((log, index) => (
                 <div
                   key={index}
-                  className={`py-1.5 border-b border-zinc-900 last:border-0 ${
+                  className={`py-1.5 border-b border-gray-900 last:border-0 ${
                     log.type === 'error' ? 'text-red-600' :
                     log.type === 'success' ? 'text-green-600' :
-                    'text-zinc-500'
+                    'text-gray-500'
                   }`}
                 >
-                  <span className="text-zinc-500">[{log.timestamp}]</span> {log.message}
+                  <span className="text-gray-500">[{log.timestamp}]</span> {log.message}
                 </div>
               ))
             )}
@@ -1541,24 +1541,24 @@ const SystemControlTab = () => {
       {/* Sidebar */}
       <div className="space-y-6">
         {/* System Status Overview */}
-        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-          <h3 className="font-semibold text-zinc-900 mb-4">System Status</h3>
+        <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+          <h3 className="font-semibold text-gray-900 mb-4">System Status</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
-              <span className="text-zinc-500">Aktive Services</span>
+              <span className="text-gray-500">Aktive Services</span>
               <span className="text-xl font-bold text-green-600">
                 {services.filter(s => s.status === 'running').length}/{services.length}
               </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
-              <span className="text-zinc-500">Gestoppt</span>
+              <span className="text-gray-500">Gestoppt</span>
               <span className="text-xl font-bold text-red-600">
                 {services.filter(s => s.status === 'stopped').length}
               </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
-              <span className="text-zinc-500">Unbekannt</span>
-              <span className="text-xl font-bold text-zinc-500">
+              <span className="text-gray-500">Unbekannt</span>
+              <span className="text-xl font-bold text-gray-500">
                 {services.filter(s => s.status === 'unknown').length}
               </span>
             </div>
@@ -1567,12 +1567,12 @@ const SystemControlTab = () => {
           {/* Health Bar */}
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-zinc-400">System Health</span>
-              <span className="text-zinc-900 font-medium">
+              <span className="text-gray-400">System Health</span>
+              <span className="text-gray-900 font-medium">
                 {Math.round((services.filter(s => s.status === 'running').length / services.length) * 100)}%
               </span>
             </div>
-            <div className="h-2 bg-zinc-50 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
                 style={{ width: `${(services.filter(s => s.status === 'running').length / services.length) * 100}%` }}
@@ -1582,9 +1582,9 @@ const SystemControlTab = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5">
-          <h3 className="font-semibold text-zinc-900 mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-gray-200/20 rounded-xl p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             Quick Actions
@@ -1594,16 +1594,16 @@ const SystemControlTab = () => {
               onClick={() => window.open('http://localhost:3000', '_blank')}
               className="w-full flex items-center gap-3 px-4 py-3 bg-white/30 rounded-lg text-left hover:bg-white/50 transition group"
             >
-              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-zinc-900 text-sm font-medium">Frontend öffnen</p>
-                <p className="text-zinc-400 text-xs">localhost:3000</p>
+                <p className="text-gray-900 text-sm font-medium">Frontend öffnen</p>
+                <p className="text-gray-400 text-xs">localhost:3000</p>
               </div>
-              <svg className="w-4 h-4 text-zinc-500 group-hover:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-500 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </button>
@@ -1617,10 +1617,10 @@ const SystemControlTab = () => {
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-zinc-900 text-sm font-medium">Backend Health</p>
-                <p className="text-zinc-400 text-xs">API Status prüfen</p>
+                <p className="text-gray-900 text-sm font-medium">Backend Health</p>
+                <p className="text-gray-400 text-xs">API Status prüfen</p>
               </div>
-              <svg className="w-4 h-4 text-zinc-500 group-hover:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-500 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </button>
@@ -1628,8 +1628,8 @@ const SystemControlTab = () => {
         </div>
 
         {/* Startup Order Info */}
-        <div className="bg-white/50 border border-zinc-200 rounded-xl p-5">
-          <h3 className="font-semibold text-zinc-900 mb-4">Startup-Reihenfolge</h3>
+        <div className="bg-white/50 border border-gray-200 rounded-xl p-5">
+          <h3 className="font-semibold text-gray-900 mb-4">Startup-Reihenfolge</h3>
           <div className="space-y-3">
             {[
               { step: 1, name: 'MongoDB', desc: 'Datenbank', color: 'green' },
@@ -1642,8 +1642,8 @@ const SystemControlTab = () => {
                   {item.step}
                 </div>
                 <div>
-                  <p className="text-zinc-900 text-sm font-medium">{item.name}</p>
-                  <p className="text-zinc-400 text-xs">{item.desc}</p>
+                  <p className="text-gray-900 text-sm font-medium">{item.name}</p>
+                  <p className="text-gray-400 text-xs">{item.desc}</p>
                 </div>
               </div>
             ))}

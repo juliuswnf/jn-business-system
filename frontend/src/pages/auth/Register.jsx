@@ -133,32 +133,32 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="text-4xl font-bold mb-2">Konto erstellen</div>
-          <p className="text-zinc-500 text-lg">
+          <p className="text-gray-500 text-lg">
             Fast geschafft! Erstelle dein {planInfo.planName}-Konto
           </p>
         </div>
 
         {/* Plan Info Banner */}
-        <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-zinc-50 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <p className="font-medium text-zinc-900">{planInfo.planName} Plan</p>
-              <p className="text-sm text-zinc-500">30 Tage kostenlos testen</p>
+              <p className="font-medium text-gray-900">{planInfo.planName} Plan</p>
+              <p className="text-sm text-gray-500">30 Tage kostenlos testen</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xl font-bold text-zinc-900">€{planInfo.price}/Monat</p>
-            <p className="text-xs text-zinc-400">nach Testphase</p>
+            <p className="text-xl font-bold text-gray-900">€{planInfo.price}/Monat</p>
+            <p className="text-xs text-gray-400">nach Testphase</p>
           </div>
         </div>
 
@@ -166,7 +166,7 @@ export default function Register() {
         <div className="card">
           {/* Error Message */}
           {apiError && (
-            <div className="mb-6 p-4 rounded-lg bg-red-600/10 border border-red-600/30 text-red-600 text-sm">
+            <div className="mb-6 p-4 rounded-xl bg-red-600/10 border border-red-600/30 text-red-600 text-sm">
               {apiError}
             </div>
           )}
@@ -175,13 +175,13 @@ export default function Register() {
 
             {/* Personal Info */}
             <div>
-              <h3 className="text-sm font-semibold text-zinc-900 mb-4 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-50 text-zinc-900 text-xs font-bold"><FiClipboard /></span>
+              <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-xl bg-gray-100 text-gray-700 text-xs font-bold"><FiClipboard /></span>
                 Persönliche Daten
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">Vorname</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Vorname</label>
                   <input
                     type="text"
                     name="firstName"
@@ -193,7 +193,7 @@ export default function Register() {
                   {errors.firstName && <p className="text-red-600 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">Nachname</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nachname</label>
                   <input
                     type="text"
                     name="lastName"
@@ -207,7 +207,7 @@ export default function Register() {
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-zinc-700 mb-2">E‑Mail</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">E‑Mail</label>
                 <input
                   type="email"
                   name="email"
@@ -220,7 +220,7 @@ export default function Register() {
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-zinc-700 mb-2">Telefon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
                 <input
                   type="tel"
                   name="phone"
@@ -233,7 +233,7 @@ export default function Register() {
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-zinc-700 mb-2">Firmenname</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Firmenname</label>
                 <input
                   type="text"
                   name="companyName"
@@ -246,7 +246,7 @@ export default function Register() {
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-zinc-700 mb-2">Ihre Branche <span className="text-red-600">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ihre Branche <span className="text-red-600">*</span></label>
                 <select
                   name="businessType"
                   value={formData.businessType}
@@ -269,19 +269,19 @@ export default function Register() {
                   <option value="other">Andere</option>
                 </select>
                 {errors.businessType && <p className="text-red-600 text-xs mt-1">{errors.businessType}</p>}
-                <p className="text-xs text-zinc-500 mt-1">Die Auswahl bestimmt, welche branchenspezifischen Funktionen Ihnen zur Verfügung stehen.</p>
+                <p className="text-xs text-gray-500 mt-1">Die Auswahl bestimmt, welche branchenspezifischen Funktionen Ihnen zur Verfügung stehen.</p>
               </div>
             </div>
 
             {/* Security Info */}
             <div>
-              <h3 className="text-sm font-semibold text-zinc-900 mb-4 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-50 text-zinc-900 text-xs font-bold"><FiLock /></span>
+              <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-xl bg-gray-100 text-gray-700 text-xs font-bold"><FiLock /></span>
                 Zugangsdaten
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">Passwort</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Passwort</label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -291,12 +291,12 @@ export default function Register() {
                       placeholder="Mind. 8 Zeichen"
                       className={`input-field ${errors.password ? 'input-error' : ''}`}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600">{showPassword ? 'Verstecken' : 'Anzeigen'}</button>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600">{showPassword ? 'Verstecken' : 'Anzeigen'}</button>
                   </div>
                   {errors.password && <p className="text-red-600 text-xs mt-1">{errors.password}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">Passwort wiederholen</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Passwort wiederholen</label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -309,7 +309,7 @@ export default function Register() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-900 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 transition-colors"
                       aria-label={showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
                     >
                       {showConfirmPassword ? 'Verstecken' : 'Anzeigen'}
@@ -321,7 +321,7 @@ export default function Register() {
             </div>
 
             {/* Terms */}
-            <label className="flex items-start p-4 rounded-lg bg-white border border-zinc-200 cursor-pointer hover:border-zinc-200 transition">
+            <label className="flex items-start p-4 rounded-xl bg-white border border-gray-100 cursor-pointer hover:border-gray-300 transition">
               <input
                 type="checkbox"
                 name="agreeToTerms"
@@ -329,11 +329,11 @@ export default function Register() {
                 onChange={handleChange}
                 className="mt-1 mr-3 rounded cursor-pointer w-4 h-4"
               />
-              <span className="text-sm text-zinc-600">
+              <span className="text-sm text-gray-600">
                 Ich stimme den{' '}
-                <a href="#" className="text-zinc-900 font-semibold">Nutzungsbedingungen</a>{' '}
+                <a href="#" className="text-gray-900 font-semibold">Nutzungsbedingungen</a>{' '}
                 und der{' '}
-                <a href="#" className="text-zinc-900 font-semibold">Datenschutzerklärung</a>{' '}zu.
+                <a href="#" className="text-gray-900 font-semibold">Datenschutzerklärung</a>{' '}zu.
               </span>
             </label>
             {errors.agreeToTerms && <p className="text-red-600 text-xs">{errors.agreeToTerms}</p>}
@@ -343,8 +343,8 @@ export default function Register() {
           </form>
 
           {/* Sign In Link */}
-          <div className="mt-6 text-center text-sm text-zinc-500 border-t border-zinc-200 pt-6">
-            <p>Bereits registriert? <Link to="/login" className="text-zinc-900 font-semibold">Hier anmelden</Link></p>
+          <div className="mt-6 text-center text-sm text-gray-500 border-t border-gray-200 pt-6">
+            <p>Bereits registriert? <Link to="/login" className="text-gray-900 font-semibold">Hier anmelden</Link></p>
           </div>
         </div>
       </div>

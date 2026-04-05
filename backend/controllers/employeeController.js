@@ -1,5 +1,6 @@
 ﻿import logger from '../utils/logger.js';
 import User from '../models/User.js';
+import Booking from '../models/Booking.js';
 
 // ==================== GET ALL EMPLOYEES ====================
 
@@ -134,13 +135,55 @@ export const deleteEmployee = async (req, res) => {
   }
 };
 
+// ==================== GET MY STATS ====================
+
+export const getMyStats = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const [monthlyBookings, totalBookings] = await Promise.all([
+      Booking.find({
+        employeeId: userId,
+        bookingDate: { $gte: startOfMonth },
+        status: { $in: ['confirmed', 'completed'] }
+      }).populate('serviceId', 'price').lean().maxTimeMS(5000),
+      Booking.countDocuments({
+        employeeId: userId,
+        status: { $in: ['confirmed', 'completed'] }
+      }).maxTimeMS(5000)
+    ]);
+
+    const monthlyEarnings = monthlyBookings.reduce((sum, b) => {
+      const price = b.serviceId?.price || b.services?.[0]?.price || 0;
+      return sum + price;
+    }, 0);
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        monthlyEarnings: Math.round(monthlyEarnings * 100) / 100,
+        totalBookings
+      }
+    });
+  } catch (error) {
+    logger.error('GetMyStats Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+};
+
 // ==================== DEFAULT EXPORT ====================
 
 export default {
   getAllEmployees,
   getEmployeeById,
   updateEmployee,
-  deleteEmployee
+  deleteEmployee,
+  getMyStats
 };
 
 

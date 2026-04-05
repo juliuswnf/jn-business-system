@@ -90,7 +90,7 @@ const SubscriptionManagement = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <svg
-            className="animate-spin h-12 w-12 text-zinc-900 mx-auto"
+            className="animate-spin h-12 w-12 text-gray-900 mx-auto"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -118,7 +118,7 @@ const SubscriptionManagement = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md p-8 bg-white rounded-lg shadow-sm text-center">
+        <div className="max-w-md p-8 bg-white rounded-xl shadow-sm text-center">
           <svg
             className="w-16 h-16 text-red-500 mx-auto"
             fill="none"
@@ -135,7 +135,7 @@ const SubscriptionManagement = () => {
           <h3 className="mt-4 text-xl font-bold text-gray-900">{error}</h3>
           <button
             onClick={() => navigate('/')}
-            className="mt-6 px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700"
+            className="mt-6 px-6 py-2 bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-100"
           >
             Zurück zum Kontrollpanel
           </button>
@@ -188,15 +188,15 @@ const SubscriptionManagement = () => {
         </div>
 
         {/* Current Plan */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
+        <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
           <div className="flex items-start justify-between mb-6">
             <div>
               <div className="flex items-center space-x-3">
-                <h2 className="text-3xl font-bold text-gray-900">
+                <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
                   {subscription.tierName}
                 </h2>
                 {subscription.tier === 'enterprise' && (
-                  <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm font-semibold rounded-full">
+                  <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-semibold rounded-full">
                     PREMIUM
                   </span>
                 )}
@@ -209,10 +209,10 @@ const SubscriptionManagement = () => {
               </p>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold text-zinc-900">
+              <div className="text-4xl font-bold text-gray-900">
                 €{subscription.price.current}
               </div>
-              <div className="text-sm text-zinc-500">
+              <div className="text-sm text-gray-500">
                 {subscription.billingCycle === 'yearly' ? '/ Jahr' : '/ Monat'}
               </div>
             </div>
@@ -225,7 +225,7 @@ const SubscriptionManagement = () => {
                 subscription.status === 'active'
                   ? 'bg-green-100 text-green-800'
                   : subscription.status === 'trial'
-                  ? 'bg-blue-100 text-blue-800'
+                  ? 'bg-gray-100 text-gray-800'
                   : 'bg-gray-100 text-gray-800'
               }`}
             >
@@ -245,7 +245,7 @@ const SubscriptionManagement = () => {
           {/* Billing Info */}
           <div className="grid md:grid-cols-2 gap-6 py-6 border-t border-gray-200">
             <div>
-              <h3 className="text-sm font-medium text-zinc-500 mb-2">Nächste Abrechnung</h3>
+              <h3 className="text-sm font-medium text-gray-500 mb-2">Nächste Abrechnung</h3>
               <p className="text-lg font-semibold text-gray-900">
                 {new Date(subscription.currentPeriodEnd).toLocaleDateString('de-DE', {
                   year: 'numeric',
@@ -255,7 +255,7 @@ const SubscriptionManagement = () => {
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-zinc-500 mb-2">Zahlungsmethode</h3>
+              <h3 className="text-sm font-medium text-gray-500 mb-2">Zahlungsmethode</h3>
               <p className="text-lg font-semibold text-gray-900 capitalize">
                 {subscription.paymentMethod === 'card'
                   ? '?? Kreditkarte'
@@ -273,11 +273,11 @@ const SubscriptionManagement = () => {
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Upgrade */}
           {currentTierIndex < tiers.length - 1 && (
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-6 border border-indigo-200">
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg
-                    className="w-8 h-8 text-zinc-900"
+                    className="w-8 h-8 text-gray-900"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -297,7 +297,7 @@ const SubscriptionManagement = () => {
                   </p>
                   <button
                     onClick={() => setShowUpgrade(true)}
-                    className="mt-4 px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700 font-semibold"
+                    className="mt-4 px-6 py-2 bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-100 font-semibold"
                   >
                     Jetzt upgraden
                   </button>
@@ -308,7 +308,7 @@ const SubscriptionManagement = () => {
 
           {/* Downgrade */}
           {availableDowngrades.length > 0 && (
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg
@@ -333,7 +333,7 @@ const SubscriptionManagement = () => {
                       <button
                         key={tier}
                         onClick={() => handleDowngradeClick(tier)}
-                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium text-sm"
+                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-medium text-sm"
                       >
                         ? {tier.charAt(0).toUpperCase() + tier.slice(1)}
                       </button>
@@ -347,7 +347,7 @@ const SubscriptionManagement = () => {
 
         {/* Cancel Subscription */}
         {!subscription.cancelAtPeriodEnd && (
-          <div className="bg-white rounded-lg shadow-sm p-8">
+          <div className="bg-white rounded-xl shadow-sm p-8">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Abonnement kündigen</h3>
             <p className="text-gray-700 mb-6">
               Du kannst dein Abonnement jederzeit kündigen. Du behältst den Zugriff bis zum Ende
@@ -355,7 +355,7 @@ const SubscriptionManagement = () => {
             </p>
             <button
               onClick={handleCancelSubscription}
-              className="px-6 py-2 bg-red-600 text-zinc-900 rounded-lg hover:bg-red-700 font-semibold"
+              className="px-6 py-2 bg-red-600 text-gray-900 rounded-xl hover:bg-red-700 font-semibold"
             >
               Abonnement kündigen
             </button>
@@ -363,10 +363,10 @@ const SubscriptionManagement = () => {
         )}
 
         {/* Help */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="mt-8 bg-gray-50 border border-gray-100 rounded-2xl p-6">
           <div className="flex items-start">
             <svg
-              className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"
+              className="w-6 h-6 text-gray-700 flex-shrink-0 mt-0.5"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -377,12 +377,12 @@ const SubscriptionManagement = () => {
               />
             </svg>
             <div className="ml-4">
-              <h4 className="text-lg font-semibold text-blue-900">Brauchst du Hilfe?</h4>
-              <p className="mt-1 text-sm text-blue-800">
+              <h4 className="text-lg font-semibold text-gray-900">Brauchst du Hilfe?</h4>
+              <p className="mt-1 text-sm text-gray-800">
                 Bei Fragen zu deinem Abonnement oder den Zahlungen kontaktiere uns unter{' '}
                 <a
                   href="mailto:support@jn-business-system.com"
-                  className="font-semibold underline hover:text-blue-900"
+                  className="font-semibold underline hover:text-gray-900"
                 >
                   support@jn-business-system.com
                 </a>

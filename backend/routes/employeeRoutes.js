@@ -10,6 +10,9 @@ router.use(authMiddleware.protect);
 // Get all employees
 router.get('/', employeeController.getAllEmployees);
 
+// Get my stats (must be before /:employeeId)
+router.get('/my-stats', employeeController.getMyStats);
+
 // Get employee by ID
 router.get('/:employeeId', employeeController.getEmployeeById);
 

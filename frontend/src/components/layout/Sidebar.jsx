@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo, useEffect, Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -43,7 +43,12 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
   const [expandedSections, setExpandedSections] = useState({});
 
   const toggleSection = (key) => {
-    setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+    setExpandedSections(prev => {
+      const isCurrentlyOpen = prev[key];
+      // Close all sections, then open the clicked one (unless it was already open)
+      const allClosed = Object.fromEntries(Object.keys(prev).map(k => [k, false]));
+      return isCurrentlyOpen ? allClosed : { ...allClosed, [key]: true };
+    });
   };
 
   const isActive = (path) => {
@@ -128,7 +133,6 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
             { label: 'Unternehmen', path: '/ceo/companies' },
             { label: 'Benutzer', path: '/ceo/users' },
             { label: 'Zahlungen', path: '/ceo/payments' },
-            { label: 'Abonnements', path: '/ceo/subscriptions' }
           ]
         },
         {
@@ -240,6 +244,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
         key: 'marketing',
         label: 'Marketing',
         icon: Megaphone,
+        tier: 'professional',
         children: [
           { label: 'Kampagnen', path: '/dashboard/marketing', tier: 'professional' },
           { label: 'SMS-Versand', path: '/dashboard/marketing/sms', tier: 'enterprise' },
@@ -250,6 +255,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
         key: 'finance',
         label: 'Finanzen & Berichte',
         icon: CreditCard,
+        tier: 'professional',
         children: [
           { label: 'Erfolgsmetriken', path: '/dashboard/success-metrics', tier: 'enterprise' },
           { label: 'Rechnungen', path: '/dashboard/billing/invoices', tier: 'enterprise' },
@@ -285,6 +291,19 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
     return items;
   }, [user?.role, industry]);
 
+  // Auto-expand sections that contain the active route
+  useEffect(() => {
+    const toExpand = {};
+    navigation.forEach((item) => {
+      if (item.children && item.children.some((c) => isActive(c.path))) {
+        toExpand[item.key] = true;
+      }
+    });
+    if (Object.keys(toExpand).length > 0) {
+      setExpandedSections((prev) => ({ ...prev, ...toExpand }));
+    }
+  }, [location.pathname, navigation]);
+
   const handleLogout = async () => {
     localStorage.removeItem('jnAuthToken');
     localStorage.removeItem('jnUser');
@@ -316,35 +335,35 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
 
     if (hasChildren) {
       return (
-        <div key={item.key} className="mb-0.5">
+        <div key={item.key}>
           <button
             onClick={() => !sectionLocked && toggleSection(item.key)}
             disabled={sectionLocked}
             className={`
-              w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-[13px] font-medium
-              transition-colors
+              w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left text-[13px] font-medium
+              transition-colors duration-150
               ${sectionLocked
-                ? 'text-zinc-300 cursor-not-allowed'
+                ? 'text-gray-300 cursor-not-allowed'
                 : hasActiveChild
-                  ? 'text-zinc-900 bg-zinc-100'
-                  : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
+                  ? 'text-gray-900 bg-gray-100'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
               }
             `}
           >
-            <Icon size={17} className="shrink-0" />
+            <Icon size={16} className="shrink-0" />
             <span className="flex-1 truncate">{item.label}</span>
             {sectionLocked ? (
-              <Lock size={13} className="shrink-0 text-zinc-300" />
+              <Lock size={12} className="shrink-0 text-gray-300" />
             ) : (
               <ChevronDown
-                size={13}
+                size={12}
                 className={`shrink-0 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
               />
             )}
           </button>
 
           {isExpanded && !sectionLocked && (
-            <div className="mt-0.5 ml-5 pl-3 border-l border-zinc-200 space-y-0.5">
+            <div className="mt-0.5 ml-4 pl-3 border-l border-gray-100">
               {item.children.map((child, idx) => {
                 const childLocked = child.tier && !hasTier(child.tier);
                 const childActive = isActive(child.path);
@@ -353,10 +372,10 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
                   return (
                     <div
                       key={idx}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] text-zinc-300 cursor-not-allowed"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[12.5px] text-gray-300 cursor-not-allowed"
                     >
                       <span className="truncate">{child.label}</span>
-                      <Lock size={11} className="shrink-0 ml-auto" />
+                      <Lock size={10} className="shrink-0 ml-auto" />
                     </div>
                   );
                 }
@@ -367,11 +386,11 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
                     to={child.path}
                     onClick={() => onClose?.()}
                     className={`
-                      flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px]
-                      transition-colors
+                      flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[12.5px]
+                      transition-colors duration-150
                       ${childActive
-                        ? 'text-zinc-900 font-medium'
-                        : 'text-zinc-400 hover:text-zinc-700'
+                        ? 'text-gray-900 font-medium bg-gray-100'
+                        : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
                       }
                     `}
                   >
@@ -390,11 +409,11 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
       return (
         <div
           key={item.key}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium text-zinc-300 cursor-not-allowed mb-0.5"
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13px] font-medium text-gray-300 cursor-not-allowed"
         >
-          <Icon size={17} className="shrink-0" />
+          <Icon size={16} className="shrink-0" />
           <span className="flex-1 truncate">{item.label}</span>
-          <Lock size={13} className="shrink-0" />
+          <Lock size={12} className="shrink-0" />
         </div>
       );
     }
@@ -405,15 +424,15 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
         to={item.path}
         onClick={() => onClose?.()}
         className={`
-          flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium mb-0.5
-          transition-colors
+          flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13px] font-medium
+          transition-colors duration-150
           ${isItemActive
-            ? 'text-zinc-900 bg-zinc-100'
-            : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
+            ? 'text-gray-900 bg-gray-100'
+            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
           }
         `}
       >
-        <Icon size={17} className="shrink-0" />
+        <Icon size={16} className="shrink-0" />
         <span className="truncate">{item.label}</span>
       </Link>
     );
@@ -421,34 +440,34 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
 
   return (
     <div className={`
-      w-[260px] bg-white border-r border-zinc-200 h-full flex flex-col
+      w-[256px] bg-white border-r border-gray-100 h-full flex flex-col
       transition-all duration-300
       ${!isOpen ? '-translate-x-full' : ''}
     `}>
       {/* Logo */}
-      <div className="px-5 pt-6 pb-4 flex items-center justify-between">
+      <div className="px-5 pt-5 pb-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">JN</span>
+          <div className="w-7 h-7 rounded-xl bg-gray-900 flex items-center justify-center">
+            <span className="text-white font-bold text-[12px] tracking-tight">JN</span>
           </div>
-          <span className="text-zinc-900 font-semibold text-[15px]">JN Business</span>
+          <span className="text-gray-900 font-semibold text-sm tracking-tight">JN Business</span>
         </Link>
         {onClose && (
-          <button onClick={onClose} className="md:hidden text-zinc-400 hover:text-zinc-700">
-            <X size={20} />
+          <button onClick={onClose} className="md:hidden text-gray-400 hover:text-gray-700 transition-colors">
+            <X size={18} />
           </button>
         )}
       </div>
 
       {/* User */}
-      <div className="mx-4 mb-5 px-3 py-3 bg-zinc-50 rounded-lg border border-zinc-100">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white text-xs font-semibold shrink-0">
+      <div className="mx-3 mb-4 px-3 py-2.5 rounded-xl bg-gray-50">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center text-white text-[11px] font-semibold shrink-0">
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-medium text-zinc-900 truncate">{user?.name || 'Benutzer'}</p>
-            <p className="text-[11px] text-zinc-400">{getRoleLabel(user?.role)}</p>
+            <p className="text-[13px] font-medium text-gray-900 truncate leading-tight">{user?.name || 'Benutzer'}</p>
+            <p className="text-[11px] text-gray-400 leading-tight">{getRoleLabel(user?.role)}</p>
           </div>
         </div>
       </div>
@@ -456,17 +475,25 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 pb-4">
         <div className="space-y-0.5">
-          {navigation.map(renderNavItem)}
+          {navigation.map((item, idx) => (
+            <React.Fragment key={item.key}>
+              {/* Thin section divider before certain groups */}
+              {idx > 0 && ['marketing', 'finance', 'branch', 'help', 'settings', 'system'].includes(item.key) && (
+                <div className="my-2 border-t border-gray-100" />
+              )}
+              {renderNavItem(item)}
+            </React.Fragment>
+          ))}
         </div>
       </nav>
 
       {/* Logout */}
-      <div className="px-4 py-4 border-t border-zinc-100">
+      <div className="px-3 py-3 border-t border-gray-100">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13px] font-medium text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors duration-150"
         >
-          <LogOut size={17} />
+          <LogOut size={15} />
           <span>Abmelden</span>
         </button>
       </div>

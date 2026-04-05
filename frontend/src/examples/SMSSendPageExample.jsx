@@ -61,7 +61,7 @@ export default function SMSSendPage() {
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="+49123456789"
-              className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg"
+              className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg"
               required
             />
           </div>
@@ -72,7 +72,7 @@ export default function SMSSendPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Your message..."
-              className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg"
+              className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg"
               rows={4}
               required
             />

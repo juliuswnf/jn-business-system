@@ -1,9 +1,9 @@
 :root {
-  --primary: #2563EB;      /* Blau - Trust, Professionell */
-  --secondary: #1E40AF;    /* Dunkelblau */
+  --primary: #111827;      /* Gray-900 */
+  --secondary: #374151;    /* Gray-700 */
   --accent: #10B981;       /* Grün - Success */
-  --text: #1F2937;         /* Dunkelgrau */
-  --bg: #F9FAFB;            /* Light Gray */
+  --text: #111827;         /* Gray-900 */
+  --bg: #ffffff;           /* White */
   --white: #FFFFFF;
 }
 

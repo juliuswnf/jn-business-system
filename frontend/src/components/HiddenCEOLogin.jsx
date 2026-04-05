@@ -29,12 +29,12 @@ const HiddenCEOLogin = () => {
         <p className="text-gray-600 mb-4">Bitte geben Sie Ihr Passwort ein:</p>
         <input
           type="password"
-          className="w-full p-3 border border-gray-300 rounded-lg mb-4"
+          className="w-full p-3 border border-gray-300 rounded-xl mb-4"
           placeholder="Passwort"
         />
         <button
           onClick={handleLogin}
-          className="px-6 py-3 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700"
+          className="px-6 py-3 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900"
         >
           Login
         </button>

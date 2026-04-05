@@ -62,14 +62,14 @@ const CEOLogin = () => {
   return (
     <AuthLayout title="Systemzugang" subtitle="CEO-Portal — Zutritt nur für berechtigte Personen">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-3">
-          <p className="text-sm text-zinc-600">Sicherheitsprotokoll: Unautorisierte Zugriffsversuche werden protokolliert.</p>
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+          <p className="text-sm text-gray-600">Sicherheitsprotokoll: Unautorisierte Zugriffsversuche werden protokolliert.</p>
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-zinc-600 mb-2">E-Mail</label>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-2">E-Mail</label>
           <div className="relative">
-            <FiMail className="absolute left-3 top-3 text-zinc-500" size={18} />
+            <FiMail className="absolute left-3 top-3 text-gray-500" size={18} />
             <input
               id="email"
               name="email"
@@ -84,9 +84,9 @@ const CEOLogin = () => {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-zinc-600 mb-2">Passwort</label>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-2">Passwort</label>
           <div className="relative">
-            <FiLock className="absolute left-3 top-3 text-zinc-500" size={18} />
+            <FiLock className="absolute left-3 top-3 text-gray-500" size={18} />
             <input
               id="password"
               name="password"
@@ -99,7 +99,7 @@ const CEOLogin = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-700"
+              className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
             >
               {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
             </button>
@@ -108,8 +108,8 @@ const CEOLogin = () => {
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer text-sm text-zinc-600">
-            <input type="checkbox" className="rounded text-zinc-900" /> Angemeldet bleiben
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600">
+            <input type="checkbox" className="rounded text-gray-900" /> Angemeldet bleiben
           </label>
           <a href="/forgot-password?role=business" className="text-sm text-indigo-300 hover:text-indigo-200">Passwort vergessen?</a>
         </div>
@@ -118,10 +118,10 @@ const CEOLogin = () => {
           Zugang zum CEO-Portal
         </ButtonLoading>
 
-        <p className="text-xs text-zinc-400 text-center">Zwei-Faktor-Authentifizierung wird empfohlen</p>
+        <p className="text-xs text-gray-400 text-center">Zwei-Faktor-Authentifizierung wird empfohlen</p>
       </form>
 
-      <div className="mt-6 text-sm text-zinc-500">Support: <strong className="text-zinc-700">security@jn-business-system.de</strong></div>
+      <div className="mt-6 text-sm text-gray-500">Support: <strong className="text-gray-700">security@jn-business-system.de</strong></div>
     </AuthLayout>
   );
 };

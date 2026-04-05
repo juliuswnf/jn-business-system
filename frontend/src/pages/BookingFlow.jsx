@@ -40,7 +40,7 @@ const BookingFlow = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Termin buchen</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-8">Termin buchen</h1>
 
         {/* Step 1: Service Selection */}
         {step === 1 && (
@@ -51,14 +51,14 @@ const BookingFlow = () => {
                 <div
                   key={service.id}
                   onClick={() => handleServiceSelect(service)}
-                  className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50"
+                  className="border border-gray-100 rounded-2xl p-4 cursor-pointer hover:bg-gray-50"
                 >
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium text-gray-900">{service.name}</p>
-                      <p className="text-zinc-500">{service.price}€, {service.duration} Min.</p>
+                      <p className="text-gray-500">{service.price}€, {service.duration} Min.</p>
                     </div>
-                    <button className="px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700">
+                    <button className="px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900">
                       Auswählen
                     </button>
                   </div>
@@ -80,7 +80,7 @@ const BookingFlow = () => {
                   <div
                     key={i}
                     onClick={() => handleDateSelect(date.toISOString().split('T')[0])}
-                    className="border border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50"
+                    className="border border-gray-100 rounded-2xl p-4 text-center cursor-pointer hover:bg-gray-50"
                   >
                     <p className="font-medium text-gray-900">{date.toLocaleDateString()}</p>
                   </div>
@@ -102,7 +102,7 @@ const BookingFlow = () => {
                   <div
                     key={i}
                     onClick={() => handleTimeSelect(time)}
-                    className="border border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50"
+                    className="border border-gray-100 rounded-2xl p-4 text-center cursor-pointer hover:bg-gray-50"
                   >
                     <p className="font-medium text-gray-900">{time}</p>
                   </div>
@@ -124,7 +124,7 @@ const BookingFlow = () => {
                   name="name"
                   value={customerInfo.name}
                   onChange={handleCustomerInfoChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  className="w-full p-3 border border-gray-100 rounded-2xl"
                 />
               </div>
               <div>
@@ -134,7 +134,7 @@ const BookingFlow = () => {
                   name="email"
                   value={customerInfo.email}
                   onChange={handleCustomerInfoChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  className="w-full p-3 border border-gray-100 rounded-2xl"
                 />
               </div>
               <div>
@@ -144,12 +144,12 @@ const BookingFlow = () => {
                   name="phone"
                   value={customerInfo.phone}
                   onChange={handleCustomerInfoChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  className="w-full p-3 border border-gray-100 rounded-2xl"
                 />
               </div>
               <button
                 onClick={handleSubmit}
-                className="px-6 py-3 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700"
+                className="px-6 py-3 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900"
               >
                 Buchung abschließen
               </button>
@@ -161,10 +161,10 @@ const BookingFlow = () => {
         {step === 5 && (
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Buchung bestätigt</h2>
-            <p className="text-zinc-500">Ihr Termin wurde erfolgreich gebucht. Sie erhalten eine Bestätigungs-Email.</p>
+            <p className="text-gray-500">Ihr Termin wurde erfolgreich gebucht. Sie erhalten eine Bestätigungs-Email.</p>
             <Link
               to="/customer/dashboard"
-              className="mt-4 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-zinc-900 bg-blue-600 hover:bg-blue-700 transition-colors"
+              className="mt-4 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-gray-900 bg-gray-900 hover:bg-gray-900 transition-colors"
             >
               Zu meinem Kontrollpanel
             </Link>

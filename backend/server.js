@@ -336,6 +336,7 @@ app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: p
 
 // Protected Routes (Auth Required)
 app.use('/api/v1/salon', authMiddleware.protect, salonRoutes);
+app.use('/api/v1/salons', authMiddleware.protect, salonRoutes); // Plural alias
 app.use('/api/v1/bookings', authMiddleware.protect, bookingRoutes);
 app.use('/api/v1/appointments', authMiddleware.protect, appointmentsRoutes);
 app.use('/api/v1/payments', authMiddleware.protect, paymentRoutes);

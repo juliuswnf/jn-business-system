@@ -70,7 +70,7 @@ export default function MobileBottomNav() {
               text-xs font-medium
               transition-colors
               touch-manipulation
-              ${isActive ? 'text-blue-600' : 'text-gray-600'}
+              ${isActive ? 'text-gray-900' : 'text-gray-400'}
             `}
           >
             {({ isActive }) => {

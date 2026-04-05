@@ -101,10 +101,10 @@ const CampaignAnalytics = () => {
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-gray-100 text-gray-700',
-      sent: 'bg-blue-100 text-blue-700',
+      sent: 'bg-gray-100 text-gray-700',
       delivered: 'bg-green-100 text-green-700',
       failed: 'bg-red-100 text-red-700',
-      clicked: 'bg-purple-100 text-purple-700',
+      clicked: 'bg-gray-100 text-gray-700',
       booked: 'bg-emerald-100 text-emerald-700'
     };
     return colors[status] || 'bg-gray-100 text-gray-700';
@@ -178,7 +178,7 @@ const CampaignAnalytics = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -200,13 +200,13 @@ const CampaignAnalytics = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/dashboard/marketing')}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className="p-2 hover:bg-gray-100 rounded-xl"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-gray-900">{campaign.name}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{campaign.name}</h1>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 campaign.status === 'active' ? 'bg-green-100 text-green-700' :
                 campaign.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
@@ -214,24 +214,24 @@ const CampaignAnalytics = () => {
               }`}>
                 {campaign.status}
               </span>
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
                 {getTypeLabel(campaign.type)}
               </span>
             </div>
-            <p className="text-zinc-500">Campaign Analytics & Performance</p>
+            <p className="text-gray-500">Campaign Analytics & Performance</p>
           </div>
         </div>
         <div className="flex gap-3">
           <button
             onClick={() => navigate(`/dashboard/campaign-editor/${id}`)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
           >
             <Edit className="w-4 h-4" />
             Bearbeiten
           </button>
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900"
           >
             <Download className="w-4 h-4" />
             Export CSV
@@ -274,7 +274,7 @@ const CampaignAnalytics = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg shadow p-6 mb-8"
+        className="bg-white rounded-xl shadow p-6 mb-8"
       >
         <h2 className="text-xl font-semibold mb-4">📈 Verlauf über Zeit</h2>
         <ResponsiveContainer width="100%" height={300}>
@@ -297,7 +297,7 @@ const CampaignAnalytics = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow p-6 mb-8"
+          className="bg-white rounded-xl shadow p-6 mb-8"
         >
           <h2 className="text-xl font-semibold mb-4">💰 Top 10 Umsatz-Bringer</h2>
           <ResponsiveContainer width="100%" height={300}>
@@ -316,7 +316,7 @@ const CampaignAnalytics = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg shadow"
+        className="bg-white rounded-xl shadow"
       >
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -327,7 +327,7 @@ const CampaignAnalytics = () => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100 focus:border-transparent"
             >
               <option value="all">Alle Status</option>
               <option value="pending">Ausstehend</option>
@@ -344,14 +344,14 @@ const CampaignAnalytics = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Kunde</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Telefon</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Rabattcode</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Gesendet</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Geklickt</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Gebucht</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">Umsatz</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Kunde</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Telefon</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Rabattcode</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Gesendet</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Geklickt</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Gebucht</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Umsatz</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -362,7 +362,7 @@ const CampaignAnalytics = () => {
                       {recipient.customerName || 'N/A'}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {recipient.phoneNumber}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -370,10 +370,10 @@ const CampaignAnalytics = () => {
                       {getStatusLabel(recipient.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {recipient.discountCode || '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {recipient.sentAt ? new Date(recipient.sentAt).toLocaleString('de-DE', {
                       day: '2-digit',
                       month: '2-digit',
@@ -381,7 +381,7 @@ const CampaignAnalytics = () => {
                       minute: '2-digit'
                     }) : '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {recipient.clickedAt ? new Date(recipient.clickedAt).toLocaleString('de-DE', {
                       day: '2-digit',
                       month: '2-digit',
@@ -389,7 +389,7 @@ const CampaignAnalytics = () => {
                       minute: '2-digit'
                     }) : '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {recipient.bookedAt ? new Date(recipient.bookedAt).toLocaleString('de-DE', {
                       day: '2-digit',
                       month: '2-digit',
@@ -409,21 +409,21 @@ const CampaignAnalytics = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-zinc-500">
+            <div className="text-sm text-gray-500">
               Seite {currentPage} von {totalPages}
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-gray-100 rounded-2xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Zurück
               </button>
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-gray-100 rounded-2xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Weiter
               </button>
@@ -437,9 +437,9 @@ const CampaignAnalytics = () => {
 
 const StatCard = ({ icon, label, value, subtext, color }) => {
   const colorClasses = {
-    blue: 'text-blue-600 bg-blue-50',
+    blue: 'text-gray-700 bg-gray-50',
     green: 'text-green-600 bg-green-50',
-    purple: 'text-purple-600 bg-purple-50',
+    purple: 'text-gray-700 bg-gray-100',
     emerald: 'text-emerald-600 bg-emerald-50'
   };
 
@@ -447,17 +447,17 @@ const StatCard = ({ icon, label, value, subtext, color }) => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-lg shadow p-6"
+      className="bg-white rounded-xl shadow p-6"
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+        <div className={`p-3 rounded-xl ${colorClasses[color]}`}>
           {icon}
         </div>
       </div>
-      <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-sm text-zinc-500">{label}</div>
+      <div className="text-2xl font-semibold tracking-tight text-gray-900 mb-1">{value}</div>
+      <div className="text-sm text-gray-500">{label}</div>
       {subtext && (
-        <div className="text-xs text-zinc-400 mt-1">{subtext}</div>
+        <div className="text-xs text-gray-400 mt-1">{subtext}</div>
       )}
     </motion.div>
   );

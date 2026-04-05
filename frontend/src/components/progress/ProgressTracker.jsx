@@ -69,7 +69,7 @@ export default function ProgressTracker({ customerId, trainerId }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -84,7 +84,7 @@ export default function ProgressTracker({ customerId, trainerId }) {
         </div>
         <button
           onClick={() => setShowAddEntry(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-zinc-900 rounded-lg hover:bg-blue-600 transition-colors"
+          className="flex items-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors"
         >
           <Upload className="w-5 h-5" />
           <span>Log Progress</span>
@@ -135,9 +135,9 @@ export default function ProgressTracker({ customerId, trainerId }) {
           <div className="flex space-x-2">
             <button
               onClick={() => setSelectedMetric('weight')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-xl transition-colors ${
                 selectedMetric === 'weight'
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-gray-900 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -145,9 +145,9 @@ export default function ProgressTracker({ customerId, trainerId }) {
             </button>
             <button
               onClick={() => setSelectedMetric('bodyFat')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-xl transition-colors ${
                 selectedMetric === 'bodyFat'
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-gray-900 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -155,9 +155,9 @@ export default function ProgressTracker({ customerId, trainerId }) {
             </button>
             <button
               onClick={() => setSelectedMetric('performance')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-xl transition-colors ${
                 selectedMetric === 'performance'
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-gray-900 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -184,12 +184,12 @@ export default function ProgressTracker({ customerId, trainerId }) {
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900 flex items-center">
-            <Camera className="w-6 h-6 mr-2 text-blue-500" />
+            <Camera className="w-6 h-6 mr-2 text-gray-700" />
             Photo Progress
           </h2>
           <button
             onClick={() => setPhotoCompareMode(!photoCompareMode)}
-            className="text-blue-500 hover:text-blue-600 font-medium"
+            className="text-gray-700 hover:text-gray-900 font-medium"
           >
             {photoCompareMode ? 'View All' : 'Compare Photos'}
           </button>
@@ -225,17 +225,17 @@ function SummaryCard({ title, value, unit, trend, icon: Icon, color }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 border-2 border-gray-100">
       <div className="flex items-center justify-between mb-4">
-        <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center`}>
+        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center`}>
           <Icon className="w-6 h-6 text-white" />
         </div>
         {trend && (
-          <TrendIcon className={`w-6 h-6 ${trend === 'down' && (color === 'blue' || color === 'green') ? 'text-green-500' : 'text-blue-500'}`} />
+          <TrendIcon className={`w-6 h-6 ${trend === 'down' && (color === 'blue' || color === 'green') ? 'text-green-500' : 'text-gray-700'}`} />
         )}
       </div>
       <h3 className="text-sm text-gray-600 mb-1">{title}</h3>
       <div className="flex items-baseline">
         <span className="text-3xl font-bold text-gray-900">{Math.abs(value)}</span>
-        <span className="ml-2 text-zinc-400">{unit}</span>
+        <span className="ml-2 text-gray-400">{unit}</span>
       </div>
     </div>
   );
@@ -393,8 +393,8 @@ function PhotoGallery({ entries }) {
 
   if (entriesWithPhotos.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-400">
-        <Camera className="w-16 h-16 mx-auto mb-4 text-zinc-600" />
+      <div className="text-center py-8 text-gray-400">
+        <Camera className="w-16 h-16 mx-auto mb-4 text-gray-600" />
         <p>No progress photos yet</p>
       </div>
     );
@@ -404,14 +404,14 @@ function PhotoGallery({ entries }) {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {entriesWithPhotos.map((entry) => (
         entry.photos.map((photo, idx) => (
-          <div key={`${entry._id}-${idx}`} className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-none transition-shadow">
+          <div key={`${entry._id}-${idx}`} className="relative aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-sm transition-shadow">
             <img
               src={photo.url}
               alt={`Progress ${photo.type}`}
               className="w-full h-full object-cover"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-              <p className="text-zinc-900 text-sm font-medium">{photo.type}</p>
+              <p className="text-gray-900 text-sm font-medium">{photo.type}</p>
               <p className="text-white/80 text-xs">
                 {new Date(entry.entryDate).toLocaleDateString()}
               </p>
@@ -439,7 +439,7 @@ function PhotoComparison({ entries }) {
 
   if (entriesWithPhotos.length < 2) {
     return (
-      <div className="text-center py-8 text-zinc-400">
+      <div className="text-center py-8 text-gray-400">
         <p>Need at least 2 progress photos to compare</p>
       </div>
     );
@@ -458,7 +458,7 @@ function PhotoComparison({ entries }) {
             </p>
           </div>
           {entry.photos.map((photo, photoIdx) => (
-            <div key={photoIdx} className="aspect-square rounded-lg overflow-hidden shadow-sm">
+            <div key={photoIdx} className="aspect-square rounded-xl overflow-hidden shadow-sm">
               <img
                 src={photo.url}
                 alt={`${photo.type}`}
@@ -476,7 +476,7 @@ function PhotoComparison({ entries }) {
 function ProgressTimeline({ entries }) {
   if (entries.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-400">
+      <div className="text-center py-8 text-gray-400">
         <p>No progress entries yet</p>
       </div>
     );
@@ -485,12 +485,12 @@ function ProgressTimeline({ entries }) {
   return (
     <div className="space-y-6">
       {entries.map((entry, idx) => (
-        <div key={entry._id} className="relative pl-8 pb-8 border-l-2 border-blue-200 last:border-l-0 last:pb-0">
+        <div key={entry._id} className="relative pl-8 pb-8 border-l-2 border-gray-200 last:border-l-0 last:pb-0">
           {/* Timeline Dot */}
-          <div className="absolute left-0 top-0 -translate-x-1/2 w-4 h-4 rounded-full bg-blue-500 border-4 border-white"></div>
+          <div className="absolute left-0 top-0 -translate-x-1/2 w-4 h-4 rounded-full bg-gray-900 border-4 border-white"></div>
 
           {/* Content */}
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="font-semibold text-gray-900">
@@ -501,7 +501,7 @@ function ProgressTimeline({ entries }) {
                     day: 'numeric'
                   })}
                 </p>
-                <p className="text-sm text-zinc-400">
+                <p className="text-sm text-gray-400">
                   by {entry.trainerId?.name || 'Trainer'}
                 </p>
               </div>
@@ -514,19 +514,19 @@ function ProgressTimeline({ entries }) {
             <div className="grid grid-cols-3 gap-4 mb-3">
               {entry.weight && (
                 <div>
-                  <p className="text-xs text-zinc-400">Weight</p>
+                  <p className="text-xs text-gray-400">Weight</p>
                   <p className="font-semibold text-gray-900">{entry.weight} kg</p>
                 </div>
               )}
               {entry.bodyFatPercentage && (
                 <div>
-                  <p className="text-xs text-zinc-400">Body Fat</p>
+                  <p className="text-xs text-gray-400">Body Fat</p>
                   <p className="font-semibold text-gray-900">{entry.bodyFatPercentage}%</p>
                 </div>
               )}
               {entry.muscleMass && (
                 <div>
-                  <p className="text-xs text-zinc-400">Muscle Mass</p>
+                  <p className="text-xs text-gray-400">Muscle Mass</p>
                   <p className="font-semibold text-gray-900">{entry.muscleMass} kg</p>
                 </div>
               )}
@@ -545,7 +545,7 @@ function ProgressTimeline({ entries }) {
                     key={photoIdx}
                     src={photo.url}
                     alt={photo.type}
-                    className="w-20 h-20 rounded-lg object-cover"
+                    className="w-20 h-20 rounded-xl object-cover"
                   />
                 ))}
               </div>

@@ -69,9 +69,9 @@ const BUSINESS_TYPES = [
 
 const colorMap = {
   'pink-500': 'bg-pink-500',
-  'purple-500': 'bg-purple-500',
+  'purple-500': 'bg-gray-500',
   'red-500': 'bg-red-500',
-  'cyan-500': 'bg-cyan-500',
+  'cyan-500': 'bg-gray-900',
   'amber-500': 'bg-amber-500',
   'fuchsia-500': 'bg-fuchsia-500',
   'lime-500': 'bg-lime-500',
@@ -207,7 +207,7 @@ export default function BusinessTypeModal({ onSelect, onBack }) {
                     {/* Icon Container */}
                     <motion.div
                       className={`
-                        w-14 h-14 rounded-lg flex items-center justify-center mb-3 mx-auto
+                        w-14 h-14 rounded-xl flex items-center justify-center mb-3 mx-auto
                         transition-all duration-300
                         ${
                           isSelected
@@ -265,7 +265,7 @@ export default function BusinessTypeModal({ onSelect, onBack }) {
                   value={customBusinessType}
                   onChange={(e) => setCustomBusinessType(e.target.value)}
                   placeholder="z.B. Fitnessstudio, Fotografie, Consulting..."
-                  className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
                   autoFocus
                 />
               </motion.div>
@@ -279,7 +279,7 @@ export default function BusinessTypeModal({ onSelect, onBack }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="mb-8 p-4 bg-slate-800/40 border border-slate-700 rounded-lg text-center"
+                className="mb-8 p-4 bg-slate-800/40 border border-slate-700 rounded-xl text-center"
               >
                 <p className="text-gray-400 text-sm">
                   Ausgewählt:{' '}
@@ -300,7 +300,7 @@ export default function BusinessTypeModal({ onSelect, onBack }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onBack}
-            className="px-6 py-3 rounded-lg border border-slate-600 text-white font-medium hover:bg-slate-800/50 transition-all flex items-center gap-2"
+            className="px-6 py-3 rounded-xl border border-slate-600 text-white font-medium hover:bg-slate-800/50 transition-all flex items-center gap-2"
           >
             <ArrowLeft size={18} />
             <span>Zurück</span>
@@ -312,7 +312,7 @@ export default function BusinessTypeModal({ onSelect, onBack }) {
             onClick={handleContinue}
             disabled={!canContinue}
             className={`
-              px-8 py-3 rounded-lg font-medium flex items-center gap-2 transition-all
+              px-8 py-3 rounded-xl font-medium flex items-center gap-2 transition-all
               ${
                 canContinue
                   ? 'bg-white text-slate-900 hover:bg-gray-100 cursor-pointer'

@@ -277,7 +277,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -288,14 +288,14 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <FileSignature className="w-8 h-8 text-blue-600" />
+            <FileSignature className="w-8 h-8 text-gray-700" />
             Consent Forms
           </h1>
           <p className="text-gray-600 mt-2">Digital consent management with e-signatures</p>
         </div>
         <button
           onClick={() => setShowSignModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
         >
           <FileSignature className="w-5 h-5" />
           Sign New Form
@@ -305,12 +305,12 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
       {/* Forms List */}
       <div className="grid grid-cols-1 gap-6">
         {forms.length === 0 ? (
-          <div className="bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
-            <FileText className="w-16 h-16 mx-auto mb-4 text-zinc-500" />
+          <div className="bg-white p-12 rounded-xl shadow-sm border border-gray-200 text-center">
+            <FileText className="w-16 h-16 mx-auto mb-4 text-gray-500" />
             <p className="text-gray-600 mb-4">No consent forms on file</p>
             <button
               onClick={() => setShowSignModal(true)}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-gray-700 hover:text-gray-700 font-medium"
             >
               Sign your first consent form
             </button>
@@ -319,11 +319,11 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
           forms.map((form) => (
             <div
               key={form._id}
-              className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-lg ${getStatusColor(form.status)}`}>
+                  <div className={`p-3 rounded-xl ${getStatusColor(form.status)}`}>
                     {getStatusIcon(form.status)}
                   </div>
                   <div>
@@ -345,7 +345,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                     </div>
 
                     {form.status === 'revoked' && form.revokedDate && (
-                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl">
                         <p className="text-sm text-red-800">
                           <strong>Revoked:</strong> {new Date(form.revokedDate).toLocaleDateString()}
                         </p>
@@ -356,7 +356,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                     )}
 
                     {form.status === 'expired' && (
-                      <div className="mt-3 flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-3 py-2 rounded-lg inline-flex">
+                      <div className="mt-3 flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-3 py-2 rounded-xl inline-flex">
                         <AlertTriangle className="w-4 h-4" />
                         <span>This consent has expired. Please sign a new form.</span>
                       </div>
@@ -367,7 +367,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setSelectedForm(form)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-2 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
                     title="View form"
                   >
                     <Eye className="w-5 h-5" />
@@ -375,7 +375,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                   
                   <button
                     onClick={() => window.open(`/api/consent-forms/${form._id}/pdf`, '_blank')}
-                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
                     title="Download PDF"
                   >
                     <Download className="w-5 h-5" />
@@ -387,7 +387,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                         setSelectedForm(form);
                         setShowRevokeModal(true);
                       }}
-                      className="px-4 py-2 bg-red-600 text-zinc-900 rounded-lg hover:bg-red-700 transition-colors text-sm"
+                      className="px-4 py-2 bg-red-600 text-gray-900 rounded-xl hover:bg-red-700 transition-colors text-sm"
                     >
                       Revoke Consent
                     </button>
@@ -402,7 +402,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
       {/* Sign Form Modal */}
       {showSignModal && (
         <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-lg shadow-none max-w-3xl w-full p-6 my-8">
+          <div className="bg-white rounded-xl shadow-sm max-w-3xl w-full p-6 my-8">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Sign Consent Form</h3>
             
             <form onSubmit={handleSignForm} className="space-y-4">
@@ -420,7 +420,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                       document.getElementById('formContent').value = template.content;
                     }
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select form type...</option>
                   {getFormTemplates().map((template) => (
@@ -440,7 +440,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                   id="formTitle"
                   name="formTitle"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -454,7 +454,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                   rows={12}
                   required
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 font-mono text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 font-mono text-sm"
                 ></textarea>
               </div>
 
@@ -467,7 +467,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                     type="text"
                     name="customerName"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -479,7 +479,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                     type="email"
                     name="customerEmail"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Signature
                 </label>
-                <div className="border-2 border-gray-300 rounded-lg bg-white">
+                <div className="border-2 border-gray-300 rounded-xl bg-white">
                   <SignatureCanvas
                     ref={signatureRef}
                     canvasProps={{
@@ -501,19 +501,19 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                 <button
                   type="button"
                   onClick={clearSignature}
-                  className="mt-2 text-sm text-blue-600 hover:text-blue-700"
+                  className="mt-2 text-sm text-gray-700 hover:text-gray-700"
                 >
                   Clear Signature
                 </button>
               </div>
 
-              <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-xl">
                 <input
                   type="checkbox"
                   id="customerConsent"
                   name="customerConsent"
                   required
-                  className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="mt-1 w-5 h-5 text-gray-700 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <label htmlFor="customerConsent" className="text-sm text-gray-700">
                   I have read and understood the above consent form. I acknowledge that I have had the opportunity to ask questions and all my questions have been answered to my satisfaction. I voluntarily agree to the treatment/services described in this consent form.
@@ -527,13 +527,13 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                     setShowSignModal(false);
                     clearSignature();
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-zinc-900 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 transition-colors"
                 >
                   Sign & Submit
                 </button>
@@ -546,10 +546,10 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
       {/* Revoke Consent Modal */}
       {showRevokeModal && selectedForm && (
         <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-none max-w-md w-full p-6">
+          <div className="bg-white rounded-xl shadow-sm max-w-md w-full p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Revoke Consent</h3>
             
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
               <p className="text-sm text-red-800">
                 You are about to revoke consent for: <strong>{selectedForm.formTitle}</strong>
               </p>
@@ -565,7 +565,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                   rows={4}
                   required
                   placeholder="Please provide a detailed reason for revoking this consent..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 ></textarea>
                 <p className="text-xs text-gray-600 mt-1">Minimum 10 characters required</p>
               </div>
@@ -577,13 +577,13 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                     setShowRevokeModal(false);
                     setSelectedForm(null);
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRevokeConsent}
-                  className="flex-1 px-4 py-2 bg-red-600 text-zinc-900 rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-red-600 text-gray-900 rounded-xl hover:bg-red-700 transition-colors"
                 >
                   Revoke Consent
                 </button>
@@ -596,19 +596,19 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
       {/* View Form Modal */}
       {selectedForm && !showRevokeModal && (
         <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-lg shadow-none max-w-3xl w-full p-6 my-8">
+          <div className="bg-white rounded-xl shadow-sm max-w-3xl w-full p-6 my-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-gray-900">{selectedForm.formTitle}</h3>
               <button
                 onClick={() => setSelectedForm(null)}
-                className="text-zinc-500 hover:text-gray-600"
+                className="text-gray-500 hover:text-gray-600"
               >
                 ✕
               </button>
             </div>
 
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="p-4 bg-gray-50 rounded-xl">
                 <pre className="whitespace-pre-wrap font-sans text-sm text-gray-800">
                   {selectedForm.formContent}
                 </pre>
@@ -619,7 +619,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                 <img
                   src={selectedForm.signature}
                   alt="Signature"
-                  className="border border-gray-300 rounded-lg bg-white p-2"
+                  className="border border-gray-300 rounded-xl bg-white p-2"
                 />
               </div>
 

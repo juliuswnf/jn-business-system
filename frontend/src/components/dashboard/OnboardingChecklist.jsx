@@ -81,28 +81,28 @@ export default function OnboardingChecklist() {
   const remainingItems = CHECKLIST_ITEMS.filter(item => !checklist[item.id]);
 
   return (
-    <div className="bg-gradient-to-br from-indigo-900/30 to-purple-900/20 border border-indigo-500/30 rounded-2xl p-6 mb-8">
+    <div className="bg-gradient-to-br from-indigo-900/30 to-purple-900/20 border border-gray-200/30 rounded-2xl p-6 mb-8">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-zinc-900" />
+          <div className="w-10 h-10 bg-gray-500/20 rounded-xl flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-gray-900" />
           </div>
           <div>
-            <h3 className="font-semibold text-zinc-900">Studio einrichten</h3>
-            <p className="text-sm text-zinc-400">{completedCount} von 6 Schritten erledigt</p>
+            <h3 className="font-semibold text-gray-900">Studio einrichten</h3>
+            <p className="text-sm text-gray-400">{completedCount} von 6 Schritten erledigt</p>
           </div>
         </div>
         <button 
           onClick={handleDismiss}
-          className="p-1 text-zinc-500 hover:text-zinc-300 transition"
+          className="p-1 text-gray-500 hover:text-gray-300 transition"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Progress Bar */}
-      <div className="h-2 bg-zinc-50 rounded-full mb-4 overflow-hidden">
+      <div className="h-2 bg-gray-50 rounded-full mb-4 overflow-hidden">
         <div 
           className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
@@ -122,25 +122,25 @@ export default function OnboardingChecklist() {
               className={`flex items-center justify-between p-3 rounded-xl transition ${
                 isCompleted 
                   ? 'bg-green-500/10 border border-green-500/20' 
-                  : 'bg-zinc-50/50 border border-zinc-200 hover:border-zinc-200'
+                  : 'bg-gray-50/50 border border-gray-200 hover:border-gray-200'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                  isCompleted ? 'bg-green-500/20' : 'bg-zinc-700'
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                  isCompleted ? 'bg-green-500/20' : 'bg-gray-700'
                 }`}>
                   {isCompleted ? (
                     <Check className="w-4 h-4 text-green-400" />
                   ) : (
-                    <Icon className="w-4 h-4 text-zinc-400" />
+                    <Icon className="w-4 h-4 text-gray-400" />
                   )}
                 </div>
-                <span className={`text-sm ${isCompleted ? 'text-green-400 line-through' : 'text-zinc-900'}`}>
+                <span className={`text-sm ${isCompleted ? 'text-green-400 line-through' : 'text-gray-900'}`}>
                   {item.label}
                 </span>
               </div>
               {!isCompleted && (
-                <ChevronRight className="w-4 h-4 text-zinc-500" />
+                <ChevronRight className="w-4 h-4 text-gray-500" />
               )}
             </Link>
           );
@@ -151,7 +151,7 @@ export default function OnboardingChecklist() {
       {remainingItems.length > 0 && (
         <Link
           to="/onboarding"
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-zinc-900 font-medium transition"
+          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-900 hover:bg-gray-800 rounded-xl text-white font-medium transition"
         >
           Weiter einrichten
           <ChevronRight className="w-4 h-4" />

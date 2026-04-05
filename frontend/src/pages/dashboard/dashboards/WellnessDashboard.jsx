@@ -5,8 +5,8 @@ export default function WellnessDashboard() {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-zinc-900">Wellness Center Kontrollpanel</h1>
-        <p className="text-sm text-zinc-500">Willkommen in deinem Wellness Center.</p>
+        <h1 className="text-xl font-semibold tracking-tight text-gray-900">Wellness Center Kontrollpanel</h1>
+        <p className="text-sm text-gray-500">Willkommen in deinem Wellness Center.</p>
       </header>
 
       <div className="bg-green-50 border border-green-200 rounded-2xl p-6 flex items-start gap-4">
@@ -33,21 +33,21 @@ export default function WellnessDashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Mitgliedschaften</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
+        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 opacity-50">
+          <span className="text-sm text-gray-500">Mitgliedschaften</span>
+          <p className="text-2xl font-semibold text-gray-900">-</p>
         </div>
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Pakete</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
+        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 opacity-50">
+          <span className="text-sm text-gray-500">Pakete</span>
+          <p className="text-2xl font-semibold text-gray-900">-</p>
         </div>
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Gutscheine</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
+        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 opacity-50">
+          <span className="text-sm text-gray-500">Gutscheine</span>
+          <p className="text-2xl font-semibold text-gray-900">-</p>
         </div>
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col gap-2 opacity-50">
-          <span className="text-sm text-zinc-500">Umsatz</span>
-          <p className="text-2xl font-semibold text-zinc-900">-</p>
+        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 opacity-50">
+          <span className="text-sm text-gray-500">Umsatz</span>
+          <p className="text-2xl font-semibold text-gray-900">-</p>
         </div>
       </div>
     </div>

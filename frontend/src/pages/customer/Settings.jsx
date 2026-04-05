@@ -165,27 +165,27 @@ export default function Settings() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
-          <p className="text-zinc-600 mt-4">Lade Profil...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200 mx-auto"></div>
+          <p className="text-gray-600 mt-4">Lade Profil...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="text-zinc-900">
+    <div className="text-gray-900">
       {/* Header */}
-      <div className="border-b border-zinc-200 bg-white">
+      <div className="border-b border-gray-200 bg-white">
         <div className="max-w-5xl mx-auto px-6 py-6">
-          <h1 className="text-3xl font-bold">Einstellungen & Profil</h1>
-          <p className="text-zinc-600 text-sm mt-1">Verwalte dein Konto und deine Präferenzen</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Einstellungen & Profil</h1>
+          <p className="text-gray-600 text-sm mt-1">Verwalte dein Konto und deine Präferenzen</p>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-5xl mx-auto px-6 py-12">
         {/* Tab Navigation */}
-        <div className="flex gap-4 mb-8 border-b border-zinc-200 overflow-x-auto">
+        <div className="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto">
           {[
             { key: 'profile', label: 'Profil' },
             { key: 'bookings', label: 'Buchungshistorie' },
@@ -197,8 +197,8 @@ export default function Settings() {
               onClick={() => setActiveTab(tab.key)}
               className={`px-6 py-4 font-medium transition border-b-2 whitespace-nowrap ${
                 activeTab === tab.key
-                  ? 'border-zinc-900 text-zinc-900'
-                  : 'border-transparent text-zinc-600 hover:text-zinc-600'
+                  ? 'border-gray-900 text-gray-900'
+                  : 'border-transparent text-gray-600 hover:text-gray-600'
               }`}
             >
               {tab.label}
@@ -208,14 +208,14 @@ export default function Settings() {
 
         {/* PROFILE TAB */}
         {activeTab === 'profile' && (
-          <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-8">
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Persönliche Daten</h2>
+              <h2 className="text-xl font-semibold tracking-tight">Persönliche Daten</h2>
               <button
                 onClick={() => setEditMode(!editMode)}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-4 py-2 rounded-xl font-medium transition ${
                   editMode
-                    ? 'bg-zinc-100 text-zinc-900 hover:bg-zinc-600'
+                    ? 'bg-gray-100 text-gray-900 hover:bg-gray-600'
                     : 'bg-white text-black hover:bg-gray-100'
                 }`}
               >
@@ -233,7 +233,7 @@ export default function Settings() {
                   value={profile.firstName}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -246,7 +246,7 @@ export default function Settings() {
                   value={profile.lastName}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -259,7 +259,7 @@ export default function Settings() {
                   value={profile.email}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export default function Settings() {
                   value={profile.phone}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export default function Settings() {
                   value={profile.birthDate}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -297,7 +297,7 @@ export default function Settings() {
                   value={profile.gender}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 >
                   <option value="male">Männlich</option>
                   <option value="female">Weiblich</option>
@@ -314,7 +314,7 @@ export default function Settings() {
                   value={profile.address}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -327,7 +327,7 @@ export default function Settings() {
                   value={profile.city}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -340,7 +340,7 @@ export default function Settings() {
                   value={profile.zipCode}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
 
@@ -353,7 +353,7 @@ export default function Settings() {
                   value={profile.country}
                   onChange={handleProfileChange}
                   disabled={!editMode}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:border-zinc-500 focus:outline-none transition"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed focus:border-gray-500 focus:outline-none transition"
                 />
               </div>
             </div>
@@ -361,7 +361,7 @@ export default function Settings() {
             {editMode && (
               <button
                 onClick={handleSaveProfile}
-                className="w-full mt-6 px-6 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition"
+                className="w-full mt-6 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-100 transition"
               >
                 Änderungen speichern
               </button>
@@ -372,19 +372,19 @@ export default function Settings() {
         {/* BOOKINGS TAB */}
         {activeTab === 'bookings' && (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold mb-6">Deine Buchungen</h2>
+            <h2 className="text-xl font-semibold tracking-tight mb-6">Deine Buchungen</h2>
             {bookingHistory.map(booking => (
-              <div key={booking.id} className="rounded-xl bg-zinc-50 border border-zinc-200 p-6">
+              <div key={booking.id} className="rounded-xl bg-gray-50 border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-semibold">{booking.service}</h3>
-                    <p className="text-zinc-600 text-sm">mit {booking.employee}</p>
+                    <p className="text-gray-600 text-sm">mit {booking.employee}</p>
                   </div>
                   <div className="text-right">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       booking.status === 'confirmed'
                         ? 'bg-green-50 text-green-600'
-                        : 'bg-zinc-300 text-zinc-600'
+                        : 'bg-gray-300 text-gray-600'
                     }`}>
                       {booking.status === 'confirmed' ? 'Bestätigt' : 'Abgeschlossen'}
                     </span>
@@ -393,25 +393,25 @@ export default function Settings() {
 
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-zinc-600">Datum & Zeit</p>
+                    <p className="text-gray-600">Datum & Zeit</p>
                     <p className="font-semibold">{booking.date} um {booking.time}</p>
                   </div>
                   <div>
-                    <p className="text-zinc-600">Dauer</p>
+                    <p className="text-gray-600">Dauer</p>
                     <p className="font-semibold">30-120 Minuten</p>
                   </div>
                   <div>
-                    <p className="text-zinc-600">Preis</p>
-                    <p className="font-semibold text-zinc-900">{booking.price}</p>
+                    <p className="text-gray-600">Preis</p>
+                    <p className="font-semibold text-gray-900">{booking.price}</p>
                   </div>
                 </div>
 
                 {booking.status === 'confirmed' && (
                   <div className="mt-4 flex gap-3">
-                    <button className="flex-1 px-4 py-2 border border-gray-600 hover:bg-zinc-100 rounded-lg transition">
+                    <button className="flex-1 px-4 py-2 border border-gray-600 hover:bg-gray-100 rounded-xl transition">
                       Ändern
                     </button>
-                    <button className="flex-1 px-4 py-2 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-lg transition">
+                    <button className="flex-1 px-4 py-2 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-xl transition">
                       Absagen
                     </button>
                   </div>
@@ -423,8 +423,8 @@ export default function Settings() {
 
         {/* PREFERENCES TAB */}
         {activeTab === 'preferences' && (
-          <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-8">
-            <h2 className="text-2xl font-bold mb-6">Benachrichtigungseinstellungen</h2>
+          <div className="rounded-xl bg-gray-50 border border-gray-200 p-8">
+            <h2 className="text-xl font-semibold tracking-tight mb-6">Benachrichtigungseinstellungen</h2>
 
             <div className="space-y-4">
               {[
@@ -434,28 +434,28 @@ export default function Settings() {
                 { key: 'specialOffers', label: 'Spezialangebote', desc: 'Informationen über Rabatte und Aktionen' },
                 { key: 'newsletter', label: 'Newsletter', desc: 'Wöchentliche Tipps und News' }
               ].map(pref => (
-                <div key={pref.key} className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg">
+                <div key={pref.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                   <div>
                     <p className="font-semibold">{pref.label}</p>
-                    <p className="text-sm text-zinc-600">{pref.desc}</p>
+                    <p className="text-sm text-gray-600">{pref.desc}</p>
                   </div>
                   <button
                     onClick={() => handlePreferenceChange(pref.key)}
                     className={`relative w-12 h-6 rounded-full transition ${
                       preferences[pref.key]
-                        ? 'bg-zinc-900'
-                        : 'bg-zinc-200'
+                        ? 'bg-gray-900'
+                        : 'bg-gray-200'
                     }`}
                   >
                     <div className={`absolute top-1 w-4 h-4 rounded-full transition transform ${
-                      preferences[pref.key] ? 'translate-x-6 bg-white' : 'translate-x-1 bg-zinc-700'
+                      preferences[pref.key] ? 'translate-x-6 bg-white' : 'translate-x-1 bg-gray-900'
                     }`} />
                   </button>
                 </div>
               ))}
             </div>
 
-            <button className="w-full mt-6 px-6 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition">
+            <button className="w-full mt-6 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-100 transition">
               Speichern
             </button>
           </div>
@@ -465,8 +465,8 @@ export default function Settings() {
         {activeTab === 'security' && (
           <div className="space-y-6">
             {/* Change Password */}
-            <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-8">
-              <h2 className="text-2xl font-bold mb-6">Passwort ändern</h2>
+            <div className="rounded-xl bg-gray-50 border border-gray-200 p-8">
+              <h2 className="text-xl font-semibold tracking-tight mb-6">Passwort ändern</h2>
 
               <div className="space-y-4">
                 <div>
@@ -477,7 +477,7 @@ export default function Settings() {
                     value={passwords.current}
                     onChange={handlePasswordChange}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg focus:border-zinc-500 focus:outline-none transition"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:border-gray-500 focus:outline-none transition"
                   />
                 </div>
 
@@ -489,7 +489,7 @@ export default function Settings() {
                     value={passwords.new}
                     onChange={handlePasswordChange}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg focus:border-zinc-500 focus:outline-none transition"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:border-gray-500 focus:outline-none transition"
                   />
                 </div>
 
@@ -501,28 +501,28 @@ export default function Settings() {
                     value={passwords.confirm}
                     onChange={handlePasswordChange}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg focus:border-zinc-500 focus:outline-none transition"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:border-gray-500 focus:outline-none transition"
                   />
                 </div>
               </div>
 
               <button
                 onClick={handleChangePassword}
-                className="w-full mt-6 px-6 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition"
+                className="w-full mt-6 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-100 transition"
               >
                 Passwort ändern
               </button>
             </div>
 
             {/* Account Status */}
-            <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-8">
-              <h2 className="text-2xl font-bold mb-6">Kontostatus</h2>
+            <div className="rounded-xl bg-gray-50 border border-gray-200 p-8">
+              <h2 className="text-xl font-semibold tracking-tight mb-6">Kontostatus</h2>
               <div className="space-y-4">
-                <div className="p-4 bg-green-50 bg-opacity-20 border border-green-200 rounded-lg">
+                <div className="p-4 bg-green-50 bg-opacity-20 border border-green-200 rounded-xl">
                   <p className="text-green-600">Konto aktiv</p>
                   <p className="text-sm text-green-600 mt-1">Dein Konto ist in Ordnung.</p>
                 </div>
-                <button className="w-full px-6 py-3 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-lg font-semibold transition">
+                <button className="w-full px-6 py-3 border border-red-600 text-red-600 hover:bg-red-50 hover:bg-opacity-20 rounded-xl font-semibold transition">
                   Konto löschen
                 </button>
               </div>

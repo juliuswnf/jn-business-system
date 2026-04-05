@@ -95,10 +95,10 @@ export default function PublicBookingPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-10">
-        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-8 text-center">
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-zinc-500" />
-          <p className="mt-3 text-sm text-zinc-600">Buchungsseite wird geladen...</p>
+      <main className="min-h-screen bg-gray-50 px-4 py-10">
+        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-8 text-center">
+          <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-500" />
+          <p className="mt-3 text-sm text-gray-600">Buchungsseite wird geladen...</p>
         </div>
       </main>
     );
@@ -106,7 +106,7 @@ export default function PublicBookingPage() {
 
   if (errorMessage) {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-10">
+      <main className="min-h-screen bg-gray-50 px-4 py-10">
         <div className="mx-auto w-full max-w-2xl rounded-2xl border border-red-200 bg-red-50 p-6">
           <p className="text-sm font-medium text-red-700">{errorMessage}</p>
         </div>
@@ -116,11 +116,11 @@ export default function PublicBookingPage() {
 
   if (isSuccess) {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-10">
-        <section className="mx-auto w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-8 text-center">
+      <main className="min-h-screen bg-gray-50 px-4 py-10">
+        <section className="mx-auto w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-8 text-center">
           <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
-          <h1 className="mt-4 text-2xl font-bold text-zinc-900">Danke für deine Buchung!</h1>
-          <p className="mt-2 text-sm text-zinc-600">
+          <h1 className="mt-4 text-xl font-semibold tracking-tight text-gray-900">Danke für deine Buchung!</h1>
+          <p className="mt-2 text-sm text-gray-600">
             Dein Termin wurde angefragt. Du erhältst in Kürze eine Bestätigung.
           </p>
         </section>
@@ -129,15 +129,15 @@ export default function PublicBookingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4 py-6 sm:py-10">
+    <main className="min-h-screen bg-gray-50 px-4 py-6 sm:py-10">
       <section className="mx-auto w-full max-w-2xl space-y-5">
-        <header className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6">
-          <h1 className="text-xl font-bold text-zinc-900 sm:text-2xl">
+        <header className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
             {studio?.businessName || 'Online-Buchung'}
           </h1>
 
           {studio?.address?.street || studio?.address?.city || studio?.address?.postalCode ? (
-            <div className="mt-3 space-y-1 text-sm text-zinc-600">
+            <div className="mt-3 space-y-1 text-sm text-gray-600">
               <p className="inline-flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
                 {[studio?.address?.street, studio?.address?.postalCode, studio?.address?.city].filter(Boolean).join(', ')}
@@ -152,11 +152,11 @@ export default function PublicBookingPage() {
           ) : null}
         </header>
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6">
-          <h2 className="text-base font-semibold text-zinc-900">1. Dienstleistung auswählen</h2>
+        <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+          <h2 className="text-base font-semibold text-gray-900">1. Dienstleistung auswählen</h2>
           <div className="mt-4 space-y-3">
             {services.length === 0 ? (
-              <p className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
+              <p className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
                 Aktuell sind keine Dienstleistungen verfügbar.
               </p>
             ) : (
@@ -170,12 +170,12 @@ export default function PublicBookingPage() {
                     onClick={() => setSelectedServiceId(service._id)}
                     className={`w-full rounded-xl border p-4 text-left transition ${
                       isSelected
-                        ? 'border-zinc-900 bg-zinc-100'
-                        : 'border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50'
+                        ? 'border-gray-900 bg-gray-100'
+                        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    <p className="text-sm font-semibold text-zinc-900">{service.name}</p>
-                    <div className="mt-2 flex flex-wrap gap-3 text-xs text-zinc-600">
+                    <p className="text-sm font-semibold text-gray-900">{service.name}</p>
+                    <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-600">
                       <span className="inline-flex items-center gap-1">
                         <Clock3 className="h-3.5 w-3.5" />
                         {service.duration} Min.
@@ -193,12 +193,12 @@ export default function PublicBookingPage() {
         </section>
 
         {selectedService ? (
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6">
-            <h2 className="text-base font-semibold text-zinc-900">2. Deine Kontaktdaten & Wunschzeit</h2>
+          <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+            <h2 className="text-base font-semibold text-gray-900">2. Deine Kontaktdaten & Wunschzeit</h2>
 
             <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="public-booking-name" className="mb-1 block text-sm font-medium text-zinc-700">
+                <label htmlFor="public-booking-name" className="mb-1 block text-sm font-medium text-gray-700">
                   Name
                 </label>
                 <input
@@ -206,13 +206,13 @@ export default function PublicBookingPage() {
                   type="text"
                   value={formData.customerName}
                   onChange={(event) => handleFormFieldChange('customerName', event.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="public-booking-email" className="mb-1 block text-sm font-medium text-zinc-700">
+                <label htmlFor="public-booking-email" className="mb-1 block text-sm font-medium text-gray-700">
                   E-Mail
                 </label>
                 <input
@@ -220,13 +220,13 @@ export default function PublicBookingPage() {
                   type="email"
                   value={formData.customerEmail}
                   onChange={(event) => handleFormFieldChange('customerEmail', event.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="public-booking-phone" className="mb-1 block text-sm font-medium text-zinc-700">
+                <label htmlFor="public-booking-phone" className="mb-1 block text-sm font-medium text-gray-700">
                   Telefon
                 </label>
                 <input
@@ -234,40 +234,40 @@ export default function PublicBookingPage() {
                   type="tel"
                   value={formData.customerPhone}
                   onChange={(event) => handleFormFieldChange('customerPhone', event.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="public-booking-time" className="mb-1 block text-sm font-medium text-zinc-700">
+                <label htmlFor="public-booking-time" className="mb-1 block text-sm font-medium text-gray-700">
                   Wunsch-Uhrzeit
                 </label>
                 <div className="relative">
-                  <CalendarClock className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-zinc-500" />
+                  <CalendarClock className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                   <input
                     id="public-booking-time"
                     type="datetime-local"
                     value={formData.startTime}
                     onChange={(event) => handleFormFieldChange('startTime', event.target.value)}
-                    className="w-full rounded-lg border border-zinc-300 bg-white py-2 pl-9 pr-3 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none"
+                    className="w-full rounded-xl border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 focus:border-gray-500 focus:outline-none"
                     required
                   />
                 </div>
               </div>
 
               {submitError ? (
-                <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{submitError}</p>
+                <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{submitError}</p>
               ) : null}
 
               <div className="pt-2">
-                <p className="mb-3 text-xs text-zinc-500">
+                <p className="mb-3 text-xs text-gray-500">
                   3. Buchung absenden
                 </p>
                 <button
                   type="submit"
                   disabled={isSubmitting || services.length === 0}
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isSubmitting ? 'Wird gebucht...' : 'Kostenpflichtig buchen'}
                 </button>

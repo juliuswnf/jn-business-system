@@ -154,7 +154,7 @@ export const getConsolidatedDashboard = async (req, res) => {
             total: { $sum: '$totalPrice' }
           }
         }
-      ]).maxTimeMS(5000),
+      ]).option({ maxTimeMS: 5000 }),
 
       // Breakdown by location
       Booking.aggregate([
@@ -173,7 +173,7 @@ export const getConsolidatedDashboard = async (req, res) => {
             cancelled: { $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] } }
           }
         }
-      ]).maxTimeMS(5000)
+      ]).option({ maxTimeMS: 5000 })
     ]);
 
     // Get salon names for breakdown

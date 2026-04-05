@@ -138,9 +138,9 @@ const TattooProjectEditor = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow p-8"
+          className="bg-white rounded-xl shadow p-8"
         >
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-6">
             {isEdit ? 'Projekt bearbeiten' : 'Neues Tattoo-Projekt'}
           </h1>
 
@@ -155,7 +155,7 @@ const TattooProjectEditor = () => {
                   required
                   value={formData.customerId}
                   onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 >
                   <option value="">Kunde wählen...</option>
                   {customers.map((customer) => (
@@ -173,7 +173,7 @@ const TattooProjectEditor = () => {
                 <select
                   value={formData.artistId}
                   onChange={(e) => setFormData({ ...formData, artistId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 >
                   <option value="">Artist wählen...</option>
                   {employees.map((emp) => (
@@ -195,7 +195,7 @@ const TattooProjectEditor = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="z.B. Japanischer Drache Rücken"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
               />
             </div>
 
@@ -207,7 +207,7 @@ const TattooProjectEditor = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
               />
             </div>
 
@@ -221,7 +221,7 @@ const TattooProjectEditor = () => {
                   value={formData.style}
                   onChange={(e) => setFormData({ ...formData, style: e.target.value })}
                   placeholder="z.B. Japanese, Blackwork"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
@@ -235,7 +235,7 @@ const TattooProjectEditor = () => {
                   value={formData.bodyPart}
                   onChange={(e) => setFormData({ ...formData, bodyPart: e.target.value })}
                   placeholder="z.B. Rücken, Arm"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
@@ -247,7 +247,7 @@ const TattooProjectEditor = () => {
                   required
                   value={formData.size}
                   onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 >
                   <option value="small">Klein</option>
                   <option value="medium">Mittel</option>
@@ -268,7 +268,7 @@ const TattooProjectEditor = () => {
                   min="1"
                   value={formData.totalSessions}
                   onChange={(e) => setFormData({ ...formData, totalSessions: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
@@ -282,7 +282,7 @@ const TattooProjectEditor = () => {
                   step="0.5"
                   value={formData.estimatedDuration}
                   onChange={(e) => setFormData({ ...formData, estimatedDuration: parseFloat(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
@@ -296,7 +296,7 @@ const TattooProjectEditor = () => {
                   step="0.01"
                   value={formData.estimatedPrice}
                   onChange={(e) => setFormData({ ...formData, estimatedPrice: parseFloat(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="w-full px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                 />
               </div>
             </div>
@@ -312,13 +312,13 @@ const TattooProjectEditor = () => {
                   value={checklistItem}
                   onChange={(e) => setChecklistItem(e.target.value)}
                   placeholder="z.B. Snacks, Wasser, Locker Kleidung"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zinc-900"
+                  className="flex-1 px-3 py-2 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-gray-100"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
                 />
                 <button
                   type="button"
                   onClick={addChecklistItem}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300"
                 >
                   Hinzufügen
                 </button>
@@ -346,14 +346,14 @@ const TattooProjectEditor = () => {
               <button
                 type="button"
                 onClick={() => navigate('/dashboard/tattoo/projects')}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50"
               >
                 Abbrechen
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-indigo-600 text-zinc-900 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                className="px-6 py-2 bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-100 disabled:opacity-50"
               >
                 {loading ? 'Speichere...' : (isEdit ? 'Aktualisieren' : 'Erstellen')}
               </button>

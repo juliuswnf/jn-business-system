@@ -124,15 +124,15 @@ const FAQ = () => {
         keywords="FAQ, Häufige Fragen, Buchungssystem Hilfe, Support"
         url="/faq"
       />
-    <div className="min-h-screen bg-white text-zinc-900 py-16 md:py-20">
+    <div className="min-h-screen bg-white text-gray-900 py-16 md:py-20">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-14 md:mb-16">
-          <p className="text-xs tracking-[0.2em] uppercase text-zinc-400 mb-4">Support</p>
-          <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 mb-4">
+          <p className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-4">Support</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Häufig gestellte Fragen
           </h1>
-          <p className="text-lg md:text-xl text-zinc-500 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto">
             Alles, was Sie über JN Business System wissen müssen
           </p>
         </div>
@@ -140,37 +140,37 @@ const FAQ = () => {
         <section className="mb-14 space-y-10">
           {faqs.map((section, sectionIndex) => (
             <div key={section.category}>
-              <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 mb-4">
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                 {section.category}
               </h2>
 
-              <div className="border-t border-zinc-200">
+              <div className="border-t border-gray-200">
                 {section.questions.map((faq, index) => {
                   const globalIndex = `${sectionIndex}-${index}`;
                   const isOpen = openIndex === globalIndex;
 
                   return (
-                    <article key={globalIndex} className="border-b border-zinc-200">
+                    <article key={globalIndex} className="border-b border-gray-200">
                       <button
                         onClick={() => toggleFAQ(globalIndex)}
-                        className="w-full !bg-transparent !border-0 !rounded-none px-0 py-5 text-left flex items-start justify-between gap-6 hover:bg-zinc-50/60 transition-colors"
+                        className="w-full !bg-transparent !border-0 !rounded-none px-0 py-5 text-left flex items-start justify-between gap-6 hover:bg-gray-50/60 transition-colors"
                       >
-                        <span className="font-medium text-zinc-900 leading-relaxed text-base md:text-lg">
+                        <span className="font-medium text-gray-900 leading-relaxed text-base md:text-lg">
                           {faq.question}
                         </span>
 
                         <span className="flex-shrink-0 mt-0.5">
                           {isOpen ? (
-                            <ChevronUpIcon className="h-5 w-5 text-zinc-500" />
+                            <ChevronUpIcon className="h-5 w-5 text-gray-500" />
                           ) : (
-                            <ChevronDownIcon className="h-5 w-5 text-zinc-500" />
+                            <ChevronDownIcon className="h-5 w-5 text-gray-500" />
                           )}
                         </span>
                       </button>
 
                       {isOpen && (
                         <div className="pb-6 -mt-1 max-w-3xl">
-                          <div className="pl-4 border-l-2 border-zinc-200 text-zinc-600 leading-relaxed">
+                          <div className="pl-4 border-l-2 border-gray-200 text-gray-600 leading-relaxed">
                             {faq.answer}
                           </div>
                         </div>
@@ -184,23 +184,23 @@ const FAQ = () => {
         </section>
 
         {/* Contact CTA */}
-        <div className="bg-zinc-50 rounded-2xl p-8 md:p-10 text-center mt-14 border border-zinc-200">
-          <h3 className="text-2xl font-semibold text-zinc-900 mb-3">
+        <div className="bg-gray-50 rounded-2xl p-8 md:p-10 text-center mt-14 border border-gray-200">
+          <h3 className="text-2xl font-semibold text-gray-900 mb-3">
             Noch Fragen?
           </h3>
-          <p className="text-zinc-600 mb-7">
+          <p className="text-gray-600 mb-7">
             Unser Support-Team hilft Ihnen gerne weiter.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:support@jn-business-system.de"
-              className="bg-zinc-200 hover:bg-zinc-300 text-zinc-900 font-medium py-3 px-6 rounded-lg border border-zinc-300 transition-colors"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-3 px-6 rounded-xl border border-gray-300 transition-colors"
             >
               E-Mail schreiben
             </a>
             <a
               href="/demo"
-              className="bg-zinc-200 hover:bg-zinc-300 text-zinc-900 font-medium py-3 px-6 rounded-lg border border-zinc-300 transition-colors"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-3 px-6 rounded-xl border border-gray-300 transition-colors"
             >
               Demo buchen
             </a>

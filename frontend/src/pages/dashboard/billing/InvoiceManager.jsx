@@ -18,28 +18,28 @@ export default function InvoiceManager() {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-zinc-900">SEPA & Rechnungen</h1>
-        <p className="text-sm text-zinc-500">Enterprise-Modul für Lastschriftmandate und Rechnungsprozesse.</p>
+        <h1 className="text-xl font-semibold tracking-tight text-gray-900">SEPA & Rechnungen</h1>
+        <p className="text-sm text-gray-500">Enterprise-Modul für Lastschriftmandate und Rechnungsprozesse.</p>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5">
-          <p className="text-sm text-zinc-500">Offene Rechnungen</p>
-          <p className="mt-2 text-3xl font-bold text-zinc-900">1.250 €</p>
+        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+          <p className="text-sm text-gray-500">Offene Rechnungen</p>
+          <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">1.250 €</p>
         </div>
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5">
-          <p className="text-sm text-zinc-500">Erfolgreiche SEPA-Einzüge diesen Monat</p>
-          <p className="mt-2 text-3xl font-bold text-zinc-900">4.800 €</p>
+        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+          <p className="text-sm text-gray-500">Erfolgreiche SEPA-Einzüge diesen Monat</p>
+          <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">4.800 €</p>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-        <div className="mb-4 inline-flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+      <section className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="mb-4 inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1">
           <button
             type="button"
             onClick={() => setActiveTab('mandates')}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-              activeTab === 'mandates' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600'
+            className={`rounded-xl px-3 py-1.5 text-sm font-medium ${
+              activeTab === 'mandates' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
             }`}
           >
             SEPA-Mandate
@@ -47,8 +47,8 @@ export default function InvoiceManager() {
           <button
             type="button"
             onClick={() => setActiveTab('invoices')}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-              activeTab === 'invoices' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600'
+            className={`rounded-xl px-3 py-1.5 text-sm font-medium ${
+              activeTab === 'invoices' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
             }`}
           >
             Rechnungen schreiben
@@ -58,10 +58,10 @@ export default function InvoiceManager() {
         {activeTab === 'mandates' ? (
           <div className="space-y-3">
             {sepaMandates.map((mandate) => (
-              <div key={mandate.id} className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-                <p className="font-medium text-zinc-900">{mandate.customer}</p>
-                <p className="text-sm text-zinc-600">{mandate.iban}</p>
-                <p className="mt-1 text-xs text-zinc-500">Aktiv seit {mandate.since}</p>
+              <div key={mandate.id} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">{mandate.customer}</p>
+                <p className="text-sm text-gray-600">{mandate.iban}</p>
+                <p className="mt-1 text-xs text-gray-500">Aktiv seit {mandate.since}</p>
               </div>
             ))}
           </div>
@@ -69,33 +69,33 @@ export default function InvoiceManager() {
           <div className="space-y-4">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900"
             >
               Neue Rechnung erstellen
             </button>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-zinc-200 text-sm">
-                <thead className="bg-zinc-50">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-2 text-left font-medium text-zinc-600">Rechnung</th>
-                    <th className="px-3 py-2 text-left font-medium text-zinc-600">Datum</th>
-                    <th className="px-3 py-2 text-left font-medium text-zinc-600">Kunde</th>
-                    <th className="px-3 py-2 text-left font-medium text-zinc-600">Betrag</th>
-                    <th className="px-3 py-2 text-left font-medium text-zinc-600">Aktion</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Rechnung</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Datum</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Kunde</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Betrag</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Aktion</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100">
+                <tbody className="divide-y divide-gray-100">
                   {invoices.map((invoice) => (
                     <tr key={invoice.id}>
-                      <td className="px-3 py-2 text-zinc-700">{invoice.id}</td>
-                      <td className="px-3 py-2 text-zinc-700">{invoice.date}</td>
-                      <td className="px-3 py-2 text-zinc-700">{invoice.customer}</td>
-                      <td className="px-3 py-2 text-zinc-700">{invoice.amount}</td>
+                      <td className="px-3 py-2 text-gray-700">{invoice.id}</td>
+                      <td className="px-3 py-2 text-gray-700">{invoice.date}</td>
+                      <td className="px-3 py-2 text-gray-700">{invoice.customer}</td>
+                      <td className="px-3 py-2 text-gray-700">{invoice.amount}</td>
                       <td className="px-3 py-2">
                         <button
                           type="button"
-                          className="text-xs font-medium text-zinc-700 underline hover:text-zinc-900"
+                          className="text-xs font-medium text-gray-700 underline hover:text-gray-900"
                         >
                           PDF herunterladen
                         </button>

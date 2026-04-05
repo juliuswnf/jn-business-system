@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Menu, X, Bell, Search, ChevronRight, Home } from 'lucide-react';
+import { Menu, X, ChevronRight, Home } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
-import StripeConnectAlert from '../components/Dashboard/StripeConnectAlert';
 import MobileBottomNav from '../components/Dashboard/MobileBottomNav';
 import MobileHeader from '../components/Dashboard/MobileHeader';
 import { useIsMobile } from '../hooks/useMediaQuery';
@@ -79,53 +78,50 @@ export default function DashboardLayout({ children }) {
       <div className={`${isMobile ? '' : 'ml-[260px]'} min-h-screen flex flex-col`}>
         {/* Top bar */}
         {!isMobile ? (
-          <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-sm border-b border-zinc-100">
-            <div className="flex items-center justify-between h-14 px-6">
+          <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-gray-100">
+            <div className="flex items-center justify-between h-13 px-8" style={{ height: '52px' }}>
               {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-sm">
-                <Link to={user?.role === 'ceo' ? '/ceo/dashboard' : user?.role === 'employee' ? '/employee/dashboard' : '/dashboard'} className="text-zinc-400 hover:text-zinc-600 transition-colors">
-                  <Home size={15} />
+              <div className="flex items-center gap-1.5 text-sm">
+                <Link to={user?.role === 'ceo' ? '/ceo/dashboard' : user?.role === 'employee' ? '/employee/dashboard' : '/dashboard'} className="text-gray-400 hover:text-gray-600 transition-colors">
+                  <Home size={14} />
                 </Link>
                 {!isHome && (
                   <>
-                    <ChevronRight size={14} className="text-zinc-300" />
-                    <span className="text-zinc-900 font-medium">{currentLabel}</span>
+                    <ChevronRight size={13} className="text-gray-300" />
+                    <span className="text-gray-800 font-medium text-[13px]">{currentLabel}</span>
                   </>
                 )}
               </div>
 
               {/* Right side */}
-              <div className="flex items-center gap-3">
-                <button className="p-2 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 transition-colors">
-                  <Bell size={18} />
-                </button>
-                <Link to="/" className="text-[13px] text-zinc-400 hover:text-zinc-600 transition-colors">
+              <div className="flex items-center gap-1">
+                <Link
+                  to="/"
+                  className="px-3 py-1.5 text-[13px] text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                >
                   Zur Website
                 </Link>
               </div>
             </div>
           </header>
         ) : (
-          <header className="fixed top-0 left-0 right-0 z-30 bg-white border-b border-zinc-100">
+          <header className="fixed top-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100">
             <div className="flex items-center justify-between h-14 px-4">
               <button
                 onClick={() => setMobileSidebarOpen(true)}
-                className="p-2 -ml-2 text-zinc-600"
+                className="p-2 -ml-2 text-gray-600"
               >
-                <Menu size={22} />
+                <Menu size={20} />
               </button>
-              <span className="font-semibold text-zinc-900 text-[15px]">JN Business</span>
-              <button className="p-2 -mr-2 text-zinc-400">
-                <Bell size={20} />
-              </button>
+              <span className="font-semibold text-gray-900 text-sm tracking-tight">JN Business</span>
+              <div className="w-9" />
             </div>
           </header>
         )}
 
         {/* Content */}
         <main className={`flex-1 ${isMobile ? 'pt-14 pb-20' : ''}`}>
-          <div className="px-6 py-6 max-w-[1400px] mx-auto">
-            <StripeConnectAlert />
+          <div className="px-8 py-8 max-w-[1400px] mx-auto">
             {children || <Outlet />}
           </div>
         </main>

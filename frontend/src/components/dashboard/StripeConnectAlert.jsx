@@ -49,7 +49,7 @@ export default function StripeConnectAlert() {
   // No account yet
   if (!accountStatus?.hasAccount) {
     return (
-      <div className="mb-6 bg-yellow-900/20 border border-yellow-600/50 rounded-lg p-4">
+      <div className="mb-6 bg-yellow-900/20 border border-yellow-600/50 rounded-xl p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -58,11 +58,11 @@ export default function StripeConnectAlert() {
                 Stripe-Konto verbinden erforderlich
               </h3>
             </div>
-            <p className="text-sm text-zinc-600 mb-3">
+            <p className="text-sm text-gray-600 mb-3">
               Um Gebühren bei Nichterscheinen zu erhalten, verbinden Sie Ihr Stripe-Konto.
               Die Einrichtung dauert nur 2-3 Minuten.
             </p>
-            <ul className="text-sm text-zinc-500 space-y-1 mb-3">
+            <ul className="text-sm text-gray-500 space-y-1 mb-3">
               <li>✓ Direkte Auszahlungen auf Ihr Bankkonto</li>
               <li>✓ Automatische Abrechnung bei Nichterscheinen</li>
               <li>✓ 100% sicher über Stripe</li>
@@ -70,7 +70,7 @@ export default function StripeConnectAlert() {
           </div>
           <button
             onClick={handleConnectStripe}
-            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-zinc-900 rounded-lg font-medium transition whitespace-nowrap"
+            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-gray-900 rounded-xl font-medium transition whitespace-nowrap"
           >
             Jetzt verbinden
           </button>
@@ -82,23 +82,23 @@ export default function StripeConnectAlert() {
   // Account exists but not complete
   if (!accountStatus.chargesEnabled) {
     return (
-      <div className="mb-6 bg-blue-900/20 border border-blue-600/50 rounded-lg p-4">
+      <div className="mb-6 bg-gray-50 border border-gray-200/50 rounded-xl p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <FiInfo className="text-blue-400" size={20} />
-              <h3 className="font-semibold text-blue-400">
+              <FiInfo className="text-gray-500" size={20} />
+              <h3 className="font-semibold text-gray-500">
                 Stripe-Einrichtung unvollständig
               </h3>
             </div>
-            <p className="text-sm text-zinc-600 mb-3">
+            <p className="text-sm text-gray-600 mb-3">
               Ihre Stripe-Kontoanmeldung ist noch nicht abgeschlossen.
               Schließen Sie die Einrichtung ab, um Gebühren bei Nichterscheinen zu erhalten.
             </p>
           </div>
           <button
             onClick={handleRefreshOnboarding}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-zinc-900 rounded-lg font-medium transition whitespace-nowrap"
+            className="px-4 py-2 bg-gray-900 hover:bg-gray-900 text-gray-900 rounded-xl font-medium transition whitespace-nowrap"
           >
             Einrichtung fortsetzen
           </button>
@@ -109,7 +109,7 @@ export default function StripeConnectAlert() {
 
   // All good - show success briefly or hide
   return (
-    <div className="mb-6 bg-green-900/20 border border-green-600/50 rounded-lg p-4">
+    <div className="mb-6 bg-green-900/20 border border-green-600/50 rounded-xl p-4">
       <div className="flex items-center gap-2">
         <FiCheckCircle className="text-green-400" size={20} />
         <span className="font-medium text-green-400">Stripe-Konto verbunden und aktiv</span>

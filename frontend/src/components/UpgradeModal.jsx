@@ -110,21 +110,21 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 backdrop-blur-sm">
-      <div className="bg-zinc-50 border border-zinc-200 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-50 border border-gray-200 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-zinc-50 border-b border-zinc-200 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-zinc-900">Upgrade erforderlich</h2>
-            <p className="text-zinc-500 text-sm mt-1">
+            <h2 className="text-2xl font-bold text-gray-900">Upgrade erforderlich</h2>
+            <p className="text-gray-500 text-sm mt-1">
               {featureName} ist in deinem aktuellen Plan nicht verfügbar
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-zinc-50 transition"
+            className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-50 transition"
             aria-label="Close modal"
           >
-            <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -134,21 +134,21 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-700"></div>
             </div>
           ) : (
             <>
               {/* Feature Benefits */}
-              <div className="mb-8 p-6 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-                <h3 className="text-lg font-semibold text-zinc-900 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mb-8 p-6 bg-gray-50 border border-gray-200/30 rounded-xl">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   Mit {featureName} kannst du:
                 </h3>
                 <ul className="space-y-2">
                   {benefits.map((benefit, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-zinc-600">
+                    <li key={idx} className="flex items-start gap-2 text-gray-600">
                       <svg className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -160,7 +160,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
 
               {/* Pricing Comparison */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-zinc-900 mb-4">Wähle dein Upgrade:</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Wähle dein Upgrade:</h3>
                 <div className="grid md:grid-cols-3 gap-4">
                   {pricingTiers.map((tier, idx) => {
                     const tierIndex = tierOrder.indexOf(tier.slug);
@@ -171,12 +171,12 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
                     return (
                       <div
                         key={tier.slug}
-                        className={`border rounded-lg p-4 ${
+                        className={`border rounded-xl p-4 ${
                           hasFeature && isUpgrade
-                            ? 'border-purple-500 bg-purple-900/20'
+                            ? 'border-gray-200 bg-gray-50'
                             : isCurrentTier
-                            ? 'border-zinc-200 bg-zinc-50/50 opacity-60'
-                            : 'border-zinc-200 bg-zinc-50/50'
+                            ? 'border-gray-200 bg-gray-50/50 opacity-60'
+                            : 'border-gray-200 bg-gray-50/50'
                         }`}
                       >
                         {tier.popular && (
@@ -185,22 +185,22 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
                           </span>
                         )}
                         {hasFeature && isUpgrade && (
-                          <span className="inline-block text-xs font-bold bg-purple-500 text-zinc-900 px-2 py-1 rounded mb-2">
+                          <span className="inline-block text-xs font-bold bg-gray-900 text-gray-900 px-2 py-1 rounded mb-2">
                             EMPFOHLEN
                           </span>
                         )}
                         {isCurrentTier && (
-                          <span className="inline-block text-xs font-bold bg-zinc-100 text-zinc-500 px-2 py-1 rounded mb-2">
+                          <span className="inline-block text-xs font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded mb-2">
                             AKTUELL
                           </span>
                         )}
 
-                        <h4 className="text-lg font-semibold text-zinc-900 mb-1">{tier.name}</h4>
+                        <h4 className="text-lg font-semibold text-gray-900 mb-1">{tier.name}</h4>
 
                         <div className="mb-4">
-                          <span className="text-2xl font-bold text-zinc-900">€{tier.priceMonthly}</span>
-                          <span className="text-zinc-500 text-sm"> / Monat</span>
-                          <p className="text-xs text-zinc-400 mt-1">
+                          <span className="text-2xl font-bold text-gray-900">€{tier.priceMonthly}</span>
+                          <span className="text-gray-500 text-sm"> / Monat</span>
+                          <p className="text-xs text-gray-400 mt-1">
                             oder €{tier.priceYearly} jährlich ({tier.yearlyDiscount}% sparen)
                           </p>
                         </div>
@@ -222,8 +222,8 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
                             onClick={onClose}
                             className={`block w-full py-2 rounded text-center text-sm font-medium transition ${
                               hasFeature
-                                ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                                : 'bg-zinc-50 hover:bg-zinc-100 text-white'
+                                ? 'bg-gray-900 hover:bg-gray-800 text-white'
+                                : 'bg-gray-50 hover:bg-gray-100 text-white'
                             }`}
                           >
                             Zu {tier.name} upgraden
@@ -233,7 +233,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
                         {isCurrentTier && (
                           <button
                             disabled
-                            className="w-full py-2 bg-zinc-50 text-zinc-400 rounded text-sm font-medium cursor-not-allowed"
+                            className="w-full py-2 bg-gray-50 text-gray-400 rounded text-sm font-medium cursor-not-allowed"
                           >
                             Dein aktueller Plan
                           </button>
@@ -242,7 +242,7 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
                         {!isCurrentTier && !isUpgrade && (
                           <button
                             disabled
-                            className="w-full py-2 bg-zinc-50 text-zinc-400 rounded text-sm font-medium cursor-not-allowed"
+                            className="w-full py-2 bg-gray-50 text-gray-400 rounded text-sm font-medium cursor-not-allowed"
                           >
                             Nicht verfügbar
                           </button>
@@ -254,17 +254,17 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
               </div>
 
               {/* Additional Info */}
-              <div className="p-4 bg-zinc-50/50 rounded-lg">
+              <div className="p-4 bg-gray-50/50 rounded-xl">
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="flex-1">
-                    <p className="text-sm text-zinc-600 mb-2">
-                      <strong className="text-zinc-900">Upgrade jederzeit möglich:</strong> Deine Abrechnung wird automatisch angepasst.
+                    <p className="text-sm text-gray-600 mb-2">
+                      <strong className="text-gray-900">Upgrade jederzeit möglich:</strong> Deine Abrechnung wird automatisch angepasst.
                       Du zahlst nur die Differenz für die verbleibende Zeit im aktuellen Abrechnungszeitraum.
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-gray-500">
                       Keine versteckten Kosten. Keine Mindestvertragslaufzeit. Kündigung jederzeit möglich.
                     </p>
                   </div>
@@ -275,17 +275,17 @@ export default function UpgradeModal({ isOpen, onClose, feature, currentTier }) 
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-zinc-50 border-t border-zinc-200 px-6 py-4 flex items-center justify-between">
+        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-between">
           <Link
             to="/pricing"
             onClick={onClose}
-            className="text-sm text-zinc-500 hover:text-zinc-900 transition"
+            className="text-sm text-gray-500 hover:text-gray-900 transition"
           >
             Alle Preise & Features ansehen →
           </Link>
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-900 rounded-lg text-sm font-medium transition"
+            className="px-6 py-2 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-xl text-sm font-medium transition"
           >
             Schließen
           </button>

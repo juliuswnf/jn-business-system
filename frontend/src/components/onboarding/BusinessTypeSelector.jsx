@@ -129,22 +129,22 @@ export default function BusinessTypeSelector({ onSelect, selectedType }) {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-zinc-900 mb-4">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
           Welche Branche betreiben Sie?
         </h1>
-        <p className="text-xl text-zinc-500">
+        <p className="text-xl text-gray-500">
           Wählen Sie Ihre Branche, um Ihr Erlebnis anzupassen
         </p>
       </div>
 
       {/* Business Type Container - Like Preview */}
-      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl shadow-none overflow-hidden">
-        <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200">
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <svg className="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
-            <span className="font-semibold text-zinc-900">Ihre Branche wählen</span>
+            <span className="font-semibold text-gray-900">Ihre Branche wählen</span>
           </div>
         </div>
 
@@ -162,10 +162,10 @@ export default function BusinessTypeSelector({ onSelect, selectedType }) {
                   onMouseEnter={() => setHoveredType(type.id)}
                   onMouseLeave={() => setHoveredType(null)}
                   className={`
-                    bg-white border rounded-lg p-4 transition cursor-pointer text-left
+                    bg-white border rounded-xl p-4 transition cursor-pointer text-left
                     ${isSelected 
-                      ? 'border-cyan-500/50 hover:border-cyan-500/70' 
-                      : 'border-zinc-200 hover:bg-zinc-50 hover:border-cyan-500/30'
+                      ? 'border-gray-300 hover:border-gray-300' 
+                      : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                     }
                   `}
                 >
@@ -173,20 +173,20 @@ export default function BusinessTypeSelector({ onSelect, selectedType }) {
                     <div className={`
                       w-10 h-10 rounded flex items-center justify-center flex-shrink-0
                       ${isSelected
-                        ? 'bg-cyan-500/10 border border-cyan-500/30'
-                        : 'bg-zinc-50 border border-zinc-200'
+                        ? 'bg-gray-900/10 border border-gray-300'
+                        : 'bg-gray-50 border border-gray-200'
                       }
                     `}>
-                      <Icon className={`w-5 h-5 ${isSelected ? 'text-cyan-500' : 'text-zinc-500'}`} />
+                      <Icon className={`w-5 h-5 ${isSelected ? 'text-gray-900' : 'text-gray-500'}`} />
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold text-zinc-900">{type.name}</div>
-                      <div className="text-sm text-zinc-500 mt-1">
+                      <div className="font-semibold text-gray-900">{type.name}</div>
+                      <div className="text-sm text-gray-500 mt-1">
                         {type.features.slice(0, 2).join(', ')}
                       </div>
                     </div>
                     {isSelected && (
-                      <svg className="w-5 h-5 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-gray-900 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
@@ -198,19 +198,19 @@ export default function BusinessTypeSelector({ onSelect, selectedType }) {
 
           {/* Feature Preview (if type selected) */}
           {selectedType && (
-            <div className="mt-6 bg-white border border-cyan-500/30 rounded-lg p-4">
+            <div className="mt-6 bg-white border border-gray-300 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <svg className="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 className="text-lg font-semibold text-zinc-900">
+                <h3 className="text-lg font-semibold text-gray-900">
                   Features für {BUSINESS_TYPES.find(t => t.id === selectedType)?.name}
                 </h3>
               </div>
-              <div className="bg-zinc-50 rounded-lg p-3 space-y-2">
+              <div className="bg-gray-50 rounded-xl p-3 space-y-2">
                 {BUSINESS_TYPES.find(t => t.id === selectedType)?.features.map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-zinc-600 text-sm">
-                    <svg className="w-4 h-4 text-cyan-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div key={idx} className="flex items-center gap-2 text-gray-600 text-sm">
+                    <svg className="w-4 h-4 text-gray-900 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span>{feature}</span>

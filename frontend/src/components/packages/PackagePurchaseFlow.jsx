@@ -37,7 +37,7 @@ export default function PackagePurchaseFlow({ salonId }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
@@ -90,12 +90,12 @@ function PackageList({ packages, onSelect }) {
         {packages.map((pkg) => (
           <div
             key={pkg._id}
-            className="relative bg-white rounded-2xl shadow-sm hover:shadow-none transition-all duration-300 overflow-hidden border-2 border-gray-200 hover:border-blue-500"
+            className="relative bg-white rounded-2xl shadow-sm hover:shadow-sm transition-all duration-300 overflow-hidden border-2 border-gray-200 hover:border-gray-200"
           >
             {/* Most Popular Badge */}
             {pkg.soldCount > 50 && (
               <div className="absolute top-4 right-4">
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-zinc-900 px-4 py-1 rounded-full text-sm font-bold">
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-4 py-1 rounded-full text-sm font-bold">
                   Most Popular
                 </div>
               </div>
@@ -123,7 +123,7 @@ function PackageList({ packages, onSelect }) {
                   <span className="text-4xl font-bold text-gray-900">
                     {pkg.currency === 'EUR' ? '€' : '$'}{pkg.price}
                   </span>
-                  <span className="ml-2 text-zinc-400">
+                  <span className="ml-2 text-gray-400">
                     / {pkg.totalSessions} sessions
                   </span>
                 </div>
@@ -131,7 +131,7 @@ function PackageList({ packages, onSelect }) {
                   {pkg.currency === 'EUR' ? '€' : '$'}{(pkg.price / pkg.totalSessions).toFixed(2)} per session
                 </div>
                 {calculateSavings(pkg) > 0 && (
-                  <div className="mt-1 text-sm text-blue-600">
+                  <div className="mt-1 text-sm text-gray-700">
                     Save {pkg.currency === 'EUR' ? '€' : '$'}{calculateSavings(pkg)}!
                   </div>
                 )}
@@ -144,11 +144,11 @@ function PackageList({ packages, onSelect }) {
                   <span>{pkg.totalSessions} Training Sessions</span>
                 </div>
                 <div className="flex items-center text-gray-700">
-                  <Clock className="w-5 h-5 text-blue-500 mr-3 flex-shrink-0" />
+                  <Clock className="w-5 h-5 text-gray-600 mr-3 flex-shrink-0" />
                   <span>{pkg.sessionDuration} minutes per session</span>
                 </div>
                 <div className="flex items-center text-gray-700">
-                  <Calendar className="w-5 h-5 text-purple-500 mr-3 flex-shrink-0" />
+                  <Calendar className="w-5 h-5 text-gray-600 mr-3 flex-shrink-0" />
                   <span>Valid for {pkg.validityPeriod} days</span>
                 </div>
                 {pkg.trainerSpecific && pkg.trainerId && (
@@ -162,14 +162,14 @@ function PackageList({ packages, onSelect }) {
               {/* CTA Button */}
               <button
                 onClick={() => onSelect(pkg)}
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-sm hover:shadow-none"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-sm hover:shadow-sm"
               >
                 Purchase Package
               </button>
 
               {/* Stats */}
               {pkg.soldCount > 0 && (
-                <div className="mt-4 text-center text-sm text-zinc-400">
+                <div className="mt-4 text-center text-sm text-gray-400">
                   {pkg.soldCount} {pkg.soldCount === 1 ? 'person has' : 'people have'} purchased
                 </div>
               )}
@@ -181,9 +181,9 @@ function PackageList({ packages, onSelect }) {
       {/* No Packages */}
       {packages.length === 0 && (
         <div className="text-center py-16">
-          <PackageIcon className="w-24 h-24 text-zinc-600 mx-auto mb-4" />
+          <PackageIcon className="w-24 h-24 text-gray-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-700 mb-2">No packages available</h3>
-          <p className="text-zinc-400">Check back later for training packages</p>
+          <p className="text-gray-400">Check back later for training packages</p>
         </div>
       )}
     </div>
@@ -257,17 +257,17 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
     return (
       <div className="max-w-2xl mx-auto text-center py-16">
         <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check className="w-12 h-12 text-zinc-900" />
+          <Check className="w-12 h-12 text-gray-900" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h2>
         <p className="text-xl text-gray-600 mb-8">
           Your {pkg.name} package has been activated
         </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
           <p className="text-gray-700">
-            You now have <span className="font-bold text-blue-600">{pkg.totalSessions} sessions</span> available
+            You now have <span className="font-bold text-gray-700">{pkg.totalSessions} sessions</span> available
           </p>
-          <p className="text-sm text-zinc-400 mt-2">
+          <p className="text-sm text-gray-400 mt-2">
             Valid until {new Date(Date.now() + pkg.validityPeriod * 24 * 60 * 60 * 1000).toLocaleDateString()}
           </p>
         </div>
@@ -289,7 +289,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
       </button>
 
       {/* Package Summary */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 mb-8 border border-blue-200">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 mb-8 border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Order Summary</h2>
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -308,9 +308,9 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
             <span className="text-gray-700">Validity:</span>
             <span className="font-semibold text-gray-900">{pkg.validityPeriod} days</span>
           </div>
-          <div className="pt-3 border-t border-blue-300 flex justify-between">
+          <div className="pt-3 border-t border-gray-200 flex justify-between">
             <span className="text-lg font-bold text-gray-900">Total:</span>
-            <span className="text-2xl font-bold text-blue-600">
+            <span className="text-2xl font-bold text-gray-700">
               {pkg.currency === 'EUR' ? '€' : '$'}{pkg.price}
             </span>
           </div>
@@ -318,9 +318,9 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
       </div>
 
       {/* Payment Form */}
-      <div className="bg-white rounded-2xl shadow-none p-8">
+      <div className="bg-white rounded-2xl shadow-sm p-8">
         <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-          <CreditCard className="w-6 h-6 mr-2 text-blue-500" />
+          <CreditCard className="w-6 h-6 mr-2 text-gray-600" />
           Payment Details
         </h3>
 
@@ -330,7 +330,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Card Information
             </label>
-            <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+            <div className="border border-gray-300 rounded-xl p-4 bg-gray-50">
               <CardElement
                 options={{
                   style: {
@@ -352,7 +352,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
               {error}
             </div>
           )}
@@ -362,11 +362,11 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
             type="submit"
             disabled={!stripe || loading}
             className={`
-              w-full py-4 rounded-xl font-semibold text-zinc-900 text-lg
+              w-full py-4 rounded-xl font-semibold text-gray-900 text-lg
               transition-all duration-300
               ${loading || !stripe
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-sm hover:shadow-none'
+                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-sm hover:shadow-sm'
               }
             `}
           >
@@ -384,7 +384,7 @@ function CheckoutForm({ package: pkg, onBack, onSuccess }) {
           </button>
 
           {/* Security Notice */}
-          <div className="mt-6 text-center text-sm text-zinc-400">
+          <div className="mt-6 text-center text-sm text-gray-400">
             <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>

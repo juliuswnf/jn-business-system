@@ -73,7 +73,7 @@ const WizardStep = ({
         )}
 
         {type === 'multiple' && minSelections > 0 && (
-          <p className="text-sm text-blue-600 mt-2">
+          <p className="text-sm text-gray-700 mt-2">
             Mindestens {minSelections} Auswahl erforderlich
           </p>
         )}
@@ -94,8 +94,8 @@ const WizardStep = ({
             className={`
               w-full p-4 rounded-xl border-2 text-left transition-all
               ${isSelected(option.value)
-                ? 'border-blue-600 bg-blue-50 shadow-sm'
-                : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md'
+                ? 'border-gray-200 bg-gray-50 shadow-sm'
+                : 'border-gray-200 bg-white hover:border-gray-200 hover:shadow-md'
               }
             `}
           >
@@ -106,7 +106,7 @@ const WizardStep = ({
                   <div className={`
                     w-6 h-6 rounded border-2 flex items-center justify-center
                     ${isSelected(option.value)
-                      ? 'border-blue-600 bg-blue-600'
+                      ? 'border-gray-200 bg-gray-900'
                       : 'border-gray-300 bg-white'
                     }
                   `}>
@@ -120,12 +120,12 @@ const WizardStep = ({
                   <div className={`
                     w-6 h-6 rounded-full border-2 flex items-center justify-center
                     ${isSelected(option.value)
-                      ? 'border-blue-600'
+                      ? 'border-gray-200'
                       : 'border-gray-300'
                     }
                   `}>
                     {isSelected(option.value) && (
-                      <div className="w-3 h-3 rounded-full bg-blue-600" />
+                      <div className="w-3 h-3 rounded-full bg-gray-900" />
                     )}
                   </div>
                 )}
@@ -143,15 +143,15 @@ const WizardStep = ({
                 )}
 
                 {option.description && (
-                  <p className="text-xs text-zinc-400">{option.description}</p>
+                  <p className="text-xs text-gray-400">{option.description}</p>
                 )}
 
                 {option.tier && (
                   <span className={`
                     inline-block mt-2 px-2 py-1 text-xs rounded-full
                     ${option.tier === 'enterprise'
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'bg-blue-100 text-blue-700'
+                      ? 'bg-gray-100 text-gray-700'
+                      : 'bg-gray-100 text-gray-700'
                     }
                   `}>
                     {option.tier === 'enterprise' ? 'Enterprise' : 'Professional'}
@@ -166,7 +166,7 @@ const WizardStep = ({
                   animate={{ scale: 1 }}
                   className="flex-shrink-0 ml-2"
                 >
-                  <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-6 h-6 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 </motion.div>
