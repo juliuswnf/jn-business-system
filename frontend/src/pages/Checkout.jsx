@@ -6,8 +6,8 @@ const plans = {
   starter: {
     id: 'starter',
     name: 'Starter',
-    price: 49,
-    yearlyPrice: 39,
+    price: 129,
+    yearlyPrice: 99,
     description: 'Perfekt für Solo-Studios & Einzelunternehmer',
     features: [
       '150 Termine pro Monat',
@@ -23,8 +23,8 @@ const plans = {
   professional: {
     id: 'professional',
     name: 'Professional',
-    price: 99,
-    yearlyPrice: 79,
+    price: 249,
+    yearlyPrice: 199,
     description: 'Für wachsende Teams mit mehreren Mitarbeitern',
     features: [
       'Unbegrenzte Termine',
@@ -39,8 +39,8 @@ const plans = {
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
-    price: 199,
-    yearlyPrice: 159,
+    price: 599,
+    yearlyPrice: 479,
     description: 'Für Unternehmen mit mehreren Standorten',
     features: [
       'Unbegrenzte Termine',

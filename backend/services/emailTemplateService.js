@@ -71,7 +71,15 @@ const formatTime = (date, language = 'de') => {
  * @returns {Object} - Email subject and body
  */
 const renderConfirmationEmail = (salon, booking, language = 'de') => {
-  const template = salon.getEmailTemplate('confirmation', language);
+  let template = salon.getEmailTemplate('confirmation', language);
+
+  // Fallback: salon was created without templates (e.g. QA/test salons) — init defaults in-memory
+  if (!template) {
+    if (typeof salon.initializeDefaultTemplates === 'function') {
+      salon.initializeDefaultTemplates();
+      template = salon.getEmailTemplate('confirmation', language);
+    }
+  }
 
   if (!template) {
     throw new Error(`Confirmation email template not found for language: ${language}`);
@@ -104,7 +112,15 @@ const renderConfirmationEmail = (salon, booking, language = 'de') => {
  * @returns {Object} - Email subject and body
  */
 const renderReminderEmail = (salon, booking, language = 'de') => {
-  const template = salon.getEmailTemplate('reminder', language);
+  let template = salon.getEmailTemplate('reminder', language);
+
+  // Fallback: salon was created without templates (e.g. QA/test salons) — init defaults in-memory
+  if (!template) {
+    if (typeof salon.initializeDefaultTemplates === 'function') {
+      salon.initializeDefaultTemplates();
+      template = salon.getEmailTemplate('reminder', language);
+    }
+  }
 
   if (!template) {
     throw new Error(`Reminder email template not found for language: ${language}`);
@@ -137,7 +153,15 @@ const renderReminderEmail = (salon, booking, language = 'de') => {
  * @returns {Object} - Email subject and body
  */
 const renderReviewEmail = (salon, booking, language = 'de') => {
-  const template = salon.getEmailTemplate('review', language);
+  let template = salon.getEmailTemplate('review', language);
+
+  // Fallback: salon was created without templates (e.g. QA/test salons) — init defaults in-memory
+  if (!template) {
+    if (typeof salon.initializeDefaultTemplates === 'function') {
+      salon.initializeDefaultTemplates();
+      template = salon.getEmailTemplate('review', language);
+    }
+  }
 
   if (!template) {
     throw new Error(`Review email template not found for language: ${language}`);

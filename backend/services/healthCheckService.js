@@ -270,7 +270,9 @@ const checkMemory = () => {
     const rssMB = Math.round(used.rss / 1024 / 1024);
 
     const heapUsagePercent = (used.heapUsed / used.heapTotal) * 100;
-    const isHealthy = heapUsagePercent < 90; // Alert if >90% heap used
+    // 90% threshold is misleading — heapTotal is currently allocated (not Node.js max).
+    // Only alert if heap is large AND near-full to avoid false positives.
+    const isHealthy = heapUsagePercent < 95 || heapUsedMB < 200;
 
     return {
       status: isHealthy ? 'healthy' : 'warning',

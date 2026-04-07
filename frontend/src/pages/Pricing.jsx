@@ -8,8 +8,8 @@ const plans = [
     name: 'Starter',
     description: 'Perfekt für kleine Betriebe',
     price: 129,
-    yearlyPrice: 1290,
-    yearlyMonthlyCost: 107.50,
+    yearlyPrice: 1188,
+    yearlyMonthlyCost: 99,
     features: [
       { name: 'Mitarbeiter', value: '5', description: 'Bis zu 5 Mitarbeiter können das System nutzen' },
       { name: 'Standorte', value: '1', description: 'Für einen Unternehmens-Standort' },
@@ -43,8 +43,8 @@ const plans = [
     name: 'Professional',
     description: 'Ideal für wachsende Teams',
     price: 249,
-    yearlyPrice: 2490,
-    yearlyMonthlyCost: 207.50,
+    yearlyPrice: 2388,
+    yearlyMonthlyCost: 199,
     popular: true,
     features: [
       { name: 'Mitarbeiter', value: '30', description: 'Bis zu 30 Mitarbeiter können das System nutzen' },
@@ -87,8 +87,8 @@ const plans = [
     name: 'Enterprise',
     description: 'Für Unternehmen mit höchsten Ansprüchen',
     price: 599,
-    yearlyPrice: 5990,
-    yearlyMonthlyCost: 499.17,
+    yearlyPrice: 5748,
+    yearlyMonthlyCost: 479,
     badge: 'ALLES INKLUSIVE',
     features: [
       { name: 'Mitarbeiter', value: 'Unbegrenzt', description: 'Beliebig viele Mitarbeiter ohne Aufpreis' },
@@ -192,7 +192,7 @@ export default function Pricing() {
           </span>
           {yearly && (
             <span className="ml-2 px-3 py-1 bg-green-500/20 text-green-600 text-sm font-medium rounded-full">
-              Spare bis zu €1.198
+              Spare bis zu €1.440
             </span>
           )}
         </div>

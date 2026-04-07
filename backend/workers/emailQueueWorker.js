@@ -109,11 +109,14 @@ const processEmailQueue = async () => {
  * @param {Object} queueItem - EmailQueue document
  */
 const processEmailQueueItem = async (queueItem) => {
+  // Declare outside try so catch block can access them
+  let bookingRef;
+  let salonRef;
   try {
     logger.log(`?? Processing email: ${queueItem._id} | Type: ${queueItem.type} | To: ${queueItem.to || 'N/A'}`);
 
-    const bookingRef = queueItem.booking || queueItem.bookingId;
-    const salonRef = queueItem.salon || queueItem.salonId;
+    bookingRef = queueItem.booking || queueItem.bookingId;
+    salonRef = queueItem.salon || queueItem.salonId;
 
     // If no bookingId, treat as direct email (notification/custom)
     if (!bookingRef) {
