@@ -1,11 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 export default function NotFound() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4">
+      <SEO
+        title="Seite nicht gefunden - JN Business System"
+        description="Die aufgerufene Seite existiert nicht oder wurde verschoben."
+      />
       <div className="text-center max-w-md">
         <div className="text-7xl font-bold text-gray-900 mb-4">404</div>
         <h1 className="text-2xl font-semibold tracking-tight mb-4 text-gray-900">Seite nicht gefunden</h1>

@@ -1,9 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../../components/SEO';
 
 export default function AGB() {
   return (
     <div className="min-h-screen bg-white text-gray-900 py-16">
+      <SEO
+        title="Allgemeine Geschäftsbedingungen - JN Business System"
+        description="Die AGB von JN Business System. Alle wichtigen Nutzungsbedingungen für unser Online-Buchungssystem auf einem Blick."
+        url="/agb"
+      />
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="mb-12">

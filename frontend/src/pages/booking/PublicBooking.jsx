@@ -8,6 +8,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import PaymentMethodStep from '../../components/Booking/PaymentMethodStep';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import SEO from '../../components/SEO';
 
 const defaultTimeSlots = [
   '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -501,6 +502,10 @@ export default function PublicBooking() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-6 md:px-8 md:py-10 lg:px-12 lg:py-12 text-gray-900">
+      <SEO
+        title={salonInfo?.name ? `Termin buchen bei ${salonInfo.name}` : 'Online Termin buchen'}
+        description={salonInfo?.name ? `Jetzt online Termin buchen bei ${salonInfo.name}. Einfach, schnell und ohne Anruf.` : 'Jetzt online Termin buchen. Einfach, schnell und ohne Anruf.'}
+      />
       <div className="w-full mx-auto max-w-full md:max-w-4xl space-y-4 md:space-y-6">
         <header className="bg-white text-gray-900 rounded-2xl border border-gray-200 shadow-sm p-5 md:p-8 flex flex-col gap-4">
           <div className="flex items-start justify-between gap-3">

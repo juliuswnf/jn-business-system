@@ -22,6 +22,7 @@
     "validate-env": "node scripts/validateEnv.js",
     "pre-launch": "node scripts/preLaunchCheck.js",
     "migrate": "node scripts/migrateData.js",
+    "migrate:run": "node scripts/runMigrations.js",
     "migrate:soft-delete": "node scripts/migrateToSoftDelete.js",
     "migrate:onboarding": "node migrations/migrate-onboarding-fields.js",
     "test:email": "node scripts/emailDeliverabilityTest.js",

@@ -1,10 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheckIcon, ServerIcon, LockClosedIcon, GlobeEuropeAfricaIcon } from '@heroicons/react/24/outline';
+import SEO from '../../components/SEO';
 
 export default function Datenschutz() {
   return (
     <div className="min-h-screen bg-white text-gray-900 py-16">
+      <SEO
+        title="Datenschutzerklärung - JN Business System"
+        description="Erfahren Sie, wie JN Business System Ihre persönlichen Daten schützt und verarbeitet. DSGVO-konforme Datenspeicherung auf deutschen Servern."
+        url="/datenschutz"
+      />
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="mb-12">

@@ -97,6 +97,12 @@ export const handleStripeWebhook = async (req, res) => {
     try {
       // Handle different event types
     switch (event.type) {
+    // ==================== CHECKOUT EVENTS ====================
+
+    case 'checkout.session.completed':
+      await handleCheckoutSessionCompleted(event.data.object);
+      break;
+
     // ==================== SUBSCRIPTION EVENTS ====================
 
     case 'customer.subscription.created':
@@ -179,6 +185,42 @@ export const handleStripeWebhook = async (req, res) => {
       message: 'Webhook processing error',
       ...(process.env.NODE_ENV === 'development' && { debug: error.message })
     });
+  }
+};
+
+/**
+ * Handle checkout.session.completed
+ * Activates the salon subscription when a Stripe Checkout payment succeeds.
+ */
+const handleCheckoutSessionCompleted = async (session) => {
+  try {
+    const salonId = session.metadata?.salonId;
+    const plan = session.metadata?.plan;
+
+    if (!salonId) {
+      logger.warn('checkout.session.completed: no salonId in metadata');
+      return;
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      logger.warn(`checkout.session.completed: salon not found (${salonId})`);
+      return;
+    }
+
+    salon.subscription.status = 'active';
+    if (plan) {
+      salon.subscription.tier = plan;
+    }
+    if (!salon.subscription.stripeCustomerId && session.customer) {
+      salon.subscription.stripeCustomerId = session.customer;
+    }
+    await salon.save();
+
+    logger.log(`✅ Salon ${salonId} activated via checkout.session.completed (plan: ${plan || 'unchanged'})`);
+  } catch (error) {
+    logger.error('Error handling checkout.session.completed:', error);
+    throw error;
   }
 };
 

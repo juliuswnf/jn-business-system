@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPinIcon, MagnifyingGlassIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { API_URL } from '../../utils/api';
+import SEO from '../../components/SEO';
 
 /**
  * /salons Landing Page - SEO-optimierte Dienstleister-Übersicht
@@ -55,6 +56,11 @@ const Salons = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
+      <SEO
+        title="Alle Betriebe - JN Business System"
+        description="Entdecken Sie alle Betriebe auf JN Business System. Buchen Sie jetzt online Ihren Termin bei Friseuren, Barbershops, Nagelstudios und mehr."
+        url="/salons"
+      />
       {/* SEO Header */}
       <div className="bg-gray-50 border-b border-gray-200 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

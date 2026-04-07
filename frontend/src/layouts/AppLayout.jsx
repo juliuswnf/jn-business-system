@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import CookieBanner from '../components/CookieBanner';
 
 export default function AppLayout({ children }) {
   return (
@@ -10,6 +11,7 @@ export default function AppLayout({ children }) {
         {children}
       </main>
       <Footer />
+      <CookieBanner />
     </div>
   );
 }
