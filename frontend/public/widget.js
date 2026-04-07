@@ -8,7 +8,7 @@
       return;
     }
 
-    var origin = (container.getAttribute('data-origin') || window.location.origin).replace(/\/$/, '');
+    var origin = (container.getAttribute('data-origin') || 'https://app.jn-business-system.de').replace(/\/$/, '');
     var src = origin + '/s/' + encodeURIComponent(slug);
 
     // Wrapper keeps relative positioning for the loader overlay
