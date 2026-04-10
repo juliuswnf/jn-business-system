@@ -1626,7 +1626,7 @@ const SystemControlTab = () => {
           </h3>
           <div className="space-y-2">
             <button
-              onClick={() => window.open('http://localhost:3000', '_blank')}
+              onClick={() => window.open(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://app.jn-business-system.de', '_blank')}
               className="w-full flex items-center gap-3 px-4 py-3 bg-white/30 rounded-lg text-left hover:bg-white/50 transition group"
             >
               <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
@@ -1636,7 +1636,7 @@ const SystemControlTab = () => {
               </div>
               <div className="flex-1">
                 <p className="text-gray-900 text-sm font-medium">Frontend öffnen</p>
-                <p className="text-gray-400 text-xs">localhost:3000</p>
+                <p className="text-gray-400 text-xs">app.jn-business-system.de</p>
               </div>
               <svg className="w-4 h-4 text-gray-500 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

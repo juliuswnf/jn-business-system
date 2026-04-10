@@ -67,7 +67,7 @@ export default function PublicBooking() {
   const [bookingStep, setBookingStep] = useState(0);
   const stripePromise = useMemo(() => {
     if (bookingStep < 3) return null;
-    return loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+    return loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
   }, [bookingStep]);
   const [bookingData, setBookingData] = useState({
     customerName: prefillData.customerName || '',

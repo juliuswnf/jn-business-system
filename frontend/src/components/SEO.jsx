@@ -12,15 +12,16 @@ const SEO = ({
   keywords = 'Terminbuchung, Online Booking, Business Software, Appointment Booking, Buchungssystem',
   author = 'JN Business System',
   image = '/og-image.png',
-  url = 'https://jn-automation.vercel.app',
+  url = 'https://jn-business-system.de',
   type = 'website',
   siteName = 'JN Business System',
   locale = 'de_DE',
   structuredData = null
 }) => {
   const fullTitle = title.includes('JN Business System') ? title : `${title} | JN Business System`;
-  const fullUrl = url.startsWith('http') ? url : `https://jn-automation.vercel.app${url}`;
-  const fullImage = image.startsWith('http') ? image : `https://jn-automation.vercel.app${image}`;
+  const fullUrl = url.startsWith('http') ? url : `https://jn-business-system.de${url}`;
+  const ogImage = image || 'https://jn-business-system.de/og-image.png';
+  const fullImage = ogImage.startsWith('http') ? ogImage : `https://jn-business-system.de${ogImage}`;
 
   return (
     <Helmet>

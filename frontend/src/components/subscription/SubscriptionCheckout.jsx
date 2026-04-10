@@ -5,7 +5,7 @@ import { api } from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
 
 // Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 /**
  * Subscription Checkout Component
