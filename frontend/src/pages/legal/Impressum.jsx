@@ -17,9 +17,9 @@ export default function Impressum() {
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Angaben gemäß § 5 TMG</h2>
           <p className="text-gray-700 leading-relaxed">
             JN Business System<br />
-            Inhaber: Julius <span className="bg-yellow-100 text-yellow-800 px-1 rounded">[NACHNAME HIER EINTRAGEN]</span><br />
-            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">[STRASSE UND HAUSNUMMER HIER EINTRAGEN]</span><br />
-            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">[PLZ ORT HIER EINTRAGEN]</span>
+            Inhaber: Julius <span className="bg-yellow-100 text-yellow-800 px-1 rounded">Wagenfeldt</span><br />
+            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">Brunnenstraße 8a</span><br />
+            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">66706 Perl</span>
           </p>
         </section>
 
@@ -27,7 +27,7 @@ export default function Impressum() {
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Kontakt</h2>
           <p className="text-gray-700 leading-relaxed">
-            Telefon: <span className="bg-yellow-100 text-yellow-800 px-1 rounded">[TELEFONNUMMER HIER EINTRAGEN]</span><br />
+            Telefon: <span className="bg-yellow-100 text-yellow-800 px-1 rounded">+352 691 774488</span><br />
             E-Mail: <a href="mailto:support@jn-business-system.de" className="text-blue-600 hover:underline">support@jn-business-system.de</a>
           </p>
         </section>
@@ -36,9 +36,9 @@ export default function Impressum() {
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
           <p className="text-gray-700 leading-relaxed">
-            Julius <span className="bg-yellow-100 text-yellow-800 px-1 rounded">[NACHNAME HIER EINTRAGEN]</span><br />
-            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">[STRASSE UND HAUSNUMMER HIER EINTRAGEN]</span><br />
-            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">[PLZ ORT HIER EINTRAGEN]</span>
+            Julius <span className="bg-yellow-100 text-yellow-800 px-1 rounded">Wagenfeldt</span><br />
+            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">Brunnenstraße 8a</span><br />
+            <span className="bg-yellow-100 text-yellow-800 px-1 rounded">66706 Perl</span>
           </p>
         </section>
 
