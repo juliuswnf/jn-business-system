@@ -15,6 +15,14 @@ export const getSalonInfo = async (req, res) => {
   try {
     const salonId = req.params.salonId || req.user.salonId;
 
+    // IDOR check: non-CEO users may only access their own salon
+    if (req.user.role !== 'ceo' && req.user.salonId?.toString() !== salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     const salon = await Salon.findById(salonId)
       .populate('owner', 'name email').maxTimeMS(5000);
 
@@ -207,13 +215,21 @@ export const getSalonStats = async (req, res) => {
   try {
     const salonId = req.params.salonId || req.user.salonId;
 
-    const totalBookings = await Booking.countDocuments({ salonId });
-    const confirmedBookings = await Booking.countDocuments({ salonId, status: 'confirmed' });
-    const pendingBookings = await Booking.countDocuments({ salonId, status: 'pending' });
-    const cancelledBookings = await Booking.countDocuments({ salonId, status: 'cancelled' });
-    const completedBookings = await Booking.countDocuments({ salonId, status: 'completed' });
-
-    const totalServices = await Service.countDocuments({ salonId });
+    const [
+      totalBookings,
+      confirmedBookings,
+      pendingBookings,
+      cancelledBookings,
+      completedBookings,
+      totalServices
+    ] = await Promise.all([
+      Booking.countDocuments({ salonId }),
+      Booking.countDocuments({ salonId, status: 'confirmed' }),
+      Booking.countDocuments({ salonId, status: 'pending' }),
+      Booking.countDocuments({ salonId, status: 'cancelled' }),
+      Booking.countDocuments({ salonId, status: 'completed' }),
+      Service.countDocuments({ salonId })
+    ]);
 
     res.status(200).json({
       success: true,
@@ -264,27 +280,31 @@ export const getSalonDashboard = async (req, res) => {
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const todayBookings = await Booking.countDocuments({
-      salonId,
-      bookingDate: { $gte: today, $lt: tomorrow }
-    });
-
-    // Get upcoming bookings (next 7 days)
     const nextWeek = new Date(today);
     nextWeek.setDate(nextWeek.getDate() + 7);
 
-    const upcomingBookings = await Booking.countDocuments({
-      salonId,
-      bookingDate: { $gte: today, $lt: nextWeek },
-      status: { $in: ['confirmed', 'pending'] }
-    });
-
-    // Get stats
-    const totalBookings = await Booking.countDocuments({ salonId });
-    const totalServices = await Service.countDocuments({ salonId });
-    const completedBookings = await Booking.countDocuments({ salonId, status: 'completed' });
-    const cancelledBookings = await Booking.countDocuments({ salonId, status: 'cancelled' });
+    const [
+      todayBookings,
+      upcomingBookings,
+      totalBookings,
+      totalServices,
+      completedBookings,
+      cancelledBookings
+    ] = await Promise.all([
+      Booking.countDocuments({
+        salonId,
+        bookingDate: { $gte: today, $lt: tomorrow }
+      }),
+      Booking.countDocuments({
+        salonId,
+        bookingDate: { $gte: today, $lt: nextWeek },
+        status: { $in: ['confirmed', 'pending'] }
+      }),
+      Booking.countDocuments({ salonId }),
+      Service.countDocuments({ salonId }),
+      Booking.countDocuments({ salonId, status: 'completed' }),
+      Booking.countDocuments({ salonId, status: 'cancelled' })
+    ]);
 
     // Get revenue (sum of completed bookings)
     const revenueData = await Booking.aggregate([

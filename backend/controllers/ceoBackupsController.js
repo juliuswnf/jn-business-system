@@ -32,8 +32,9 @@ export const getAllBackups = async (req, res) => {
 
     const backups = await Backup.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1).lean().maxTimeMS(5000) * limit)
+      .skip((parseInt(page) - 1) * parseInt(limit))
       .limit(parseInt(limit))
+      .lean().maxTimeMS(5000)
       .populate('createdBy', 'name email');
 
     const total = await Backup.countDocuments(query);
@@ -364,7 +365,15 @@ export const downloadBackup = async (req, res) => {
       });
     }
 
-    res.download(backup.storagePath, `backup-${backup.name}.json`);
+    // Path traversal guard: ensure the file is within the expected backups directory
+    const backupsDir = path.resolve(process.cwd(), 'backups');
+    const resolvedPath = path.resolve(backup.storagePath);
+    if (!resolvedPath.startsWith(backupsDir + path.sep) && resolvedPath !== backupsDir) {
+      logger.error(`Path traversal attempt blocked: ${backup.storagePath}`);
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+
+    res.download(resolvedPath, `backup-${backup.name}.json`);
   } catch (error) {
     logger.error('DownloadBackup Error:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });

@@ -119,6 +119,11 @@ export const getSalonWorkflows = async (req, res) => {
     const { salonId } = req.params;
     const { enabled } = req.query;
 
+    // Enforce tenant isolation: only the owning salon or CEO may access
+    if (req.user?.role !== 'ceo' && req.user?.salonId?.toString() !== salonId) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+
     const workflows = await IndustryWorkflow.getSalonWorkflows(
       salonId,
       enabled === 'true'
@@ -144,6 +149,11 @@ export const updateWorkflowConfig = async (req, res) => {
   try {
     const { salonId, industry } = req.params;
     const { config, features } = req.body;
+
+    // Enforce tenant isolation: only the owning salon or CEO may update
+    if (req.user?.role !== 'ceo' && req.user?.salonId?.toString() !== salonId) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
 
     const workflow = await IndustryWorkflow.findOne({ salonId, industry });
 
@@ -293,6 +303,11 @@ export const getProject = async (req, res) => {
         success: false,
         message: 'Project not found'
       });
+    }
+
+    // Enforce tenant isolation: only the owning salon or CEO may access
+    if (req.user?.role !== 'ceo' && project.salonId?.toString() !== req.user?.salonId?.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
     }
 
     // Get consents for this project
@@ -769,12 +784,7 @@ export const getSalonPackages = async (req, res) => {
 
     const packages = packageDocs.map((pkg) => ({
       ...pkg,
-      status: pkg.isActive ? 'active' : 'inactive',
-      creditsTotal: pkg.totalSessions || 0,
-      creditsRemaining: pkg.totalSessions || 0,
-      validUntil: null,
-      customerId: null,
-      services: []
+      status: pkg.isActive ? 'active' : 'inactive'
     }));
 
     res.json({

@@ -211,6 +211,15 @@ export const updateEmployee = async (req, res) => {
     const { employeeId } = req.params;
     const { name, phone, role, status } = req.body;
 
+    // Whitelist allowed roles to prevent privilege escalation
+    const ALLOWED_ROLES = ['employee', 'manager'];
+    if (role !== undefined && !ALLOWED_ROLES.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role. Allowed values: employee, manager'
+      });
+    }
+
     const employee = await User.findOneAndUpdate(
       { _id: employeeId, salonId, role: { $in: ['employee', 'manager'] } },
       { name, phone, role, status },
@@ -245,11 +254,11 @@ export const deleteEmployee = async (req, res) => {
     const salonId = req.user.salonId;
     const { employeeId } = req.params;
 
-    const employee = await User.findOneAndDelete({
-      _id: employeeId,
-      salonId,
-      role: { $in: ['employee', 'manager'] }
-    });
+    const employee = await User.findOneAndUpdate(
+      { _id: employeeId, salonId, role: { $in: ['employee', 'manager'] } },
+      { isActive: false },
+      { new: true }
+    );
 
     if (!employee) {
       return res.status(404).json({
@@ -260,7 +269,7 @@ export const deleteEmployee = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Employee deleted successfully'
+      message: 'Employee deactivated successfully'
     });
   } catch (error) {
     logger.error('DeleteEmployee Error:', error);

@@ -314,7 +314,7 @@ export const refundPayment = async (req, res) => {
       refundAmount = maxRefundable;
     }
 
-    // Create refund with Stripe
+    // Create refund with Stripe first (external side-effect before DB writes)
     const refund = await getStripe().refunds.create({
       payment_intent: payment.stripePaymentIntentId,
       amount: Math.round(refundAmount * 100), // Convert to cents
@@ -325,42 +325,51 @@ export const refundPayment = async (req, res) => {
     const newRefundedAmount = alreadyRefunded + refundAmount;
     const isFullyRefunded = newRefundedAmount >= payment.amount;
 
-    // Update payment record
-    const updatedPayment = await Payment.findByIdAndUpdate(
-      paymentId,
-      {
-        status: isFullyRefunded ? 'refunded' : 'partially_refunded',
-        refundId: refund.id,
-        refundedAmount: newRefundedAmount,
-        refundedAt: Date.now(),
-        $push: {
-          refundHistory: {
-            refundId: refund.id,
-            amount: refundAmount,
-            reason: reason || 'requested_by_customer',
-            createdAt: new Date()
-          }
-        }
-      },
-      { new: true }
-    );
+    // Wrap both DB updates in a transaction so they succeed or fail together
+    const session = await mongoose.startSession();
+    let updatedPayment;
+    try {
+      session.startTransaction();
 
-    // Update booking status based on refund type
-    if (isFullyRefunded) {
-      await Booking.findByIdAndUpdate(
-        payment.bookingId,
+      updatedPayment = await Payment.findByIdAndUpdate(
+        paymentId,
         {
-          status: 'cancelled',
-          paymentStatus: 'refunded'
-        }
+          status: isFullyRefunded ? 'refunded' : 'partially_refunded',
+          refundId: refund.id,
+          refundedAmount: newRefundedAmount,
+          refundedAt: Date.now(),
+          $push: {
+            refundHistory: {
+              refundId: refund.id,
+              amount: refundAmount,
+              reason: reason || 'requested_by_customer',
+              createdAt: new Date()
+            }
+          }
+        },
+        { new: true, session }
       );
-    } else {
-      await Booking.findByIdAndUpdate(
-        payment.bookingId,
-        {
-          paymentStatus: 'partially_refunded'
-        }
-      );
+
+      if (isFullyRefunded) {
+        await Booking.findByIdAndUpdate(
+          payment.bookingId,
+          { status: 'cancelled', paymentStatus: 'refunded' },
+          { session }
+        );
+      } else {
+        await Booking.findByIdAndUpdate(
+          payment.bookingId,
+          { paymentStatus: 'partially_refunded' },
+          { session }
+        );
+      }
+
+      await session.commitTransaction();
+    } catch (dbError) {
+      await session.abortTransaction();
+      throw dbError;
+    } finally {
+      session.endSession();
     }
 
     res.status(200).json({

@@ -114,8 +114,8 @@ export const getConsolidatedDashboard = async (req, res) => {
     const validSalonIds = salonIds.filter(id => id);
 
     const now = new Date();
-    const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-    const endOfToday = new Date(now.setHours(23, 59, 59, 999));
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Aggregate data across all locations

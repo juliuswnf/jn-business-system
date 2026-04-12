@@ -124,24 +124,19 @@ export const getRevenueChart = async (req, res) => {
     const months = period === '6m' ? 6 : 12;
     const chartData = [];
 
+    // Fetch all active salons once — avoids N×2 sequential queries in the loop
+    const [allStarters, allPros] = await Promise.all([
+      Salon.find({ 'subscription.plan': 'starter', 'subscription.status': 'active' }, { createdAt: 1 }).lean().maxTimeMS(5000),
+      Salon.find({ 'subscription.plan': 'pro', 'subscription.status': 'active' }, { createdAt: 1 }).lean().maxTimeMS(5000)
+    ]);
+
     for (let i = months - 1; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-      // Count active subscriptions at end of month
-      const starterCount = await Salon.countDocuments({
-        'subscription.plan': 'starter',
-        'subscription.status': 'active',
-        createdAt: { $lte: monthEnd }
-      });
-
-      const proCount = await Salon.countDocuments({
-        'subscription.plan': 'pro',
-        'subscription.status': 'active',
-        createdAt: { $lte: monthEnd }
-      });
-
+      const starterCount = allStarters.filter(s => new Date(s.createdAt) <= monthEnd).length;
+      const proCount = allPros.filter(s => new Date(s.createdAt) <= monthEnd).length;
       const revenue = (starterCount * PRICING.starter) + (proCount * PRICING.pro);
 
       chartData.push({
@@ -168,20 +163,19 @@ export const getCustomerGrowthChart = async (req, res) => {
     const months = period === '6m' ? 6 : 12;
     const chartData = [];
 
+    // Fetch all salons once — avoids N×2 sequential queries in the loop
+    const [allSalons, allPaidSalons] = await Promise.all([
+      Salon.find({}, { createdAt: 1 }).lean().maxTimeMS(5000),
+      Salon.find({ 'subscription.status': 'active', 'subscription.plan': { $in: ['starter', 'pro'] } }, { createdAt: 1 }).lean().maxTimeMS(5000)
+    ]);
+
     for (let i = months - 1; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-      const totalCustomers = await Salon.countDocuments({
-        createdAt: { $lte: monthEnd }
-      });
-
-      const paidCustomers = await Salon.countDocuments({
-        'subscription.status': 'active',
-        'subscription.plan': { $in: ['starter', 'pro'] },
-        createdAt: { $lte: monthEnd }
-      });
+      const totalCustomers = allSalons.filter(s => new Date(s.createdAt) <= monthEnd).length;
+      const paidCustomers = allPaidSalons.filter(s => new Date(s.createdAt) <= monthEnd).length;
 
       chartData.push({
         month: date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' }),
@@ -332,6 +326,21 @@ export const getAtRiskStudios = async (req, res) => {
     const fourteenDaysAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
 
+    // Pre-fetch booking counts for all studios in 2 aggregations instead of 2×N queries
+    const studioIds = studios.map(s => s._id);
+    const [recentCountDocs, totalCountDocs] = await Promise.all([
+      Booking.aggregate([
+        { $match: { salonId: { $in: studioIds }, createdAt: { $gte: sevenDaysAgo } } },
+        { $group: { _id: '$salonId', count: { $sum: 1 } } }
+      ]),
+      Booking.aggregate([
+        { $match: { salonId: { $in: studioIds } } },
+        { $group: { _id: '$salonId', count: { $sum: 1 } } }
+      ])
+    ]);
+    const recentCountMap = new Map(recentCountDocs.map(r => [r._id.toString(), r.count]));
+    const totalCountMap = new Map(totalCountDocs.map(r => [r._id.toString(), r.count]));
+
     for (const studio of studios) {
       const riskFactors = [];
       let riskScore = 0;
@@ -346,15 +355,9 @@ export const getAtRiskStudios = async (req, res) => {
         riskScore += lastLogin < thirtyDaysAgo ? 25 : 15;
       }
 
-      // Check booking activity
-      const recentBookings = await Booking.countDocuments({
-        salonId: studio._id,
-        createdAt: { $gte: sevenDaysAgo }
-      });
-
-      const totalBookings = await Booking.countDocuments({
-        salonId: studio._id
-      });
+      // Check booking activity (use pre-fetched counts)
+      const recentBookings = recentCountMap.get(studio._id.toString()) ?? 0;
+      const totalBookings = totalCountMap.get(studio._id.toString()) ?? 0;
 
       if (totalBookings === 0) {
         riskFactors.push('Keine Buchungen');

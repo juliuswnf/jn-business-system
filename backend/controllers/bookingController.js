@@ -375,7 +375,17 @@ export const updateBooking = async (req, res) => {
     }
 
     // Build update data with validation
-    if (status) booking.status = status;
+    if (status) {
+      // Whitelist: only these transitions are permitted via updateBooking
+      const UPDATABLE_STATUSES = ['pending', 'booked', 'confirmed'];
+      if (!UPDATABLE_STATUSES.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid status. Use the dedicated endpoints for: cancelled, completed, no_show`
+        });
+      }
+      booking.status = status;
+    }
     if (notes !== undefined) booking.notes = notes;
 
     if (bookingDate) {

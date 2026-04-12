@@ -146,11 +146,14 @@ const startNodeService = async (service, serviceId) => {
 
   try {
     if (isWindows) {
-      // Windows: Start in a new cmd window that stays open
-      const startCommand = `start "${service.name}" cmd /k "cd /d ${service.cwd} && npm run dev"`;
-
-      await execAsync(startCommand, { timeout: 10000, shell: 'cmd.exe' });
-
+      // Windows: use spawn with an argument array — avoids shell interpolation of service.cwd
+      const child = spawn('cmd.exe', ['/c', 'start', service.name, 'cmd', '/k', `cd /d "${service.cwd}" && npm run dev`], {
+        cwd: service.cwd,
+        detached: true,
+        stdio: 'ignore',
+        shell: false
+      });
+      child.unref();
       return { success: true, message: 'Process started in new window' };
     } else {
       // Unix: Use nohup

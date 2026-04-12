@@ -23,31 +23,26 @@ export const getMetricsOverview = async (req, res) => {
     startOfWeek.setDate(now.getDate() - now.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
 
-    // This month's bookings
-    const thisMonthBookings = await Booking.countDocuments({
-      salonId,
-      createdAt: { $gte: startOfMonth }
-    });
-
-    // Last month's bookings
-    const lastMonthBookings = await Booking.countDocuments({
-      salonId,
-      createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
-    });
-
-    // This week's bookings
-    const thisWeekBookings = await Booking.countDocuments({
-      salonId,
-      createdAt: { $gte: startOfWeek }
-    });
-
-    // Total bookings all time
-    const totalBookings = await Booking.countDocuments({ salonId });
-
-    // Confirmed vs cancelled
-    const confirmedBookings = await Booking.countDocuments({ salonId, status: 'confirmed' });
-    const cancelledBookings = await Booking.countDocuments({ salonId, status: 'cancelled' });
-    const completedBookings = await Booking.countDocuments({ salonId, status: 'completed' });
+    // Run all count queries in parallel
+    const [
+      thisMonthBookings,
+      lastMonthBookings,
+      thisWeekBookings,
+      totalBookings,
+      confirmedBookings,
+      cancelledBookings,
+      completedBookings,
+      noShowBookings
+    ] = await Promise.all([
+      Booking.countDocuments({ salonId, createdAt: { $gte: startOfMonth } }),
+      Booking.countDocuments({ salonId, createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth } }),
+      Booking.countDocuments({ salonId, createdAt: { $gte: startOfWeek } }),
+      Booking.countDocuments({ salonId }),
+      Booking.countDocuments({ salonId, status: 'confirmed' }),
+      Booking.countDocuments({ salonId, status: 'cancelled' }),
+      Booking.countDocuments({ salonId, status: 'completed' }),
+      Booking.countDocuments({ salonId, status: 'no_show' })
+    ]);
 
     // Revenue calculation
     const revenueAggregation = await Booking.aggregate([
@@ -85,9 +80,9 @@ export const getMetricsOverview = async (req, res) => {
       ? Math.round(((thisMonthBookings - lastMonthBookings) / lastMonthBookings) * 100)
       : thisMonthBookings > 0 ? 100 : 0;
 
-    // No-show rate (cancelled / total)
+    // No-show rate (no_show status / total)
     const noShowRate = totalBookings > 0
-      ? Math.round((cancelledBookings / totalBookings) * 100)
+      ? Math.round((noShowBookings / totalBookings) * 100)
       : 0;
 
     // Time saved estimate (average 5 min per phone booking)
@@ -210,7 +205,7 @@ export const getTopServices = async (req, res) => {
         revenue: { $sum: '$totalPrice' }
       }},
       { $sort: { bookings: -1 } },
-      { $limit: parseInt(limit) },
+      { $limit: Math.min(parseInt(limit) || 5, 50) },
       { $lookup: {
         from: 'services',
         localField: '_id',

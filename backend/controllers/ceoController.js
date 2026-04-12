@@ -4,10 +4,12 @@ import logger from '../utils/logger.js';
  * Essential CEO dashboard and salon management only
  */
 
+import mongoose from 'mongoose';
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
 import User from '../models/User.js';
 import ErrorLog from '../models/ErrorLog.js';
+import SystemSettings from '../models/SystemSettings.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
 
 // ==================== PRICING CONSTANTS ====================
@@ -143,7 +145,7 @@ export const getAllBusinesses = async (req, res) => {
       .select('name slug email phone address isActive subscription createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(Math.min(parseInt(limit) || 20, 100));
 
     const totalPages = Math.ceil(total / limit);
 
@@ -184,27 +186,34 @@ export const createBusiness = async (req, res) => {
       });
     }
 
-    // Create owner user
-    const owner = await User.create({
-      name: ownerName,
-      email: ownerEmail,
-      password: ownerPassword,
-      role: 'salon_owner'
-    });
-
-    // Create salon
-    const salon = await Salon.create({
-      name,
-      email,
-      phone,
-      address,
-      owner: owner._id,
-      isActive: true,
-      subscription: {
-        status: 'trial',
-        trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days trial
-      }
-    });
+    // Create owner + salon atomically so a failed salon doesn't leave an orphaned user
+    const txSession = await mongoose.startSession();
+    let owner, salon;
+    try {
+      txSession.startTransaction();
+      [owner] = await User.create(
+        [{ name: ownerName, email: ownerEmail, password: ownerPassword, role: 'salon_owner' }],
+        { session: txSession }
+      );
+      [salon] = await Salon.create(
+        [{
+          name, email, phone, address,
+          owner: owner._id,
+          isActive: true,
+          subscription: {
+            status: 'trial',
+            trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          }
+        }],
+        { session: txSession }
+      );
+      await txSession.commitTransaction();
+    } catch (txError) {
+      await txSession.abortTransaction();
+      throw txError;
+    } finally {
+      txSession.endSession();
+    }
 
     res.status(201).json({
       success: true,
@@ -546,16 +555,16 @@ export const updateSystemSettings = async (req, res) => {
 
     const { trialPeriodDays, emailNotificationsEnabled } = req.body;
 
-    // In MVP, we just acknowledge the update
-    // In production, save to database
+    const settings = await SystemSettings.findOneAndUpdate(
+      {},
+      { trialPeriodDays, emailNotificationsEnabled },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
 
     res.status(200).json({
       success: true,
       message: 'Settings updated successfully',
-      settings: {
-        trialPeriodDays,
-        emailNotificationsEnabled
-      }
+      settings
     });
   } catch (error) {
     logger.error('UpdateSystemSettings Error:', error);
@@ -952,7 +961,7 @@ export const getCEOSubscriptions = async (req, res) => {
       .select('name email isPremium subscription createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(Math.min(parseInt(limit) || 20, 100));
 
     // Calculate MRR
     let totalMRR = 0;

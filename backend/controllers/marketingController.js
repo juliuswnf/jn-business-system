@@ -340,8 +340,7 @@ export const previewCampaign = async (req, res) => {
         sampleMessage,
         recipients: targetCustomers.slice(0, 10).map(c => ({
           name: c.name,
-          email: c.email,
-          phoneNumber: c.phoneNumber
+          email: c.email
         }))
       }
     });
@@ -595,12 +594,17 @@ async function findTargetCustomers(campaign, salonId) {
       const today = new Date();
       const targetDate = new Date(today);
       targetDate.setDate(targetDate.getDate() + campaign.rules.birthdayDaysBefore);
+      const targetMonth = targetDate.getMonth() + 1; // 1-12
+      const targetDay = targetDate.getDate();
 
       query = {
-        birthdate: {
-          $exists: true,
-          $ne: null
+        $expr: {
+          $and: [
+            { $eq: [{ $month: '$birthdate' }, targetMonth] },
+            { $eq: [{ $dayOfMonth: '$birthdate' }, targetDay] }
+          ]
         },
+        birthdate: { $exists: true, $ne: null },
         phoneNumber: { $exists: true, $ne: null }
       };
       break;

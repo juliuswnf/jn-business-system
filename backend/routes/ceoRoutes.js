@@ -13,6 +13,11 @@ import * as ceoAuditController from '../controllers/ceoAuditController.js';
 import * as ceoFeatureFlagsController from '../controllers/ceoFeatureFlagsController.js';
 import * as ceoBackupsController from '../controllers/ceoBackupsController.js';
 
+import { createRateLimiter } from '../middleware/rateLimiterMiddleware.js';
+
+// Strict rate limit for shell-exec endpoints: max 10 calls per 15 min per CEO session
+const serviceActionLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10, message: 'Service action rate limit exceeded' });
+
 const router = express.Router();
 
 // Apply auth middleware

@@ -262,12 +262,22 @@ export const setupSEPA = async (req, res) => {
       });
     }
 
+    // Basic IBAN format validation: letters+digits only, 15–34 chars (ISO 13616)
+    const cleanIban = iban.replace(/\s/g, '').toUpperCase();
+    if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/.test(cleanIban)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid IBAN format',
+        message: 'Please provide a valid IBAN (e.g. DE89370400440532013000)'
+      });
+    }
+
     // Setup SEPA
     const result = await stripePaymentService.setupSEPA({
       salon,
       email,
       name,
-      iban
+      iban: cleanIban
     });
 
     res.json({

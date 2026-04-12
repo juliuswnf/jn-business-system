@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import RefreshToken from '../models/RefreshToken.js';
 import jwt from 'jsonwebtoken';
@@ -137,60 +138,77 @@ export const register = async (req, res) => {
       userData.companyName = companyName;
     }
 
-    // Create user (password auto-hashed by mongoose pre-hook)
-    const user = await User.create(userData);
-
-    // If salon_owner, automatically create a Salon with 30-day trial
-    let salon = null;
+    // Compute slug + businessType before transaction (read-only checks)
+    let SalonModel = null;
+    let slug = null;
+    let selectedBusinessType = null;
     if (userRole === 'salon_owner' && companyName) {
-      const Salon = (await import('../models/Salon.js')).default;
+      SalonModel = (await import('../models/Salon.js')).default;
 
-      // Generate unique slug
-      let slug = companyName.toLowerCase()
+      slug = companyName.toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
 
-      // Check for existing slug and add number if needed
-      const existingSlug = await Salon.findOne({ slug }).maxTimeMS(5000);
+      const existingSlug = await SalonModel.findOne({ slug }).maxTimeMS(5000);
       if (existingSlug) {
         slug = `${slug}-${Date.now().toString(36)}`;
       }
 
-      // Validate businessType
       const validBusinessTypes = [
         'hair-salon', 'beauty-salon', 'spa-wellness', 'tattoo-piercing',
         'medical-aesthetics', 'personal-training', 'physiotherapy',
         'barbershop', 'nail-salon', 'massage-therapy', 'yoga-studio',
         'pilates-studio', 'other'
       ];
-      const selectedBusinessType = businessType && validBusinessTypes.includes(businessType)
+      selectedBusinessType = businessType && validBusinessTypes.includes(businessType)
         ? businessType
-        : 'hair-salon'; // Default fallback
+        : 'hair-salon';
+    }
 
-      salon = await Salon.create({
-        name: companyName,
-        slug,
-        owner: user._id,
-        email: email,
-        phone: phone || '',
-        businessType: selectedBusinessType,
-        address: {
-          street: companyAddress || '',
-          city: companyCity || '',
-          postalCode: companyZip || '',
-          country: 'Deutschland'
-        },
-        isActive: true,
-        subscription: {
-          status: 'trial_pending',
-          tier: plan || 'starter'
-        }
-      });
+    // Create user + salon atomically — Salon failure rolls back the user too
+    let user, salon = null;
+    const txSession = await mongoose.startSession();
+    try {
+      txSession.startTransaction();
 
-      // Link salon to user
-      user.salonId = salon._id;
-      await user.save();
+      [user] = await User.create([userData], { session: txSession });
 
+      if (userRole === 'salon_owner' && companyName) {
+        [salon] = await SalonModel.create(
+          [{
+            name: companyName,
+            slug,
+            owner: user._id,
+            email,
+            phone: phone || '',
+            businessType: selectedBusinessType,
+            address: {
+              street: companyAddress || '',
+              city: companyCity || '',
+              postalCode: companyZip || '',
+              country: 'Deutschland'
+            },
+            isActive: true,
+            subscription: {
+              status: 'trial_pending',
+              tier: plan || 'starter'
+            }
+          }],
+          { session: txSession }
+        );
+        user.salonId = salon._id;
+        await user.save({ session: txSession });
+      }
+
+      await txSession.commitTransaction();
+    } catch (txError) {
+      await txSession.abortTransaction();
+      throw txError;
+    } finally {
+      txSession.endSession();
+    }
+
+    if (salon) {
       logger.info(`Salon created for new owner: ${salon.name} (${salon.slug})`);
 
       // Queue welcome email
@@ -591,7 +609,6 @@ export const ceoLogin = async (req, res) => {
         requiresTwoFactorSetup: true,
         message: '2FA ist für CEO-Zugang Pflicht. Bitte richten Sie die Zwei-Faktor-Authentifizierung ein.',
         qrCode,
-        secret, // Allow manual entry
         setupInstructions: 'Scannen Sie den QR-Code mit einer Authenticator-App (Google Authenticator, Authy, etc.)'
       });
     }

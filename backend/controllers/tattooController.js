@@ -617,7 +617,9 @@ export const getCustomerConsents = async (req, res) => {
 export const signConsent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { signature, ipAddress, userAgent } = req.body;
+    const { signature } = req.body;
+    const ipAddress = req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || 'unknown';
     const salonId = req.user.salonId || req.salon?._id;
 
     const consent = await Consent.findOne({ _id: id, salonId });
@@ -710,7 +712,7 @@ export const getPortfolio = async (req, res) => {
     // Get completed projects
     const projects = await TattooProject.find(filters)
       .populate('artistId', 'firstName lastName')
-      .limit(parseInt(limit))
+      .limit(Math.min(parseInt(limit) || 20, 50))
       .sort({ completedDate: -1 });
 
     // Get sessions with photos for each project

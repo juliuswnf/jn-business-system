@@ -48,10 +48,6 @@ export const getAllSalons = async (req, res) => {
       100 // Maximum 100 items per page to prevent DoS
     );
 
-    // Debug: Log all salons count
-    const allSalonsCount = await Salon.countDocuments({});
-    logger.info(`Total salons in DB: ${allSalonsCount}`);
-
     // Get all salons (show all for now, can filter by subscription later)
     // For production: filter by subscription.status: 'active' or 'trialing'
     const salons = await Salon.find({}).lean().maxTimeMS(5000)
@@ -307,7 +303,6 @@ export const getAvailableSlots = async (req, res) => {
 
     let bookingFilter = {
       salonId: salon._id,
-      serviceId,
       bookingDate: { $gte: startUTC, $lte: endUTC },
       status: { $nin: ['cancelled', 'no_show'] }
     };

@@ -209,7 +209,7 @@ export const getPatientClinicalNotes = async (req, res) => {
 
     const clinicalNotes = await ClinicalNote.find(query)
       .sort({ treatmentDate: -1 })
-      .populate('practitionerId', 'name email').lean().maxTimeMS(5000)
+      .populate('practitionerId', 'name email').maxTimeMS(5000)
       .select('-encryptedContent -encryptedIV -encryptedAuthTag')
       .lean();
 
