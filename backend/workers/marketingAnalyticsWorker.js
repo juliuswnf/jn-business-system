@@ -11,6 +11,7 @@
 import MarketingCampaign from '../models/MarketingCampaign.js';
 import MarketingRecipient from '../models/MarketingRecipient.js';
 import Booking from '../models/Booking.js';
+import ErrorLog from '../models/ErrorLog.js';
 import logger from '../utils/logger.js';
 
 // Track if worker is running
@@ -43,6 +44,12 @@ export const updateMarketingAnalytics = async () => {
     logger.log('[SUCCESS] Marketing analytics update complete');
   } catch (error) {
     logger.error('[ERROR] Marketing analytics worker error:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `MarketingAnalytics worker error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[MarketingAnalytics] ErrorLog write failed:', e.message));
   } finally {
     isRunning = false;
   }
@@ -57,36 +64,69 @@ const updateDeliveryStatuses = async () => {
     const recipients = await MarketingRecipient.find({
       status: { $in: ['sent', 'pending'] },
       smsLogId: { $exists: true, $ne: null }
-    }).populate('smsLogId');
+    }).populate('smsLogId').limit(500).maxTimeMS(5000);
 
-    let updated = 0;
+    // Separate into delivered / failed buckets — avoid N+1 saves in the loop
+    const deliveredIds = [];
+    const failedUpdates = []; // { id, errorMessage }
+    const campaignDeliveredCounts = new Map(); // campaignId -> increment count
 
     for (const recipient of recipients) {
       if (!recipient.smsLogId) continue;
-
       const smsLog = recipient.smsLogId;
 
-      // Update based on SMS log status
       if (smsLog.status === 'delivered' && recipient.status !== 'delivered') {
-        await recipient.markAsDelivered();
-        updated++;
-
-        // Update campaign stats
-        await MarketingCampaign.findByIdAndUpdate(
-          recipient.campaignId,
-          { $inc: { 'stats.totalDelivered': 1 } }
-        );
+        deliveredIds.push(recipient._id);
+        const key = recipient.campaignId.toString();
+        campaignDeliveredCounts.set(key, (campaignDeliveredCounts.get(key) || 0) + 1);
       } else if (smsLog.status === 'failed' && recipient.status !== 'failed') {
-        await recipient.markAsFailed(smsLog.errorMessage || 'SMS delivery failed');
-        updated++;
+        failedUpdates.push({ id: recipient._id, errorMessage: smsLog.errorMessage || 'SMS delivery failed' });
       }
     }
 
+    // Bulk-update delivered status
+    if (deliveredIds.length > 0) {
+      await MarketingRecipient.updateMany(
+        { _id: { $in: deliveredIds } },
+        { $set: { status: 'delivered', deliveredAt: new Date() } }
+      );
+      // Bulk-update campaign delivered counts
+      const campaignBulk = Array.from(campaignDeliveredCounts.entries()).map(
+        ([campaignId, count]) => ({
+          updateOne: {
+            filter: { _id: campaignId },
+            update: { $inc: { 'stats.totalDelivered': count } }
+          }
+        })
+      );
+      if (campaignBulk.length > 0) {
+        await MarketingCampaign.bulkWrite(campaignBulk);
+      }
+    }
+
+    // Bulk-update failed status
+    if (failedUpdates.length > 0) {
+      const failedBulk = failedUpdates.map(({ id, errorMessage }) => ({
+        updateOne: {
+          filter: { _id: id },
+          update: { $set: { status: 'failed', failedAt: new Date(), errorMessage } }
+        }
+      }));
+      await MarketingRecipient.bulkWrite(failedBulk);
+    }
+
+    const updated = deliveredIds.length + failedUpdates.length;
     if (updated > 0) {
       logger.log(`[INFO] Updated delivery status for ${updated} recipients`);
     }
   } catch (error) {
     logger.error('[ERROR] Update delivery statuses error:', error);
+    ErrorLog.logError({
+      type: 'error',
+      message: `MarketingAnalytics: updateDeliveryStatuses failed: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[MarketingAnalytics] ErrorLog write failed:', e.message));
   }
 };
 
@@ -99,7 +139,7 @@ const trackBookingConversions = async () => {
     const recipients = await MarketingRecipient.find({
       status: { $ne: 'booked' },
       discountCode: { $exists: true, $ne: null }
-    });
+    }).limit(500).maxTimeMS(5000);
 
     if (recipients.length === 0) return;
 
@@ -108,7 +148,7 @@ const trackBookingConversions = async () => {
     const bookings = await Booking.find({
       discountCode: { $in: allCodes },
       status: { $ne: 'cancelled' }
-    }).lean();
+    }).lean().maxTimeMS(5000);
 
     // Build lookup map keyed by "customerId:discountCode"
     const bookingMap = new Map();
@@ -117,24 +157,35 @@ const trackBookingConversions = async () => {
       bookingMap.set(key, booking);
     }
 
-    let conversions = 0;
-
+    const conversionTasks = [];
     for (const recipient of recipients) {
       const key = `${recipient.customerId}:${recipient.discountCode}`;
       const booking = bookingMap.get(key);
 
       if (booking) {
-        await recipient.markAsBooked(booking._id, booking.totalPrice || 0);
-        conversions++;
-        logger.log(`[SUCCESS] Conversion tracked: ${recipient.discountCode} -> ${booking.totalPrice}€`);
+        conversionTasks.push(
+          recipient.markAsBooked(booking._id, booking.totalPrice || 0)
+            .then(() => {
+              logger.log(`[SUCCESS] Conversion tracked: ${recipient.discountCode} -> ${booking.totalPrice}€`);
+            })
+        );
       }
     }
+
+    await Promise.allSettled(conversionTasks);
+    const conversions = conversionTasks.length;
 
     if (conversions > 0) {
       logger.log(`[INFO] Tracked ${conversions} new conversions`);
     }
   } catch (error) {
     logger.error('[ERROR] Track booking conversions error:', error);
+    ErrorLog.logError({
+      type: 'error',
+      message: `MarketingAnalytics: trackBookingConversions failed: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[MarketingAnalytics] ErrorLog write failed:', e.message));
   }
 };
 
@@ -143,37 +194,42 @@ const trackBookingConversions = async () => {
  */
 const updateCampaignROI = async () => {
   try {
-    const campaigns = await MarketingCampaign.find({ status: 'active' });
+    const campaigns = await MarketingCampaign.find({ status: 'active' }).limit(500).maxTimeMS(5000);
+    if (campaigns.length === 0) return;
 
+    const campaignIds = campaigns.map(c => c._id);
+
+    // Aggregate all recipient stats in one query instead of N individual finds
+    const recipientStats = await MarketingRecipient.aggregate([
+      { $match: { campaignId: { $in: campaignIds } } },
+      {
+        $group: {
+          _id: '$campaignId',
+          totalSent: {
+            $sum: {
+              $cond: [{ $in: ['$status', ['sent', 'delivered', 'clicked', 'booked']] }, 1, 0]
+            }
+          },
+          totalDelivered: {
+            $sum: {
+              $cond: [{ $in: ['$status', ['delivered', 'clicked', 'booked']] }, 1, 0]
+            }
+          },
+          totalClicked: { $sum: { $cond: [{ $ifNull: ['$clickedAt', false] }, 1, 0] } },
+          totalBooked: { $sum: { $cond: [{ $eq: ['$status', 'booked'] }, 1, 0] } },
+          totalRevenue: { $sum: { $ifNull: ['$revenue', 0] } }
+        }
+      }
+    ]).option({ maxTimeMS: 5000 });
+
+    const statsMap = new Map(recipientStats.map(s => [s._id.toString(), s]));
+
+    const bulkOps = [];
     for (const campaign of campaigns) {
-      // Get recipient stats
-      const recipients = await MarketingRecipient.find({ campaignId: campaign._id });
-
-      const stats = {
-        totalSent: 0,
-        totalDelivered: 0,
-        totalClicked: 0,
-        totalBooked: 0,
-        totalRevenue: 0
+      const stats = statsMap.get(campaign._id.toString()) || {
+        totalSent: 0, totalDelivered: 0, totalClicked: 0, totalBooked: 0, totalRevenue: 0
       };
 
-      recipients.forEach(r => {
-        if (r.status === 'sent' || r.status === 'delivered' || r.status === 'clicked' || r.status === 'booked') {
-          stats.totalSent++;
-        }
-        if (r.status === 'delivered' || r.status === 'clicked' || r.status === 'booked') {
-          stats.totalDelivered++;
-        }
-        if (r.clickedAt) {
-          stats.totalClicked++;
-        }
-        if (r.status === 'booked') {
-          stats.totalBooked++;
-          stats.totalRevenue += r.revenue || 0;
-        }
-      });
-
-      // Update campaign stats if changed
       const hasChanges =
         campaign.stats.totalSent !== stats.totalSent ||
         campaign.stats.totalDelivered !== stats.totalDelivered ||
@@ -182,19 +238,36 @@ const updateCampaignROI = async () => {
         campaign.stats.totalRevenue !== stats.totalRevenue;
 
       if (hasChanges) {
-        campaign.stats.totalSent = stats.totalSent;
-        campaign.stats.totalDelivered = stats.totalDelivered;
-        campaign.stats.totalClicked = stats.totalClicked;
-        campaign.stats.totalBooked = stats.totalBooked;
-        campaign.stats.totalRevenue = stats.totalRevenue;
-
-        await campaign.save();
-
-        logger.log(`[INFO] Updated stats for campaign ${campaign.name}: ${stats.totalBooked} conversions, ${stats.totalRevenue}€ revenue`);
+        bulkOps.push({
+          updateOne: {
+            filter: { _id: campaign._id },
+            update: {
+              $set: {
+                'stats.totalSent': stats.totalSent,
+                'stats.totalDelivered': stats.totalDelivered,
+                'stats.totalClicked': stats.totalClicked,
+                'stats.totalBooked': stats.totalBooked,
+                'stats.totalRevenue': stats.totalRevenue
+              }
+            }
+          }
+        });
+        logger.log(`[INFO] Queued stats update for campaign ${campaign.name}: ${stats.totalBooked} conversions, ${stats.totalRevenue}€ revenue`);
       }
+    }
+
+    if (bulkOps.length > 0) {
+      await MarketingCampaign.bulkWrite(bulkOps);
+      logger.log(`[INFO] Updated stats for ${bulkOps.length} campaigns`);
     }
   } catch (error) {
     logger.error('[ERROR] Update campaign ROI error:', error);
+    ErrorLog.logError({
+      type: 'error',
+      message: `MarketingAnalytics: updateCampaignROI failed: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[MarketingAnalytics] ErrorLog write failed:', e.message));
   }
 };
 
@@ -203,7 +276,7 @@ const updateCampaignROI = async () => {
  */
 export const getAnalyticsSummary = async () => {
   try {
-    const campaigns = await MarketingCampaign.find({});
+    const campaigns = await MarketingCampaign.find({}).maxTimeMS(5000);
 
     const summary = {
       totalCampaigns: campaigns.length,
@@ -251,6 +324,12 @@ export const getAnalyticsSummary = async () => {
     return summary;
   } catch (error) {
     logger.error('[ERROR] Get analytics summary error:', error);
+    ErrorLog.logError({
+      type: 'error',
+      message: `MarketingAnalytics: getAnalyticsSummary failed: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[MarketingAnalytics] ErrorLog write failed:', e.message));
     throw error;
   }
 };

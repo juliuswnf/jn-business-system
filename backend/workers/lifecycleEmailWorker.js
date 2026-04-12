@@ -7,6 +7,7 @@
  */
 
 import LifecycleEmail from '../models/LifecycleEmail.js';
+import ErrorLog from '../models/ErrorLog.js';
 import { sendEmail } from '../services/emailService.js';
 import { getLifecycleEmailTemplate } from '../services/lifecycleEmailTemplates.js';
 import logger from '../utils/logger.js';
@@ -27,7 +28,15 @@ export const processLifecycleEmails = async () => {
   isRunning = true;
 
   try {
-    const pendingEmails = await LifecycleEmail.getPendingEmails(50);
+    const pendingEmails = await LifecycleEmail.find({
+      status: 'pending',
+      scheduledFor: { $lte: new Date() },
+      retries: { $lt: 3 }
+    })
+      .populate('salonId')
+      .populate('userId')
+      .limit(50)
+      .maxTimeMS(5000);
 
     if (pendingEmails.length === 0) {
       return;
@@ -35,13 +44,17 @@ export const processLifecycleEmails = async () => {
 
     logger.log(`[INFO] Processing ${pendingEmails.length} lifecycle emails...`);
 
-    for (const emailDoc of pendingEmails) {
-      await processLifecycleEmail(emailDoc);
-    }
+    await Promise.allSettled(pendingEmails.map(emailDoc => processLifecycleEmail(emailDoc)));
 
     logger.log('[INFO] Finished processing lifecycle emails');
   } catch (error) {
     logger.error('[ERROR] Error in lifecycle email worker:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `LifecycleEmail worker error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[LifecycleEmail] ErrorLog write failed:', e.message));
   } finally {
     isRunning = false;
   }
@@ -122,6 +135,14 @@ const processLifecycleEmail = async (emailDoc) => {
     }
 
     await emailDoc.save();
+
+    ErrorLog.logError({
+      type: 'error',
+      message: `LifecycleEmail: failed ${emailDoc.emailType}: ${error.message}`,
+      source: 'worker',
+      salonId: emailDoc?.salonId?._id || emailDoc?.salonId,
+      stackTrace: error.stack
+    }).catch(e => logger.error('[LifecycleEmail] ErrorLog write failed:', e.message));
   }
 };
 

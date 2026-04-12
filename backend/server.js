@@ -29,6 +29,8 @@ import { startConfirmationSender } from './workers/confirmationSenderWorker.js';
 import { startAutoCancelWorker } from './workers/autoCancelWorker.js';
 import { startWaitlistMatcher } from './workers/waitlistMatcherWorker.js';
 import { startReminderWorker } from './workers/reminderWorker.js';
+import { startNoShowChargeWorker } from './workers/noShowChargeWorker.js';
+import { startSubscriptionExpiryWorker } from './workers/subscriptionExpiryWorker.js';
 
 // Marketing Automation Workers
 import { startMarketingCampaignWorker } from './workers/marketingCampaignWorker.js';
@@ -631,6 +633,8 @@ const startNoShowKillerWorkers = () => {
     startAutoCancelWorker(); // Every 15 min
     startWaitlistMatcher(); // Every 15 min
     startReminderWorker(); // Every 30 min
+    startNoShowChargeWorker(); // Every hour at :10
+    startSubscriptionExpiryWorker(); // Every hour at :30
 
     logger.info('? NO-SHOW-KILLER workers started successfully');
   } catch (error) {

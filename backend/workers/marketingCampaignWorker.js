@@ -10,6 +10,8 @@ import MarketingCampaign from '../models/MarketingCampaign.js';
 import MarketingRecipient from '../models/MarketingRecipient.js';
 import User from '../models/User.js';
 import Booking from '../models/Booking.js';
+import ErrorLog from '../models/ErrorLog.js';
+import crypto from 'crypto';
 import { sendSMS } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
@@ -31,7 +33,7 @@ export const processMarketingCampaigns = async () => {
 
   try {
     // Find campaigns ready to run
-    const campaigns = await MarketingCampaign.getReadyToRun();
+    const campaigns = (await MarketingCampaign.getReadyToRun()).slice(0, 500);
 
     if (campaigns.length === 0) {
       return;
@@ -39,13 +41,17 @@ export const processMarketingCampaigns = async () => {
 
     logger.log(`[INFO] Processing ${campaigns.length} marketing campaigns...`);
 
-    for (const campaign of campaigns) {
-      await processCampaign(campaign);
-    }
+    await Promise.allSettled(campaigns.map(campaign => processCampaign(campaign)));
 
     logger.log('[SUCCESS] Finished processing marketing campaigns');
   } catch (error) {
     logger.error('[ERROR] Marketing campaign worker error:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `MarketingCampaign worker error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[MarketingCampaign] ErrorLog write failed:', e.message));
   } finally {
     isRunning = false;
   }
@@ -104,6 +110,13 @@ const processCampaign = async (campaign) => {
     logger.log(`[SUCCESS] Campaign ${campaign.name}: ${results.sent} sent, ${results.failed} failed`);
   } catch (error) {
     logger.error(`[ERROR] Process campaign ${campaign.name} error:`, error);
+    ErrorLog.logError({
+      type: 'error',
+      message: `MarketingCampaign: process campaign failed (${campaign._id}): ${error.message}`,
+      source: 'worker',
+      salonId: campaign?.salonId?._id || campaign?.salonId,
+      stackTrace: error.stack
+    }).catch(e => logger.error('[MarketingCampaign] ErrorLog write failed:', e.message));
   }
 };
 
@@ -127,7 +140,7 @@ const findTargetCustomers = async (campaign, salonId) => {
           lastBooking: { $first: '$date' }
         }},
         { $match: { lastBooking: { $lt: inactiveSince } } }
-      ]);
+      ]).option({ maxTimeMS: 5000 });
 
       const inactiveCustomerIds = lastBookings.map(b => b._id);
 
@@ -147,7 +160,7 @@ const findTargetCustomers = async (campaign, salonId) => {
       const salonBookings = await Booking.aggregate([
         { $match: { salonId } },
         { $group: { _id: '$customerId' } }
-      ]);
+      ]).option({ maxTimeMS: 5000 });
       const salonCustomerIds = salonBookings.map(b => b._id);
 
       // Fetch only those customers who have a birthdate and phone
@@ -155,7 +168,7 @@ const findTargetCustomers = async (campaign, salonId) => {
         _id: { $in: salonCustomerIds },
         phoneNumber: { $exists: true, $ne: null },
         birthdate: { $exists: true, $ne: null }
-      }).lean();
+      }).lean().maxTimeMS(5000);
 
       const targetDate = new Date(today);
       targetDate.setDate(targetDate.getDate() + daysAhead);
@@ -170,26 +183,21 @@ const findTargetCustomers = async (campaign, salonId) => {
     }
 
     case 'last_minute': {
-      // Find customers based on segment
+      // Find customers based on segment — always scoped to this salon via booking history
       const segment = campaign.rules.targetSegment || 'all';
+      const minCount = segment === 'vip' ? 10 : segment === 'regular' ? 3 : 1;
 
-      if (segment === 'vip' || segment === 'regular') {
-        const bookingCounts = await Booking.aggregate([
-          { $match: { salonId } },
-          { $group: { _id: '$customerId', count: { $sum: 1 } } },
-          { $match: { count: { $gte: segment === 'vip' ? 10 : 3 } } }
-        ]);
+      const bookingCounts = await Booking.aggregate([
+        { $match: { salonId } },
+        { $group: { _id: '$customerId', count: { $sum: 1 } } },
+        { $match: { count: { $gte: minCount } } }
+      ]).option({ maxTimeMS: 5000 });
 
-        const customerIds = bookingCounts.map(b => b._id);
-        query = {
-          _id: { $in: customerIds },
-          phoneNumber: { $exists: true, $ne: null }
-        };
-      } else {
-        query = {
-          phoneNumber: { $exists: true, $ne: null }
-        };
-      }
+      const customerIds = bookingCounts.map(b => b._id);
+      query = {
+        _id: { $in: customerIds },
+        phoneNumber: { $exists: true, $ne: null }
+      };
       break;
     }
 
@@ -201,7 +209,7 @@ const findTargetCustomers = async (campaign, salonId) => {
         { $match: { salonId } },
         { $group: { _id: '$customerId', count: { $sum: 1 } } },
         { $match: { count: { $gte: minBookings } } }
-      ]);
+      ]).option({ maxTimeMS: 5000 });
 
       const upsellCustomerIds = upsellCustomers.map(b => b._id);
       query = {
@@ -220,7 +228,7 @@ const findTargetCustomers = async (campaign, salonId) => {
         { $match: { salonId } },
         { $group: { _id: '$customerId', count: { $sum: 1 } } },
         { $match: { count: { $gte: minBookings } } }
-      ]);
+      ]).option({ maxTimeMS: 5000 });
 
       const referralCustomerIds = referralCustomers.map(b => b._id);
       query = {
@@ -246,7 +254,7 @@ const findTargetCustomers = async (campaign, salonId) => {
           count: { $gte: loyaltyBookings },
           totalSpent: { $gte: minSpent }
         }}
-      ]);
+      ]).option({ maxTimeMS: 5000 });
 
       const loyalCustomerIds = loyalCustomers.map(b => b._id);
       query = {
@@ -256,16 +264,24 @@ const findTargetCustomers = async (campaign, salonId) => {
       break;
     }
 
-    default:
+    default: {
+      // Scope to customers who have at least one booking at this salon
+      const defaultBookings = await Booking.aggregate([
+        { $match: { salonId } },
+        { $group: { _id: '$customerId' } }
+      ]).option({ maxTimeMS: 5000 });
+      const defaultCustomerIds = defaultBookings.map(b => b._id);
       query = {
+        _id: { $in: defaultCustomerIds },
         phoneNumber: { $exists: true, $ne: null }
       };
+    }
   }
 
   // Filter out customers who already received this campaign
   const alreadySent = await MarketingRecipient.distinct('customerId', {
     campaignId: campaign._id
-  });
+  }).maxTimeMS(5000);
 
   if (query._id) {
     if (query._id.$in) {
@@ -278,11 +294,12 @@ const findTargetCustomers = async (campaign, salonId) => {
   }
 
   // Apply max recipients limit
-  const maxRecipients = campaign.rules.maxRecipients || 100;
+  const maxRecipients = Math.min(campaign.rules.maxRecipients || 100, 500);
 
   const customers = await User.find(query)
     .limit(maxRecipients)
-    .select('name email phoneNumber');
+    .select('name email phoneNumber')
+    .maxTimeMS(5000);
 
   return customers;
 };
@@ -297,36 +314,66 @@ const sendCampaignMessages = async (campaign, customers, salon) => {
     errors: []
   };
 
-  for (const customer of customers) {
+  const codePrefix = campaign.type.toUpperCase().substring(0, 3);
+  const initialRecipients = customers.map(customer => {
+    const discountCode = `${codePrefix}-${crypto.randomBytes(5).toString('hex').toUpperCase()}`;
+    const trackingLink = crypto.randomBytes(6).toString('hex');
+    return {
+      campaignId: campaign._id,
+      customerId: customer._id,
+      customerName: customer.name,
+      phoneNumber: customer.phoneNumber,
+      discountCode,
+      trackingLink,
+      status: 'pending'
+    };
+  });
+
+  let createdRecipients = [];
+  try {
+    createdRecipients = await MarketingRecipient.insertMany(
+      initialRecipients.map(({ customerName, ...recipient }) => recipient),
+      { ordered: false }
+    );
+  } catch (insertError) {
+    logger.warn('[WARN] MarketingCampaign recipient insert had partial failures:', insertError.message);
+    ErrorLog.logError({
+      type: 'warning',
+      message: `MarketingCampaign: recipient insert partial failure for campaign ${campaign._id}: ${insertError.message}`,
+      source: 'worker',
+      salonId: salon?._id,
+      stackTrace: insertError.stack
+    }).catch(e => logger.error('[MarketingCampaign] ErrorLog write failed:', e.message));
+
+    createdRecipients = await MarketingRecipient.find({
+      campaignId: campaign._id,
+      customerId: { $in: customers.map(customer => customer._id) }
+    }).maxTimeMS(5000);
+  }
+
+  const createdMap = new Map(createdRecipients.map(r => [r.customerId.toString(), r]));
+
+  const sendTasks = customers.map(async customer => {
+    const recipient = createdMap.get(customer._id.toString());
+    if (!recipient) {
+      results.failed++;
+      results.errors.push({
+        customer: customer.name,
+        error: 'Recipient creation failed'
+      });
+      return { recipientId: null, success: false, error: 'Recipient creation failed', customerName: customer.name };
+    }
+
+    const message = renderMessage(campaign.message.template, {
+      customerName: customer.name || 'Kunde',
+      salonName: salon.name,
+      discount: formatDiscount(campaign.message),
+      discountCode: recipient.discountCode,
+      bookingLink: `${process.env.FRONTEND_URL}/track/${recipient.trackingLink}`,
+      validDays: campaign.message.validDays
+    });
+
     try {
-      // Generate discount code
-      const codePrefix = campaign.type.toUpperCase().substring(0, 3);
-      const discountCode = await MarketingRecipient.generateDiscountCode(codePrefix);
-
-      // Generate tracking link
-      const trackingLink = await MarketingRecipient.generateTrackingLink();
-
-      // Create recipient record
-      const recipient = await MarketingRecipient.create({
-        campaignId: campaign._id,
-        customerId: customer._id,
-        phoneNumber: customer.phoneNumber,
-        discountCode,
-        trackingLink,
-        status: 'pending'
-      });
-
-      // Render message with variables
-      const message = renderMessage(campaign.message.template, {
-        customerName: customer.name || 'Kunde',
-        salonName: salon.name,
-        discount: formatDiscount(campaign.message),
-        discountCode,
-        bookingLink: `${process.env.FRONTEND_URL}/track/${trackingLink}`,
-        validDays: campaign.message.validDays
-      });
-
-      // Send SMS
       const smsResult = await sendSMS({
         phoneNumber: customer.phoneNumber,
         message,
@@ -335,19 +382,26 @@ const sendCampaignMessages = async (campaign, customers, salon) => {
       });
 
       if (smsResult.success) {
-        await recipient.markAsSent(smsResult.smsLogId);
         results.sent++;
-      } else {
-        await recipient.markAsFailed(smsResult.error || 'SMS send failed');
-        results.failed++;
-        results.errors.push({
-          customer: customer.name,
-          error: smsResult.error
-        });
+        return {
+          recipientId: recipient._id,
+          success: true,
+          smsLogId: smsResult.smsLogId,
+          customerName: customer.name
+        };
       }
 
-      // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100));
+      results.failed++;
+      results.errors.push({
+        customer: customer.name,
+        error: smsResult.error
+      });
+      return {
+        recipientId: recipient._id,
+        success: false,
+        error: smsResult.error || 'SMS send failed',
+        customerName: customer.name
+      };
     } catch (error) {
       logger.error('[ERROR] Send campaign SMS error:', error);
       results.failed++;
@@ -355,7 +409,38 @@ const sendCampaignMessages = async (campaign, customers, salon) => {
         customer: customer.name,
         error: error.message
       });
+      ErrorLog.logError({
+        type: 'error',
+        message: `MarketingCampaign: send message failed for customer ${customer._id}: ${error.message}`,
+        source: 'worker',
+        salonId: salon?._id,
+        stackTrace: error.stack
+      }).catch(e => logger.error('[MarketingCampaign] ErrorLog write failed:', e.message));
+
+      return {
+        recipientId: recipient._id,
+        success: false,
+        error: error.message,
+        customerName: customer.name
+      };
     }
+  });
+
+  const sendResults = await Promise.all(sendTasks);
+
+  const statusUpdates = sendResults
+    .filter(result => result.recipientId)
+    .map(result => ({
+      updateOne: {
+        filter: { _id: result.recipientId },
+        update: result.success
+          ? { $set: { status: 'sent', sentAt: new Date(), smsLogId: result.smsLogId || null } }
+          : { $set: { status: 'failed', errorMessage: result.error || 'SMS send failed' } }
+      }
+    }));
+
+  if (statusUpdates.length > 0) {
+    await MarketingRecipient.bulkWrite(statusUpdates);
   }
 
   return results;
@@ -378,11 +463,13 @@ const checkTierLimits = async (salonId, tier = 'starter') => {
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
-  const campaignIds = await MarketingCampaign.find({ salonId }).distinct('_id');
+  const campaignIds = await MarketingCampaign.find({ salonId }).distinct('_id').maxTimeMS(5000);
   const smsUsed = await MarketingRecipient.countDocuments({
     campaignId: { $in: campaignIds },
     sentAt: { $gte: startOfMonth }
-  });
+  }).maxTimeMS(5000);
+
+  
 
   return {
     smsLimit: config.smsPerMonth,

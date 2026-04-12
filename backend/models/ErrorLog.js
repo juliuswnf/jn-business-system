@@ -30,7 +30,7 @@ const errorLogSchema = new mongoose.Schema({
   // Source of the error
   source: {
     type: String,
-    enum: ['payment', 'email', 'booking', 'widget', 'auth', 'subscription', 'system', 'other'],
+    enum: ['payment', 'email', 'booking', 'widget', 'auth', 'subscription', 'worker', 'system', 'other'],
     default: 'system'
   },
 

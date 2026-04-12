@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import Booking from '../models/Booking.js';
 import Waitlist from '../models/Waitlist.js';
 import SlotSuggestion from '../models/SlotSuggestion.js';
+import ErrorLog from '../models/ErrorLog.js';
 import { sendWaitlistOffer } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 
@@ -25,7 +26,7 @@ async function processWaitlistMatching() {
   logger.info('[WaitlistMatcher] Starting waitlist matcher worker...');
 
   try {
-    // Find recently cancelled bookings (last 1 hour)
+    // Find recently cancelled bookings (last 1 hour), cap at 500
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const cancelledBookings = await Booking.find({
       status: 'cancelled',
@@ -33,7 +34,9 @@ async function processWaitlistMatching() {
       startTime: { $gte: new Date() } // Only future slots
     })
       .populate('salon', 'businessName phone')
-      .populate('service', 'name duration price');
+      .populate('service', 'name duration price')
+      .limit(500)
+      .maxTimeMS(5000);
 
     logger.info(`[WaitlistMatcher] Found ${cancelledBookings.length} recently cancelled bookings`);
 
@@ -41,28 +44,50 @@ async function processWaitlistMatching() {
     let skipped = 0;
     let errors = 0;
 
+    // Batch-fetch existing slot suggestions to avoid N+1
+    const cancelledBookingIds = cancelledBookings.map(b => b._id);
+    const existingSuggestions = await SlotSuggestion.find({
+      originalBookingId: { $in: cancelledBookingIds },
+      status: { $in: ['pending', 'filled'] }
+    }).select('originalBookingId').lean().maxTimeMS(5000);
+    const alreadySuggestedSet = new Set(
+      existingSuggestions.map(s => s.originalBookingId.toString())
+    );
+
+    // Prefetch waitlist candidates by salon/service pair to avoid query-in-loop
+    const candidateBookings = cancelledBookings.filter(
+      booking => !alreadySuggestedSet.has(booking._id.toString())
+    );
+    const waitlistKeys = [...new Set(candidateBookings.map(
+      booking => `${booking.salon?._id}:${booking.service?._id}`
+    ))];
+    const waitlistEntries = await Promise.all(
+      waitlistKeys.map(async key => {
+        const [salonId, serviceId] = key.split(':');
+        const waitlist = await Waitlist.find({
+          salonId,
+          preferredService: serviceId,
+          status: 'active'
+        })
+          .populate('customerId', 'firstName lastName phone email')
+          .sort({ priorityScore: -1 })
+          .limit(10)
+          .maxTimeMS(5000);
+
+        return { key, waitlist };
+      })
+    );
+    const waitlistMap = new Map(waitlistEntries.map(entry => [entry.key, entry.waitlist]));
+
     for (const booking of cancelledBookings) {
       try {
-        // Check if slot already has a suggestion (avoid duplicates)
-        const existingSuggestion = await SlotSuggestion.findOne({
-          originalBookingId: booking._id,
-          status: { $in: ['pending', 'filled'] }
-        });
-
-        if (existingSuggestion) {
+        if (alreadySuggestedSet.has(booking._id.toString())) {
           skipped++;
           continue;
         }
 
-        // Find waitlist entries for this salon and service
-        const waitlist = await Waitlist.find({
-          salonId: booking.salon._id,
-          preferredService: booking.service._id,
-          status: 'active'
-        })
-          .populate('customerId', 'firstName lastName phone email')
-          .sort({ priorityScore: -1 }) // Highest priority first
-          .limit(10); // Top 10 candidates
+        const waitlistKey = `${booking.salon._id}:${booking.service._id}`;
+        const waitlist = waitlistMap.get(waitlistKey) || [];
 
         if (waitlist.length === 0) {
           logger.info(`[WaitlistMatcher] No waitlist entries for booking ${booking._id}`);
@@ -157,6 +182,13 @@ async function processWaitlistMatching() {
       } catch (error) {
         logger.error(`[WaitlistMatcher] Error processing booking ${booking._id}:`, error);
         errors++;
+        ErrorLog.logError({
+          type: 'error',
+          message: `WaitlistMatcher: failed processing booking ${booking._id}: ${error.message}`,
+          source: 'worker',
+          salonId: booking.salon?._id,
+          stackTrace: error.stack
+        }).catch(e => logger.error('[WaitlistMatcher] ErrorLog write failed:', e.message));
       }
     }
 
@@ -164,6 +196,12 @@ async function processWaitlistMatching() {
 
   } catch (error) {
     logger.error('[WaitlistMatcher] Fatal error:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `WaitlistMatcher worker fatal error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[WaitlistMatcher] ErrorLog write failed:', e.message));
   } finally {
     isRunning = false;
   }

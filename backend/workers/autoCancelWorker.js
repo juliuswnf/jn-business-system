@@ -3,6 +3,7 @@ import BookingConfirmation from '../models/BookingConfirmation.js';
 import Booking from '../models/Booking.js';
 import SlotSuggestion from '../models/SlotSuggestion.js';
 import Waitlist from '../models/Waitlist.js';
+import ErrorLog from '../models/ErrorLog.js';
 import { sendWaitlistOffer } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 
@@ -26,21 +27,48 @@ async function processAutoCancellations() {
   logger.info('[AutoCancel] Starting auto-cancel worker...');
 
   try {
-    // Find confirmations ready for auto-cancel
-    const confirmations = await BookingConfirmation.findReadyForAutoCancel();
+    // Find confirmations ready for auto-cancel (cap at 500 to prevent memory issues)
+    const capped = await BookingConfirmation.findReadyForAutoCancel()
+      .limit(500)
+      .maxTimeMS(5000);
 
-    logger.info(`[AutoCancel] Found ${confirmations.length} bookings to auto-cancel`);
+    logger.info(`[AutoCancel] Found ${capped.length} bookings to auto-cancel`);
 
     let cancelled = 0;
     let waitlistOffered = 0;
     let errors = 0;
 
-    for (const confirmation of confirmations) {
+    // Batch-fetch all bookings in one query to avoid N+1
+    const bookingIds = capped.map(c => c.bookingId);
+    const bookings = await Booking.find({ _id: { $in: bookingIds } })
+      .populate('salon', 'businessName')
+      .populate('service', 'name duration price')
+      .maxTimeMS(5000);
+    const bookingMap = new Map(bookings.map(b => [b._id.toString(), b]));
+
+    // Prefetch waitlists per salon/service key to avoid query-in-loop
+    const waitlistKeys = [...new Set(bookings.map(b => `${b.salon?._id}:${b.service?._id}`))];
+    const waitlistEntries = await Promise.all(
+      waitlistKeys.map(async key => {
+        const [salonId, serviceId] = key.split(':');
+        const waitlist = await Waitlist.find({
+          salonId,
+          preferredService: serviceId,
+          status: 'active'
+        })
+          .populate('customerId', 'firstName lastName phone')
+          .sort({ priorityScore: -1 })
+          .limit(5)
+          .maxTimeMS(5000);
+
+        return { key, waitlist };
+      })
+    );
+    const waitlistMap = new Map(waitlistEntries.map(entry => [entry.key, entry.waitlist]));
+
+    for (const confirmation of capped) {
       try {
-        // Get booking details
-        const booking = await Booking.findById(confirmation.bookingId)
-          .populate('salon', 'businessName')
-          .populate('service', 'name duration price');
+        const booking = bookingMap.get(confirmation.bookingId.toString());
 
         if (!booking) {
           logger.warn(`[AutoCancel] Booking ${confirmation.bookingId} not found`);
@@ -61,15 +89,8 @@ async function processAutoCancellations() {
 
         // Try to fill slot from waitlist
         try {
-          // Find waitlist entries for this salon and service
-          const waitlist = await Waitlist.find({
-            salonId: booking.salon._id,
-            preferredService: booking.service._id,
-            status: 'active'
-          })
-            .populate('customerId', 'firstName lastName phone')
-            .sort({ priorityScore: -1 })
-            .limit(5); // Top 5 candidates
+          const waitlistKey = `${booking.salon._id}:${booking.service._id}`;
+          const waitlist = waitlistMap.get(waitlistKey) || [];
 
           if (waitlist.length > 0) {
             logger.info(`[AutoCancel] Found ${waitlist.length} waitlist candidates for freed slot`);
@@ -114,6 +135,13 @@ async function processAutoCancellations() {
       } catch (error) {
         logger.error(`[AutoCancel] Error processing confirmation ${confirmation._id}:`, error);
         errors++;
+        ErrorLog.logError({
+          type: 'error',
+          message: `AutoCancel: failed to process confirmation ${confirmation._id}: ${error.message}`,
+          source: 'worker',
+          salonId: confirmation?.salonId,
+          stackTrace: error.stack
+        }).catch(e => logger.error('[AutoCancel] ErrorLog write failed:', e.message));
       }
     }
 
@@ -121,6 +149,12 @@ async function processAutoCancellations() {
 
   } catch (error) {
     logger.error('[AutoCancel] Fatal error:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `AutoCancel worker fatal error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[AutoCancel] ErrorLog write failed:', e.message));
   } finally {
     isRunning = false;
   }

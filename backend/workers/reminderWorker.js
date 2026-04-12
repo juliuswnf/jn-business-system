@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import Booking from '../models/Booking.js';
 import BookingConfirmation from '../models/BookingConfirmation.js';
+import ErrorLog from '../models/ErrorLog.js';
 import { sendReminderSMS } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 
@@ -24,7 +25,7 @@ async function processReminders() {
   logger.info('[Reminder] Starting reminder worker...');
 
   try {
-    // Find bookings 24h away (23-25h window to avoid missing)
+    // Find bookings 24h away (23-25h window to avoid missing), cap at 500
     const now = new Date();
     const hours23FromNow = new Date(now.getTime() + 23 * 60 * 60 * 1000);
     const hours25FromNow = new Date(now.getTime() + 25 * 60 * 60 * 1000);
@@ -38,7 +39,9 @@ async function processReminders() {
     })
       .populate('customer', 'firstName lastName phone')
       .populate('salon', 'businessName phone email address')
-      .populate('service', 'name duration price');
+      .populate('service', 'name duration price')
+      .limit(500)
+      .maxTimeMS(5000);
 
     logger.info(`[Reminder] Found ${bookings.length} bookings needing 24h reminder`);
 
@@ -46,13 +49,17 @@ async function processReminders() {
     let skipped = 0;
     let errors = 0;
 
+    // Batch-fetch all relevant confirmations in one query to avoid N+1
+    const bookingIds = bookings.map(b => b._id);
+    const confirmations = await BookingConfirmation.find({
+      bookingId: { $in: bookingIds },
+      status: 'confirmed'
+    }).maxTimeMS(5000);
+    const confirmationMap = new Map(confirmations.map(c => [c.bookingId.toString(), c]));
+
     for (const booking of bookings) {
       try {
-        // Check if booking is confirmed (has confirmation record)
-        const confirmation = await BookingConfirmation.findOne({
-          bookingId: booking._id,
-          status: 'confirmed'
-        });
+        const confirmation = confirmationMap.get(booking._id.toString());
 
         if (!confirmation) {
           logger.warn(`[Reminder] Booking ${booking._id} is not confirmed, skipping reminder`);
@@ -61,8 +68,8 @@ async function processReminders() {
         }
 
         // Check if already sent 24h reminder (avoid duplicates)
+        // 1st reminder = 48h confirmation, 2nd reminder = 24h reminder
         if (confirmation.remindersSent >= 2) {
-          // 1st reminder = 48h confirmation, 2nd reminder = 24h reminder
           logger.info(`[Reminder] Already sent 24h reminder for booking ${booking._id}`);
           skipped++;
           continue;
@@ -88,6 +95,13 @@ async function processReminders() {
       } catch (error) {
         logger.error(`[Reminder] Error processing booking ${booking._id}:`, error);
         errors++;
+        ErrorLog.logError({
+          type: 'error',
+          message: `Reminder: failed processing booking ${booking._id}: ${error.message}`,
+          source: 'worker',
+          salonId: booking.salon?._id,
+          stackTrace: error.stack
+        }).catch(e => logger.error('[Reminder] ErrorLog write failed:', e.message));
       }
     }
 
@@ -95,6 +109,12 @@ async function processReminders() {
 
   } catch (error) {
     logger.error('[Reminder] Fatal error:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `Reminder worker fatal error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[Reminder] ErrorLog write failed:', e.message));
   } finally {
     isRunning = false;
   }

@@ -9,6 +9,7 @@ import EmailQueue from '../models/EmailQueue.js';
 import EmailLog from '../models/EmailLog.js';
 import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';
+import ErrorLog from '../models/ErrorLog.js';
 import emailService from '../services/emailService.js';
 import emailTemplateService from '../services/emailTemplateService.js';
 import alertingService from '../services/alertingService.js';
@@ -86,7 +87,9 @@ const processEmailQueue = async () => {
         { nextRetryAt: null }
       ],
       attempts: { $lt: 3 }
-    }).limit(50); // Process in batches
+    })
+      .limit(50)
+      .maxTimeMS(5000); // Process in batches
 
     if (pendingEmails.length === 0) {
       return;
@@ -94,13 +97,46 @@ const processEmailQueue = async () => {
 
     logger.log(`?? Processing ${pendingEmails.length} pending emails...`);
 
-    for (const queueItem of pendingEmails) {
-      await processEmailQueueItem(queueItem);
-    }
+    // Batch-fetch booking/salon references to avoid N+1 reads per queue item
+    const bookingRefs = pendingEmails
+      .map(item => item.booking || item.bookingId)
+      .filter(Boolean);
+
+    const bookings = bookingRefs.length > 0
+      ? await Booking.find({ _id: { $in: bookingRefs } })
+        .populate('salonId')
+        .populate('serviceId')
+        .maxTimeMS(5000)
+      : [];
+
+    const bookingMap = new Map(bookings.map(booking => [booking._id.toString(), booking]));
+
+    const directSalonRefs = pendingEmails
+      .map(item => item.salon || item.salonId)
+      .filter(Boolean);
+    const salonRefsFromBookings = bookings
+      .map(booking => booking.salonId?._id || booking.salonId)
+      .filter(Boolean);
+    const salonRefs = [...new Set([...directSalonRefs, ...salonRefsFromBookings].map(id => id.toString()))];
+
+    const salons = salonRefs.length > 0
+      ? await Salon.find({ _id: { $in: salonRefs } }).maxTimeMS(5000)
+      : [];
+    const salonMap = new Map(salons.map(salon => [salon._id.toString(), salon]));
+
+    await Promise.allSettled(
+      pendingEmails.map(queueItem => processEmailQueueItem(queueItem, bookingMap, salonMap))
+    );
 
     logger.log(`? Finished processing email queue - ${pendingEmails.length} emails processed`);
   } catch (error) {
     logger.error('? Error processing email queue:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `EmailQueue worker error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[EmailQueue] ErrorLog write failed:', e.message));
   }
 };
 
@@ -108,7 +144,7 @@ const processEmailQueue = async () => {
  * Process a single email queue item
  * @param {Object} queueItem - EmailQueue document
  */
-const processEmailQueueItem = async (queueItem) => {
+const processEmailQueueItem = async (queueItem, bookingMap = new Map(), salonMap = new Map()) => {
   // Declare outside try so catch block can access them
   let bookingRef;
   let salonRef;
@@ -141,9 +177,7 @@ const processEmailQueueItem = async (queueItem) => {
     }
 
     // Get booking with related data
-    const booking = await Booking.findById(bookingRef)
-      .populate('salonId')
-      .populate('serviceId');
+    const booking = bookingMap.get(String(bookingRef));
     if (!booking) {
       logger.warn(`??  Booking not found: ${bookingRef}`);
       queueItem.status = 'failed';
@@ -156,7 +190,8 @@ const processEmailQueueItem = async (queueItem) => {
       return;
     }
     // Get salon
-    const salon = await Salon.findById(booking.salonId || salonRef);
+    const bookingSalonId = booking.salonId?._id || booking.salonId;
+    const salon = salonMap.get(String(bookingSalonId || salonRef));
     if (!salon) {
       logger.warn('??  Salon not found');
       queueItem.status = 'failed';
@@ -222,6 +257,14 @@ const processEmailQueueItem = async (queueItem) => {
   } catch (error) {
     logger.error(`? Failed to send email ${queueItem._id}:`, error.message);
     logger.error(`   Error stack: ${error.stack}`);
+
+    ErrorLog.logError({
+      type: 'error',
+      message: `EmailQueue: failed to process queue item ${queueItem._id}: ${error.message}`,
+      source: 'worker',
+      salonId: salonRef || null,
+      stackTrace: error.stack
+    }).catch(e => logger.error('[EmailQueue] ErrorLog write failed:', e.message));
 
     // ? SECURITY FIX: Determine if error is transient or permanent
     const isTransient = isTransientError(error);
@@ -373,7 +416,7 @@ const cancelScheduledEmails = async (bookingId) => {
         status: 'cancelled',
         error: 'Booking was cancelled'
       }
-    );
+    ).maxTimeMS(5000);
     logger.log(`?? Cancelled ${result.modifiedCount} pending emails for booking ${bookingId}`);
     return result;
   } catch (error) {
@@ -393,7 +436,7 @@ const cleanupOldEmails = async () => {
     const result = await EmailQueue.deleteMany({
       status: { $in: ['sent', 'failed', 'cancelled'] },
       updatedAt: { $lt: thirtyDaysAgo }
-    });
+    }).maxTimeMS(5000);
     if (result.deletedCount > 0) {
       logger.log(`🧹 Cleaned up ${result.deletedCount} old email queue items`);
     }
@@ -403,7 +446,7 @@ const cleanupOldEmails = async () => {
     const expiredResult = await EmailQueue.updateMany(
       { status: 'pending', scheduledFor: { $lt: twoHoursAgo } },
       { $set: { status: 'failed', error: 'Auto-expired: pending >2h past scheduled time' } }
-    );
+    ).maxTimeMS(5000);
     if (expiredResult.modifiedCount > 0) {
       logger.log(`⏰ Auto-expired ${expiredResult.modifiedCount} stuck pending emails`);
     }

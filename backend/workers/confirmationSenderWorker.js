@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import Booking from '../models/Booking.js';
 import BookingConfirmation from '../models/BookingConfirmation.js';
+import ErrorLog from '../models/ErrorLog.js';
 import { sendBookingConfirmation } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 
@@ -24,7 +25,7 @@ async function processConfirmations() {
   logger.info('[ConfirmationSender] Starting confirmation sender worker...');
 
   try {
-    // Find bookings 48-72h away (optimal time to send confirmation)
+    // Find bookings 48-72h away (optimal time to send confirmation), cap at 500
     const now = new Date();
     const hours48FromNow = new Date(now.getTime() + 48 * 60 * 60 * 1000);
     const hours72FromNow = new Date(now.getTime() + 72 * 60 * 60 * 1000);
@@ -38,7 +39,9 @@ async function processConfirmations() {
     })
       .populate('customer', 'firstName lastName phone')
       .populate('salon', 'businessName phone email')
-      .populate('service', 'name duration price');
+      .populate('service', 'name duration price')
+      .limit(500)
+      .maxTimeMS(5000);
 
     logger.info(`[ConfirmationSender] Found ${bookings.length} bookings needing confirmation`);
 
@@ -46,14 +49,18 @@ async function processConfirmations() {
     let skipped = 0;
     let errors = 0;
 
+    // Batch-fetch existing confirmations to avoid N+1
+    const candidateBookingIds = bookings.map(b => b._id);
+    const existingConfirmations = await BookingConfirmation.find({
+      bookingId: { $in: candidateBookingIds }
+    }).select('bookingId').lean().maxTimeMS(5000);
+    const confirmedBookingIdSet = new Set(
+      existingConfirmations.map(c => c.bookingId.toString())
+    );
+
     for (const booking of bookings) {
       try {
-        // Check if confirmation already exists
-        const existingConfirmation = await BookingConfirmation.findOne({
-          bookingId: booking._id
-        });
-
-        if (existingConfirmation) {
+        if (confirmedBookingIdSet.has(booking._id.toString())) {
           skipped++;
           continue;
         }
@@ -81,13 +88,19 @@ async function processConfirmations() {
           created++;
         } catch (smsError) {
           logger.error(`[ConfirmationSender] ❌ Failed to send SMS for booking ${booking._id}:`, smsError.message);
-          // Keep confirmation but mark as failed SMS attempt
           errors++;
         }
 
       } catch (error) {
         logger.error(`[ConfirmationSender] Error processing booking ${booking._id}:`, error);
         errors++;
+        ErrorLog.logError({
+          type: 'error',
+          message: `ConfirmationSender: failed processing booking ${booking._id}: ${error.message}`,
+          source: 'worker',
+          salonId: booking.salon?._id,
+          stackTrace: error.stack
+        }).catch(e => logger.error('[ConfirmationSender] ErrorLog write failed:', e.message));
       }
     }
 
@@ -95,6 +108,12 @@ async function processConfirmations() {
 
   } catch (error) {
     logger.error('[ConfirmationSender] Fatal error:', error);
+    ErrorLog.logError({
+      type: 'critical',
+      message: `ConfirmationSender worker fatal error: ${error.message}`,
+      source: 'worker',
+      stackTrace: error.stack
+    }).catch(e => logger.error('[ConfirmationSender] ErrorLog write failed:', e.message));
   } finally {
     isRunning = false;
   }

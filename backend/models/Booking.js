@@ -372,6 +372,12 @@ const bookingSchema = new mongoose.Schema(
       }
     },
 
+    noShowChargeFailed: {
+      type: Boolean,
+      default: false,
+      comment: 'True when no-show charge attempt failed and should not be retried automatically'
+    },
+
     // ==================== NO-SHOW-KILLER: Legal Compliance ====================
     noShowFeeAcceptance: {
       accepted: {
