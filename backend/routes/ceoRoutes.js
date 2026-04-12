@@ -122,16 +122,16 @@ router.get('/system/status', ceoMiddleware.verifyCEOAuth, systemController.getAl
 router.get('/system/status/:serviceId', ceoMiddleware.verifyCEOAuth, systemController.getServiceStatus);
 
 // Start a specific service
-router.post('/system/start/:serviceId', ceoMiddleware.verifyCEOAuth, systemController.startService);
+router.post('/system/start/:serviceId', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.startService);
 
 // Stop a specific service
-router.post('/system/stop/:serviceId', ceoMiddleware.verifyCEOAuth, systemController.stopService);
+router.post('/system/stop/:serviceId', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.stopService);
 
 // Start all services
-router.post('/system/start-all', ceoMiddleware.verifyCEOAuth, systemController.startAllServices);
+router.post('/system/start-all', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.startAllServices);
 
 // Stop all services
-router.post('/system/stop-all', ceoMiddleware.verifyCEOAuth, systemController.stopAllServices);
+router.post('/system/stop-all', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.stopAllServices);
 
 // ==================== ANALYTICS ROUTES ====================
 router.get('/analytics/overview', ceoMiddleware.verifyCEOAuth, ceoAnalyticsController.getAnalyticsOverview);
