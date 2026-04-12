@@ -176,6 +176,16 @@ const userSchema = new mongoose.Schema(
       type: Date
     },
 
+    // ==================== Employee Invite ====================
+    inviteToken: {
+      type: String,
+      select: false
+    },
+    inviteTokenExpiry: {
+      type: Date,
+      select: false
+    },
+
     // ==================== Employee Specific ====================
     // Only for role: 'employee'
     availability: [

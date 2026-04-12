@@ -24,7 +24,7 @@ const TwoFAVerify = () => {
               to="/login"
               className="inline-block px-8 py-3 rounded-xl bg-gray-900 hover:bg-gray-900 text-white font-semibold transition"
             >
-              Back to Login
+              Zurück zum Login
             </Link>
           </div>
         </div>
@@ -49,7 +49,7 @@ const TwoFAVerify = () => {
         // Tokens are automatically sent by browser with withCredentials: true
         // No need to store in localStorage
         
-        showNotification('2FA verified successfully!', 'success');
+        showNotification('2FA erfolgreich bestätigt!', 'success');
         setTimeout(() => {
           navigate(`/${user.role}/dashboard`);
         }, 1000);
@@ -66,15 +66,15 @@ const TwoFAVerify = () => {
       <div className="w-full max-w-md">
           <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-8">
           <div className="text-5xl text-center mb-4"></div>
-          <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-2 text-center">Two-Factor Authentication</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-2 text-center">Zwei-Faktor-Authentifizierung</h1>
           <p className="text-gray-500 text-center mb-8">
-            Enter the code from your authenticator app
+            Gib den Code aus deiner Authenticator-App ein
           </p>
           
           <form onSubmit={handleVerify} className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
-                {useBackupCode ? 'Backup Code' : 'Authentication Code'}
+                {useBackupCode ? 'Backup-Code' : 'Authentifizierungscode'}
               </label>
               <input
                 type="text"
@@ -93,7 +93,7 @@ const TwoFAVerify = () => {
               disabled={loading}
               className="w-full py-3 rounded-xl bg-gray-900 hover:bg-gray-900 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {loading ? '⏳ Verifying...' : '✓ Verify'}
+              {loading ? '⏳ Wird geprüft...' : '✓ Bestätigen'}
             </button>
           </form>
 
@@ -105,11 +105,11 @@ const TwoFAVerify = () => {
               }}
               className="text-gray-500 hover:text-gray-700 font-medium transition w-full"
             >
-              {useBackupCode ? 'Use authenticator code' : 'Use backup code'}
+              {useBackupCode ? 'Authenticator-Code verwenden' : 'Backup-Code verwenden'}
             </button>
             <div>
               <Link to="/login" className="text-gray-500 hover:text-gray-700 font-medium transition">
-                Back to Login
+                Zurück zum Login
               </Link>
             </div>
           </div>

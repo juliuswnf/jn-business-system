@@ -335,13 +335,13 @@ app.use('/api/v1/system', systemRoutes); // ? MEDIUM FIX #13 & #14: Health & Bac
 app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: public + protected)
 
 // Protected Routes (Auth Required)
-app.use('/api/v1/salon', authMiddleware.protect, salonRoutes);
-app.use('/api/v1/salons', authMiddleware.protect, salonRoutes); // Plural alias
-app.use('/api/v1/bookings', authMiddleware.protect, bookingRoutes);
-app.use('/api/v1/appointments', authMiddleware.protect, appointmentsRoutes);
-app.use('/api/v1/payments', authMiddleware.protect, paymentRoutes);
-app.use('/api/v1/services', authMiddleware.protect, serviceRoutes);
-app.use('/api/v1/employees', authMiddleware.protect, employeeRoutes);
+app.use('/api/v1/salon', authMiddleware.protect, authMiddleware.requireActiveSubscription, salonRoutes);
+app.use('/api/v1/salons', authMiddleware.protect, authMiddleware.requireActiveSubscription, salonRoutes); // Plural alias
+app.use('/api/v1/bookings', authMiddleware.protect, authMiddleware.requireActiveSubscription, bookingRoutes);
+app.use('/api/v1/appointments', authMiddleware.protect, authMiddleware.requireActiveSubscription, appointmentsRoutes);
+app.use('/api/v1/payments', authMiddleware.protect, authMiddleware.requireActiveSubscription, paymentRoutes);
+app.use('/api/v1/services', authMiddleware.protect, authMiddleware.requireActiveSubscription, serviceRoutes);
+app.use('/api/v1/employees', authMiddleware.protect, employeeRoutes); // protect is inside employeeRoutes; /setup-password is public
 app.use('/api/v1/ceo', ceoRoutes); // Auth middleware is already in ceoRoutes
 app.use('/api/v1/gdpr', gdprRoutes); // GDPR Compliance (Protected)
 app.use('/api/v1/compliance', authMiddleware.protect, complianceRoutes); // Compliance & HIPAA routes

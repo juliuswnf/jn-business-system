@@ -78,26 +78,26 @@ export const sanitizePagination = (page, limit, maxLimit = 100) => {
  */
 export const validatePassword = (password) => {
   if (typeof password !== 'string') {
-    return { valid: false, message: 'Password must be a string' };
+    return { valid: false, message: 'Passwort muss ein Text sein' };
   }
 
   if (password.length < 8) {
-    return { valid: false, message: 'Password must be at least 8 characters long' };
+    return { valid: false, message: 'Das Passwort muss mindestens 8 Zeichen lang sein' };
   }
 
   if (!/[a-z]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+    return { valid: false, message: 'Das Passwort muss mindestens einen Kleinbuchstaben enthalten' };
   }
 
   if (!/[A-Z]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+    return { valid: false, message: 'Das Passwort muss mindestens einen Großbuchstaben enthalten' };
   }
 
   if (!/[0-9]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one number' };
+    return { valid: false, message: 'Das Passwort muss mindestens eine Zahl enthalten' };
   }
 
-  return { valid: true, message: 'Password is valid' };
+  return { valid: true, message: 'Passwort ist gültig' };
 };
 
 /**

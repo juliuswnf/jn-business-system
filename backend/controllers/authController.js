@@ -116,7 +116,7 @@ export const register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'Email already in use'
+        message: 'Diese E-Mail-Adresse wird bereits verwendet'
       });
     }
 
@@ -181,9 +181,8 @@ export const register = async (req, res) => {
         },
         isActive: true,
         subscription: {
-          status: 'trial',
-          tier: plan || 'starter',
-          trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 days trial
+          status: 'trial_pending',
+          tier: plan || 'starter'
         }
       });
 
@@ -881,7 +880,7 @@ export const changePassword = async (req, res) => {
     if (!passwordMatch) {
       return res.status(400).json({
         success: false,
-        message: 'Passwords do not match'
+        message: 'Passwörter stimmen nicht überein'
       });
     }
 
@@ -889,7 +888,7 @@ export const changePassword = async (req, res) => {
     if (newPassword.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 8 characters'
+        message: 'Das Passwort muss mindestens 8 Zeichen lang sein'
       });
     }
 
@@ -1309,7 +1308,7 @@ export const resetPassword = async (req, res) => {
     if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 8 characters'
+        message: 'Das Passwort muss mindestens 8 Zeichen lang sein'
       });
     }
 

@@ -276,11 +276,7 @@ export default function Pricing() {
 
               <Link
                 to={`/register?plan=${plan.id}${yearly ? '&billing=yearly' : ''}`}
-                className={`block w-full py-4 rounded-xl text-center font-semibold transition mb-8 ${
-                  plan.popular
-                    ? 'bg-white text-black hover:bg-gray-100'
-                    : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
-                }`}
+                className="block w-full py-4 rounded-xl text-center font-semibold transition mb-8 bg-gray-900 text-white hover:bg-gray-800"
               >
                 {plan.id === 'enterprise' ? 'Enterprise testen' : 'Jetzt starten'}
               </Link>

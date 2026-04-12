@@ -26,7 +26,7 @@ export default function Appointments() {
       const response = await bookingAPI.getByDateRange({ startDate: selectedDate, limit: 50 });
       setAppointments(response.data.bookings || response.data.data || []);
     } catch (error) {
-      showNotification('Error loading appointments', 'error');
+      showNotification('Fehler beim Laden der Termine', 'error');
     } finally {
       setLoading(false);
     }

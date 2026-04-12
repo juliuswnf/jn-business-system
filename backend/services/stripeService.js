@@ -311,7 +311,19 @@ export const handleFailedPayment = async (invoice) => {
 
     logger.log(`⚠️ Updated subscription after failed payment for salon ${salon.slug}`);
 
-    // TODO: Send email notification to salon owner
+    // Send payment failure notification to salon owner
+    try {
+      const { sendEmail } = await import('./emailService.js');
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      await sendEmail({
+        to: salon.email,
+        subject: 'Zahlungsproblem – Bitte Zahlungsmethode aktualisieren',
+        body: `Hallo,\n\nLeider konnte die Zahlung für Ihr JN Business Abonnement ("${salon.name}") nicht verarbeitet werden.\n\nBitte aktualisieren Sie Ihre Zahlungsmethode, um eine Unterbrechung Ihres Dienstes zu vermeiden:\n\n${frontendUrl}/dashboard/settings\n\nBei Fragen stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
+        type: 'payment_failed'
+      });
+    } catch (emailError) {
+      logger.error('❌ Failed to send payment failure email:', emailError.message);
+    }
   } catch (error) {
     logger.error('Error handling failed payment:', error);
     throw error;
@@ -326,7 +338,7 @@ export const handleFailedPayment = async (invoice) => {
  * @param {String} cancelUrl - Cancel redirect URL
  * @returns {Object} - Checkout session
  */
-export const createCheckoutSession = async (salon, priceId, successUrl, cancelUrl) => {
+export const createCheckoutSession = async (salon, priceId, successUrl, cancelUrl, planId = null) => {
   try {
     let customerId = salon.subscription?.stripeCustomerId;
 
@@ -357,17 +369,20 @@ export const createCheckoutSession = async (salon, priceId, successUrl, cancelUr
         }
       ],
       subscription_data: {
-        trial_period_days: 30,
+        // No trial_period_days here — users already have a 14-day local trial at registration.
+        // Adding a Stripe trial would delay the first charge by 30 extra days.
         metadata: {
           salonId: salon._id.toString(),
-          salonSlug: salon.slug
+          salonSlug: salon.slug,
+          ...(planId && { plan: planId })
         }
       },
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
         salonId: salon._id.toString(),
-        salonSlug: salon.slug
+        salonSlug: salon.slug,
+        ...(planId && { plan: planId })
       },
       // German locale for SEPA
       locale: 'de'

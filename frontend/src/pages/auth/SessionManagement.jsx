@@ -31,7 +31,7 @@ const SessionManagement = () => {
     try {
       const response = await authAPI.revokeSession(sessionId);
       if (response.data.success) {
-        showNotification('Session revoked', 'success');
+        showNotification('Sitzung beendet', 'success');
         setSessions(sessions.filter(s => s.id !== sessionId));
       }
     } catch (error) {

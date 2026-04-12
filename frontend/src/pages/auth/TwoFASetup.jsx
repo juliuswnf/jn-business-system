@@ -42,7 +42,7 @@ const TwoFASetup = () => {
     e.preventDefault();
 
     if (verificationCode.length < 6) {
-      showNotification('Verification code must be 6 digits', 'error');
+      showNotification('Der Bestätigungscode muss 6 Stellen haben', 'error');
       return;
     }
 
@@ -51,7 +51,7 @@ const TwoFASetup = () => {
     try {
       const response = await authAPI.verify2FACode(verificationCode);
       if (response.data.success) {
-        showNotification('Two-factor authentication enabled!', 'success');
+        showNotification('Zwei-Faktor-Authentifizierung aktiviert!', 'success');
         setStep('backup');
       }
     } catch (error) {
@@ -67,7 +67,7 @@ const TwoFASetup = () => {
         <div className="w-full max-w-md">
           <div className="rounded-xl bg-gray-50 border border-gray-200 p-6 md:p-8 text-center">
             <div className="w-12 h-12 border-4 border-gray-200 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500">Setting up 2FA...</p>
+            <p className="text-gray-500">2FA wird eingerichtet...</p>
           </div>
         </div>
       </div>
@@ -146,18 +146,18 @@ const TwoFASetup = () => {
             onClick={() => {
               const text = backupCodes.join('\n');
               navigator.clipboard.writeText(text);
-              showNotification('Backup codes copied to clipboard!', 'success');
+              showNotification('Backup-Codes kopiert!', 'success');
             }}
             className="w-full py-3 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-900 font-semibold border border-gray-200 transition duration-300 mb-4"
           >
-            📋 Copy Codes
+            📋 Codes kopieren
           </button>
 
           <button
             onClick={() => navigate('/login')}
             className="w-full py-3 rounded-xl bg-gray-900 hover:bg-gray-900 text-white font-semibold transition duration-300 shadow-sm shadow-gray-100"
           >
-            ✓ Done
+            ✓ Fertig
           </button>
 
           <p className="text-xs text-slate-400 text-center mt-6">

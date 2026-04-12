@@ -58,6 +58,15 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Handle subscription required (paywall)
+    if (error.response?.status === 403 && error.response?.data?.code === 'SUBSCRIPTION_REQUIRED') {
+      const blocked = ['/pending-payment', '/pricing', '/checkout'];
+      if (!blocked.some((p) => window.location.pathname.startsWith(p))) {
+        window.location.href = '/pending-payment';
+      }
+      return Promise.reject(error);
+    }
+
     // Skip redirect for login/register endpoints - let the component handle the error
     const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
                            originalRequest?.url?.includes('/auth/register') ||

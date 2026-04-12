@@ -167,7 +167,7 @@ const Navbar = () => {
                   Anmelden
                 </Link>
                 <Link
-                  to="/pricing"
+                  to="/register"
                   className="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
                 >
                   Starten

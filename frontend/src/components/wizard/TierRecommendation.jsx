@@ -171,7 +171,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
           whileTap={{ scale: 0.98 }}
           onClick={() => handleSelectTier(recommendation.recommendedTier)}
           disabled={loading}
-          className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-gray-900 font-bold rounded-xl shadow-sm hover:shadow-sm transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-4 bg-gray-900 text-white font-bold rounded-xl shadow-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Wird geladen...' : `${recommendation.tierDetails.name.toUpperCase()} WÄHLEN`}
         </motion.button>
@@ -198,7 +198,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
                   className="relative p-6 rounded-xl border-2 border-green-500 bg-green-50"
                 >
                   <div className="absolute top-2 right-2">
-                    <span className="text-xs font-semibold bg-green-600 text-gray-900 px-2 py-1 rounded">
+                    <span className="text-xs font-semibold bg-green-600 text-white px-2 py-1 rounded">
                       EMPFOHLEN
                     </span>
                   </div>
@@ -269,7 +269,7 @@ const TierRecommendation = ({ recommendation, onSelectTier, loading }) => {
       <div className="text-center">
         <a
           href="/pricing"
-          className="text-gray-700 hover:text-gray-700 font-semibold text-sm"
+          className="text-gray-700 hover:text-gray-900 font-semibold text-sm"
         >
           Alle Features im Detail vergleichen →
         </a>

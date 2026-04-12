@@ -143,11 +143,11 @@ const PricingWizard = () => {
         })
       });
 
-      // Navigate to pricing page with selected tier
-      navigate(`/pricing?tier=${tier}&from=wizard`);
+      // Navigate directly to checkout with selected tier
+      navigate(`/checkout/${tier}`);
     } catch (error) {
       // Still navigate even if save fails
-      navigate(`/pricing?tier=${tier}&from=wizard`);
+      navigate(`/checkout/${tier}`);
     } finally {
       setLoading(false);
     }
@@ -155,9 +155,7 @@ const PricingWizard = () => {
 
   // Handle skip wizard
   const handleSkip = () => {
-    if (window.confirm('Möchtest du den Wizard wirklich überspringen?')) {
-      navigate('/pricing');
-    }
+    navigate('/pricing');
   };
 
   // Check if current step can proceed

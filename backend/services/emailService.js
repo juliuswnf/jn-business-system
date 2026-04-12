@@ -507,7 +507,7 @@ export const sendWelcomeEmail = async (user, _salon) => {
     </p>
 
     <p style="color: #4b5563; margin: 0 0 30px 0;">
-      Herzlichen Glückwunsch! Dein Account ist aktiviert und du hast <strong>30 Tage kostenlos</strong> alle Features zur Verfügung.
+      Herzlichen Glückwunsch! Dein Account ist aktiviert und du hast <strong>14 Tage kostenlos</strong> alle Features zur Verfügung.
       Lass uns gemeinsam dein Studio einrichten.
     </p>
 
@@ -593,7 +593,7 @@ export const sendWelcomeEmail = async (user, _salon) => {
     <!-- Trial Reminder -->
     <div style="border: 2px dashed #e5e7eb; border-radius: 12px; padding: 20px; text-align: center;">
       <p style="color: #6b7280; margin: 0; font-size: 14px;">
-        <strong style="color: #1f2937;">Deine Testphase:</strong> 30 Tage kostenlos<br>
+        <strong style="color: #1f2937;">Deine Testphase:</strong> 14 Tage kostenlos<br>
         Keine Kreditkarte erforderlich • Jederzeit kündbar
       </p>
     </div>

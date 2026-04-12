@@ -23,22 +23,22 @@ export default function Services() {
       const response = await serviceAPI.getAll();
       setServices(response.data.services || response.data.data || []);
     } catch (error) {
-      showNotification('Error loading services', 'error');
+      showNotification('Fehler beim Laden der Leistungen', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (serviceId) => {
-    if (!window.confirm('Are you sure you want to delete this service?')) return;
+    if (!window.confirm('Leistung wirklich löschen?')) return;
     
     try {
       setDeleting(serviceId);
       await serviceAPI.delete(serviceId);
-      showNotification('Service deleted successfully', 'success');
+      showNotification('Leistung erfolgreich gelöscht', 'success');
       setServices(services.filter(s => s._id !== serviceId));
     } catch (error) {
-      showNotification('Error deleting service', 'error');
+      showNotification('Fehler beim Löschen der Leistung', 'error');
     } finally {
       setDeleting(null);
     }

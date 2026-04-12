@@ -31,6 +31,9 @@ const SessionManagement = lazy(() => import('./pages/auth/SessionManagement'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Demo = lazy(() => import('./pages/Demo'));
 const Checkout = lazy(() => import('./pages/Checkout'));
+const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'));
+const PendingPayment = lazy(() => import('./pages/PendingPayment'));
+const EmployeeSetup = lazy(() => import('./pages/auth/EmployeeSetup'));
 const SubscriptionManagement = lazy(() => import('./pages/SubscriptionManagement'));
 const Impressum = lazy(() => import('./pages/legal/Impressum'));
 const Datenschutz = lazy(() => import('./pages/legal/Datenschutz'));
@@ -264,6 +267,9 @@ function App() {
         <Route path="/" element={<AppLayout><Home /></AppLayout>} />
         <Route path="/demo" element={<AppLayout><LazyPage><Demo /></LazyPage></AppLayout>} />
         <Route path="/pricing" element={<AppLayout><LazyPage><Pricing /></LazyPage></AppLayout>} />
+        <Route path="/checkout/success" element={<AppLayout><LazyPage><CheckoutSuccess /></LazyPage></AppLayout>} />
+        <Route path="/pending-payment" element={<AppLayout><LazyPage><PendingPayment /></LazyPage></AppLayout>} />
+        <Route path="/auth/employee-setup" element={<AppLayout><LazyPage><EmployeeSetup /></LazyPage></AppLayout>} />
         <Route path="/checkout/:planId" element={<AppLayout><LazyPage><Checkout /></LazyPage></AppLayout>} />
         <Route path="/login" element={<AppLayout><LoginSelection /></AppLayout>} />
         <Route path="/login/customer" element={<AppLayout><CustomerLogin /></AppLayout>} />

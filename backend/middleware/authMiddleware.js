@@ -324,11 +324,65 @@ const rateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
   };
 };
 
+// ==================== REQUIRE ACTIVE SUBSCRIPTION ====================
+
+const requireActiveSubscription = async (req, res, next) => {
+  // CEO always bypasses subscription check
+  if (req.user?.role === 'ceo') return next();
+
+  const salonId = req.user?.salonId;
+  if (!salonId) {
+    return res.status(403).json({
+      success: false,
+      code: 'SUBSCRIPTION_REQUIRED',
+      message: 'Kein Salon verknüpft. Bitte wähle einen Plan.'
+    });
+  }
+
+  try {
+    const Salon = (await import('../models/Salon.js')).default;
+    const salon = await Salon.findById(salonId).select('subscription').lean().maxTimeMS(3000);
+
+    if (!salon) {
+      return res.status(403).json({
+        success: false,
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: 'Salon nicht gefunden'
+      });
+    }
+
+    const { status, trialEndsAt } = salon.subscription || {};
+
+    // Active paid subscription
+    if (status === 'active') return next();
+
+    // Active trial (not yet expired)
+    if (status === 'trial' && trialEndsAt && new Date(trialEndsAt) > new Date()) return next();
+
+    // All other states (trial_pending, canceled, past_due, inactive, expired trial) → block
+    return res.status(403).json({
+      success: false,
+      code: 'SUBSCRIPTION_REQUIRED',
+      subscriptionStatus: status,
+      message: 'Aktives Abonnement erforderlich. Bitte wähle einen Plan.'
+    });
+  } catch (error) {
+    logger.error('requireActiveSubscription error:', error.message);
+    return next(error);
+  }
+};
+
+// ==================== REQUIRE ROLE (alias for authorize) ====================
+
+const requireRole = (...roles) => authorize(...roles);
+
 // ==================== EXPORT ====================
 
 export default {
   protect,
   authorize,
+  requireRole,
+  requireActiveSubscription,
   isAdmin,
   isCEO,
   checkCompanyAccess,

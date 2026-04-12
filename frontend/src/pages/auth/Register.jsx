@@ -120,8 +120,8 @@ export default function Register() {
 
         success('Registrierung erfolgreich! Weiterleitung...');
         
-        // Navigate immediately - no timeout needed since token is already set
-        navigate('/dashboard', { replace: true });
+        // Navigate to pending-payment so the new owner selects a plan
+        navigate('/pending-payment', { replace: true });
       }
     } catch (error) {
       const errorMsg = formatError(error);
@@ -141,25 +141,6 @@ export default function Register() {
           <p className="text-gray-500 text-lg">
             Fast geschafft! Erstelle dein {planInfo.planName}-Konto
           </p>
-        </div>
-
-        {/* Plan Info Banner */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">{planInfo.planName} Plan</p>
-              <p className="text-sm text-gray-500">30 Tage kostenlos testen</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-xl font-bold text-gray-900">€{planInfo.price}/Monat</p>
-            <p className="text-xs text-gray-400">nach Testphase</p>
-          </div>
         </div>
 
         {/* Form Container */}

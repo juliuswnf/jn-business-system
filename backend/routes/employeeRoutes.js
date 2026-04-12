@@ -1,11 +1,20 @@
 ﻿import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
-import employeeController from '../controllers/employeeController.js';
+import * as employeeController from '../controllers/employeeController.js';
 
 const router = express.Router();
 
-// All routes require authentication
+// ==================== PUBLIC ROUTES (no auth required) ====================
+// Must be declared BEFORE router.use(protect) to skip authentication
+
+// Employee activates account via invite link
+router.post('/setup-password', employeeController.setupEmployeePassword);
+
+// ==================== PROTECTED ROUTES (auth required) ====================
 router.use(authMiddleware.protect);
+
+// Invite a new employee (salon_owner only)
+router.post('/invite', authMiddleware.requireRole('salon_owner'), employeeController.inviteEmployee);
 
 // Get all employees
 router.get('/', employeeController.getAllEmployees);

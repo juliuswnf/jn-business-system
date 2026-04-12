@@ -29,12 +29,12 @@ const ChangePassword = () => {
     e.preventDefault();
 
     if (formData.newPassword.length < 8) {
-      showNotification('New password must be at least 8 characters', 'error');
+      showNotification('Das neue Passwort muss mindestens 8 Zeichen lang sein', 'error');
       return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      showNotification('Passwords do not match', 'error');
+      showNotification('Passwörter stimmen nicht überein', 'error');
       return;
     }
 
@@ -47,7 +47,7 @@ const ChangePassword = () => {
       });
 
       if (response.data.success) {
-        showNotification('Password changed successfully!', 'success');
+        showNotification('Passwort erfolgreich geändert!', 'success');
         setFormData({
           currentPassword: '',
           newPassword: '',
@@ -65,26 +65,26 @@ const ChangePassword = () => {
     <div className="min-h-screen bg-white text-gray-900 px-4 py-8">
       <div className="max-w-md mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-xl font-semibold tracking-tight">Change Password</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Passwort ändern</h1>
           <Link
             to="/customer/settings"
             className="px-4 py-2 text-gray-500 hover:text-gray-900 font-medium transition"
           >
-            ← Back
+            ← Zurück
           </Link>
         </div>
 
         <div className="rounded-xl bg-gray-50 border border-gray-200 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Current Password</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Aktuelles Passwort</label>
               <div className="relative">
                 <input
                   type={showPassword.current ? 'text' : 'password'}
                   name="currentPassword"
                   value={formData.currentPassword}
                   onChange={handleChange}
-                  placeholder="Enter current password"
+                  placeholder="Aktuelles Passwort eingeben"
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-100 text-gray-900 placeholder:text-gray-400"
                   required
                 />
@@ -99,14 +99,14 @@ const ChangePassword = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">New Password</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Neues Passwort</label>
               <div className="relative">
                 <input
                   type={showPassword.new ? 'text' : 'password'}
                   name="newPassword"
                   value={formData.newPassword}
                   onChange={handleChange}
-                  placeholder="Min 8 characters"
+                  placeholder="Mind. 8 Zeichen"
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-100 text-gray-900 placeholder:text-gray-400"
                   required
                 />
@@ -121,14 +121,14 @@ const ChangePassword = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Confirm New Password</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Neues Passwort bestätigen</label>
               <div className="relative">
                 <input
                   type={showPassword.confirm ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  placeholder="Confirm new password"
+                  placeholder="Neues Passwort bestätigen"
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-100 text-gray-900 placeholder:text-gray-400"
                   required
                 />

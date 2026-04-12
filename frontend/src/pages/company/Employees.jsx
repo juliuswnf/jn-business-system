@@ -23,22 +23,22 @@ export default function Employees() {
       const response = await employeeAPI.getAll();
       setEmployees(response.data.employees || response.data.data || []);
     } catch (error) {
-      showNotification('Error loading employees', 'error');
+      showNotification('Fehler beim Laden der Mitarbeiter', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (employeeId) => {
-    if (!window.confirm('Are you sure you want to remove this employee?')) return;
+    if (!window.confirm('Mitarbeiter wirklich entfernen?')) return;
     
     try {
       setDeleting(employeeId);
       await employeeAPI.delete(employeeId);
-      showNotification('Employee removed successfully', 'success');
+      showNotification('Mitarbeiter erfolgreich entfernt', 'success');
       setEmployees(employees.filter(e => e._id !== employeeId));
     } catch (error) {
-      showNotification('Error removing employee', 'error');
+      showNotification('Fehler beim Entfernen des Mitarbeiters', 'error');
     } finally {
       setDeleting(null);
     }

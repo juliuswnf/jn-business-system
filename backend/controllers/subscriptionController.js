@@ -59,13 +59,13 @@ export const createCheckout = async (req, res) => {
       });
     }
 
-    // Build URLs
+    // Build URLs — include session_id for the success page to verify
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const successUrl = `${baseUrl}/dashboard?subscription=success&plan=${planId}&billing=${billing}`;
+    const successUrl = `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&plan=${planId}`;
     const cancelUrl = `${baseUrl}/pricing?subscription=cancelled`;
 
-    // Create Stripe checkout session
-    const session = await createCheckoutSession(salon, priceId, successUrl, cancelUrl);
+    // Create Stripe checkout session (pass planId so it's stored in metadata)
+    const session = await createCheckoutSession(salon, priceId, successUrl, cancelUrl, planId);
 
     res.status(200).json({
       success: true,

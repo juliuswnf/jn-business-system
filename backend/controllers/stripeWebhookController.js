@@ -215,9 +215,27 @@ const handleCheckoutSessionCompleted = async (session) => {
     if (!salon.subscription.stripeCustomerId && session.customer) {
       salon.subscription.stripeCustomerId = session.customer;
     }
+    // Save subscription ID so future subscription.updated events can find this salon
+    if (session.subscription) {
+      salon.subscription.stripeSubscriptionId = session.subscription;
+    }
     await salon.save();
 
     logger.log(`✅ Salon ${salonId} activated via checkout.session.completed (plan: ${plan || 'unchanged'})`);
+
+    // Send subscription confirmation email to owner
+    try {
+      const { sendEmail } = await import('../services/emailService.js');
+      const planName = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : 'Premium';
+      await sendEmail({
+        to: salon.email,
+        subject: `Ihr ${planName}-Abonnement ist jetzt aktiv – JN Business`,
+        body: `Hallo,\n\nVielen Dank für Ihr Vertrauen! Ihr ${planName}-Abonnement für "${salon.name}" ist jetzt aktiv.\n\nSie haben jetzt Zugriff auf alle Funktionen Ihres Plans. Melden Sie sich in Ihrem Dashboard an, um loszulegen.\n\nBei Fragen stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
+        type: 'subscription_activated'
+      });
+    } catch (emailError) {
+      logger.error('❌ Failed to send subscription confirmation email:', emailError.message);
+    }
   } catch (error) {
     logger.error('Error handling checkout.session.completed:', error);
     throw error;

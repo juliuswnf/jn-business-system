@@ -12,9 +12,9 @@ const TIER_THRESHOLDS = {
 };
 
 const TIER_PRICING = {
-  starter: 49,
-  professional: 199,
-  enterprise: 499
+  starter: 129,
+  professional: 249,
+  enterprise: 599
 };
 
 /**

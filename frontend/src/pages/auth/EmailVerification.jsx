@@ -28,7 +28,7 @@ const EmailVerification = () => {
     try {
       const response = await authAPI.verifyEmail(token);
       if (response.data.success) {
-        showNotification('Email verified successfully!', 'success');
+        showNotification('E-Mail erfolgreich bestätigt!', 'success');
         setTimeout(() => {
           const user = JSON.parse(localStorage.getItem('user') || '{}');
           navigate(`/${user.role || 'customer'}/dashboard`);
@@ -45,7 +45,7 @@ const EmailVerification = () => {
     e.preventDefault();
     
     if (code.length < 6) {
-      showNotification('Verification code must be 6 digits', 'error');
+      showNotification('Der Bestätigungscode muss 6 Stellen haben', 'error');
       return;
     }
 
@@ -54,7 +54,7 @@ const EmailVerification = () => {
     try {
       const response = await authAPI.verifyEmail(code);
       if (response.data.success) {
-        showNotification('Email verified successfully!', 'success');
+        showNotification('E-Mail erfolgreich bestätigt!', 'success');
         setTimeout(() => {
           const user = JSON.parse(localStorage.getItem('user') || '{}');
           navigate(`/${user.role || 'customer'}/dashboard`);
@@ -69,7 +69,7 @@ const EmailVerification = () => {
 
   const handleResendEmail = async () => {
     if (!email) {
-      showNotification('Email address is required', 'error');
+      showNotification('E-Mail-Adresse ist erforderlich', 'error');
       return;
     }
 
@@ -78,7 +78,7 @@ const EmailVerification = () => {
     try {
       const response = await authAPI.resendVerificationEmail(email);
       if (response.data.success) {
-        showNotification('Verification email sent! Check your inbox.', 'success');
+        showNotification('Bestätigungs-E-Mail gesendet! Bitte prüfe deinen Posteingang.', 'success');
       }
     } catch (error) {
       showNotification(formatError(error), 'error');
