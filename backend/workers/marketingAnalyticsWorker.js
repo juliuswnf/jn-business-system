@@ -101,21 +101,31 @@ const trackBookingConversions = async () => {
       discountCode: { $exists: true, $ne: null }
     });
 
+    if (recipients.length === 0) return;
+
+    // Batch: fetch all relevant bookings in one query instead of N individual findOne calls
+    const allCodes = recipients.map(r => r.discountCode);
+    const bookings = await Booking.find({
+      discountCode: { $in: allCodes },
+      status: { $ne: 'cancelled' }
+    }).lean();
+
+    // Build lookup map keyed by "customerId:discountCode"
+    const bookingMap = new Map();
+    for (const booking of bookings) {
+      const key = `${booking.customerId}:${booking.discountCode}`;
+      bookingMap.set(key, booking);
+    }
+
     let conversions = 0;
 
     for (const recipient of recipients) {
-      // Check if booking exists with this discount code
-      const booking = await Booking.findOne({
-        customerId: recipient.customerId,
-        discountCode: recipient.discountCode,
-        status: { $ne: 'cancelled' }
-      });
+      const key = `${recipient.customerId}:${recipient.discountCode}`;
+      const booking = bookingMap.get(key);
 
       if (booking) {
-        // Mark recipient as booked
         await recipient.markAsBooked(booking._id, booking.totalPrice || 0);
         conversions++;
-
         logger.log(`[SUCCESS] Conversion tracked: ${recipient.discountCode} -> ${booking.totalPrice}€`);
       }
     }

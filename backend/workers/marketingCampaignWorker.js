@@ -139,23 +139,29 @@ const findTargetCustomers = async (campaign, salonId) => {
     }
 
     case 'birthday': {
-      // Find customers with birthday in next N days
+      // Find customers with birthday in next N days — scoped to this salon only
       const today = new Date();
       const daysAhead = campaign.rules.birthdayDaysBefore || 7;
 
-      // Get customers and filter by birthday month/day
-      const allCustomers = await User.find({
+      // First: get customer IDs who have booked at this salon
+      const salonBookings = await Booking.aggregate([
+        { $match: { salonId } },
+        { $group: { _id: '$customerId' } }
+      ]);
+      const salonCustomerIds = salonBookings.map(b => b._id);
+
+      // Fetch only those customers who have a birthdate and phone
+      const salonCustomers = await User.find({
+        _id: { $in: salonCustomerIds },
         phoneNumber: { $exists: true, $ne: null },
         birthdate: { $exists: true, $ne: null }
-      });
+      }).lean();
 
-      const birthdayCustomers = allCustomers.filter(customer => {
-        if (!customer.birthdate) return false;
+      const targetDate = new Date(today);
+      targetDate.setDate(targetDate.getDate() + daysAhead);
+
+      const birthdayCustomers = salonCustomers.filter(customer => {
         const birthday = new Date(customer.birthdate);
-        const targetDate = new Date(today);
-        targetDate.setDate(targetDate.getDate() + daysAhead);
-
-        // Check if birthday (month/day) matches target date
         return birthday.getMonth() === targetDate.getMonth() &&
                birthday.getDate() === targetDate.getDate();
       });
