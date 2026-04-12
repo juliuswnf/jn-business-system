@@ -185,9 +185,11 @@ export const handleStripeWebhook = async (req, res) => {
     }
   } catch (error) {
     logger.error('❌ Stripe Webhook Error:', error);
-    res.status(400).json({
-      success: false,
-      message: 'Webhook processing error',
+    // Always return 200 so Stripe does not retry — we have our own retry logic
+    // via StripeEvent.markFailed + the stripeEventRecord status.
+    res.status(200).json({
+      received: true,
+      error: true,
       ...(process.env.NODE_ENV === 'development' && { debug: error.message })
     });
   }
@@ -230,9 +232,9 @@ const handleCheckoutSessionCompleted = async (session) => {
 
     // Send subscription confirmation email to owner
     try {
-      const { sendEmail } = await import('../services/emailService.js');
+      const emailService = (await import('../services/emailService.js')).default;
       const planName = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : 'Premium';
-      await sendEmail({
+      await emailService.sendEmail({
         to: salon.email,
         subject: `Ihr ${planName}-Abonnement ist jetzt aktiv – JN Business`,
         body: `Hallo,\n\nVielen Dank für Ihr Vertrauen! Ihr ${planName}-Abonnement für "${salon.name}" ist jetzt aktiv.\n\nSie haben jetzt Zugriff auf alle Funktionen Ihres Plans. Melden Sie sich in Ihrem Dashboard an, um loszulegen.\n\nBei Fragen stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
@@ -300,6 +302,7 @@ const handleSubscriptionCreated = async (subscription) => {
     logger.log(`? Subscription created for salon: ${salon.slug} (${salon.subscription.tier} - ${salon.subscription.billingCycle})`);
   } catch (error) {
     logger.error('Error handling subscription created:', error);
+    throw error;
   }
 };
 
@@ -360,6 +363,7 @@ const handleSubscriptionUpdated = async (subscription) => {
     logger.log(`? Subscription updated for salon: ${salon.slug} (${salon.subscription.tier} - ${salon.subscription.status})`);
   } catch (error) {
     logger.error('Error handling subscription updated:', error);
+    throw error;
   }
 };
 
@@ -384,8 +388,8 @@ const handleSubscriptionDeleted = async (subscription) => {
 
     // Send email notification to salon owner
     try {
-      const { sendEmail } = await import('../services/emailService.js');
-      await sendEmail({
+      const emailService = (await import('../services/emailService.js')).default;
+      await emailService.sendEmail({
         to: salon.email,
         subject: 'Ihr Abonnement wurde gekündigt - JN Business',
         body: `Hallo,\n\nIhr JN Business Abonnement für "${salon.name}" wurde gekündigt.\n\nSie können jederzeit ein neues Abonnement abschließen, um alle Premium-Funktionen wieder zu nutzen.\n\nBei Fragen stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
@@ -396,6 +400,7 @@ const handleSubscriptionDeleted = async (subscription) => {
     }
   } catch (error) {
     logger.error('Error handling subscription deleted:', error);
+    throw error;
   }
 };
 
@@ -417,9 +422,9 @@ const handleTrialWillEnd = async (subscription) => {
 
     // Send email notification about trial ending
     try {
-      const { sendEmail } = await import('../services/emailService.js');
+      const emailService = (await import('../services/emailService.js')).default;
       const trialEndDate = new Date(subscription.trial_end * 1000).toLocaleDateString('de-DE');
-      await sendEmail({
+      await emailService.sendEmail({
         to: salon.email,
         subject: 'Ihre Testphase endet bald - JN Business',
         body: `Hallo,\n\nIhre kostenlose Testphase für "${salon.name}" endet am ${trialEndDate}.\n\nUm alle Premium-Funktionen weiterhin nutzen zu können, stellen Sie bitte sicher, dass eine gültige Zahlungsmethode hinterlegt ist.\n\nNach Ende der Testphase wird Ihr gewähltes Abonnement automatisch aktiviert.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
@@ -430,6 +435,7 @@ const handleTrialWillEnd = async (subscription) => {
     }
   } catch (error) {
     logger.error('Error handling trial will end:', error);
+    throw error;
   }
 };
 
@@ -457,8 +463,8 @@ const handlePaymentActionRequired = async (invoice) => {
 
     // Send email notification about payment action required
     try {
-      const { sendEmail } = await import('../services/emailService.js');
-      await sendEmail({
+      const emailService = (await import('../services/emailService.js')).default;
+      await emailService.sendEmail({
         to: salon.email,
         subject: 'Zahlungsaktion erforderlich - JN Business',
         body: `Hallo,\n\nFür Ihr JN Business Abonnement für "${salon.name}" ist eine Zahlungsaktion erforderlich.\n\nBitte überprüfen Sie Ihre Zahlungsmethode und bestätigen Sie die Zahlung, um eine Unterbrechung Ihres Services zu vermeiden.\n\nSie können dies in Ihren Kontoeinstellungen tun.\n\nMit freundlichen Grüßen,\nIhr JN Business Team`,
@@ -469,6 +475,7 @@ const handlePaymentActionRequired = async (invoice) => {
     }
   } catch (error) {
     logger.error('Error handling payment action required:', error);
+    throw error;
   }
 };
 

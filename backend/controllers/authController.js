@@ -216,7 +216,7 @@ export const register = async (req, res) => {
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: req.ip || req.connection.remoteAddress
+      ipAddress: req.ip || req.socket.remoteAddress
     });
 
     logger.info(`✅ User registered: ${user.email} (${user.role})`);
@@ -316,7 +316,7 @@ export const login = async (req, res) => {
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: req.ip || req.connection.remoteAddress,
+      ipAddress: req.ip || req.socket.remoteAddress,
       rememberMe: Boolean(rememberMe)
     });
 
@@ -379,6 +379,19 @@ export const login = async (req, res) => {
 // Track failed CEO login attempts by IP
 const ceoLoginAttempts = new Map();
 
+// TOTP replay guard: track recently used CEO 2FA codes for 90s (3 windows)
+// keyed by `userId:code`, value is timestamp when it was first used.
+const usedTotpCodes = new Map();
+const markTotpCodeUsed = (userId, code) => {
+  const key = `${userId}:${code}`;
+  usedTotpCodes.set(key, Date.now());
+  // Purge codes older than 90 seconds to avoid unbounded growth
+  for (const [k, ts] of usedTotpCodes.entries()) {
+    if (Date.now() - ts > 90000) usedTotpCodes.delete(k);
+  }
+};
+const isTotpCodeUsed = (userId, code) => usedTotpCodes.has(`${userId}:${code}`);
+
 // CEO IP Whitelist - Add allowed IPs here
 // Set to empty array [] to disable whitelist (allow all IPs)
 // In production, add specific IPs like: ['123.45.67.89', '98.76.54.32']
@@ -395,17 +408,16 @@ const isIPWhitelisted = (clientIP) => {
   const normalizedIP = clientIP.replace('::ffff:', '');
 
   // Check exact match or localhost variations
+  // Localhost is only allowed when the whitelist is empty (development mode).
+  // When a whitelist is configured, localhost must be explicitly listed.
   return CEO_IP_WHITELIST.some(allowedIP => {
     const normalizedAllowed = allowedIP.replace('::ffff:', '');
-    return normalizedIP === normalizedAllowed ||
-           normalizedIP === '127.0.0.1' ||
-           normalizedIP === '::1' ||
-           normalizedIP === 'localhost';
+    return normalizedIP === normalizedAllowed;
   });
 };
 
 export const ceoLogin = async (req, res) => {
-  const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+  const clientIP = req.ip || req.socket.remoteAddress || 'unknown';
   const userAgent = req.headers['user-agent'] || 'unknown';
 
   try {
@@ -596,6 +608,17 @@ export const ceoLogin = async (req, res) => {
 
     // Verify 2FA code - clean up the code first (remove spaces, ensure string)
     const cleanCode = twoFactorCode.toString().replace(/\s/g, '');
+
+    // TOTP replay guard: reject codes already used within the current 90s window
+    if (isTotpCodeUsed(user._id.toString(), cleanCode)) {
+      ipAttempts.count++;
+      ipAttempts.lastAttempt = now;
+      ceoLoginAttempts.set(clientIP, ipAttempts);
+      logger.warn(`[CEO-SECURITY] Failed - TOTP code replay detected: ${email}, IP: ${clientIP}`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return res.status(401).json({ success: false, message: 'Ungültiger 2FA-Code' });
+    }
+
     const isValidToken = authenticator.verify({
       token: cleanCode,
       secret: user.twoFactorSecret
@@ -617,6 +640,9 @@ export const ceoLogin = async (req, res) => {
 
     // ==================== FULL SUCCESS ====================
     // Password correct + 2FA verified
+
+    // Mark this TOTP code as used to prevent replay within the same 30s window
+    markTotpCodeUsed(user._id.toString(), cleanCode);
 
     // Reset all counters
     ceoLoginAttempts.delete(clientIP);
@@ -737,7 +763,7 @@ export const employeeLogin = async (req, res) => {
     // Generate and store refresh token
     const refreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: req.ip || req.connection.remoteAddress,
+      ipAddress: req.ip || req.socket.remoteAddress,
       rememberMe: Boolean(rememberMe)
     });
 
@@ -1600,20 +1626,22 @@ export const refreshToken = async (req, res) => {
     }
 
     // Revoke old refresh token (token rotation)
+    const rotationCount = (storedToken.rotationCount || 0) + 1;
     await storedToken.revoke();
 
     // Generate new tokens
     const newAccessToken = generateToken(user._id, '15m'); // Short-lived access token
     const newRefreshToken = await createRefreshToken(user._id, {
       userAgent: req.headers['user-agent'],
-      ipAddress: req.ip || req.connection.remoteAddress,
+      ipAddress: req.ip || req.socket.remoteAddress,
       rememberMe: storedToken?.deviceInfo?.rememberMe !== false
     });
 
-    // Update last used
-    storedToken.lastUsedAt = new Date();
-    storedToken.rotationCount = (storedToken.rotationCount || 0) + 1;
-    await storedToken.save();
+    // Record metadata on the *new* token, not the now-revoked one
+    await RefreshToken.findOneAndUpdate(
+      { token: newRefreshToken },
+      { $set: { rotationCount } }
+    );
 
     logger.info(`🔄 Token refreshed for: ${user.email}`);
 
@@ -1810,7 +1838,16 @@ export const disable2FA = async (req, res) => {
     }
 
     // Optionally verify 2FA code if enabled
-    if (user.twoFactorEnabled && code) {
+    // For CEO accounts: 2FA code is mandatory when 2FA is enabled.
+    if (user.twoFactorEnabled) {
+      if (!code) {
+        return res.status(400).json({
+          success: false,
+          message: user.role === 'ceo'
+            ? 'CEO-Konto: 2FA-Code ist zum Deaktivieren erforderlich'
+            : 'Invalid 2FA code'
+        });
+      }
       const isValid = authenticator.verify({
         token: code,
         secret: user.twoFactorSecret
