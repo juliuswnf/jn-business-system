@@ -693,7 +693,7 @@ bookingSchema.statics.findByDateRange = function(salonId, startDate, endDate) {
   }).sort({ bookingDate: 1 });
 };
 
-bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, duration, employeeId = null) {
+bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, duration, employeeId = null, session = null) {
   const startTime = new Date(bookingDate);
   const endTime = new Date(startTime.getTime() + duration * 60000);
 
@@ -711,7 +711,9 @@ bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, d
     query.employeeId = employeeId;
   }
 
-  const conflictingBooking = await this.findOne(query);
+  // Pass the session when called inside a MongoDB transaction so the read is
+  // snapshot-isolated and concurrent bookings cannot both see a free slot.
+  const conflictingBooking = await this.findOne(query).session(session);
 
   return !conflictingBooking;
 };

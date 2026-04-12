@@ -64,11 +64,11 @@ import consentFormRoutes from './routes/consentFormRoutes.js';
 import packageRoutes from './routes/packageRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
-import workflowRoutes from './routes/workflows.js';
+import workflowRoutes from './routes/workflowRoutes.js';
 import complianceRoutes from './routes/complianceRoutes.js';
 
 // Pricing & Feature Gate Routes - Phase 5
-import pricingRoutes from './routes/pricing.js';
+import pricingRoutes from './routes/pricingRoutes.js';
 
 // Customer Support Routes
 import supportRoutes from './routes/supportRoutes.js';
@@ -94,7 +94,7 @@ import webhookRoutes from './routes/webhookRoutes.js'; // MessageBird webhooks
 import marketingRoutes from './routes/marketingRoutes.js';
 
 // Tattoo Studio Routes
-import tattooRoutes from './routes/tattoo.js';
+import tattooRoutes from './routes/tattooRoutes.js';
 
 // Import Middleware
 import authMiddleware from './middleware/authMiddleware.js';
@@ -327,10 +327,9 @@ app.get('/', (req, res) => {
 // Public Routes (No Auth Required)
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/bookings/public', publicBookingRoutes);
-app.use('/api/v1/public', publicBookingRoutes);
 app.use('/api/v1/widget', widgetRoutes); // Embeddable Widget API
+app.use('/api/v1/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected) — must be before /subscriptions
 app.use('/api/v1/subscriptions', subscriptionRoutes); // Stripe Subscription Management
-app.use('/api/v1/subscriptions/manage', subscriptionManagementRoutes); // Subscription Management (Protected)
 app.use('/api/v1/system', systemRoutes); // ? MEDIUM FIX #13 & #14: Health & Backups (/health, /health/detailed, /backups/*)
 app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: public + protected)
 
