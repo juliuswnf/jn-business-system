@@ -1,4 +1,5 @@
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 import timezoneHelpers from '../utils/timezoneHelpers.js';
 import {
   escapeRegex,
@@ -63,19 +64,17 @@ export const getAllSalons = async (req, res) => {
 
     const total = await Salon.countDocuments({});
 
-    // Get service count for each salon
-    const salonsWithServices = await Promise.all(
-      salons.map(async (salon) => {
-        const serviceCount = await Service.countDocuments({
-          salonId: salon._id,
-          isActive: true
-        });
-        return {
-          ...salon,
-          serviceCount
-        };
-      })
-    );
+    // Get service counts in a single aggregation to avoid N+1 DB queries
+    const salonIds = salons.map(s => s._id);
+    const serviceCounts = await Service.aggregate([
+      { $match: { salonId: { $in: salonIds }, isActive: true } },
+      { $group: { _id: '$salonId', count: { $sum: 1 } } }
+    ]);
+    const serviceCountMap = Object.fromEntries(serviceCounts.map(r => [r._id.toString(), r.count]));
+    const salonsWithServices = salons.map(salon => ({
+      ...salon,
+      serviceCount: serviceCountMap[salon._id.toString()] || 0
+    }));
 
     res.status(200).json({
       success: true,
@@ -166,19 +165,17 @@ export const getSalonsByCity = async (req, res) => {
       .select('name slug address city phone businessHours')
       .sort({ name: 1 });
 
-    // Get service count for each salon
-    const salonsWithServices = await Promise.all(
-      salons.map(async (salon) => {
-        const serviceCount = await Service.countDocuments({
-          salonId: salon._id,
-          isActive: true
-        });
-        return {
-          ...salon,
-          serviceCount
-        };
-      })
-    );
+    // Get service counts in a single aggregation to avoid N+1 DB queries
+    const salonIdsCity = salons.map(s => s._id);
+    const serviceCountsCity = await Service.aggregate([
+      { $match: { salonId: { $in: salonIdsCity }, isActive: true } },
+      { $group: { _id: '$salonId', count: { $sum: 1 } } }
+    ]);
+    const serviceCountMapCity = Object.fromEntries(serviceCountsCity.map(r => [r._id.toString(), r.count]));
+    const salonsWithServices = salons.map(salon => ({
+      ...salon,
+      serviceCount: serviceCountMapCity[salon._id.toString()] || 0
+    }));
 
     res.status(200).json({
       success: true,
@@ -312,7 +309,7 @@ export const getAvailableSlots = async (req, res) => {
       salonId: salon._id,
       serviceId,
       bookingDate: { $gte: startUTC, $lte: endUTC },
-      status: { $nin: ['cancelled'] }
+      status: { $nin: ['cancelled', 'no_show'] }
     };
 
     if (employeeId) {
@@ -543,9 +540,10 @@ export const createPublicBooking = async (req, res) => {
     const isStarterPlan = planId.includes('starter') || (!planId.includes('pro') && salon.subscription?.status !== 'trial');
 
     if (isStarterPlan || salon.subscription?.status === 'trial') {
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
+      // Use UTC so the month boundary is calculated consistently regardless of
+      // server timezone (Railway/Render run on UTC).
+      const now = new Date();
+      const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 
       const bookingsThisMonth = await Booking.countDocuments({
         salonId: salon._id,
@@ -575,22 +573,7 @@ export const createPublicBooking = async (req, res) => {
       });
     }
 
-    // Check if slot is still available
-    stage = 'check_slot_conflict';
-    const existingBooking = await Booking.findOne({
-      salonId: salon._id,
-      serviceId,
-      employeeId: employeeId || null,
-      bookingDate: parsedBookingDate,
-      status: { $nin: ['cancelled'] }
-    }).maxTimeMS(5000);
-
-    if (existingBooking) {
-      return res.status(409).json({
-        success: false,
-        message: 'Dieser Zeitraum ist nicht mehr verfügbar'
-      });
-    }
+    // Slot conflict check is now done inside the create transaction below (checkAvailability + session)
 
     // ==================== NO-SHOW-KILLER: Payment Method Handling ====================
     stage = 'handle_payment_method';
@@ -598,6 +581,14 @@ export const createPublicBooking = async (req, res) => {
     let paymentMethodId = null;
 
     if (salon.noShowKiller?.enabled) {
+      // DSGVO Art. 6: storing payment data requires explicit consent
+      if (!req.body.gdprConsentAccepted) {
+        return res.status(400).json({
+          success: false,
+          message: 'DSGVO-Einwilligung zur Speicherung der Zahlungsdaten ist erforderlich'
+        });
+      }
+
       const { paymentMethodId: reqPaymentMethodId } = req.body;
 
       // Payment Method is required when No-Show-Killer is enabled
@@ -612,20 +603,32 @@ export const createPublicBooking = async (req, res) => {
         // Import Stripe service
         const stripeService = await import('../services/stripeService.js');
 
-        // Get or create Stripe customer for booking customer
-        stripeCustomerId = await stripeService.getOrCreateBookingCustomer(
-          customerEmail.toLowerCase(),
-          customerName,
-          customerPhone,
-          salon._id.toString()
-        );
+        // Check Customer model first to avoid duplicate Stripe customers from
+        // concurrent requests both hitting Stripe's create path with the same email.
+        const Customer = (await import('../models/Customer.js')).default;
+        let existingCustomerRecord = await Customer.findOne({
+          email: customerEmail.toLowerCase(),
+          salonId: salon._id
+        }).select('stripeCustomerId').lean().maxTimeMS(5000);
+
+        if (existingCustomerRecord?.stripeCustomerId) {
+          stripeCustomerId = existingCustomerRecord.stripeCustomerId;
+        } else {
+          // Get or create Stripe customer for booking customer
+          stripeCustomerId = await stripeService.getOrCreateBookingCustomer(
+            customerEmail.toLowerCase(),
+            customerName,
+            customerPhone,
+            salon._id.toString()
+          );
+        }
 
         // Attach payment method to customer
         await stripeService.attachPaymentMethodToCustomer(stripeCustomerId, reqPaymentMethodId);
         paymentMethodId = reqPaymentMethodId;
 
         // ✅ Store payment method details in Customer model (for DSGVO auto-delete)
-        const Customer = (await import('../models/Customer.js')).default;
+        // (Customer was already resolved above; re-fetch full doc now for update)
         let customer = await Customer.findOne({
           email: customerEmail.toLowerCase(),
           salonId: salon._id
@@ -735,7 +738,30 @@ export const createPublicBooking = async (req, res) => {
       bookingData.idempotencyKey = idempotencyKey.trim();
     }
 
-    const booking = await Booking.create(bookingData);
+    // Use a transaction so the conflict check and create are atomic — preventing
+    // the race condition where two concurrent requests both see a free slot.
+    let booking;
+    const txSession = await mongoose.startSession();
+    txSession.startTransaction();
+    try {
+      const isAvailable = await Booking.checkAvailability(
+        salon._id, parsedBookingDate, service.duration, employeeId || null, txSession
+      );
+      if (!isAvailable) {
+        await txSession.abortTransaction();
+        return res.status(409).json({
+          success: false,
+          message: 'Dieser Zeitraum ist nicht mehr verfügbar'
+        });
+      }
+      [booking] = await Booking.create([bookingData], { session: txSession });
+      await txSession.commitTransaction();
+    } catch (txErr) {
+      await txSession.abortTransaction();
+      throw txErr;
+    } finally {
+      txSession.endSession();
+    }
 
     // Populate for email
     stage = 'populate_booking';
@@ -785,8 +811,8 @@ export const createPublicBooking = async (req, res) => {
     emailService.sendEmail({
       to: salonOwnerEmail,
       subject: `New Booking: ${customerName}`,
-      text: `New booking received:\n\nCustomer: ${customerName}\nEmail: ${customerEmail}\nService: ${service.name}\nDate: ${new Date(bookingDate).toLocaleString('de-DE')}`,
-      html: `<h2>New Booking</h2><p><strong>Customer:</strong> ${customerName}<br><strong>Email:</strong> ${customerEmail}<br><strong>Service:</strong> ${service.name}<br><strong>Date:</strong> ${new Date(bookingDate).toLocaleString('de-DE')}</p>`
+      text: `New booking received:\n\nCustomer: ${customerName}\nEmail: ${customerEmail}\nService: ${service.name}\nDate: ${parsedBookingDate.toLocaleString('de-DE')}`,
+      html: `<h2>New Booking</h2><p><strong>Customer:</strong> ${customerName}<br><strong>Email:</strong> ${customerEmail}<br><strong>Service:</strong> ${service.name}<br><strong>Date:</strong> ${parsedBookingDate.toLocaleString('de-DE')}</p>`
     }).catch(error => {
       logger.error('Error sending salon notification:', error);
     });
@@ -813,8 +839,8 @@ export const createPublicBooking = async (req, res) => {
     res.status(500).json({
       success: false,
       message: sanitizeErrorMessage(error, 'Buchung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.'),
-      requestId: req.id,
-      stage
+      requestId: req.id
+      // stage is intentionally omitted — internal architecture detail
     });
   }
 };
@@ -947,17 +973,39 @@ export const createPublicAppointment = async (req, res) => {
       });
     }
 
-    const booking = await Booking.create({
-      salonId: salon._id,
-      serviceId: service._id,
-      customerId: customer._id,
-      customerName: customerName.trim(),
-      customerEmail: normalizedEmail,
-      customerPhone: customerPhone.trim(),
-      bookingDate: parsedStartTime,
-      duration: service.duration || 30,
-      status: 'pending'
-    });
+    // Check availability + create inside a transaction to prevent double-booking
+    let booking;
+    const txSession = await mongoose.startSession();
+    txSession.startTransaction();
+    try {
+      const isAvailable = await Booking.checkAvailability(
+        salon._id, parsedStartTime, service.duration || 30, null, txSession
+      );
+      if (!isAvailable) {
+        await txSession.abortTransaction();
+        return res.status(409).json({
+          success: false,
+          message: 'Dieser Zeitslot ist bereits belegt'
+        });
+      }
+      [booking] = await Booking.create([{
+        salonId: salon._id,
+        serviceId: service._id,
+        customerId: customer._id,
+        customerName: customerName.trim(),
+        customerEmail: normalizedEmail,
+        customerPhone: customerPhone.trim(),
+        bookingDate: parsedStartTime,
+        duration: service.duration || 30,
+        status: 'pending'
+      }], { session: txSession });
+      await txSession.commitTransaction();
+    } catch (txErr) {
+      await txSession.abortTransaction();
+      throw txErr;
+    } finally {
+      txSession.endSession();
+    }
 
     await booking.populate('serviceId', 'name duration price');
 
