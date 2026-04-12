@@ -61,37 +61,11 @@ export const createBooking = async (req, res) => {
     // ? AUDIT FIX: Parse and validate date with timezone support
     let parsedDate;
 
-    // Support new { date, time } format OR legacy ISO string
+    // Support new { date, time } format OR legacy ISO string.
+    // For the new format, timezone validation is deferred to inside the transaction
+    // so the same session-bound salon fetch covers both validation and capacity check.
     if (typeof bookingDate === 'object' && bookingDate.date && bookingDate.time) {
-      // New format: { date: "2025-12-15", time: "14:00" }
-      const salon = await Salon.findById(salonId).maxTimeMS(5000);
-      if (!salon) {
-        return res.status(404).json({
-          success: false,
-          message: 'Salon not found'
-        });
-      }
-
-      // Validate booking time (DST check)
-      const validation = timezoneHelpers.validateBookingTime(
-        bookingDate.date,
-        bookingDate.time,
-        salon.timezone
-      );
-
-      if (!validation.valid) {
-        return res.status(400).json({
-          success: false,
-          message: validation.error
-        });
-      }
-
-      // Convert to UTC for storage
-      parsedDate = timezoneHelpers.toUTC(
-        bookingDate.date,
-        bookingDate.time,
-        salon.timezone
-      );
+      // parsedDate will be resolved inside the transaction using the session-bound salon
     } else {
       // Legacy format: ISO string
       parsedDate = parseValidDate(bookingDate);
@@ -124,6 +98,27 @@ export const createBooking = async (req, res) => {
           success: false,
           message: 'Salon not found'
         });
+      }
+
+      // Resolve parsedDate for new { date, time } format using the session-bound salon
+      if (typeof bookingDate === 'object' && bookingDate.date && bookingDate.time) {
+        const validation = timezoneHelpers.validateBookingTime(
+          bookingDate.date,
+          bookingDate.time,
+          salon.timezone
+        );
+        if (!validation.valid) {
+          await session.abortTransaction();
+          return res.status(400).json({
+            success: false,
+            message: validation.error
+          });
+        }
+        parsedDate = timezoneHelpers.toUTC(
+          bookingDate.date,
+          bookingDate.time,
+          salon.timezone
+        );
       }
 
       // Calculate booking time window
@@ -246,10 +241,18 @@ export const getBookings = async (req, res) => {
     if (startDate || endDate) {
       filter.bookingDate = {};
       if (startDate) {
-        filter.bookingDate.$gte = new Date(startDate);
+        const parsedStart = parseValidDate(startDate);
+        if (!parsedStart) {
+          return res.status(400).json({ success: false, message: 'Ungültiges startDate-Format' });
+        }
+        filter.bookingDate.$gte = parsedStart;
       }
       if (endDate) {
-        filter.bookingDate.$lte = new Date(endDate);
+        const parsedEnd = parseValidDate(endDate);
+        if (!parsedEnd) {
+          return res.status(400).json({ success: false, message: 'Ungültiges endDate-Format' });
+        }
+        filter.bookingDate.$lte = parsedEnd;
       }
     }
 
@@ -662,7 +665,7 @@ export const markAsNoShow = async (req, res) => {
     }
 
     // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
+    if (req.user.role !== 'ceo' && booking.salonId._id.toString() !== req.user.salonId?.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Zugriff verweigert - Ressource gehört zu einem anderen Salon'
@@ -676,6 +679,9 @@ export const markAsNoShow = async (req, res) => {
         message: 'Buchung wurde bereits als No-Show markiert'
       });
     }
+
+    // Save previous status so undoNoShow can restore it
+    booking.statusBeforeNoShow = booking.status;
 
     // Update booking status
     booking.status = 'no_show';
@@ -826,7 +832,7 @@ export const undoNoShow = async (req, res) => {
     }
 
     // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
+    if (req.user.role !== 'ceo' && booking.salonId._id.toString() !== req.user.salonId?.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Zugriff verweigert - Ressource gehört zu einem anderen Salon'
@@ -867,8 +873,9 @@ export const undoNoShow = async (req, res) => {
       }
     }
 
-    // Revert status
-    booking.status = 'completed';
+    // Revert to status that was set before no-show marking
+    booking.status = booking.statusBeforeNoShow || 'confirmed';
+    booking.statusBeforeNoShow = null;
     booking.noShowMarkedAt = null;
     booking.noShowMarkedBy = null;
 
@@ -929,7 +936,7 @@ export const getBookingStats = async (req, res) => {
 
 export const getDashboardStats = async (req, res) => {
   try {
-    const studioId = req.user?.studioId || req.user?.salonId;
+    const studioId = req.user?.salonId;
 
     if (!studioId) {
       return res.status(400).json({
@@ -1026,7 +1033,7 @@ export const getDashboardStats = async (req, res) => {
 
 export const getTodayAppointments = async (req, res) => {
   try {
-    const studioId = req.user?.studioId || req.user?.salonId;
+    const studioId = req.user?.salonId;
 
     if (!studioId) {
       return res.status(400).json({
@@ -1072,7 +1079,7 @@ export const getTodayAppointments = async (req, res) => {
 
 export const updateAppointmentStatus = async (req, res) => {
   try {
-    const studioId = req.user?.studioId || req.user?.salonId;
+    const studioId = req.user?.salonId;
     const { id } = req.params;
     const { status } = req.body;
 
@@ -1134,7 +1141,7 @@ export const updateAppointmentStatus = async (req, res) => {
 
 export const createAppointment = async (req, res) => {
   try {
-    const studioId = req.user?.studioId || req.user?.salonId;
+    const studioId = req.user?.salonId;
     const {
       serviceId,
       customerName,
@@ -1194,7 +1201,7 @@ export const createAppointment = async (req, res) => {
       });
     }
 
-    const fallbackEmail = `walkin+${Date.now()}@example.invalid`;
+    const fallbackEmail = `walkin+${Date.now()}@noreply.internal`;
 
     const appointment = await Booking.create({
       salonId: studioId,

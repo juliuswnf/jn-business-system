@@ -7,6 +7,7 @@ import logger from '../utils/logger.js';
 import Stripe from 'stripe';
 import stripeService from '../services/stripeService.js';
 import Salon from '../models/Salon.js';
+import Booking from '../models/Booking.js';
 import StripeEvent from '../models/StripeEvent.js';
 
 // Lazy initialization of Stripe (after dotenv is loaded)
@@ -140,7 +141,11 @@ export const handleStripeWebhook = async (req, res) => {
       // ==================== PAYMENT EVENTS ====================
 
     case 'payment_intent.succeeded':
-      logger.log('✅ Payment succeeded:', event.data.object.id);
+      if (event.data.object.metadata?.bookingId) {
+        await handlePaymentIntentSucceeded(event.data.object);
+      } else {
+        logger.info('✅ Payment intent succeeded (no associated booking):', event.data.object.id);
+      }
       break;
 
     case 'payment_intent.payment_failed':
@@ -262,7 +267,19 @@ const handleSubscriptionCreated = async (subscription) => {
     }
 
     salon.subscription.stripeSubscriptionId = subscription.id;
-    salon.subscription.status = subscription.status === 'trialing' ? 'trial' : 'active';
+
+    // Map Stripe subscription status to internal status
+    const statusMap = {
+      trialing: 'trial',
+      active: 'active',
+      past_due: 'past_due',
+      incomplete: 'inactive',
+      incomplete_expired: 'inactive',
+      unpaid: 'past_due',
+      canceled: 'canceled',
+      paused: 'inactive'
+    };
+    salon.subscription.status = statusMap[subscription.status] ?? 'inactive';
     salon.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
 
@@ -303,8 +320,18 @@ const handleSubscriptionUpdated = async (subscription) => {
     const oldStatus = salon.subscription.status;
     const oldTier = salon.subscription.tier;
 
-    // Update subscription status
-    salon.subscription.status = subscription.status === 'trialing' ? 'trial' : subscription.status;
+    // Map Stripe subscription status to internal status
+    const statusMap = {
+      trialing: 'trial',
+      active: 'active',
+      past_due: 'past_due',
+      incomplete: 'inactive',
+      incomplete_expired: 'inactive',
+      unpaid: 'past_due',
+      canceled: 'canceled',
+      paused: 'inactive'
+    };
+    salon.subscription.status = statusMap[subscription.status] ?? 'inactive';
     salon.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
     salon.subscription.cancelAtPeriodEnd = subscription.cancel_at_period_end;
@@ -442,6 +469,31 @@ const handlePaymentActionRequired = async (invoice) => {
     }
   } catch (error) {
     logger.error('Error handling payment action required:', error);
+  }
+};
+
+/**
+ * Handle payment_intent.succeeded — update booking paymentStatus if metadata contains bookingId.
+ * This covers flows where a direct PaymentIntent (not a Checkout Session) is used to pay for a booking.
+ */
+const handlePaymentIntentSucceeded = async (paymentIntent) => {
+  try {
+    const bookingId = paymentIntent.metadata?.bookingId;
+    if (!bookingId) return;
+
+    const booking = await Booking.findById(bookingId).maxTimeMS(5000);
+    if (!booking) {
+      logger.warn(`payment_intent.succeeded: booking not found (${bookingId})`);
+      return;
+    }
+
+    booking.paymentStatus = 'paid';
+    await booking.save();
+
+    logger.info(`\u2705 Booking ${bookingId} paymentStatus set to 'paid' via payment_intent.succeeded`);
+  } catch (error) {
+    logger.error('\u274c Error handling payment_intent.succeeded:', error);
+    throw error;
   }
 };
 

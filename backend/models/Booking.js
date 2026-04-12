@@ -450,6 +450,11 @@ const bookingSchema = new mongoose.Schema(
       ref: 'User',
       default: null
     },
+    // Previous status before no-show marking, used to restore on undoNoShow
+    statusBeforeNoShow: {
+      type: String,
+      default: null
+    },
 
     // ==================== Email Tracking ====================
     emailsSent: {

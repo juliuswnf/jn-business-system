@@ -8,6 +8,7 @@ import QRCode from 'qrcode';
 import LifecycleEmail from '../models/LifecycleEmail.js';
 import { isValidEmail, validatePassword } from '../utils/validation.js';
 import { generateCSRFToken } from '../middleware/securityMiddleware.js';
+import { timingSafeEqual } from '../utils/securityHelpers.js';
 
 /**
  * Auth Controller - MVP Version
@@ -298,7 +299,7 @@ export const login = async (req, res) => {
     const isPasswordCorrect = await user.comparePassword(password);
 
     if (!isPasswordCorrect) {
-      logger.warn(`?? Invalid password for: ${email}`);
+      logger.warn(`⚠️ Invalid password for: ${email}`);
       await user.incLoginAttempts();
       return res.status(401).json({
         success: false,
@@ -319,7 +320,7 @@ export const login = async (req, res) => {
       rememberMe: Boolean(rememberMe)
     });
 
-    logger.info(`? User logged in: ${user.email} (${user.role})`);
+    logger.info(`✅ User logged in: ${user.email} (${user.role})`);
 
     // Set secure HTTP-only cookies for both tokens
     res.cookie('refreshToken', refreshToken, getCookieOptions({
@@ -358,7 +359,7 @@ export const login = async (req, res) => {
       subscriptionStatus
     });
   } catch (error) {
-    logger.error('? Login Error:', error);
+    logger.error('❌ Login Error:', error);
     res.status(500).json({
       success: false,
       message: 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.'
@@ -617,13 +618,6 @@ export const ceoLogin = async (req, res) => {
     // ==================== FULL SUCCESS ====================
     // Password correct + 2FA verified
 
-    // If 2FA was just set up (twoFactorEnabled was false), enable it now
-    if (!user.twoFactorEnabled) {
-      user.twoFactorEnabled = true;
-      await user.save();
-      logger.info(`[CEO-SECURITY] 2FA activated for CEO: ${user.email}`);
-    }
-
     // Reset all counters
     ceoLoginAttempts.delete(clientIP);
     await user.resetLoginAttempts();
@@ -658,8 +652,6 @@ export const ceoLogin = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      // Tokens are now in HTTP-only cookies, not in response body for security
-      refreshToken, // Also send in response for mobile apps only
       expiresIn: 24 * 60 * 60, // 1 day in seconds
       user: user.toJSON(),
       message: 'Willkommen im CEO Bereich'
@@ -728,7 +720,7 @@ export const employeeLogin = async (req, res) => {
     const isPasswordCorrect = await user.comparePassword(password);
 
     if (!isPasswordCorrect) {
-      logger.warn(`?? Invalid password for employee: ${email}`);
+      logger.warn(`⚠️ Invalid password for employee: ${email}`);
       await user.incLoginAttempts();
       return res.status(401).json({
         success: false,
@@ -773,7 +765,7 @@ export const employeeLogin = async (req, res) => {
       user: user.toJSON()
     });
   } catch (error) {
-    logger.error('? Employee Login Error:', error);
+    logger.error('❌ Employee Login Error:', error);
     res.status(500).json({
       success: false,
       message: 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.'
@@ -882,7 +874,6 @@ export const changePassword = async (req, res) => {
     }
 
     // Validate passwords match (timing-safe comparison)
-    const { timingSafeEqual } = await import('../utils/securityHelpers.js');
     const passwordMatch = Buffer.from(newPassword).length === Buffer.from(confirmPassword).length &&
       timingSafeEqual(newPassword, confirmPassword);
 
@@ -907,17 +898,15 @@ export const changePassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Benutzer nicht gefunden'
       });
     }
-
-    // Verify old password
     const isPasswordCorrect = await user.comparePassword(oldPassword);
     if (!isPasswordCorrect) {
-      logger.warn(`?? Invalid old password for: ${user.email}`);
+      logger.warn(`⚠️ Falsches aktuelles Passwort für: ${user.email}`);
       return res.status(401).json({
         success: false,
-        message: 'Current password is incorrect'
+        message: 'Das aktuelle Passwort ist falsch'
       });
     }
 
@@ -925,14 +914,14 @@ export const changePassword = async (req, res) => {
     user.password = newPassword;
     await user.save();
 
-    logger.info(`? Password changed for user: ${user.email}`);
+    logger.info(`✅ Passwort geändert für: ${user.email}`);
 
     res.status(200).json({
       success: true,
-      message: 'Password successfully changed'
+      message: 'Passwort erfolgreich geändert'
     });
   } catch (error) {
-    logger.error('? ChangePassword Error:', error);
+    logger.error('❌ ChangePassword Error:', error);
     res.status(500).json({
       success: false,
       message: 'Fehler beim Ändern des Passworts'
@@ -1150,10 +1139,7 @@ export const forgotPassword = async (req, res) => {
     let resetToken;
     try {
       resetToken = user.getPasswordResetToken();
-    await user.save();
-
-      // Reset attempts on successful token generation
-      await user.resetPasswordResetAttempts();
+      await user.save();
     } catch (tokenError) {
       // Handle account lock error
       if (tokenError.message.includes('locked')) {
@@ -1287,7 +1273,7 @@ export const forgotPassword = async (req, res) => {
       ...(process.env.NODE_ENV === 'development' && { resetToken })
     });
   } catch (error) {
-    logger.error('? ForgotPassword Error:', error);
+    logger.error('❌ ForgotPassword Error:', error);
     res.status(500).json({
       success: false,
       message: 'Fehler beim Zurücksetzen des Passworts'
@@ -1379,7 +1365,7 @@ export const resetPassword = async (req, res) => {
       message: 'Password successfully reset'
     });
   } catch (error) {
-    logger.error('? ResetPassword Error:', error);
+    logger.error('❌ ResetPassword Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error resetting password'
@@ -1629,7 +1615,7 @@ export const refreshToken = async (req, res) => {
     storedToken.rotationCount = (storedToken.rotationCount || 0) + 1;
     await storedToken.save();
 
-    logger.info(`?? Token refreshed for: ${user.email}`);
+    logger.info(`🔄 Token refreshed for: ${user.email}`);
 
     // Set secure HTTP-only cookies for both new tokens
     const rememberMe = storedToken?.deviceInfo?.rememberMe !== false;
@@ -1651,13 +1637,11 @@ export const refreshToken = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      // Tokens are now in HTTP-only cookies, not in response body for security
-      refreshToken: newRefreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });
   } catch (error) {
-    logger.error('? RefreshToken Error:', error);
+    logger.error('❌ RefreshToken Error:', error);
     res.status(500).json({
       success: false,
       message: 'Token refresh failed'
