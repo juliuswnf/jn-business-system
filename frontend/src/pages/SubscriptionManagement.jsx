@@ -25,6 +25,9 @@ const SubscriptionManagement = () => {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showDowngrade, setShowDowngrade] = useState(false);
   const [downgradeTarget, setDowngradeTarget] = useState('');
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const tiers = ['starter', 'professional', 'enterprise'];
 
@@ -49,8 +52,7 @@ const SubscriptionManagement = () => {
   const handleUpgradeSuccess = () => {
     setShowUpgrade(false);
     fetchSubscriptionStatus();
-    // Show success notification
-    alert('? Upgrade erfolgreich! Dein Plan wurde aktualisiert.');
+    setStatusMessage({ type: 'success', text: 'Upgrade erfolgreich! Dein Plan wurde aktualisiert.' });
   };
 
   const handleDowngradeClick = (tier) => {
@@ -61,27 +63,23 @@ const SubscriptionManagement = () => {
   const handleDowngradeSuccess = () => {
     setShowDowngrade(false);
     fetchSubscriptionStatus();
-    alert('? Downgrade erfolgreich durchgeführt!');
+    setStatusMessage({ type: 'success', text: 'Downgrade erfolgreich durchgeführt!' });
   };
 
   const handleCancelSubscription = async () => {
-    if (
-      !confirm(
-        'Möchtest du dein Abonnement wirklich kündigen? Du behältst den Zugriff bis zum Ende der Abrechnungsperiode.'
-      )
-    ) {
-      return;
-    }
-
     try {
+      setCancelling(true);
       const response = await api.post('/subscriptions/manage/cancel', { immediately: false });
 
       if (response.data.success) {
-        alert('? Abonnement gekündigt. Du behältst Zugriff bis zum Ende der Abrechnungsperiode.');
+        setShowCancelConfirm(false);
+        setStatusMessage({ type: 'info', text: 'Abonnement gekündigt. Du behältst Zugriff bis zum Ende der Abrechnungsperiode.' });
         fetchSubscriptionStatus();
       }
     } catch (err) {
-      alert('? Kündigung fehlgeschlagen: ' + (err.response?.data?.message || err.message));
+      setStatusMessage({ type: 'error', text: 'Kündigung fehlgeschlagen: ' + (err.response?.data?.message || err.message) });
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -186,6 +184,27 @@ const SubscriptionManagement = () => {
           <h1 className="text-4xl font-bold text-gray-900">Subscription Management</h1>
           <p className="mt-2 text-gray-700">Verwalte deinen JN Business System Plan</p>
         </div>
+
+        {/* Status Banner */}
+        {statusMessage && (
+          <div
+            className={`mb-6 p-4 rounded-xl text-sm font-medium flex items-center justify-between ${
+              statusMessage.type === 'success'
+                ? 'bg-green-50 text-green-800 border border-green-200'
+                : statusMessage.type === 'error'
+                ? 'bg-red-50 text-red-800 border border-red-200'
+                : 'bg-blue-50 text-blue-800 border border-blue-200'
+            }`}
+          >
+            <span>{statusMessage.text}</span>
+            <button
+              onClick={() => setStatusMessage(null)}
+              className="ml-4 text-current opacity-60 hover:opacity-100"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         {/* Current Plan */}
         <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
@@ -353,12 +372,35 @@ const SubscriptionManagement = () => {
               Du kannst dein Abonnement jederzeit kündigen. Du behältst den Zugriff bis zum Ende
               der aktuellen Abrechnungsperiode.
             </p>
-            <button
-              onClick={handleCancelSubscription}
-              className="px-6 py-2 bg-red-600 text-gray-900 rounded-xl hover:bg-red-700 font-semibold"
-            >
-              Abonnement kündigen
-            </button>
+            {showCancelConfirm ? (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <p className="text-red-800 font-medium mb-4">
+                  Möchtest du dein Abonnement wirklich kündigen? Du behältst den Zugriff bis zum Ende der Abrechnungsperiode.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleCancelSubscription}
+                    disabled={cancelling}
+                    className="px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 font-semibold disabled:opacity-50"
+                  >
+                    {cancelling ? 'Wird gekündigt...' : 'Ja, jetzt kündigen'}
+                  </button>
+                  <button
+                    onClick={() => setShowCancelConfirm(false)}
+                    className="px-6 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 font-semibold"
+                  >
+                    Abbrechen
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowCancelConfirm(true)}
+                className="px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 font-semibold"
+              >
+                Abonnement kündigen
+              </button>
+            )}
           </div>
         )}
 

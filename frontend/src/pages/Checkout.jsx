@@ -10,13 +10,12 @@ const plans = {
     yearlyPrice: 99,
     description: 'Perfekt für Solo-Studios & Einzelunternehmer',
     features: [
-      '150 Termine pro Monat',
-      '1 Mitarbeiter-Account',
+      '200 Buchungen / Monat',
+      '5 Mitarbeiter',
       'Online-Buchungswidget',
       'Automatische E-Mails',
       'Google-Review Integration',
-      'Studio-Übersicht',
-      'Kundendatenbank',
+      'Kundendatenbank (CRM)',
       'E-Mail Support',
     ],
   },
@@ -27,8 +26,8 @@ const plans = {
     yearlyPrice: 199,
     description: 'Für wachsende Teams mit mehreren Mitarbeitern',
     features: [
-      'Unbegrenzte Termine',
-      'Bis zu 10 Mitarbeiter',
+      'Unbegrenzte Buchungen',
+      'Bis zu 30 Mitarbeiter',
       'Alle Starter-Features',
       'Eigenes Branding & Logo',
       'Bis zu 3 Standorte',
@@ -163,16 +162,16 @@ export default function Checkout() {
               </ul>
             </div>
 
-            {/* Testphase Info */}
+            {/* Hinweis Abrechnung */}
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
               <div className="flex items-start gap-3">
                 <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <h4 className="font-medium text-gray-900">Kostenlose Testphase</h4>
+                  <h4 className="font-medium text-gray-900">Sofortige Aktivierung</h4>
                   <p className="text-sm text-gray-700 mt-1">
-                    Du wirst erst nach Ablauf der Testphase belastet. Jederzeit kündbar.
+                    Nach Abschluss ist Ihr Account sofort aktiv. Jederzeit monatlich kündbar.
                   </p>
                 </div>
               </div>
@@ -199,14 +198,14 @@ export default function Checkout() {
               </div>
             </div>
 
-            {/* Today's Charge */}
-            <div className="bg-green-50/20 border border-green-500/30 rounded-xl p-4 mb-6">
+            {/* Betrag */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
               <div className="flex items-center justify-between">
-                <span className="text-green-600">Heute zu zahlen:</span>
-                <span className="text-xl font-semibold tracking-tight text-green-600">€0,00</span>
+                <span className="text-gray-700">Heute zu zahlen:</span>
+                <span className="text-xl font-semibold tracking-tight text-gray-900">€{totalAmount}</span>
               </div>
-              <p className="text-sm text-green-600/70 mt-1">
-                Erste Abbuchung nach 30 Tagen Testphase
+              <p className="text-sm text-gray-500 mt-1">
+                Danach {isYearly ? 'jährlich' : 'monatlich'} zum gleichen Preis. Jederzeit kündbar.
               </p>
             </div>
 
@@ -217,14 +216,13 @@ export default function Checkout() {
               </div>
             )}
 
-            {/* CTA Button */}
             <button
               onClick={handleStripeCheckout}
               disabled={loading}
-              className={`w-full py-3 rounded text-center font-medium transition mb-4 ${
+              className={`w-full py-3 rounded-xl text-center font-semibold transition mb-4 ${
                 loading
-                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                  : 'bg-white text-black hover:bg-gray-100'
+                  ? 'bg-gray-400 text-white cursor-not-allowed'
+                  : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}
             >
               {loading ? (
@@ -236,9 +234,9 @@ export default function Checkout() {
                   Wird geladen...
                 </span>
               ) : isLoggedIn ? (
-                '30 Tage kostenlos starten'
+                'Jetzt kostenpflichtig buchen'
               ) : (
-                'Konto erstellen & starten'
+                'Konto erstellen & buchen'
               )}
             </button>
 

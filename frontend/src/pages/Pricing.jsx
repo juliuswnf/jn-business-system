@@ -117,7 +117,7 @@ const plans = [
 const faq = [
   {
     q: 'Gibt es eine Testphase?',
-    a: 'Ja, das Enterprise-Paket können Sie 14 Tage kostenlos und unverbindlich testen. Sie bekommen automatisch Zugang zu allen Enterprise-Funktionen, inklusive 50 SMS.',
+    a: 'Aktuell bieten wir keine kostenlose Testphase an. Sie können jedoch jederzeit kündigen – ohne Mindestlaufzeit und ohne versteckte Kosten.',
   },
   {
     q: 'Kann ich den Plan später wechseln?',
@@ -152,7 +152,7 @@ export default function Pricing() {
     <>
       <SEO
         title="Preise - Faire Preise ohne versteckte Kosten"
-        description="Starter ab €129/Monat, Professional €249/Monat, Enterprise €599/Monat. 14 Tage kostenlose Testphase im Enterprise-Paket."
+        description="Starter ab €129/Monat, Professional €249/Monat, Enterprise €599/Monat. Keine Mindestlaufzeit – jederzeit kündbar."
         keywords="Preise, Buchungssystem Kosten, Business Software Preis, Unternehmenssoftware"
         url="/pricing"
       />
@@ -197,22 +197,22 @@ export default function Pricing() {
           )}
         </div>
 
-        {/* Enterprise Testphase Banner */}
+        {/* Enterprise Banner */}
         <div className="max-w-4xl mx-auto mb-12 bg-white border border-gray-100 rounded-2xl shadow-sm p-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <h3 className="text-lg font-semibold">14 Tage Enterprise-Testphase</h3>
+            <h3 className="text-lg font-semibold">Enterprise für große Studios &amp; Ketten</h3>
           </div>
           <p className="text-gray-500 text-sm mb-5">
-            Testen Sie alle Enterprise-Funktionen 14 Tage kostenlos – inkl. 50 SMS. Danach wählen Sie Ihren Plan.
+            Mehrere Standorte, White-Label, API-Zugang und unbegrenzte Mitarbeiter – alles in einem Plan.
           </p>
           <Link
-            to="/register?trial=enterprise"
-            className="inline-block px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-900 transition"
+            to="/register"
+            className="inline-block px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition"
           >
-            Jetzt Enterprise kostenlos testen
+            Jetzt loslegen
           </Link>
         </div>
 

@@ -341,7 +341,7 @@ app.use('/api/v1/bookings', authMiddleware.protect, authMiddleware.requireActive
 app.use('/api/v1/appointments', authMiddleware.protect, authMiddleware.requireActiveSubscription, appointmentsRoutes);
 app.use('/api/v1/payments', authMiddleware.protect, authMiddleware.requireActiveSubscription, paymentRoutes);
 app.use('/api/v1/services', authMiddleware.protect, authMiddleware.requireActiveSubscription, serviceRoutes);
-app.use('/api/v1/employees', authMiddleware.protect, employeeRoutes); // protect is inside employeeRoutes; /setup-password is public
+app.use('/api/v1/employees', employeeRoutes); // /setup-password is public; protect handled per-route inside the router
 app.use('/api/v1/ceo', ceoRoutes); // Auth middleware is already in ceoRoutes
 app.use('/api/v1/gdpr', gdprRoutes); // GDPR Compliance (Protected)
 app.use('/api/v1/compliance', authMiddleware.protect, complianceRoutes); // Compliance & HIPAA routes

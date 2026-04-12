@@ -501,7 +501,9 @@ function App() {
           path="/subscription"
           element={
             <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
-              <LazyPage><SubscriptionManagement /></LazyPage>
+              <DashboardLayout>
+                <LazyPage><SubscriptionManagement /></LazyPage>
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -608,7 +610,7 @@ function App() {
         <Route
           path="/dashboard/tattoo/projects"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <DashboardLayout>
                 <LazyPage><TattooProjects /></LazyPage>
               </DashboardLayout>
@@ -618,7 +620,7 @@ function App() {
         <Route
           path="/dashboard/tattoo/projects/new"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <DashboardLayout>
                 <LazyPage><TattooProjectEditor /></LazyPage>
               </DashboardLayout>
@@ -628,7 +630,7 @@ function App() {
         <Route
           path="/dashboard/tattoo/projects/:id/edit"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <DashboardLayout>
                 <LazyPage><TattooProjectEditor /></LazyPage>
               </DashboardLayout>
@@ -638,7 +640,7 @@ function App() {
         <Route
           path="/dashboard/tattoo/projects/:id"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <DashboardLayout>
                 <LazyPage><TattooProjectDetails /></LazyPage>
               </DashboardLayout>
@@ -650,7 +652,7 @@ function App() {
         <Route
           path="/dashboard/workflows"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <TierRoute requiredTier="professional">
                 <DashboardLayout>
                   <LazyPage><Workflows /></LazyPage>
@@ -662,7 +664,7 @@ function App() {
         <Route
           path="/dashboard/workflow-projects"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <TierRoute requiredTier="professional">
                 <DashboardLayout>
                   <LazyPage><WorkflowProjects /></LazyPage>
@@ -674,7 +676,7 @@ function App() {
         <Route
           path="/dashboard/workflow-projects/new"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <TierRoute requiredTier="professional">
                 <DashboardLayout>
                   <LazyPage><WorkflowProjectEditor /></LazyPage>
@@ -686,7 +688,7 @@ function App() {
         <Route
           path="/dashboard/workflow-projects/:id/edit"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <TierRoute requiredTier="professional">
                 <DashboardLayout>
                   <LazyPage><WorkflowProjectEditor /></LazyPage>
@@ -698,7 +700,7 @@ function App() {
         <Route
           path="/dashboard/workflow-projects/:id"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <TierRoute requiredTier="professional">
                 <DashboardLayout>
                   <LazyPage><WorkflowProjectDetail /></LazyPage>
@@ -710,7 +712,7 @@ function App() {
         <Route
           path="/dashboard/packages-memberships"
           element={
-            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo', 'business']}>
+            <ProtectedRoute allowedRoles={['salon_owner', 'admin', 'ceo']}>
               <TierRoute requiredTier="professional">
                 <DashboardLayout>
                   <LazyPage><PackagesMemberships /></LazyPage>

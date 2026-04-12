@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { subscriptionAPI } from '../utils/api';
 
 const planNames = {
   starter: 'Starter',
@@ -11,20 +12,43 @@ export default function CheckoutSuccess() {
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan');
   const planName = planNames[plan] || 'Premium';
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(30);
+  const [statusText, setStatusText] = useState('Zahlung wird bestätigt…');
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
+    let polls = 0;
+    const maxPolls = 15; // up to 30 seconds
+
+    const checkStatus = async () => {
+      polls++;
+      try {
+        const res = await subscriptionAPI.getStatus();
+        if (res.data?.subscription?.status === 'active') {
+          setStatusText('Abonnement aktiv – weiterleitung…');
           window.location.href = '/dashboard';
-          return 0;
+          return;
         }
-        return prev - 1;
-      });
+      } catch {
+        // ignore – keep polling
+      }
+      if (polls >= maxPolls) {
+        window.location.href = '/dashboard';
+      }
+    };
+
+    // Check immediately then every 2 seconds
+    checkStatus();
+    const pollInterval = setInterval(checkStatus, 2000);
+
+    // Countdown display
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
-    return () => clearInterval(timer);
+
+    return () => {
+      clearInterval(pollInterval);
+      clearInterval(timer);
+    };
   }, []);
 
   return (
@@ -47,7 +71,7 @@ export default function CheckoutSuccess() {
         </p>
 
         <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6 mb-8">
-          <p className="text-sm text-gray-500 mb-1">Weiterleitung zum Dashboard in</p>
+          <p className="text-sm text-gray-500 mb-1">{statusText}</p>
           <p className="text-4xl font-bold text-gray-900">{countdown}s</p>
         </div>
 

@@ -107,8 +107,8 @@ export const register = async (req, res) => {
       });
     }
 
-    // Validate role (only allow specific roles)
-    const allowedRoles = ['customer', 'admin', 'employee', 'salon_owner', 'ceo'];
+    // Validate role (only allow specific roles — 'admin' is not a valid User role)
+    const allowedRoles = ['customer', 'employee', 'salon_owner', 'ceo'];
     const userRole = allowedRoles.includes(role) ? role : 'customer';
 
     // Check if user exists - ensure email is string to prevent NoSQL injection
@@ -242,8 +242,6 @@ export const register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      // Tokens are now in HTTP-only cookies, not in response body for security
-      refreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON(),
       salon: salon ? {
@@ -339,12 +337,25 @@ export const login = async (req, res) => {
     // Generate CSRF token for protected state-changing operations.
     generateCSRFToken(req, res, () => {});
 
+    // Lookup subscription status for salon_owner so the frontend can skip the
+    // dashboard redirect and go directly to /pending-payment when trial_pending.
+    let subscriptionStatus = null;
+    if (user.role === 'salon_owner' && user.salonId) {
+      try {
+        const Salon = (await import('../models/Salon.js')).default;
+        const salonData = await Salon.findById(user.salonId)
+          .select('subscription.status').lean().maxTimeMS(3000);
+        subscriptionStatus = salonData?.subscription?.status || null;
+      } catch {
+        // Non-critical – frontend will fallback via the 403 API interceptor
+      }
+    }
+
     res.status(200).json({
       success: true,
-      // Tokens are now in HTTP-only cookies, not in response body for security
-      refreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
-      user: user.toJSON()
+      user: user.toJSON(),
+      subscriptionStatus
     });
   } catch (error) {
     logger.error('? Login Error:', error);
@@ -687,9 +698,9 @@ export const employeeLogin = async (req, res) => {
       });
     }
 
-    // Verify user is employee or admin
-    if (!['employee', 'admin'].includes(user.role)) {
-      logger.warn(`?? Non-employee user attempted employee login: ${email} (role: ${user.role})`);
+    // Verify user is employee
+    if (user.role !== 'employee') {
+      logger.warn(`🚨 Non-employee user attempted employee login: ${email} (role: ${user.role})`);
       return res.status(403).json({
         success: false,
         message: 'Zugriff verweigert. Mitarbeiter-Zugangsdaten erforderlich.'
@@ -758,8 +769,6 @@ export const employeeLogin = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      // Tokens are now in HTTP-only cookies, not in response body for security
-      refreshToken, // Also send in response for mobile apps only
       expiresIn: 15 * 60, // 15 minutes in seconds
       user: user.toJSON()
     });

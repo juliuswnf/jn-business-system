@@ -108,7 +108,7 @@ const isAdmin = (req, res, next) => {
     });
   }
 
-  if (req.user.role !== 'admin' && req.user.role !== 'ceo') {
+  if (req.user.role !== 'ceo') {
     return res.status(403).json({
       success: false,
       message: 'Nur Admins können diese Aktion ausführen'

@@ -29,7 +29,7 @@ const plans = [
 
 export default function PendingPayment() {
   const { user } = useAuth();
-  const firstName = user?.name?.split(' ')[0] || 'dort';
+  const firstName = user?.name?.split(' ')[0] || null;
 
   return (
     <>
@@ -43,7 +43,7 @@ export default function PendingPayment() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-3">
-            Konto erstellt, {firstName}!
+            Konto erstellt{firstName ? `, ${firstName}` : ''}!
           </h1>
           <p className="text-gray-600 text-lg">
             Wähle jetzt deinen Plan, um Zugriff auf dein Dashboard zu erhalten.

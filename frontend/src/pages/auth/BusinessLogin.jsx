@@ -40,15 +40,15 @@ const BusinessLogin = () => {
         // Defensive cleanup: avoid stale post-logout flag blocking auth init on next route.
         sessionStorage.removeItem('jn:skipAuthInitOnce');
 
-        // Auth data saved, redirecting
-
-        // Redirect based on role
+        // Redirect based on role – avoid dashboard flash for trial_pending salon owners
         if (role === 'customer') {
           window.location.replace('/customer/dashboard');
         } else if (role === 'ceo') {
           window.location.replace('/ceo/dashboard');
+        } else if (role === 'salon_owner' && data.subscriptionStatus === 'trial_pending') {
+          window.location.replace('/pending-payment');
         } else {
-          // salon_owner, employee, etc.
+          // salon_owner (active), employee, admin, etc.
           window.location.replace('/dashboard');
         }
         return; // Stop execution after redirect
