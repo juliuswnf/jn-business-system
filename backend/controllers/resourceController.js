@@ -383,7 +383,7 @@ export const getAvailableResourcesForService = async (req, res) => {
       isAvailable: true,
       status: 'active',
       deletedAt: null
-    }).lean().maxTimeMS(5000);
+    }).maxTimeMS(5000); // lean removed so Mongoose doc methods are available
 
     if (!dateTime) {
       return res.json({
@@ -392,34 +392,34 @@ export const getAvailableResourcesForService = async (req, res) => {
       });
     }
 
-    // Check availability for each resource
-    const availableResources = [];
-    for (const resource of resources) {
-      const resourceDoc = await Resource.findById(resource._id).maxTimeMS(5000);
-      const isAvailable = resourceDoc.isAvailableAt(new Date(dateTime));
+    // Compute time window once outside the loop
+    const endDateTime = new Date(dateTime);
+    endDateTime.setMinutes(endDateTime.getMinutes() + (parseInt(duration) || 60));
 
-      if (isAvailable) {
-        // Check capacity
-        const endDateTime = new Date(dateTime);
-        endDateTime.setMinutes(endDateTime.getMinutes() + (parseInt(duration) || 60));
-
-        const overlappingBookings = await Booking.countDocuments({
-          resourceId: resource._id,
-          bookingDate: {
-            $gte: new Date(dateTime),
-            $lt: endDateTime
-          },
+    // Batch all countDocuments queries in parallel to avoid N+1
+    const overlappingCounts = await Promise.all(
+      resources.map(r =>
+        Booking.countDocuments({
+          resourceId: r._id,
+          bookingDate: { $gte: new Date(dateTime), $lt: endDateTime },
           status: { $nin: ['cancelled'] },
           deletedAt: null
-        });
+        })
+      )
+    );
 
-        if (overlappingBookings < resource.capacity) {
-          availableResources.push({
-            ...resource,
-            currentBookings: overlappingBookings,
-            availableCapacity: resource.capacity - overlappingBookings
-          });
-        }
+    const availableResources = [];
+    for (let i = 0; i < resources.length; i++) {
+      const resource = resources[i];
+      const isAvailable = resource.isAvailableAt(new Date(dateTime));
+      const overlappingBookings = overlappingCounts[i];
+
+      if (isAvailable && overlappingBookings < resource.capacity) {
+        availableResources.push({
+          ...resource.toObject(),
+          currentBookings: overlappingBookings,
+          availableCapacity: resource.capacity - overlappingBookings
+        });
       }
     }
 

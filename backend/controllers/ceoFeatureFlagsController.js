@@ -22,18 +22,19 @@ export const getAllFlags = async (req, res) => {
       .populate('lastModifiedBy', 'name');
 
     // Get customer counts for each flag
-    const flagsWithCounts = await Promise.all(flags.map(async (flag) => {
+    // flags are lean objects (plain JS) — spread directly, no .toObject()
+    const flagsWithCounts = flags.map((flag) => {
       const enabledCount = flag.enabledFor?.length || 0;
       const disabledCount = flag.disabledFor?.length || 0;
 
       return {
-        ...flag.toObject(),
+        ...flag,
         stats: {
           enabledForCount: enabledCount,
           disabledForCount: disabledCount
         }
       };
-    }));
+    });
 
     res.status(200).json({
       success: true,
