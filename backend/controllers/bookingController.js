@@ -154,16 +154,11 @@ export const createBooking = async (req, res) => {
         });
       }
 
-      // Check for conflicts with session lock
-      const existingBooking = await Booking.findOne({
-        salonId,
-        serviceId,
-        employeeId: employeeId || null,
-        bookingDate: parsedDate,
-        status: { $nin: ['cancelled'] }
-      }).maxTimeMS(5000).session(session);
-
-      if (existingBooking) {
+      // Check slot availability inside the transaction so the read is snapshot-isolated.
+      // checkAvailability uses .session(session) internally, preventing concurrent
+      // requests from both seeing a free slot and double-booking.
+      const isAvailable = await Booking.checkAvailability(salonId, parsedDate, serviceDuration, employeeId || null, session);
+      if (!isAvailable) {
         await session.abortTransaction();
         return res.status(409).json({
           success: false,

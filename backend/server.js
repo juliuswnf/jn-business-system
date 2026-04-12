@@ -225,15 +225,16 @@ app.post('/api/webhooks/stripe', webhookMiddleware, stripeWebhookController.hand
 app.use('/api/webhooks', webhookRoutes); // MessageBird webhooks
 
 // 4️⃣ BODY PARSING & COOKIES
-app.use(express.json({ limit: '50mb' }));
+// 1mb is sufficient for all API payloads; file uploads go through Multer separately
+app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
 // 5️⃣ API VERSIONING (MUST BE BEFORE ROUTES)
 // ? SECURITY FIX: Apply API versioning middleware (forwards /api/* to /api/v1/*)
 app.use(apiVersioningMiddleware);
 
-// 4?? LOGGING & MONITORING
-// ? AUDIT FIX: Add request context middleware for structured logging
+// 6️⃣ LOGGING & MONITORING
+// ✅ AUDIT FIX: Add request context middleware for structured logging
 app.use(addRequestContext);
 
 if (ENVIRONMENT === 'development') {
@@ -335,7 +336,10 @@ app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: p
 
 // Protected Routes (Auth Required)
 app.use('/api/v1/salon', authMiddleware.protect, authMiddleware.requireActiveSubscription, salonRoutes);
-app.use('/api/v1/salons', authMiddleware.protect, authMiddleware.requireActiveSubscription, salonRoutes); // Plural alias
+// Redirect plural alias → canonical singular path. A single mount avoids silent middleware divergence.
+app.use('/api/v1/salons', (req, res) => {
+  res.redirect(301, req.originalUrl.replace('/api/v1/salons', '/api/v1/salon'));
+});
 app.use('/api/v1/bookings', authMiddleware.protect, authMiddleware.requireActiveSubscription, bookingRoutes);
 app.use('/api/v1/appointments', authMiddleware.protect, authMiddleware.requireActiveSubscription, appointmentsRoutes);
 app.use('/api/v1/payments', authMiddleware.protect, authMiddleware.requireActiveSubscription, paymentRoutes);

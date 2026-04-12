@@ -1,5 +1,4 @@
 ﻿import mongoose from 'mongoose';
-import { multiTenantPlugin } from '../middleware/multiTenantPlugin.js';
 
 const PHONE_REGEX = /^\+?[0-9\s().-]{7,20}$/;
 
@@ -504,17 +503,6 @@ const bookingSchema = new mongoose.Schema(
     cancelledAt: {
       type: Date,
       default: null
-    },
-
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      index: true
-    },
-
-    updatedAt: {
-      type: Date,
-      default: Date.now
     },
 
     // ==================== SOFT DELETE ====================
