@@ -143,7 +143,7 @@ export const getMyTickets = async (req, res) => {
       .select('ticketNumber subject category priority status createdAt updatedAt')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(parseInt(limit))
+      .limit(Math.min(parseInt(limit) || 10, 100))
       .lean();
 
     const total = await SupportTicket.countDocuments(query);

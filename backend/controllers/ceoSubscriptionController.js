@@ -28,7 +28,7 @@ export const getAllSubscriptions = async (req, res) => {
       .select('name slug email subscription isActive createdAt')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(Math.min(parseInt(limit) || 20, 100));
 
     const total = await Salon.countDocuments(filter);
 

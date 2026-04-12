@@ -158,10 +158,11 @@ export const getClientProgressHistory = async (req, res) => {
 
     const progressEntries = await ProgressEntry.find(query)
       .sort({ recordedAt: -1 })
-      .limit(parseInt(limit).lean().maxTimeMS(5000))
+      .limit(Math.min(parseInt(limit) || 50, 200))
       .populate('trainerId', 'name email')
       .populate('bookingId', 'bookingDate')
-      .lean();
+      .lean()
+      .maxTimeMS(5000);
 
     return res.json({
       success: true,

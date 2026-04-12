@@ -336,12 +336,12 @@ export const getResourceUtilization = async (req, res) => {
     const bookings = await Booking.find({
       resourceId: id,
       bookingDate: {
-        $gte: new Date(startDate).lean().maxTimeMS(5000),
+        $gte: new Date(startDate),
         $lte: new Date(endDate)
       },
       status: { $nin: ['cancelled'] },
       deletedAt: null
-    }).select('bookingDate duration');
+    }).select('bookingDate duration').lean().maxTimeMS(5000);
 
     // Calculate total booked hours
     const totalBookedMinutes = bookings.reduce((sum, booking) => sum + booking.duration, 0);

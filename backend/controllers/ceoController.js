@@ -703,7 +703,7 @@ export const getErrorLogs = async (req, res) => {
     const errors = await ErrorLog.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip).lean().maxTimeMS(5000)
-      .limit(parseInt(limit))
+      .limit(Math.min(parseInt(limit) || 50, 100))
       .populate('salonId', 'name')
       .populate('userId', 'name email')
       .populate('resolvedBy', 'name');

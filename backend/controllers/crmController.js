@@ -94,7 +94,7 @@ export const getCustomers = async (req, res) => {
     // Pagination
     const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
     aggregation.push({ $skip: skip });
-    aggregation.push({ $limit: parseInt(limit, 10) });
+    aggregation.push({ $limit: Math.min(parseInt(limit, 10) || 50, 200) });
 
     const customers = await Booking.aggregate(aggregation).option({ maxTimeMS: 5000 });
 

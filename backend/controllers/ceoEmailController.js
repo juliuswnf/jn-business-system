@@ -22,7 +22,7 @@ export const getAllCampaigns = async (req, res) => {
     const campaigns = await EmailLog.find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(parseInt(limit))
+      .limit(Math.min(parseInt(limit) || 20, 100))
       .lean()
       .maxTimeMS(5000);
 

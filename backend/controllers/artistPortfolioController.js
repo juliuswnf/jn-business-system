@@ -103,10 +103,11 @@ export const getPublicPortfolio = async (req, res) => {
 
     const portfolioItems = await ArtistPortfolio.find(query)
       .sort({ featured: -1, order: 1, createdAt: -1 })
-      .limit(parseInt(limit).lean().maxTimeMS(5000))
+      .limit(Math.min(parseInt(limit) || 50, 100))
       .skip(skip)
       .populate('artistId', 'name email')
-      .lean();
+      .lean()
+      .maxTimeMS(5000);
 
     const total = await ArtistPortfolio.countDocuments(query);
 
