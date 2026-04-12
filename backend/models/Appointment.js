@@ -1,3 +1,12 @@
+/**
+ * Appointment — Legacy/Internal model used by walk-in appointment routes (/api/v1/appointments)
+ * and database utility scripts (seed, backup, clear).
+ *
+ * NOTE: The primary booking model for customer-facing flows is Booking.js.
+ * Appointment.js covers internal studio operations that require a confirmed
+ * customerId and staffId. Do NOT merge these two models without auditing
+ * all routes and utilities that reference each one.
+ */
 import mongoose from 'mongoose';
 
 const appointmentSchema = new mongoose.Schema(

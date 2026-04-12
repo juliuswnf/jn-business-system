@@ -150,7 +150,10 @@ const bookingSchema = new mongoose.Schema(
       },
       meetingLink: String,
       meetingId: String,
-      password: String
+      password: {
+        type: String,
+        select: false
+      }
     },
 
     // ==================== Employee (Optional) ====================
@@ -639,7 +642,6 @@ bookingSchema.methods.markEmailSent = async function(type) {
 };
 
 // Soft delete method
-// Soft delete method
 bookingSchema.methods.softDelete = async function(userId) {
   this.deletedAt = new Date();
   this.deletedBy = userId;
@@ -691,18 +693,25 @@ bookingSchema.statics.findByDateRange = function(salonId, startDate, endDate) {
   }).sort({ bookingDate: 1 });
 };
 
-bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, duration) {
+bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, duration, employeeId = null) {
   const startTime = new Date(bookingDate);
   const endTime = new Date(startTime.getTime() + duration * 60000);
 
-  const conflictingBooking = await this.findOne({
+  const query = {
     salonId,
     status: { $nin: ['cancelled', 'no_show'] },
     bookingDate: {
       $gte: new Date(startTime.getTime() - duration * 60000),
       $lte: endTime
     }
-  });
+  };
+
+  // If an employee is specified, also block the same employee's conflicting slots
+  if (employeeId) {
+    query.employeeId = employeeId;
+  }
+
+  const conflictingBooking = await this.findOne(query);
 
   return !conflictingBooking;
 };
@@ -762,24 +771,7 @@ bookingSchema.statics.getStats = async function(salonId, startDate = null, endDa
   };
 };
 
-// ==================== PRE-SAVE HOOKS ====================
-
-bookingSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
-});
-
 // ==================== INDEXES ====================
-
-// Compound indexes for common queries
-bookingSchema.index({ salonId: 1, bookingDate: -1 }); // Get bookings by date for salon
-bookingSchema.index({ salonId: 1, status: 1, bookingDate: -1 }); // Filter by status
-bookingSchema.index({ salonId: 1, employeeId: 1, bookingDate: 1 }); // Employee schedule
-bookingSchema.index({ customerEmail: 1, salonId: 1 }); // Customer lookup
-bookingSchema.index({ salonId: 1, createdAt: -1 }); // Recent bookings
-
-// ? AUDIT FIX: Multi-tenant plugin for automatic salonId filtering
-bookingSchema.plugin(multiTenantPlugin);
 
 // ==================== EXPORT ====================
 

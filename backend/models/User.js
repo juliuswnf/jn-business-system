@@ -199,24 +199,13 @@ const userSchema = new mongoose.Schema(
       }
     ],
 
-    // ==================== Timestamps ====================
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      index: true
-    },
-
-    updatedAt: {
-      type: Date,
-      default: Date.now
-    }
+    // ==================== Timestamps are managed by { timestamps: true } below ====================
   },
   { timestamps: true }
 );
 
 // ==================== INDEXES ====================
 
-userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ role: 1, isActive: 1 });
 userSchema.index({ salonId: 1, isActive: 1 });
 userSchema.index({ salonId: 1, role: 1 });
@@ -305,32 +294,45 @@ userSchema.methods.verifyEmail = async function() {
   this.emailVerified = true;
   this.emailVerificationToken = null;
   this.emailVerificationExpire = null;
-  logger.log(`✅ Email verified: ${this.email}`);
+  logger.info(`✅ Email verified: ${this.email}`);
   return await this.save();
 };
 
 userSchema.methods.incLoginAttempts = async function() {
-  // Reset if lock expired
+  // Reset atomically if lock has expired
   if (this.lockUntil && this.lockUntil < Date.now()) {
-    this.loginAttempts = 1;
-    this.lockUntil = null;
-  } else {
-    this.loginAttempts += 1;
-    // Lock after 5 failed attempts
-    if (this.loginAttempts >= 5) {
-      this.lockUntil = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
-      logger.warn(`⚠️ Account locked: ${this.email}`);
-    }
+    return await this.constructor.findByIdAndUpdate(
+      this._id,
+      { $set: { loginAttempts: 1, lockUntil: null } },
+      { new: true }
+    );
   }
-  return await this.save();
+
+  // Atomic increment to avoid race conditions on concurrent requests
+  const updated = await this.constructor.findByIdAndUpdate(
+    this._id,
+    { $inc: { loginAttempts: 1 } },
+    { new: true }
+  );
+
+  if (updated.loginAttempts >= 5 && !updated.lockUntil) {
+    await this.constructor.findByIdAndUpdate(
+      this._id,
+      { $set: { lockUntil: new Date(Date.now() + 30 * 60 * 1000) } }
+    );
+    logger.warn(`⚠️ Account locked: ${this.email}`);
+  }
+
+  return updated;
 };
 
 userSchema.methods.resetLoginAttempts = async function() {
-  this.loginAttempts = 0;
-  this.lockUntil = null;
   this.lastLogin = new Date();
-  logger.log(`✅ Login successful: ${this.email}`);
-  return await this.save();
+  return await this.constructor.findByIdAndUpdate(
+    this._id,
+    { $set: { loginAttempts: 0, lockUntil: null, lastLogin: this.lastLogin } },
+    { new: true }
+  );
 };
 
 userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
