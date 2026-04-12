@@ -681,7 +681,7 @@ bookingSchema.statics.findByDateRange = function(salonId, startDate, endDate) {
   }).sort({ bookingDate: 1 });
 };
 
-bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, duration, employeeId = null, session = null) {
+bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, duration, employeeId = null, session = null, excludeBookingId = null) {
   const startTime = new Date(bookingDate);
   const endTime = new Date(startTime.getTime() + duration * 60000);
 
@@ -697,6 +697,11 @@ bookingSchema.statics.checkAvailability = async function(salonId, bookingDate, d
   // If an employee is specified, also block the same employee's conflicting slots
   if (employeeId) {
     query.employeeId = employeeId;
+  }
+
+  // When rescheduling, exclude the booking being updated from the conflict check
+  if (excludeBookingId) {
+    query._id = { $ne: excludeBookingId };
   }
 
   // Pass the session when called inside a MongoDB transaction so the read is

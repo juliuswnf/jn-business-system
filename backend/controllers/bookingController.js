@@ -32,6 +32,18 @@ export const createBooking = async (req, res) => {
       });
     }
 
+    // Validate ObjectIds BEFORE any DB queries (including idempotency check) to
+    // avoid unnecessary DB load from malformed / adversarial requests.
+    if (!isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Ungültiges Salon-ID-Format' });
+    }
+    if (!isValidObjectId(serviceId)) {
+      return res.status(400).json({ success: false, message: 'Ungültiges Service-ID-Format' });
+    }
+    if (employeeId && !isValidObjectId(employeeId)) {
+      return res.status(400).json({ success: false, message: 'Ungültiges Mitarbeiter-ID-Format' });
+    }
+
     // ? SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
     if (idempotencyKey) {
       const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
@@ -45,17 +57,6 @@ export const createBooking = async (req, res) => {
           duplicate: true
         });
       }
-    }
-
-    // Validate ObjectIds
-    if (!isValidObjectId(salonId)) {
-      return res.status(400).json({ success: false, message: 'Ungültiges Salon-ID-Format' });
-    }
-    if (!isValidObjectId(serviceId)) {
-      return res.status(400).json({ success: false, message: 'Ungültiges Service-ID-Format' });
-    }
-    if (employeeId && !isValidObjectId(employeeId)) {
-      return res.status(400).json({ success: false, message: 'Ungültiges Mitarbeiter-ID-Format' });
     }
 
     // ? AUDIT FIX: Parse and validate date with timezone support
@@ -423,12 +424,40 @@ export const updateBooking = async (req, res) => {
         }
       }
 
-      booking.bookingDate = parsedDate;
+      // Check availability under a transaction to prevent the same race condition
+      // that createBooking protects against — two concurrent reschedules cannot
+      // both land on the same slot.
+      const session = await mongoose.startSession();
+      session.startTransaction();
+      try {
+        const isAvailable = await Booking.checkAvailability(
+          booking.salonId,
+          parsedDate,
+          booking.duration || 60,
+          booking.employeeId || null,
+          session,
+          booking._id  // exclude this booking so it doesn't conflict with itself
+        );
+        if (!isAvailable) {
+          await session.abortTransaction();
+          return res.status(409).json({
+            success: false,
+            message: 'Dieser Zeitslot ist bereits belegt'
+          });
+        }
+        booking.bookingDate = parsedDate;
+        await booking.save({ session });
+        await session.commitTransaction();
+      } catch (txError) {
+        await session.abortTransaction();
+        throw txError;
+      } finally {
+        session.endSession();
+      }
+    } else {
+      await booking.save();
     }
 
-    booking.updatedAt = Date.now();
-
-    await booking.save();
     await booking.populate('serviceId');
 
     return res.status(200).json({
@@ -470,6 +499,14 @@ export const confirmBooking = async (req, res) => {
       return res.status(403).json({
         success: false,
         message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    // State machine: only pending/booked bookings may be confirmed
+    if (!['pending', 'booked'].includes(booking.status)) {
+      return res.status(409).json({
+        success: false,
+        message: `Buchung im Status '${booking.status}' kann nicht bestätigt werden`
       });
     }
 
@@ -521,6 +558,14 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
+    // State machine: completed/cancelled bookings are terminal
+    if (['completed', 'cancelled'].includes(booking.status)) {
+      return res.status(409).json({
+        success: false,
+        message: `Buchung im Status '${booking.status}' kann nicht storniert werden`
+      });
+    }
+
     booking.status = 'cancelled';
     booking.cancelledAt = Date.now();
     await booking.save();
@@ -566,6 +611,14 @@ export const completeBooking = async (req, res) => {
       return res.status(403).json({
         success: false,
         message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    // State machine: only confirmed bookings can be completed
+    if (booking.status !== 'confirmed') {
+      return res.status(409).json({
+        success: false,
+        message: `Buchung im Status '${booking.status}' kann nicht abgeschlossen werden`
       });
     }
 
@@ -683,6 +736,11 @@ export const markAsNoShow = async (req, res) => {
     booking.noShowMarkedAt = new Date();
     booking.noShowMarkedBy = req.user._id;
 
+    // Persist the status change BEFORE any Stripe call. If the charge succeeds
+    // but the subsequent DB write fails, the status is already recorded and the
+    // charge can be traced via Stripe metadata (bookingId).
+    await booking.save();
+
     // Attempt to charge No-Show-Fee if enabled
     let feeCharged = false;
     if (booking.salonId?.noShowKiller?.enabled && booking.paymentMethodId) {
@@ -696,14 +754,16 @@ export const markAsNoShow = async (req, res) => {
           const stripeConnectService = await import('../services/stripeConnectService.js');
           chargeResult = await stripeConnectService.chargeNoShowFeeConnect(booking, booking.salonId);
 
-          booking.noShowFee = {
-            charged: true,
-            amount: feeAmount,
-            chargeId: chargeResult.chargeId,
-            transferId: chargeResult.transferId || null,
-            chargedAt: new Date(),
-            breakdown: chargeResult.breakdown
-          };
+          await Booking.findByIdAndUpdate(booking._id, {
+            $set: {
+              'noShowFee.charged': true,
+              'noShowFee.amount': feeAmount,
+              'noShowFee.chargeId': chargeResult.chargeId,
+              'noShowFee.transferId': chargeResult.transferId || null,
+              'noShowFee.chargedAt': new Date(),
+              'noShowFee.breakdown': chargeResult.breakdown
+            }
+          });
         } else {
           // Fallback to regular Stripe (platform account)
           const stripeService = await import('../services/stripeService.js');
@@ -723,18 +783,20 @@ export const markAsNoShow = async (req, res) => {
           const stripeFee = Math.round(25 + (feeAmount * 0.014)); // €0.25 + 1.4%
           const salonReceives = feeAmount - stripeFee;
 
-          booking.noShowFee = {
-            charged: true,
-            amount: feeAmount,
-            chargeId: paymentIntent.id,
-            chargedAt: new Date(),
-            breakdown: {
-              totalCharged: feeAmount,
-              stripeFee: stripeFee,
-              salonReceives: salonReceives,
-              platformCommission: 0
+          await Booking.findByIdAndUpdate(booking._id, {
+            $set: {
+              'noShowFee.charged': true,
+              'noShowFee.amount': feeAmount,
+              'noShowFee.chargeId': paymentIntent.id,
+              'noShowFee.chargedAt': new Date(),
+              'noShowFee.breakdown': {
+                totalCharged: feeAmount,
+                stripeFee: stripeFee,
+                salonReceives: salonReceives,
+                platformCommission: 0
+              }
             }
-          };
+          });
         }
 
         feeCharged = true;
@@ -761,11 +823,13 @@ export const markAsNoShow = async (req, res) => {
         });
 
       } catch (error) {
-        booking.noShowFee = {
-          charged: false,
-          error: error.message,
-          attemptedAt: new Date()
-        };
+        await Booking.findByIdAndUpdate(booking._id, {
+          $set: {
+            'noShowFee.charged': false,
+            'noShowFee.error': error.message,
+            'noShowFee.attemptedAt': new Date()
+          }
+        });
 
         logger.error(`❌ Failed to charge No-Show-Fee: ${error.message}`);
 
@@ -783,13 +847,13 @@ export const markAsNoShow = async (req, res) => {
       logger.warn(`⚠️ No payment method available for No-Show-Fee: Booking ${booking._id}`);
     }
 
-    await booking.save();
-
+    // Reload to reflect any noShowFee updates applied via findByIdAndUpdate
+    const updatedBooking = await Booking.findById(booking._id).populate('salonId');
     res.json({
       success: true,
       message: 'Als No-Show markiert',
       feeCharged: feeCharged,
-      booking: booking
+      booking: updatedBooking
     });
   } catch (error) {
     logger.error('MarkAsNoShow Error:', error);
@@ -845,8 +909,20 @@ export const undoNoShow = async (req, res) => {
     // Refund if fee was charged
     if (booking.noShowFee?.charged && booking.noShowFee.chargeId) {
       try {
-        const stripeService = await import('../services/stripeService.js');
-        const refund = await stripeService.refundNoShowFee(booking.noShowFee.chargeId);
+        let refund;
+        if (booking.noShowFee.transferId) {
+          // Charge was made via Stripe Connect — must refund through the Connect
+          // service so the transfer reversal is handled correctly.
+          const stripeConnectService = await import('../services/stripeConnectService.js');
+          const connectRefund = await stripeConnectService.refundNoShowFee(
+            booking.noShowFee.chargeId,
+            booking.noShowFee.amount
+          );
+          refund = { id: connectRefund.refundId };
+        } else {
+          const stripeService = await import('../services/stripeService.js');
+          refund = await stripeService.refundNoShowFee(booking.noShowFee.chargeId);
+        }
 
         booking.noShowFee.refunded = true;
         booking.noShowFee.refundedAt = new Date();
@@ -902,11 +978,15 @@ export const getBookingStats = async (req, res) => {
       filter.salonId = salonId;
     }
 
-    const totalBookings = await Booking.countDocuments(filter);
-    const confirmedBookings = await Booking.countDocuments({ ...filter, status: 'confirmed' });
-    const pendingBookings = await Booking.countDocuments({ ...filter, status: 'pending' });
-    const cancelledBookings = await Booking.countDocuments({ ...filter, status: 'cancelled' });
-    const completedBookings = await Booking.countDocuments({ ...filter, status: 'completed' });
+    const [totalBookings, confirmedBookings, pendingBookings, cancelledBookings, completedBookings, bookedBookings] = await Promise.all([
+      Booking.countDocuments(filter),
+      Booking.countDocuments({ ...filter, status: 'confirmed' }),
+      Booking.countDocuments({ ...filter, status: 'pending' }),
+      Booking.countDocuments({ ...filter, status: 'cancelled' }),
+      Booking.countDocuments({ ...filter, status: 'completed' }),
+      // 'booked' is set by createAppointment (walk-in/manual entries)
+      Booking.countDocuments({ ...filter, status: 'booked' })
+    ]);
 
     res.status(200).json({
       success: true,
@@ -915,7 +995,8 @@ export const getBookingStats = async (req, res) => {
         confirmedBookings,
         pendingBookings,
         cancelledBookings,
-        completedBookings
+        completedBookings,
+        bookedBookings
       }
     });
   } catch (error) {
@@ -1046,7 +1127,7 @@ export const getTodayAppointments = async (req, res) => {
 
     const appointments = await Booking.find({
       salonId: studioId,
-      bookingDate: { $gte: now, $lte: endOfToday },
+      bookingDate: { $gte: startOfToday, $lte: endOfToday },
       status: { $in: ['booked', 'pending', 'confirmed'] }
     })
       .populate('customerId', 'firstName lastName')
@@ -1198,17 +1279,42 @@ export const createAppointment = async (req, res) => {
 
     const fallbackEmail = `walkin+${Date.now()}@noreply.internal`;
 
-    const appointment = await Booking.create({
-      salonId: studioId,
-      serviceId: service._id,
-      bookingDate: parsedStartTime,
-      duration: service.duration || 30,
-      customerName: sanitizedCustomerName,
-      customerEmail: (customerEmail || fallbackEmail).toLowerCase().trim(),
-      customerPhone: customerPhone || null,
-      notes: notes || '',
-      status: 'booked'
-    });
+    // Check availability under a transaction so manual (walk-in) entries respect
+    // the same slot locks as public createBooking.
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    let appointment;
+    try {
+      const isAvailable = await Booking.checkAvailability(
+        studioId, parsedStartTime, service.duration || 30, null, session
+      );
+      if (!isAvailable) {
+        await session.abortTransaction();
+        return res.status(409).json({
+          success: false,
+          message: 'Dieser Zeitslot ist bereits belegt'
+        });
+      }
+
+      [appointment] = await Booking.create([{
+        salonId: studioId,
+        serviceId: service._id,
+        bookingDate: parsedStartTime,
+        duration: service.duration || 30,
+        customerName: sanitizedCustomerName,
+        customerEmail: (customerEmail || fallbackEmail).toLowerCase().trim(),
+        customerPhone: customerPhone || null,
+        notes: notes || '',
+        status: 'booked'
+      }], { session });
+
+      await session.commitTransaction();
+    } catch (txError) {
+      await session.abortTransaction();
+      throw txError;
+    } finally {
+      session.endSession();
+    }
 
     await appointment.populate('serviceId', 'name duration price');
 
@@ -1241,11 +1347,25 @@ export const getBookingsByDate = async (req, res) => {
       });
     }
 
-    const startDate = new Date(date);
-    startDate.setHours(0, 0, 0, 0);
+    // Validate YYYY-MM-DD format before using as timezone input
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Datum muss im Format YYYY-MM-DD sein'
+      });
+    }
 
-    const endDate = new Date(date);
-    endDate.setHours(23, 59, 59, 999);
+    // Compute start/end in the salon's local timezone so "today" is always
+    // the correct calendar day regardless of server UTC offset.
+    const effectiveSalonId = req.user?.salonId || (req.user?.role === 'ceo' && salonId ? salonId : null);
+    let salonTimezone = 'UTC';
+    if (effectiveSalonId) {
+      const salonDoc = await Salon.findById(effectiveSalonId).select('timezone').maxTimeMS(5000).lean();
+      salonTimezone = salonDoc?.timezone || 'UTC';
+    }
+    const startDate = timezoneHelpers.toUTC(date, '00:00', salonTimezone);
+    const endDate = timezoneHelpers.toUTC(date, '23:59', salonTimezone);
+    endDate.setSeconds(59, 999);
 
     let filter = {
       ...(req.tenantFilter || {}),
