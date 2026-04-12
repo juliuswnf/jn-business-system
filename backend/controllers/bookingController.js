@@ -1092,7 +1092,9 @@ export const getDashboardStats = async (req, res) => {
       studioId,
       stats: {
         todayAppointments,
-        totalRevenueToday: revenueResult[0]?.totalRevenueToday || 0,
+        // Service.price is stored in euros (decimal). The aggregation sums
+        // euros directly — no cent conversion needed.
+        totalRevenueTodayEur: revenueResult[0]?.totalRevenueToday || 0,
         totalCustomers
       }
     });
@@ -1357,7 +1359,15 @@ export const getBookingsByDate = async (req, res) => {
 
     // Compute start/end in the salon's local timezone so "today" is always
     // the correct calendar day regardless of server UTC offset.
-    const effectiveSalonId = req.user?.salonId || (req.user?.role === 'ceo' && salonId ? salonId : null);
+    // CEO must supply an explicit salonId — silently falling back to UTC would
+    // return wrong results for non-UTC salons.
+    if (req.user?.role === 'ceo' && !salonId) {
+      return res.status(400).json({
+        success: false,
+        message: 'CEO: salonId query parameter ist für getBookingsByDate erforderlich'
+      });
+    }
+    const effectiveSalonId = req.user?.salonId || salonId || null;
     let salonTimezone = 'UTC';
     if (effectiveSalonId) {
       const salonDoc = await Salon.findById(effectiveSalonId).select('timezone').maxTimeMS(5000).lean();
