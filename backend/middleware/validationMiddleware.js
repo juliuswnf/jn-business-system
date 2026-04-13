@@ -158,9 +158,9 @@ const sanitizeValue = (value) => {
   // Trim whitespace
   let sanitized = value.trim();
 
-  // Remove HTML/script tags
+  // Remove control characters (stripLow) - do NOT use validator.escape() which would
+  // encode & " < > ' into HTML entities and corrupt legitimate user data in the database.
   sanitized = validator.stripLow(sanitized);
-  sanitized = validator.escape(sanitized);
 
   return sanitized;
 };
@@ -543,7 +543,7 @@ export const schemas = {
   phone: Joi.string().pattern(/^[0-9+\-() ]{10,}$/),
   url: Joi.string().uri().required(),
   date: Joi.date().iso(),
-  id: Joi.string().alphanum().length(24),
+  id: Joi.string().length(24).pattern(/^[a-fA-F0-9]{24}$/),
   name: Joi.string().min(2).max(100),
   description: Joi.string().max(5000),
   price: Joi.number().positive(),

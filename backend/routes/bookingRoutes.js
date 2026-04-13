@@ -3,6 +3,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import securityMiddleware from '../middleware/securityMiddleware.js';
 import { checkTenantAccess, enforceTenantFilter } from '../middleware/tenantMiddleware.js';
 import { bookingCreationLimiter, mutationLimiter } from '../middleware/rateLimiterMiddleware.js';
+import paginationMiddleware from '../middleware/paginationMiddleware.js';
 import bookingController from '../controllers/bookingController.js';
 
 const router = express.Router();
@@ -14,7 +15,7 @@ router.use(authMiddleware.protect);
 router.use(enforceTenantFilter);
 
 // Get all bookings for salon (filtered by tenant)
-router.get('/', bookingController.getBookings);
+router.get('/', paginationMiddleware, bookingController.getBookings);
 
 // Get booking stats (filtered by tenant)
 router.get('/stats', bookingController.getBookingStats);

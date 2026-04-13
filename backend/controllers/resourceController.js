@@ -4,6 +4,10 @@ import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
 import { isValidObjectId } from '../utils/validation.js';
 
+const ALLOWED_RESOURCE_TYPES = ['room', 'equipment', 'staff', 'vehicle', 'chair', 'bed', 'table', 'other'];
+const ALLOWED_RESOURCE_CATEGORIES = ['general', 'medical', 'beauty', 'fitness', 'specialized', 'wellness'];
+const ALLOWED_RESOURCE_STATUSES = ['available', 'unavailable', 'maintenance', 'retired', 'active', 'inactive'];
+
 /**
  * Resource Controller
  * For Spa/Wellness - Room/Equipment management
@@ -77,9 +81,9 @@ export const getSalonResources = async (req, res) => {
       deletedAt: null
     };
 
-    if (type) query.type = type;
-    if (category) query.category = category;
-    if (status) query.status = status;
+    if (type && ALLOWED_RESOURCE_TYPES.includes(String(type))) query.type = String(type);
+    if (category && ALLOWED_RESOURCE_CATEGORIES.includes(String(category))) query.category = String(category);
+    if (status && ALLOWED_RESOURCE_STATUSES.includes(String(status))) query.status = String(status);
 
     const resources = await Resource.find(query)
       .populate('compatibleServices', 'name duration').lean().maxTimeMS(5000)

@@ -3,6 +3,9 @@ import CustomerPackage from '../models/CustomerPackage.js';
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
+
+const ALLOWED_PACKAGE_STATUSES = ['active', 'expired', 'completed', 'cancelled', 'suspended'];
 
 /**
  * Package Controller
@@ -167,10 +170,13 @@ export const purchasePackage = async (req, res) => {
 export const getCustomerPackages = async (req, res) => {
   try {
     const { customerId } = req.params;
-    const { status } = req.query;
+    if (!mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId format' });
+    }
+    const status = ALLOWED_PACKAGE_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
 
     const query = {
-      customerId,
+      customerId: new mongoose.Types.ObjectId(customerId),
       deletedAt: null
     };
 

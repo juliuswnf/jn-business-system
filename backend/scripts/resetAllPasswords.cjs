@@ -1,9 +1,13 @@
 /* eslint-disable no-console */
+// Run with: MONGODB_URI=<your-connection-string> RESET_CEO_PASSWORD=<pw> RESET_BUSINESS_PASSWORD=<pw> RESET_CUSTOMER_PASSWORD=<pw> node scripts/resetAllPasswords.cjs
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// MongoDB Atlas Production URI
-const MONGODB_URI = 'mongodb+srv://jn_automation_user:2007uf-21LC.JSG@jn-automation.9lulzru.mongodb.net/jn-automation?retryWrites=true&w=majority&appName=jn-automation';
+if (!process.env.MONGODB_URI) {
+  console.error('❌ MONGODB_URI environment variable is required');
+  process.exit(1);
+}
+const MONGODB_URI = process.env.MONGODB_URI;
 
 async function resetPasswords() {
   try {
@@ -21,7 +25,9 @@ async function resetPasswords() {
     const User = mongoose.models.User || mongoose.model('User', userSchema);
 
     // Reset CEO password
-    const ceoPassword = await hashPassword('2007uf-21LC.JSG');
+    const rawCeoPassword = process.env.RESET_CEO_PASSWORD;
+    if (!rawCeoPassword) { console.error('\u274c RESET_CEO_PASSWORD env var required'); process.exit(1); }
+    const ceoPassword = await hashPassword(rawCeoPassword);
     const ceoResult = await User.updateOne(
       { email: 'julius@jn-automation.de' },
       { $set: { password: ceoPassword, isActive: true, emailVerified: true, loginAttempts: 0, lockUntil: null } }
@@ -29,7 +35,9 @@ async function resetPasswords() {
     console.log(`🔐 CEO password reset: ${ceoResult.modifiedCount > 0 ? 'SUCCESS' : 'no change needed'}`);
 
     // Reset Business password
-    const businessPassword = await hashPassword('Business@123');
+    const rawBusinessPassword = process.env.RESET_BUSINESS_PASSWORD;
+    if (!rawBusinessPassword) { console.error('\u274c RESET_BUSINESS_PASSWORD env var required'); process.exit(1); }
+    const businessPassword = await hashPassword(rawBusinessPassword);
     const businessResult = await User.updateOne(
       { email: 'business@test.de' },
       { $set: { password: businessPassword, isActive: true, emailVerified: true, loginAttempts: 0, lockUntil: null } }
@@ -37,7 +45,9 @@ async function resetPasswords() {
     console.log(`💼 Business password reset: ${businessResult.modifiedCount > 0 ? 'SUCCESS' : 'no change needed'}`);
 
     // Reset Customer password
-    const customerPassword = await hashPassword('Kunde@123');
+    const rawCustomerPassword = process.env.RESET_CUSTOMER_PASSWORD;
+    if (!rawCustomerPassword) { console.error('\u274c RESET_CUSTOMER_PASSWORD env var required'); process.exit(1); }
+    const customerPassword = await hashPassword(rawCustomerPassword);
     const customerResult = await User.updateOne(
       { email: 'kunde@test.de' },
       { $set: { password: customerPassword, isActive: true, emailVerified: true, loginAttempts: 0, lockUntil: null } }

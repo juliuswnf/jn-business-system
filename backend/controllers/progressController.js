@@ -3,6 +3,7 @@ import Salon from '../models/Salon.js';
 import { uploadToCloudinary } from '../utils/cloudinaryHelper.js';
 import logger from '../utils/logger.js';
 import fs from 'fs';
+import mongoose from 'mongoose';
 
 /**
  * Progress Entry Controller
@@ -142,7 +143,12 @@ export const uploadProgressPhotos = async (req, res) => {
 export const getClientProgressHistory = async (req, res) => {
   try {
     const { customerId } = req.params;
-    const { salonId, startDate, endDate, limit = 50 } = req.query;
+    const { startDate, endDate, limit = 50 } = req.query;
+    const rawSalonId = req.query.salonId;
+    if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    const salonId = rawSalonId || null;
 
     const query = {
       customerId,
@@ -288,7 +294,12 @@ export const deleteProgressEntry = async (req, res) => {
 export const getWeightTrend = async (req, res) => {
   try {
     const { customerId } = req.params;
-    const { salonId, months = 6 } = req.query;
+    const { months = 6 } = req.query;
+    const rawSalonId = req.query.salonId;
+    if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    const salonId = rawSalonId || null;
 
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - parseInt(months));
@@ -321,7 +332,14 @@ export const getWeightTrend = async (req, res) => {
 export const getPerformanceTrend = async (req, res) => {
   try {
     const { customerId } = req.params;
-    const { salonId, exercise, months = 6 } = req.query;
+    const { exercise, months = 6 } = req.query;
+    const rawSalonId2 = req.query.salonId;
+    if (rawSalonId2 && !mongoose.isValidObjectId(rawSalonId2)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    const salonId = rawSalonId2 || null;
+    // Sanitize exercise key: only allow alphanumeric and underscores to prevent object key injection
+    const safeExercise = exercise && /^[a-zA-Z0-9_]{1,50}$/.test(exercise) ? exercise : null;
 
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - parseInt(months));
@@ -333,7 +351,7 @@ export const getPerformanceTrend = async (req, res) => {
     };
 
     if (salonId) query.salonId = salonId;
-    if (exercise) query[`performance.${exercise}`] = { $exists: true };
+    if (safeExercise) query[`performance.${safeExercise}`] = { $exists: true };
 
     const performanceEntries = await ProgressEntry.find(query)
       .sort({ recordedAt: 1 }).lean().maxTimeMS(5000)

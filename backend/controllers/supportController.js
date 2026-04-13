@@ -5,6 +5,8 @@ import logger from '../utils/logger.js';
 import crypto from 'crypto';
 import { escapeHtml } from '../utils/securityHelpers.js';
 
+const ALLOWED_SUPPORT_STATUSES = ['open', 'in_progress', 'resolved', 'closed', 'pending', 'all'];
+
 /**
  * Customer Support Controller
  * Allows salon owners/employees to create and manage support tickets
@@ -135,8 +137,8 @@ export const getMyTickets = async (req, res) => {
     const { status, page = 1, limit = 10 } = req.query;
 
     const query = { userId };
-    if (status && status !== 'all') {
-      query.status = status;
+    if (status && ALLOWED_SUPPORT_STATUSES.includes(String(status)) && status !== 'all') {
+      query.status = String(status);
     }
 
     const tickets = await SupportTicket.find(query)

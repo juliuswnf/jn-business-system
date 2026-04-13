@@ -2,6 +2,7 @@ import express from 'express';
 import SMSConsent from '../models/SMSConsent.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -32,8 +33,14 @@ router.post('/opt-in', async (req, res) => {
       });
     }
 
+    if (!mongoose.isValidObjectId(customerId) || !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid ID format' });
+    }
+    const safeCustomerId = new mongoose.Types.ObjectId(customerId);
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Check if consent already exists
-    let consent = await SMSConsent.findOne({ customerId, salonId });
+    let consent = await SMSConsent.findOne({ customerId: safeCustomerId, salonId: safeSalonId });
 
     if (consent) {
       // Reactivate if previously opted out
@@ -43,8 +50,8 @@ router.post('/opt-in', async (req, res) => {
     } else {
       // Create new consent
       consent = await SMSConsent.create({
-        customerId,
-        salonId,
+        customerId: safeCustomerId,
+        salonId: safeSalonId,
         phoneNumber,
         active: true,
         optInDate: new Date()
@@ -89,8 +96,12 @@ router.post('/opt-out', async (req, res) => {
       });
     }
 
+    if (!mongoose.isValidObjectId(customerId) || !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid ID format' });
+    }
+
     // Find consent
-    const consent = await SMSConsent.findOne({ customerId, salonId });
+    const consent = await SMSConsent.findOne({ customerId: new mongoose.Types.ObjectId(customerId), salonId: new mongoose.Types.ObjectId(salonId) });
 
     if (!consent) {
       return res.status(404).json({

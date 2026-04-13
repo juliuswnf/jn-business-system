@@ -4,6 +4,10 @@ import Consent from '../models/Consent.js';
 import Customer from '../models/Customer.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
+import mongoose from 'mongoose';
+
+const ALLOWED_TATTOO_STYLES = ['traditional', 'neo-traditional', 'realism', 'watercolor', 'blackwork', 'fineline', 'japanese', 'tribal', 'geometric', 'illustrative', 'dotwork', 'biomechanical', 'portrait', 'minimalist', 'other'];
+const ALLOWED_BODY_PARTS = ['arm', 'forearm', 'upper-arm', 'shoulder', 'back', 'chest', 'leg', 'thigh', 'calf', 'foot', 'hand', 'neck', 'rib', 'hip', 'wrist', 'ankle', 'finger', 'head', 'other'];
 
 /**
  * Tattoo Controller
@@ -40,7 +44,10 @@ export const createProject = async (req, res) => {
     } = req.body;
 
     // Validate customer exists
-    const customer = await Customer.findOne({ _id: customerId, salonId });
+    if (!mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, error: 'Invalid customerId' });
+    }
+    const customer = await Customer.findOne({ _id: new mongoose.Types.ObjectId(customerId), salonId });
     if (!customer) {
       return res.status(404).json({
         success: false,
@@ -301,7 +308,10 @@ export const createSession = async (req, res) => {
     } = req.body;
 
     // Validate project
-    const project = await TattooProject.findOne({ _id: projectId, salonId });
+    if (!mongoose.isValidObjectId(projectId)) {
+      return res.status(400).json({ success: false, error: 'Invalid projectId' });
+    }
+    const project = await TattooProject.findOne({ _id: new mongoose.Types.ObjectId(projectId), salonId });
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -546,7 +556,10 @@ export const createConsent = async (req, res) => {
     const { customerId, projectId, type, consentText, expiresAt } = req.body;
 
     // Validate customer
-    const customer = await Customer.findOne({ _id: customerId, salonId });
+    if (!mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, error: 'Invalid customerId' });
+    }
+    const customer = await Customer.findOne({ _id: new mongoose.Types.ObjectId(customerId), salonId });
     if (!customer) {
       return res.status(404).json({
         success: false,
@@ -706,8 +719,8 @@ export const getPortfolio = async (req, res) => {
     const { style, bodyPart, limit = 20 } = req.query;
 
     const filters = { salonId, status: 'completed' };
-    if (style) filters.style = style;
-    if (bodyPart) filters.bodyPart = bodyPart;
+    if (style && ALLOWED_TATTOO_STYLES.includes(String(style))) filters.style = String(style);
+    if (bodyPart && ALLOWED_BODY_PARTS.includes(String(bodyPart))) filters.bodyPart = String(bodyPart);
 
     // Get completed projects
     const projects = await TattooProject.find(filters)

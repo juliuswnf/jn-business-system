@@ -7,7 +7,6 @@ import BookingConfirmation from '../models/BookingConfirmation.js';
 import {
   parseValidDate,
   isValidObjectId,
-  sanitizePagination,
   sanitizeErrorMessage
 } from '../utils/validation.js';
 /**
@@ -46,7 +45,10 @@ export const createBooking = async (req, res) => {
 
     // ? SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
     if (idempotencyKey) {
-      const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
+      if (typeof idempotencyKey !== 'string' || idempotencyKey.length > 512) {
+        return res.status(400).json({ success: false, message: 'Invalid idempotency key' });
+      }
+      const existingBooking = await Booking.findOne({ idempotencyKey: String(idempotencyKey) }).maxTimeMS(5000);
 
       if (existingBooking) {
         logger.info(`?? Duplicate booking attempt detected: ${idempotencyKey}`);
@@ -217,20 +219,20 @@ export const createBooking = async (req, res) => {
 export const getBookings = async (req, res) => {
   try {
     const { status, startDate, endDate, salonId } = req.query;
-    const { page, limit, skip } = sanitizePagination(
-      req.query.page,
-      req.query.limit,
-      100 // Maximum 100 items per page
-    );
+    const { page, limit, skip } = req.pagination;
 
+    const ALLOWED_BOOKING_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show', 'booked'];
     let filter = { ...(req.tenantFilter || {}) };
 
     // Optional salon filter for CEO only
     if (req.user?.role === 'ceo' && salonId) {
-      filter.salonId = salonId;
+      if (!isValidObjectId(salonId)) {
+        return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+      }
+      filter.salonId = new mongoose.Types.ObjectId(salonId);
     }
 
-    if (status) {
+    if (status && ALLOWED_BOOKING_STATUSES.includes(status)) {
       filter.status = status;
     }
 
@@ -985,7 +987,10 @@ export const getBookingStats = async (req, res) => {
 
     // Optional salon filter for CEO only
     if (req.user?.role === 'ceo' && salonId) {
-      filter.salonId = salonId;
+      if (!isValidObjectId(salonId)) {
+        return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+      }
+      filter.salonId = new mongoose.Types.ObjectId(salonId);
     }
 
     const [totalBookings, confirmedBookings, pendingBookings, cancelledBookings, completedBookings, bookedBookings] = await Promise.all([
@@ -1262,7 +1267,7 @@ export const createAppointment = async (req, res) => {
     }
 
     const service = await Service.findOne({
-      _id: serviceId,
+      _id: new mongoose.Types.ObjectId(serviceId),
       salonId: studioId
     }).maxTimeMS(5000);
 
@@ -1350,7 +1355,12 @@ export const createAppointment = async (req, res) => {
 
 export const getBookingsByDate = async (req, res) => {
   try {
-    const { date, salonId } = req.query;
+    const { date } = req.query;
+    const salonId = req.query.salonId;
+
+    if (salonId && !isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
 
     if (!date) {
       return res.status(400).json({
@@ -1394,7 +1404,10 @@ export const getBookingsByDate = async (req, res) => {
 
     // Optional salon filter for CEO only
     if (req.user?.role === 'ceo' && salonId) {
-      filter.salonId = salonId;
+      if (!isValidObjectId(salonId)) {
+        return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+      }
+      filter.salonId = new mongoose.Types.ObjectId(salonId);
     }
 
     // ? PAGINATION - single day should be reasonable, but limit for safety

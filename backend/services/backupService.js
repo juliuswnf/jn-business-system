@@ -1,5 +1,4 @@
 ﻿import { spawn } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
@@ -8,8 +7,6 @@ import logger from '../utils/logger.js';
 import alertingService from './alertingService.js';
 import Backup from '../models/Backup.js';
 import ErrorLog from '../models/ErrorLog.js';
-
-const execAsync = promisify(spawn);
 
 /**
  * Run an external command via spawn (never exec) to prevent shell injection.

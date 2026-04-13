@@ -8,6 +8,9 @@ import { sendSMS } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
 
+const ALLOWED_CAMPAIGN_STATUSES = ['draft', 'active', 'paused', 'completed', 'cancelled'];
+const ALLOWED_RECIPIENT_STATUSES = ['pending', 'sent', 'delivered', 'failed', 'unsubscribed'];
+
 const getSalonForRequestUser = async (req, { populateOwner = false } = {}) => {
   const userId = req.user?._id || req.user?.id;
   const userSalonId = req.user?.salonId;
@@ -120,7 +123,7 @@ export const getCampaigns = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
 
-    const { status } = req.query;
+    const status = ALLOWED_CAMPAIGN_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
     const query = { salonId: salon._id };
     if (status) query.status = status;
 
@@ -368,9 +371,9 @@ export const getRecipients = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
 
-    const { status } = req.query;
+    const recipientStatus = ALLOWED_RECIPIENT_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
     const query = { campaignId: campaign._id };
-    if (status) query.status = status;
+    if (recipientStatus) query.status = recipientStatus;
 
     const recipients = await MarketingRecipient.find(query)
       .populate('customerId', 'name email phoneNumber')

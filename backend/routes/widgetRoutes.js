@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import Booking from '../models/Booking.js';
@@ -458,7 +459,7 @@ publicRouter.post('/book/:slug', publicBookingLimiter, validateBooking, async (r
       });
     }
 
-    const service = await Service.findById(serviceId);
+    const service = await Service.findById(new mongoose.Types.ObjectId(serviceId));
     if (!service) {
       return res.status(404).json({
         success: false,

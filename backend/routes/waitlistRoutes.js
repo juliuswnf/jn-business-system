@@ -5,6 +5,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 import { tierHasFeature } from '../config/pricing.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -184,9 +185,14 @@ router.post('/', requirePublicWaitlistFeature, async (req, res) => {
       });
     }
 
+    if (!mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    const safeCustomerId = new mongoose.Types.ObjectId(customerId);
+
     // Check if already on waitlist
     const existing = await Waitlist.findOne({
-      customerId,
+      customerId: safeCustomerId,
       salonId,
       status: 'active'
     });
@@ -201,7 +207,7 @@ router.post('/', requirePublicWaitlistFeature, async (req, res) => {
 
     // Create waitlist entry
     const waitlistEntry = await Waitlist.create({
-      customerId,
+      customerId: safeCustomerId,
       salonId,
       preferredService,
       preferredDate,
@@ -300,9 +306,13 @@ router.get('/customer/:customerId/:salonId', async (req, res) => {
   try {
     const { customerId, salonId } = req.params;
 
+    if (!mongoose.isValidObjectId(customerId) || !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid ID format' });
+    }
+
     const waitlistEntry = await Waitlist.findOne({
-      customerId,
-      salonId,
+      customerId: new mongoose.Types.ObjectId(customerId),
+      salonId: new mongoose.Types.ObjectId(salonId),
       status: 'active'
     })
       .populate('preferredService', 'name duration price');

@@ -12,6 +12,10 @@ import ErrorLog from '../models/ErrorLog.js';
 import SystemSettings from '../models/SystemSettings.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
 
+const ALLOWED_SUBSCRIPTION_STATUSES = ['active', 'inactive', 'trial', 'cancelled', 'past_due', 'unpaid'];
+const ALLOWED_ERROR_TYPES = ['server', 'client', 'auth', 'payment', 'database', 'external', 'validation'];
+const ALLOWED_USER_ROLES = ['ceo', 'salon_owner', 'employee', 'customer', 'admin'];
+
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
   starter: 129,  // €129/Monat
@@ -130,7 +134,8 @@ export const getAllBusinesses = async (req, res) => {
       });
     }
 
-    const { page = 1, limit = 20, status } = req.query;
+    const { page = 1, limit = 20 } = req.query;
+    const status = ALLOWED_SUBSCRIPTION_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
 
     let filter = {};
     if (status) {
@@ -685,7 +690,8 @@ export const getErrorLogs = async (req, res) => {
       });
     }
 
-    const { resolved, type, limit = 50, page = 1 } = req.query;
+    const { resolved, limit = 50, page = 1 } = req.query;
+    const type = ALLOWED_ERROR_TYPES.includes(String(req.query.type)) ? String(req.query.type) : undefined;
 
     let filter = {};
 
@@ -1025,11 +1031,12 @@ export const getAllUsers = async (req, res) => {
       });
     }
 
-    const { role, search, page = 1, limit = 20 } = req.query;
+    const { search, page = 1, limit = 20 } = req.query;
+    const role = ALLOWED_USER_ROLES.includes(String(req.query.role)) ? String(req.query.role) : undefined;
 
     let filter = {};
 
-    if (role && role !== 'all') {
+    if (role) {
       filter.role = role;
     }
 

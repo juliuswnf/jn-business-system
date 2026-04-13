@@ -6,7 +6,7 @@
 
 import Salon from '../models/Salon.js';
 import Payment from '../models/Payment.js';
-import { escapeRegExp } from '../utils/securityHelpers.js';
+import { escapeRegExp } from '../utils/securityHelpers.js';\n\nconst ALLOWED_PAYMENT_STATUSES = ['pending', 'completed', 'failed', 'refunded', 'partially_refunded', 'cancelled'];\nconst ALLOWED_PAYMENT_TYPES = ['subscription', 'booking', 'refund', 'connect', 'manual'];
 
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
@@ -34,12 +34,11 @@ export const getAllTransactions = async (req, res) => {
 
     const query = {};
 
-    if (status) {
-      query.status = status;
-    }
-    if (type) {
-      query.type = type;
-    }
+    const safeStatus = ALLOWED_PAYMENT_STATUSES.includes(String(status)) ? String(status) : undefined;
+    const safeType = ALLOWED_PAYMENT_TYPES.includes(String(type)) ? String(type) : undefined;
+
+    if (safeStatus) query.status = safeStatus;
+    if (safeType) query.type = safeType;
 
     if (startDate || endDate) {
       query.createdAt = {};

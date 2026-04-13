@@ -1,5 +1,7 @@
 ﻿import logger from '../utils/logger.js';
 import mongoose from 'mongoose';
+
+const ALLOWED_BOOKING_STATUSES_SALON = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show', 'booked'];
 /**
  * Salon Controller - MVP
  * Salon owner operations for their salon
@@ -13,7 +15,10 @@ import Booking from '../models/Booking.js';
 
 export const getSalonInfo = async (req, res) => {
   try {
-    const salonId = req.params.salonId || req.user.salonId;
+    if (req.params.salonId && !mongoose.isValidObjectId(req.params.salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
 
     // IDOR check: non-CEO users may only access their own salon
     if (req.user.role !== 'ceo' && req.user.salonId?.toString() !== salonId?.toString()) {
@@ -59,7 +64,10 @@ const ALLOWED_SALON_FIELDS = [
 
 export const updateSalon = async (req, res) => {
   try {
-    const salonId = req.params.salonId || req.user.salonId;
+    if (req.params.salonId && !mongoose.isValidObjectId(req.params.salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
 
     // Load salon first
     const salon = await Salon.findById(salonId).maxTimeMS(5000);
@@ -117,7 +125,10 @@ export const updateSalon = async (req, res) => {
 
 export const getSalonServices = async (req, res) => {
   try {
-    const salonId = req.params.salonId || req.user.salonId;
+    if (req.params.salonId && !mongoose.isValidObjectId(req.params.salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
 
     // ? PAGINATION - prevent unbounded queries (DoS protection)
     const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -158,7 +169,10 @@ export const getSalonServices = async (req, res) => {
 
 export const getSalonBookings = async (req, res) => {
   try {
-    const salonId = req.params.salonId || req.user.salonId;
+    if (req.params.salonId && !mongoose.isValidObjectId(req.params.salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
     const { status, startDate, endDate } = req.query;
     // ? SECURITY FIX: Validate and limit pagination to prevent DoS
     const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -166,8 +180,8 @@ export const getSalonBookings = async (req, res) => {
 
     let filter = { salonId };
 
-    if (status) {
-      filter.status = status;
+    if (status && ALLOWED_BOOKING_STATUSES_SALON.includes(String(status))) {
+      filter.status = String(status);
     }
 
     if (startDate || endDate) {
@@ -213,7 +227,10 @@ export const getSalonBookings = async (req, res) => {
 
 export const getSalonStats = async (req, res) => {
   try {
-    const salonId = req.params.salonId || req.user.salonId;
+    if (req.params.salonId && !mongoose.isValidObjectId(req.params.salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
 
     const [
       totalBookings,

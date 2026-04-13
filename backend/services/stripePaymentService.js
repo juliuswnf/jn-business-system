@@ -468,7 +468,7 @@ class StripePaymentService {
           paymentType: 'invoice'
         }
       }, {
-        idempotencyKey: `invoice-create-${salon._id}-${Date.now()}`
+        idempotencyKey: `invoice-create-${salon._id}-${dueDate}-${amount}`
       });
 
       // Finalize and send invoice

@@ -7,10 +7,13 @@
 import FeatureFlag from '../models/FeatureFlag.js';
 import Salon from '../models/Salon.js';
 
+const ALLOWED_FLAG_CATEGORIES = ['feature', 'experiment', 'killswitch', 'plan', 'beta', 'internal'];
+
 // ==================== GET ALL FLAGS ====================
 export const getAllFlags = async (req, res) => {
   try {
-    const { category, enabled } = req.query;
+    const { enabled } = req.query;
+    const category = ALLOWED_FLAG_CATEGORIES.includes(String(req.query.category)) ? String(req.query.category) : undefined;
 
     const query = {};
     if (category) query.category = category;
@@ -95,8 +98,12 @@ export const createFlag = async (req, res) => {
       });
     }
 
+    if (typeof key !== 'string' || key.length > 100 || !/^[a-zA-Z0-9_.-]+$/.test(key)) {
+      return res.status(400).json({ success: false, message: 'Invalid key format (alphanumeric, _ . - only, max 100 chars)' });
+    }
+
     // Check for duplicate key
-    const existing = await FeatureFlag.findOne({ key }).maxTimeMS(5000);
+    const existing = await FeatureFlag.findOne({ key: String(key) }).maxTimeMS(5000);
     if (existing) {
       return res.status(400).json({
         success: false,

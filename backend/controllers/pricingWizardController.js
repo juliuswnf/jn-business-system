@@ -191,8 +191,12 @@ export const saveResponse = async (req, res) => {
       });
     }
 
+    if (typeof sessionId !== 'string' || sessionId.length > 256 || !/^[a-zA-Z0-9_-]+$/.test(sessionId)) {
+      return res.status(400).json({ success: false, message: 'Invalid session ID format' });
+    }
+
     // Find most recent response for this session
-    const response = await PricingWizardResponse.findOne({ sessionId })
+    const response = await PricingWizardResponse.findOne({ sessionId: String(sessionId) })
       .sort({ createdAt: -1 });
 
     if (!response) {

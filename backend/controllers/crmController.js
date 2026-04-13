@@ -26,7 +26,8 @@ export const getCustomers = async (req, res) => {
       });
     }
 
-    const { search, sortBy = 'lastBooking', sortOrder = 'desc', page = 1, limit = 50 } = req.query;
+    const { search, sortBy = 'lastBooking', sortOrder = 'desc' } = req.query;
+    const { page, limit, skip } = req.pagination;
 
     // Aggregate customers from bookings
     const aggregation = [
@@ -91,10 +92,9 @@ export const getCustomers = async (req, res) => {
     const sortDirection = sortOrder === 'asc' ? 1 : -1;
     aggregation.push({ $sort: { [sortField]: sortDirection } });
 
-    // Pagination
-    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+    // Pagination (skip/limit come from paginationMiddleware via req.pagination)
     aggregation.push({ $skip: skip });
-    aggregation.push({ $limit: Math.min(parseInt(limit, 10) || 50, 200) });
+    aggregation.push({ $limit: limit });
 
     const customers = await Booking.aggregate(aggregation).option({ maxTimeMS: 5000 });
 
@@ -112,7 +112,7 @@ export const getCustomers = async (req, res) => {
       count: customers.length,
       totalCount,
       totalPages: Math.ceil(totalCount / limit),
-      currentPage: parseInt(page, 10),
+      currentPage: page,
       customers: customers.map(c => ({
         id: c._id,
         name: c.customerName,

@@ -186,7 +186,7 @@ export const processPayment = async (req, res) => {
 
 export const getPaymentHistory = async (req, res) => {
   try {
-    const { bookingId, salonId } = req.query;
+    const { bookingId: rawBookingId, salonId: rawSalonId } = req.query;
     // ? SECURITY FIX: Validate and limit pagination to prevent DoS
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20)); // Max 100 items
@@ -197,6 +197,15 @@ export const getPaymentHistory = async (req, res) => {
         message: 'Invalid pagination parameters'
       });
     }
+
+    if (rawBookingId && !mongoose.isValidObjectId(rawBookingId)) {
+      return res.status(400).json({ success: false, message: 'Invalid bookingId format' });
+    }
+    if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    const bookingId = rawBookingId ? new mongoose.Types.ObjectId(rawBookingId) : undefined;
+    const salonId = rawSalonId ? new mongoose.Types.ObjectId(rawSalonId) : undefined;
 
     let filter = {};
 
@@ -398,7 +407,12 @@ export const refundPayment = async (req, res) => {
 
 export const getRevenueAnalytics = async (req, res) => {
   try {
-    const { startDate, endDate, salonId } = req.query;
+    const { startDate, endDate } = req.query;
+    const rawSalonId = req.query.salonId;
+    if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    const salonId = rawSalonId ? new mongoose.Types.ObjectId(rawSalonId) : undefined;
     let filter = { status: 'completed' };
 
     if (req.user && req.user.role !== 'ceo') {

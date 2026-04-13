@@ -1,8 +1,12 @@
 /* eslint-disable no-console */
+// Run with: MONGODB_URI=<your-connection-string> node scripts/listUsers.cjs
 const mongoose = require('mongoose');
 
-// MongoDB Atlas Production URI
-const MONGODB_URI = 'mongodb+srv://jn_automation_user:2007uf-21LC.JSG@jn-automation.9lulzru.mongodb.net/jn-automation?retryWrites=true&w=majority&appName=jn-automation';
+if (!process.env.MONGODB_URI) {
+  console.error('❌ MONGODB_URI environment variable is required');
+  process.exit(1);
+}
+const MONGODB_URI = process.env.MONGODB_URI;
 
 async function listUsers() {
   try {

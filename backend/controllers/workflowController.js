@@ -8,6 +8,9 @@ import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 
+const ALLOWED_INDUSTRIES = ['tattoo', 'salon', 'barbershop', 'medical', 'wellness', 'fitness', 'nail', 'beauty', 'spa', 'piercing', 'aesthetics'];
+const ALLOWED_PACKAGE_TYPES = ['session', 'treatment', 'membership', 'bundle', 'subscription', 'custom'];
+
 /**
  * ==================== WORKFLOW MANAGEMENT ====================
  */
@@ -43,6 +46,10 @@ export const enableWorkflow = async (req, res) => {
         success: false,
         message: 'Industry is required'
       });
+    }
+
+    if (!ALLOWED_INDUSTRIES.includes(String(industry))) {
+      return res.status(400).json({ success: false, message: 'Invalid industry' });
     }
 
     if (!salonId) {
@@ -150,6 +157,10 @@ export const updateWorkflowConfig = async (req, res) => {
     const { salonId, industry } = req.params;
     const { config, features } = req.body;
 
+    if (!ALLOWED_INDUSTRIES.includes(String(industry))) {
+      return res.status(400).json({ success: false, message: 'Invalid industry' });
+    }
+
     // Enforce tenant isolation: only the owning salon or CEO may update
     if (req.user?.role !== 'ceo' && req.user?.salonId?.toString() !== salonId) {
       return res.status(403).json({ success: false, message: 'Access denied' });
@@ -211,7 +222,10 @@ export const createProject = async (req, res) => {
     const salonId = req.user.salonId;
 
     // Check if workflow is enabled
-    const workflow = await IndustryWorkflow.findOne({ salonId, industry, enabled: true });
+    if (!ALLOWED_INDUSTRIES.includes(String(industry))) {
+      return res.status(400).json({ success: false, message: 'Invalid industry' });
+    }
+    const workflow = await IndustryWorkflow.findOne({ salonId, industry: String(industry), enabled: true });
     if (!workflow) {
       return res.status(400).json({
         success: false,
@@ -770,8 +784,8 @@ export const getSalonPackages = async (req, res) => {
       deletedAt: null
     };
 
-    if (filters.type) {
-      query.type = filters.type;
+    if (filters.type && ALLOWED_PACKAGE_TYPES.includes(String(filters.type))) {
+      query.type = String(filters.type);
     }
 
     if (filters.status) {
@@ -1095,8 +1109,8 @@ export const getPortfolio = async (req, res) => {
       status: 'completed'
     };
 
-    if (industry) {
-      query.industry = industry;
+    if (industry && ALLOWED_INDUSTRIES.includes(String(industry))) {
+      query.industry = String(industry);
     }
 
     let projects = await WorkflowProject.find(query)

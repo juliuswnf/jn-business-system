@@ -308,7 +308,10 @@ export const getAvailableSlots = async (req, res) => {
     };
 
     if (employeeId) {
-      bookingFilter.employeeId = employeeId;
+      if (!isValidObjectId(employeeId)) {
+        return res.status(400).json({ success: false, message: 'Invalid employeeId format' });
+      }
+      bookingFilter.employeeId = new mongoose.Types.ObjectId(employeeId);
     }
 
     const existingBookings = await Booking.find(bookingFilter)
@@ -403,7 +406,10 @@ export const createPublicBooking = async (req, res) => {
     // ? SRE FIX #30: Idempotency check
     stage = 'idempotency_check';
     if (idempotencyKey) {
-      const existingBooking = await Booking.findOne({ idempotencyKey }).maxTimeMS(5000);
+      if (typeof idempotencyKey !== 'string' || idempotencyKey.length > 512) {
+        return res.status(400).json({ success: false, message: 'Invalid idempotency key' });
+      }
+      const existingBooking = await Booking.findOne({ idempotencyKey: String(idempotencyKey) }).maxTimeMS(5000);
 
       if (existingBooking) {
         logger.info(`?? Duplicate public booking: ${idempotencyKey}`);
@@ -939,7 +945,7 @@ export const createPublicAppointment = async (req, res) => {
     }
 
     const service = await Service.findOne({
-      _id: serviceId,
+      _id: new mongoose.Types.ObjectId(serviceId),
       salonId: salon._id,
       isActive: true
     }).maxTimeMS(5000);

@@ -3,6 +3,9 @@ import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinaryHelper.js';
 import fs from 'fs';
+import mongoose from 'mongoose';
+
+const ALLOWED_PORTFOLIO_CATEGORIES = ['hair', 'nails', 'makeup', 'tattoo', 'beauty', 'wellness', 'barbershop', 'medical', 'other'];
 
 /**
  * Artist Portfolio Controller
@@ -95,8 +98,13 @@ export const getPublicPortfolio = async (req, res) => {
       deletedAt: null
     };
 
-    if (category) query.category = category;
-    if (artistId) query.artistId = artistId;
+    if (category && ALLOWED_PORTFOLIO_CATEGORIES.includes(String(category))) query.category = String(category);
+    if (artistId) {
+      if (!mongoose.isValidObjectId(artistId)) {
+        return res.status(400).json({ success: false, message: 'Invalid artistId format' });
+      }
+      query.artistId = new mongoose.Types.ObjectId(artistId);
+    }
     if (featured === 'true') query.featured = true;
 
     const skip = (page - 1) * limit;

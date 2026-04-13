@@ -4,6 +4,8 @@ import logger from '../utils/logger.js';
 import { generateConsentPDF } from '../utils/pdfGenerator.js';
 import { validateUrl } from '../utils/securityHelpers.js';
 
+const ALLOWED_CONSENT_TYPES = ['general', 'photo', 'gdpr', 'treatment', 'minor', 'tattoo', 'medical', 'aftercare', 'liability'];
+
 /**
  * Consent Form Controller
  * For Medical Aesthetics / Tattoo Studios
@@ -141,7 +143,7 @@ export const getCustomerConsents = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Tenant context required' });
     }
 
-    if (consentType) query.consentType = consentType;
+    if (consentType && ALLOWED_CONSENT_TYPES.includes(String(consentType))) query.consentType = String(consentType);
     if (typeof isActive !== 'undefined') query.isActive = isActive === 'true';
 
     const consents = await ConsentForm.find(query)
@@ -246,7 +248,11 @@ export const checkConsentValidity = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Authentication required' });
     }
 
-    const { customerId, consentType } = req.params;
+    const { customerId, consentType: rawConsentType } = req.params;
+    const consentType = ALLOWED_CONSENT_TYPES.includes(String(rawConsentType)) ? String(rawConsentType) : null;
+    if (!consentType) {
+      return res.status(400).json({ success: false, message: 'Invalid consent type' });
+    }
 
     let query;
     try {
@@ -466,7 +472,10 @@ export const getSalonConsents = async (req, res) => {
     }
 
     const query = { salonId, deletedAt: null };
-    if (consentType) query.consentType = consentType;
+    if (consentType) {
+      const safeConsentType = ALLOWED_CONSENT_TYPES.includes(String(consentType)) ? String(consentType) : undefined;
+      if (safeConsentType) query.consentType = safeConsentType;
+    }
     if (typeof isActive !== 'undefined') query.isActive = isActive === 'true';
 
     // ? SECURITY FIX: Validate and limit pagination to prevent DoS

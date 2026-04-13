@@ -125,8 +125,11 @@ router.get('/audit-logs', async (req, res) => {
 
     if (startDate || endDate) {
       query.createdAt = {};
-      if (startDate) query.createdAt.$gte = new Date(startDate);
-      if (endDate) query.createdAt.$lte = new Date(endDate);
+      const parsedStart = startDate ? new Date(String(startDate)) : null;
+      const parsedEnd = endDate ? new Date(String(endDate)) : null;
+      if (parsedStart && !isNaN(parsedStart.getTime())) query.createdAt.$gte = parsedStart;
+      if (parsedEnd && !isNaN(parsedEnd.getTime())) query.createdAt.$lte = parsedEnd;
+      if (!Object.keys(query.createdAt).length) delete query.createdAt;
     }
 
     const validatedPage = Math.max(1, parseInt(page) || 1);
@@ -169,18 +172,19 @@ router.post('/check-ip', async (req, res) => {
   try {
     const { ipAddress } = req.body;
 
-    if (!ipAddress) {
+    if (!ipAddress || !/^[\d.:a-fA-F]+$/.test(String(ipAddress)) || String(ipAddress).length > 45) {
       return res.status(400).json({
         success: false,
-        message: 'IP address required'
+        message: 'Invalid IP address format'
       });
     }
+    const safeIp = String(ipAddress);
 
-    const isSuspicious = isSuspiciousIP(ipAddress);
+    const isSuspicious = isSuspiciousIP(safeIp);
 
     // Get IP history from AuditLog
     const ipHistory = await AuditLog.find({
-      ipAddress,
+      ipAddress: safeIp,
       category: 'security',
       createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
     })

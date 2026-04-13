@@ -1,4 +1,5 @@
 ﻿import express from 'express';
+import path from 'path';
 import healthCheckService from '../services/healthCheckService.js';
 import backupService from '../services/backupService.js';
 import authMiddleware from '../middleware/authMiddleware.js';
@@ -172,7 +173,10 @@ router.post('/backups/restore', async (req, res) => {
       });
     }
 
-    const result = await backupService.restoreFromBackup(backupPath);
+    // Only the filename (basename) is passed to the service — the service resolves the
+    // full path internally and enforces a path-traversal check against BACKUP_DIR.
+    const backupName = path.basename(backupPath);
+    const result = await backupService.restoreFromBackup(backupName);
     return res.status(200).json({
       success: true,
       message: 'Restore completed',

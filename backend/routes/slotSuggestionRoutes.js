@@ -212,9 +212,10 @@ router.get('/:salonId', authMiddleware.protect, async (req, res) => {
     }
 
     // Build query
+    const ALLOWED_SLOT_STATUSES = ['pending', 'accepted', 'declined', 'expired', 'sent'];
     const query = { salonId };
-    if (status) {
-      query.status = status;
+    if (status && ALLOWED_SLOT_STATUSES.includes(String(status))) {
+      query.status = String(status);
     }
 
     // Filter by date range

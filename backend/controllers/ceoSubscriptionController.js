@@ -7,13 +7,16 @@
 import Salon from '../models/Salon.js';
 import stripeService from '../services/stripeService.js';
 
+const ALLOWED_SUBSCRIPTION_STATUSES = ['active', 'inactive', 'trial', 'cancelled', 'past_due', 'unpaid'];
+
 /**
  * Get all salons with subscription info
  * GET /api/ceo/subscriptions
  */
 export const getAllSubscriptions = async (req, res) => {
   try {
-    const { status, page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 20 } = req.query;
+    const status = ALLOWED_SUBSCRIPTION_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
 
     let filter = {};
 

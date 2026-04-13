@@ -6,6 +6,11 @@
 
 import AuditLog from '../models/AuditLog.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
+import mongoose from 'mongoose';
+
+const ALLOWED_AUDIT_CATEGORIES = ['auth', 'salon', 'booking', 'payment', 'user', 'security', 'system', 'phi', 'gdpr', 'admin'];
+const ALLOWED_AUDIT_STATUSES = ['success', 'failure', 'warning', 'error'];
+const ALLOWED_RESOURCE_TYPES = ['user', 'salon', 'booking', 'payment', 'service', 'employee', 'subscription'];
 
 // ==================== GET AUDIT LOGS ====================
 export const getAuditLogs = async (req, res) => {
@@ -25,13 +30,18 @@ export const getAuditLogs = async (req, res) => {
 
     const query = {};
 
-    if (category) query.category = category;
+    if (category && ALLOWED_AUDIT_CATEGORIES.includes(String(category))) query.category = String(category);
     if (action && typeof action === 'string' && action.length <= 50) {
       query.action = { $regex: escapeRegExp(action), $options: 'i' };
     }
-    if (userId) query.userId = userId;
-    if (resourceType) query.resourceType = resourceType;
-    if (status) query.status = status;
+    if (userId) {
+      if (!mongoose.isValidObjectId(userId)) {
+        return res.status(400).json({ success: false, message: 'Invalid userId format' });
+      }
+      query.userId = new mongoose.Types.ObjectId(userId);
+    }
+    if (resourceType && ALLOWED_RESOURCE_TYPES.includes(String(resourceType))) query.resourceType = String(resourceType);
+    if (status && ALLOWED_AUDIT_STATUSES.includes(String(status))) query.status = String(status);
 
     if (startDate || endDate) {
       query.createdAt = {};

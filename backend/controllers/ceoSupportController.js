@@ -6,19 +6,27 @@
 
 import SupportTicket from '../models/SupportTicket.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
+import mongoose from 'mongoose';
+
+const ALLOWED_TICKET_STATUSES = ['open', 'in_progress', 'resolved', 'closed', 'pending'];
+const ALLOWED_TICKET_PRIORITIES = ['low', 'medium', 'high', 'urgent'];
+const ALLOWED_TICKET_CATEGORIES = ['billing', 'technical', 'account', 'feature', 'general', 'bug'];
 
 // ==================== GET ALL TICKETS ====================
 export const getAllTickets = async (req, res) => {
   try {
-    const {
-      status,
-      priority,
-      category,
-      assignedTo,
-      page = 1,
-      limit = 20,
-      search
-    } = req.query;
+    const { page = 1, limit = 20, search } = req.query;
+    const status = ALLOWED_TICKET_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
+    const priority = ALLOWED_TICKET_PRIORITIES.includes(String(req.query.priority)) ? String(req.query.priority) : undefined;
+    const category = ALLOWED_TICKET_CATEGORIES.includes(String(req.query.category)) ? String(req.query.category) : undefined;
+    const assignedToRaw = req.query.assignedTo;
+    let assignedTo;
+    if (assignedToRaw) {
+      if (!mongoose.isValidObjectId(assignedToRaw)) {
+        return res.status(400).json({ success: false, message: 'Invalid assignedTo format' });
+      }
+      assignedTo = new mongoose.Types.ObjectId(assignedToRaw);
+    }
 
     const query = {};
 

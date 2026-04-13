@@ -73,3 +73,6 @@ node_modules
 *.env
 .env.*
 .env.*.local
+
+# ==================== BACKUPS (contain sensitive data) ====================
+backend/backups/

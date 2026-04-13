@@ -7,6 +7,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import { validateBody } from '../middleware/validationMiddleware.js';
+import paginationMiddleware from '../middleware/paginationMiddleware.js';
 import {
   getCustomers,
   getCustomerDetails,
@@ -23,7 +24,7 @@ const router = express.Router();
  * @desc    Get all customers for the salon
  * @access  Protected (salon_owner, employee)
  */
-router.get('/customers', getCustomers);
+router.get('/customers', paginationMiddleware, getCustomers);
 
 /**
  * @route   GET /api/crm/customers/:email

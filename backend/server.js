@@ -10,6 +10,7 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import logger from './utils/logger.js';
 import { addRequestContext } from './utils/structuredLogger.js';
@@ -339,8 +340,12 @@ app.use('/api/v1/pricing', pricingRoutes); // Pricing & Feature Access (Mixed: p
 // Protected Routes (Auth Required)
 app.use('/api/v1/salon', authMiddleware.protect, authMiddleware.requireActiveSubscription, salonRoutes);
 // Redirect plural alias → canonical singular path. A single mount avoids silent middleware divergence.
+// Build the redirect from a hardcoded base + normalized path — never use req.originalUrl directly
+// to prevent open-redirect via crafted paths like /api/v1/salons//evil.com/...
 app.use('/api/v1/salons', (req, res) => {
-  res.redirect(301, req.originalUrl.replace('/api/v1/salons', '/api/v1/salon'));
+  const safePath = req.path.replace(/^\/+/, '/'); // normalize leading slashes
+  const safeQuery = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  res.redirect(301, `/api/v1/salon${safePath}${safeQuery}`);
 });
 app.use('/api/v1/bookings', authMiddleware.protect, authMiddleware.requireActiveSubscription, bookingRoutes);
 app.use('/api/v1/appointments', authMiddleware.protect, authMiddleware.requireActiveSubscription, appointmentsRoutes);
@@ -403,42 +408,43 @@ if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
 // Global error handler
 app.use(errorHandlerMiddleware.globalErrorHandler);
 
+// ==================== SOCKET.IO AUTH MIDDLEWARE ====================
+// Only authenticated users may establish a Socket.IO connection.
+// Events are emitted server-side only from controllers — clients must NOT
+// be able to trigger broadcasts by sending custom events.
+io.use((socket, next) => {
+  try {
+    const token =
+      socket.handshake.auth?.token ||
+      socket.handshake.headers?.authorization?.replace(/^Bearer\s+/i, '');
+
+    if (!token) {
+      return next(new Error('Authentication required'));
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      logger.error('JWT_SECRET not set — rejecting Socket.IO connection');
+      return next(new Error('Server configuration error'));
+    }
+
+    const decoded = jwt.verify(token, secret);
+    socket.user = decoded;
+    next();
+  } catch {
+    next(new Error('Invalid or expired token'));
+  }
+});
+
 // ==================== SOCKET.IO EVENTS ====================
 io.on('connection', (socket) => {
-  logger.info(`? Client connected: ${socket.id}`);
+  logger.info(`✅ Client connected: ${socket.id} (user: ${socket.user?.id ?? 'unknown'})`);
 
-  socket.on('bookingCreated', (data) => {
-    logger.info('?? Booking created:', data);
-    io.emit('bookingUpdate', { type: 'created', data });
-  });
-
-  socket.on('bookingUpdated', (data) => {
-    logger.info('?? Booking updated:', data);
-    io.emit('bookingUpdate', { type: 'updated', data });
-  });
-
-  socket.on('bookingDeleted', (data) => {
-    logger.info('?? Booking deleted:', data);
-    io.emit('bookingUpdate', { type: 'deleted', data });
-  });
-
-  socket.on('paymentStarted', (data) => {
-    logger.info('?? Payment started:', data);
-    io.emit('paymentUpdate', { type: 'started', data });
-  });
-
-  socket.on('paymentCompleted', (data) => {
-    logger.info('?? Payment completed:', data);
-    io.emit('paymentUpdate', { type: 'completed', data });
-  });
-
-  socket.on('paymentFailed', (data) => {
-    logger.info('?? Payment failed:', data);
-    io.emit('paymentUpdate', { type: 'failed', data });
-  });
+  // Events are emitted server-side only from controllers.
+  // Clients are not permitted to trigger broadcasts.
 
   socket.on('disconnect', () => {
-    logger.info(`? Client disconnected: ${socket.id}`);
+    logger.info(`❌ Client disconnected: ${socket.id}`);
   });
 });
 

@@ -3,6 +3,8 @@ import Salon from '../models/Salon.js';
 import AuditLog from '../models/AuditLog.js';
 import logger from '../utils/logger.js';
 
+const ALLOWED_NOTE_TYPES = ['assessment', 'treatment', 'follow_up', 'consultation', 'consent', 'progress', 'discharge', 'general'];
+
 /**
  * Clinical Notes Controller
  * For Medical Aesthetics / Physiotherapy
@@ -205,7 +207,7 @@ export const getPatientClinicalNotes = async (req, res) => {
       deletedAt: null
     };
 
-    if (noteType) query.noteType = noteType;
+    if (noteType && ALLOWED_NOTE_TYPES.includes(String(noteType))) query.noteType = String(noteType);
 
     const clinicalNotes = await ClinicalNote.find(query)
       .sort({ treatmentDate: -1 })

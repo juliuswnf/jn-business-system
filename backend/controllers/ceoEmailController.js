@@ -8,10 +8,13 @@ import Salon from '../models/Salon.js';
 import EmailLog from '../models/EmailLog.js';
 import EmailQueue from '../models/EmailQueue.js';
 
+const ALLOWED_EMAIL_STATUSES = ['pending', 'sent', 'failed', 'cancelled', 'completed', 'draft'];
+
 // ==================== GET ALL CAMPAIGNS ====================
 export const getAllCampaigns = async (req, res) => {
   try {
-    const { status, page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 20 } = req.query;
+    const status = ALLOWED_EMAIL_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
 
     const query = { type: 'campaign' };
     if (status) {

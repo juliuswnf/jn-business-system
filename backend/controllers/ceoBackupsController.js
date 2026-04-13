@@ -22,9 +22,14 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 // ==================== GET ALL BACKUPS ====================
+const ALLOWED_BACKUP_TYPES = ['full', 'incremental', 'manual', 'scheduled'];
+const ALLOWED_BACKUP_STATUSES = ['pending', 'running', 'completed', 'failed'];
+
 export const getAllBackups = async (req, res) => {
   try {
-    const { type, status, page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 20 } = req.query;
+    const type = ALLOWED_BACKUP_TYPES.includes(String(req.query.type)) ? String(req.query.type) : undefined;
+    const status = ALLOWED_BACKUP_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
 
     const query = {};
     if (type) query.type = type;

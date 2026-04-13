@@ -154,6 +154,9 @@ export const chargeNoShowFeeConnect = async (booking, salon) => {
         type: 'no_show_fee',
         salonName: salon.name
       }
+    }, {
+      // Deterministic key: if the worker retries the same booking, Stripe deduplicates
+      idempotencyKey: `no-show-connect-${booking._id}`
     });
 
     // Calculate breakdown (Stripe takes ~€0.46 from salon)
