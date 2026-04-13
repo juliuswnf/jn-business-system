@@ -21,6 +21,7 @@ import logger from '../utils/logger.js';
  */
 
 let isRunning = false;
+let cronTask = null;
 
 async function processNoShowCharges() {
   if (isRunning) {
@@ -143,11 +144,19 @@ export function startNoShowChargeWorker() {
   processNoShowCharges();
 
   // Schedule to run every hour at :10
-  cron.schedule('10 * * * *', () => {
+  cronTask = cron.schedule('10 * * * *', () => {
     processNoShowCharges();
   });
 
   logger.info('[NoShowCharge] Worker scheduled ✅');
+}
+
+export function stopNoShowChargeWorker() {
+  if (cronTask) {
+    cronTask.stop();
+    cronTask = null;
+    logger.info('[NoShowCharge] Worker stopped');
+  }
 }
 
 export default startNoShowChargeWorker;

@@ -177,7 +177,9 @@ export const initializeCronJobs = () => {
     logger.log('?? Initializing Cron Jobs...');
 
     // ? SECURITY FIX: Automated Database Backups
-    // Every day at 3 AM - Create database backup
+    // Every day at 3 AM - Create database backup.
+    // NOT a standalone worker: backups are a one-shot daily task with no queue, no isRunning guard,
+    // and no in-process state. A cron job is sufficient and correct here.
     cron.schedule(backupService.BACKUP_SCHEDULE, async () => {
       try {
         logger.log('?? Starting scheduled database backup...');
@@ -188,44 +190,61 @@ export const initializeCronJobs = () => {
     });
 
     // ? Cleanup Jobs
-    // Every day at 2:30 AM - Clean up old error logs
+    // Every day at 2:30 AM - Clean up old error logs.
+    // NOT a standalone worker: pure database housekeeping with no shared state or queuing needs.
     cron.schedule('30 2 * * *', cleanupExpiredErrorLogs);
 
-    // Every day at 3 AM - Clean up expired sessions
+    // Every day at 3 AM - Clean up expired sessions.
+    // NOT a standalone worker: stateless one-shot cleanup; no retry or batch-cap logic required.
     cron.schedule('0 3 * * *', cleanupExpiredSessions);
 
-    // Every day at 4 AM - Clean up orphaned data
+    // Every day at 4 AM - Clean up orphaned data.
+    // NOT a standalone worker: stateless housekeeping; runs once per day with no concurrency risk.
     cron.schedule('0 4 * * *', cleanupOrphanedData);
 
     // ✅ Maintenance Jobs
-    // Every Sunday at 3 AM - Database maintenance
+    // Every Sunday at 3 AM - Database maintenance.
+    // NOT a standalone worker: weekly, read-only maintenance with no customer-facing side effects.
     cron.schedule('0 3 * * 0', performDatabaseMaintenance);
 
-    // Every day at 6 AM - Generate system report
+    // Every day at 6 AM - Generate system report.
+    // NOT a standalone worker: analytics snapshot with no queue or retry semantics needed.
     cron.schedule('0 6 * * *', generateSystemReport);
 
     // ✅ Monitoring Jobs
-    // Every 5 minutes - Check system health
+    // Every 5 minutes - Check system health.
+    // NOT a standalone worker: passive health-check probe only; does not write customer data.
     cron.schedule('*/5 * * * *', checkSystemHealth);
 
-    // Every 10 minutes - Check webhook health
+    // Every 10 minutes - Check webhook health.
+    // NOT a standalone worker: passive endpoint probe; no customer data mutations.
     cron.schedule('*/10 * * * *', checkWebhookHealth);
 
     // ✅ Notification Jobs
-    // Every day at 8 AM - Send daily reports
+    // Every day at 8 AM - Send daily reports.
+    // NOT a standalone worker: fires once per day; no persistent queue or idempotency required.
     cron.schedule('0 8 * * *', sendDailyReports);
 
-    // Every Monday at 9 AM - Send weekly digest
+    // Every Monday at 9 AM - Send weekly digest.
+    // NOT a standalone worker: fires once per week; no persistent queue or idempotency required.
     cron.schedule('0 9 * * 1', sendWeeklyDigest);
 
-    // ✅ Booking Notification Jobs
-    // Every hour - Send 24h booking reminders
+    // ✅ Booking Notification Jobs (EMAIL channel)
+    // Every hour - Send 24h EMAIL booking reminders.
+    // NOT a duplicate of reminderWorker.js: reminderWorker sends SMS via smsService and tracks
+    // state in BookingConfirmation.remindersSent. This job sends EMAILS via emailService and
+    // tracks state in booking.emailsSent.reminder — a completely different channel and flag.
     cron.schedule('0 * * * *', sendBookingReminders);
 
-    // Every hour - Send review requests (2h after appointment)
+    // Every hour - Send EMAIL review requests (2h after appointment).
+    // NOT a standalone worker: no corresponding worker handles post-appointment review emails.
+    // cronService is the single source of truth for review request emails.
     cron.schedule('30 * * * *', sendReviewRequests);
 
     // ✅ NO-SHOW-KILLER: DSGVO Auto-Delete Payment Methods (daily at 3:15 AM)
+    // NOT a standalone worker: GDPR data-deletion task that runs once daily with no queue or
+    // retry semantics. noShowChargeWorker handles Stripe no-show CHARGES; this job handles
+    // post-policy GDPR DELETION of stored payment methods — a separate obligation entirely.
     cron.schedule('15 3 * * *', async () => {
       try {
         logger.info('🧹 Starting payment method cleanup (DSGVO auto-delete)...');

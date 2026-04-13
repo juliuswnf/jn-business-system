@@ -16,6 +16,7 @@ import logger from '../utils/logger.js';
  */
 
 let isRunning = false;
+let cronTask = null;
 
 async function processAutoCancellations() {
   if (isRunning) {
@@ -170,11 +171,19 @@ export function startAutoCancelWorker() {
   processAutoCancellations();
 
   // Schedule to run every 15 minutes
-  cron.schedule('*/15 * * * *', () => {
+  cronTask = cron.schedule('*/15 * * * *', () => {
     processAutoCancellations();
   });
 
   logger.info('[AutoCancel] Worker scheduled ✅');
+}
+
+export function stopAutoCancelWorker() {
+  if (cronTask) {
+    cronTask.stop();
+    cronTask = null;
+    logger.info('[AutoCancel] Worker stopped');
+  }
 }
 
 export default startAutoCancelWorker;

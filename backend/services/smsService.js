@@ -197,14 +197,12 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
   });
 
   try {
-    // Check SMS Consent (GDPR)
-    const consent = await SMSConsent.findOne({ customerId, salonId });
-    if (!consent || !consent.active) {
-      throw new Error('Customer has not opted in for SMS notifications');
-    }
+    // Consent was already verified in sendSMS() before queuing.
+    // No redundant check here — trust the gate at the public entry point.
 
-    // Check Do-Not-Disturb hours
-    if (!consent.canSendNow()) {
+    // Check Do-Not-Disturb hours (consent DnD applies even after gate)
+    const dnDConsent = await SMSConsent.findOne({ customerPhone: phoneNumber, salonId }).maxTimeMS(3000).catch(() => null);
+    if (dnDConsent && !dnDConsent.canSendNow()) {
       throw new Error('Cannot send SMS during Do-Not-Disturb hours (22:00-08:00)');
     }
 
@@ -272,9 +270,31 @@ async function sendSMSImmediate(phoneNumber, message, salonId, template, booking
 }
 
 /**
- * Main SMS Send Function (with rate limiting)
+ * Main SMS Send Function (with GDPR consent gate + rate limiting)
+ *
+ * The consent check runs BEFORE the message enters the queue so it is enforced
+ * regardless of which caller invokes sendSMS. Consent failure is fail-safe:
+ * if the DB query itself throws we block the SMS (never fail open).
  */
 export async function sendSMS(phoneNumber, message, salonId, template, bookingId = null, customerId = null) {
+  // GDPR consent gate — must pass before queuing
+  try {
+    const consent = await SMSConsent.findOne({
+      customerPhone: phoneNumber,
+      salonId,
+      opted: true
+    }).maxTimeMS(3000);
+
+    if (!consent) {
+      logger.warn(`[SMS] Blocked — no consent for phone ${phoneNumber} salonId ${salonId}`);
+      return { sent: false, reason: 'no_consent' };
+    }
+  } catch (consentErr) {
+    // Fail safe: a broken consent check must NOT allow the SMS through
+    logger.error('[SMS] Consent check failed, blocking SMS (fail safe):', consentErr.message);
+    return { sent: false, reason: 'consent_check_error' };
+  }
+
   return queueSMS(phoneNumber, message, salonId, template, bookingId, customerId);
 }
 

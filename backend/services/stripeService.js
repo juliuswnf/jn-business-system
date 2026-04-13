@@ -87,6 +87,8 @@ export const createSubscription = async (salon, priceId, trialDays = 14) => {
         save_default_payment_method: 'on_subscription'
       },
       expand: ['latest_invoice.payment_intent']
+    }, {
+      idempotencyKey: `sub-create-${salon._id}-${priceId}`
     });
 
     // Update salon subscription data
@@ -522,6 +524,8 @@ export const chargeNoShowFee = async (customerId, paymentMethodId, amount, descr
         type: 'no_show_fee',
         ...metadata
       }
+    }, {
+      idempotencyKey: `no-show-${metadata.bookingId || `${customerId}-${Date.now()}`}`
     });
 
     logger.log(`✅ Charged No-Show-Fee: €${amount / 100} - Payment Intent: ${paymentIntent.id}`);

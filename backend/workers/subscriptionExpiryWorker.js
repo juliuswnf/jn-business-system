@@ -23,6 +23,7 @@ import logger from '../utils/logger.js';
  */
 
 let isRunning = false;
+let cronTask = null;
 
 async function processSubscriptionExpiry() {
   if (isRunning) {
@@ -118,11 +119,19 @@ export function startSubscriptionExpiryWorker() {
   processSubscriptionExpiry();
 
   // Schedule to run every hour at :30
-  cron.schedule('30 * * * *', () => {
+  cronTask = cron.schedule('30 * * * *', () => {
     processSubscriptionExpiry();
   });
 
   logger.info('[SubscriptionExpiry] Worker scheduled ✅');
+}
+
+export function stopSubscriptionExpiryWorker() {
+  if (cronTask) {
+    cronTask.stop();
+    cronTask = null;
+    logger.info('[SubscriptionExpiry] Worker stopped');
+  }
 }
 
 export default startSubscriptionExpiryWorker;

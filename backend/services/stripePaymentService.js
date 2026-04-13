@@ -159,7 +159,9 @@ class StripePaymentService {
         subscriptionData.metadata.trial = 'true';
       }
 
-      const subscription = await this.stripe.subscriptions.create(subscriptionData);
+      const subscription = await this.stripe.subscriptions.create(subscriptionData, {
+        idempotencyKey: `sub-create-${salon._id}-${tier}-${billingCycle}`
+      });
 
       // Update salon subscription info
       salon.subscription.stripeSubscriptionId = subscription.id;
@@ -451,6 +453,8 @@ class StripePaymentService {
         amount,
         currency: 'eur',
         description
+      }, {
+        idempotencyKey: `invoiceitem-${salon._id}-${description.slice(0, 40).replace(/\s+/g, '_')}`
       });
 
       // Create invoice
@@ -463,6 +467,8 @@ class StripePaymentService {
           salonId: salon._id.toString(),
           paymentType: 'invoice'
         }
+      }, {
+        idempotencyKey: `invoice-create-${salon._id}-${Date.now()}`
       });
 
       // Finalize and send invoice

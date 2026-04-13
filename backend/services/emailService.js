@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import EmailQueue from '../models/EmailQueue.js';
 import EmailLog from '../models/EmailLog.js';
+import ErrorLog from '../models/ErrorLog.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
 
@@ -67,6 +68,16 @@ export const sendEmail = async (emailData) => {
     return { success: true, messageId: info.messageId };
   } catch (error) {
     logger.error('❌ Email send error:', error);
+
+    // Log to ErrorLog so failures appear in the CEO dashboard
+    ErrorLog.logError({
+      type: 'email_failure',
+      message: `sendEmail failed to ${emailData.to}: ${error.message}`,
+      source: 'service',
+      ...(emailData.salonId || emailData.companyId
+        ? { salonId: emailData.salonId || emailData.companyId }
+        : {})
+    }).catch(logErr => logger.warn('ErrorLog write failed:', logErr.message));
 
     // Log failed email (only if companyId provided)
     if (emailData.companyId || emailData.salonId) {

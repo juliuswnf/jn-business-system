@@ -14,6 +14,7 @@ import logger from '../utils/logger.js';
  */
 
 let isRunning = false;
+let cronTask = null;
 
 async function processReminders() {
   if (isRunning) {
@@ -130,11 +131,19 @@ export function startReminderWorker() {
   processReminders();
 
   // Schedule to run every 30 minutes
-  cron.schedule('*/30 * * * *', () => {
+  cronTask = cron.schedule('*/30 * * * *', () => {
     processReminders();
   });
 
   logger.info('[Reminder] Worker scheduled ✅');
+}
+
+export function stopReminderWorker() {
+  if (cronTask) {
+    cronTask.stop();
+    cronTask = null;
+    logger.info('[Reminder] Worker stopped');
+  }
 }
 
 export default startReminderWorker;

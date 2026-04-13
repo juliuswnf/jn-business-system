@@ -15,6 +15,7 @@ import logger from '../utils/logger.js';
  */
 
 let isRunning = false;
+let cronTask = null;
 
 async function processWaitlistMatching() {
   if (isRunning) {
@@ -217,11 +218,19 @@ export function startWaitlistMatcher() {
   processWaitlistMatching();
 
   // Schedule to run every 15 minutes
-  cron.schedule('*/15 * * * *', () => {
+  cronTask = cron.schedule('*/15 * * * *', () => {
     processWaitlistMatching();
   });
 
   logger.info('[WaitlistMatcher] Worker scheduled ✅');
+}
+
+export function stopWaitlistMatcher() {
+  if (cronTask) {
+    cronTask.stop();
+    cronTask = null;
+    logger.info('[WaitlistMatcher] Worker stopped');
+  }
 }
 
 export default startWaitlistMatcher;

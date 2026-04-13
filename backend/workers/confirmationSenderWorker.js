@@ -14,6 +14,7 @@ import logger from '../utils/logger.js';
  */
 
 let isRunning = false;
+let cronTask = null;
 
 async function processConfirmations() {
   if (isRunning) {
@@ -129,11 +130,19 @@ export function startConfirmationSender() {
   processConfirmations();
 
   // Schedule to run every 5 minutes
-  cron.schedule('*/5 * * * *', () => {
+  cronTask = cron.schedule('*/5 * * * *', () => {
     processConfirmations();
   });
 
   logger.info('[ConfirmationSender] Worker scheduled ✅');
+}
+
+export function stopConfirmationSender() {
+  if (cronTask) {
+    cronTask.stop();
+    cronTask = null;
+    logger.info('[ConfirmationSender] Worker stopped');
+  }
 }
 
 export default startConfirmationSender;

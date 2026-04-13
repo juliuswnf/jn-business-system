@@ -1,13 +1,32 @@
-﻿import { exec } from 'child_process';
+﻿import { spawn } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
 import alertingService from './alertingService.js';
 import Backup from '../models/Backup.js';
+import ErrorLog from '../models/ErrorLog.js';
 
-const execAsync = promisify(exec);
+const execAsync = promisify(spawn);
+
+/**
+ * Run an external command via spawn (never exec) to prevent shell injection.
+ * @param {string} command - The executable name.
+ * @param {string[]} args  - Array of arguments (no shell expansion applied).
+ */
+const spawnAsync = (command, args) =>
+  new Promise((resolve, reject) => {
+    const proc = spawn(command, args, { stdio: 'pipe' });
+    let stderr = '';
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    proc.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`${command} exited with code ${code}: ${stderr.slice(0, 500)}`));
+    });
+    proc.on('error', reject);
+  });
 
 /**
  * ? SECURITY FIX: Automated Database Backup Service
@@ -21,7 +40,9 @@ const execAsync = promisify(exec);
  * - Restore procedures
  */
 
-const BACKUP_DIR = process.env.BACKUP_DIR || './backups';
+// Backup directory: MUST come from env var; never default to a relative path that could
+// land inside the repository. Fall back to a user-home subdirectory instead.
+const BACKUP_DIR = process.env.BACKUP_DIR || path.join(os.homedir(), 'jn-backups');
 const RETENTION_DAYS = parseInt(process.env.BACKUP_RETENTION_DAYS || '7'); // ? SECURITY FIX: 7 days retention
 const BACKUP_SCHEDULE = process.env.BACKUP_SCHEDULE || '0 3 * * *'; // ? SECURITY FIX: 3 AM daily
 
@@ -45,21 +66,25 @@ const createMongoBackup = async () => {
 
     // Use mongodump if available, otherwise use mongoose export
     if (await isMongoToolsInstalled()) {
-      await execAsync(`mongodump --uri="${mongoUri}" --out="${backupPath}"`);
+      // spawn() with an argument array — no shell expansion, no injection risk
+      await spawnAsync('mongodump', [`--uri=${mongoUri}`, `--out=${backupPath}`]);
     } else {
       // Fallback: Export collections using mongoose
       await exportCollectionsManually(backupPath);
     }
 
-    // Compress backup
+    // Compress backup (spawn — no shell string interpolation)
     const zipPath = `${backupPath}.tar.gz`;
     if (process.platform === 'win32') {
       // Windows: Use 7zip or skip compression
       logger.warn('?? Compression skipped on Windows. Install 7zip for compression.');
     } else {
-      await execAsync(`tar -czf "${zipPath}" -C "${BACKUP_DIR}" "${path.basename(backupPath)}"`);
+      await spawnAsync('tar', ['-czf', zipPath, '-C', BACKUP_DIR, path.basename(backupPath)]);
       // Remove uncompressed directory
       await fs.rm(backupPath, { recursive: true, force: true });
+
+      // Restrict backup file to owner read/write only
+      await fs.chmod(zipPath, 0o600);
     }
 
     const backupSize = await getFileSize(process.platform === 'win32' ? backupPath : zipPath);
@@ -91,7 +116,13 @@ const createMongoBackup = async () => {
       backupId: backupRecord._id
     };
   } catch (error) {
-    logger.error('? Backup creation failed:', error);
+    logger.error('? Backup creation failed:', error.message);
+
+    ErrorLog.logError({
+      type: 'backup_failure',
+      message: `Backup creation failed: ${error.message}`,
+      source: 'service'
+    }).catch(e => logger.error('ErrorLog write failed:', e.message));
 
     // Send alert
     await alertingService.sendAlert({
@@ -130,7 +161,7 @@ const exportCollectionsManually = async (backupPath) => {
  */
 const isMongoToolsInstalled = async () => {
   try {
-    await execAsync('mongodump --version');
+    await spawnAsync('mongodump', ['--version']);
     return true;
   } catch {
     return false;
@@ -177,7 +208,7 @@ const cleanupOldBackups = async () => {
     }
 
     // ? SECURITY FIX: Clean up old backup records from database
-    await Backup.updateMany(
+    const markedRecords = await Backup.updateMany(
       {
         status: 'completed',
         createdAt: { $lt: retentionDate }
@@ -193,7 +224,7 @@ const cleanupOldBackups = async () => {
       createdAt: { $lt: new Date(now.getTime() - (RETENTION_DAYS + 1) * 24 * 60 * 60 * 1000) }
     });
 
-    const markedRecordsCount = deletedRecords.modifiedCount || 0;
+    const markedRecordsCount = markedRecords.modifiedCount || 0;
     const totalDeleted = deletedFilesCount + actuallyDeleted.deletedCount;
 
     if (totalDeleted > 0) {
@@ -206,13 +237,21 @@ const cleanupOldBackups = async () => {
       deletedRecordsCount: actuallyDeleted.deletedCount
     };
   } catch (error) {
-    logger.error('? Backup cleanup failed:', error);
+    logger.error('? Backup cleanup failed:', error.message);
+
+    ErrorLog.logError({
+      type: 'backup_failure',
+      message: `Backup cleanup failed: ${error.message}`,
+      source: 'service'
+    }).catch(e => logger.error('ErrorLog write failed:', e.message));
+
     throw error;
   }
 };
 
 /**
- * List all available backups
+ * List all available backups.
+ * Internal file paths are never exposed in the returned objects.
  */
 const listBackups = async () => {
   try {
@@ -227,7 +266,7 @@ const listBackups = async () => {
 
       backups.push({
         filename: file,
-        path: filePath,
+        // Do NOT include the full server path — it must never reach API responses
         size: `${(stats.size / 1024 / 1024).toFixed(2)}MB`,
         created: stats.mtime.toISOString(),
         age: `${Math.round((Date.now() - stats.mtimeMs) / 1000 / 60 / 60 / 24)} days`
@@ -243,26 +282,43 @@ const listBackups = async () => {
 
 /**
  * Restore from backup (CAUTION!)
+ *
+ * @param {string} backupName - The filename (not a full path) of the backup to restore.
+ *   Only alphanumeric characters, hyphens, underscores and dots are accepted.
+ *   The resolved path must be inside BACKUP_DIR (path-traversal check).
  */
-const restoreFromBackup = async (backupPath) => {
+const restoreFromBackup = async (backupName) => {
   try {
     logger.warn('??  RESTORE OPERATION STARTED - This will overwrite current data!');
+
+    // 1. Sanitize input: allow only safe filename characters
+    const SAFE_FILENAME = /^[a-zA-Z0-9_\-\.]+$/;
+    if (!backupName || !SAFE_FILENAME.test(backupName)) {
+      throw new Error('Invalid backup name. Only alphanumeric, hyphen, underscore and dot characters are allowed.');
+    }
+
+    // 2. Path traversal check — resolved path must stay inside BACKUP_DIR
+    const resolvedBackupDir = path.resolve(BACKUP_DIR);
+    const resolvedBackupPath = path.resolve(BACKUP_DIR, backupName);
+    if (!resolvedBackupPath.startsWith(resolvedBackupDir + path.sep)) {
+      throw new Error('Path traversal detected');
+    }
 
     const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
     if (!mongoUri) {
       throw new Error('MONGO_URI not configured');
     }
 
-    // Extract if compressed
-    let extractedPath = backupPath;
-    if (backupPath.endsWith('.tar.gz')) {
-      extractedPath = backupPath.replace('.tar.gz', '');
-      await execAsync(`tar -xzf "${backupPath}" -C "${BACKUP_DIR}"`);
+    // 3. Extract if compressed (spawn — no shell string interpolation)
+    let extractedPath = resolvedBackupPath;
+    if (backupName.endsWith('.tar.gz')) {
+      extractedPath = resolvedBackupPath.replace('.tar.gz', '');
+      await spawnAsync('tar', ['-xzf', resolvedBackupPath, '-C', resolvedBackupDir]);
     }
 
-    // Restore using mongorestore
+    // 4. Restore using mongorestore (spawn — argument array, no shell injection)
     if (await isMongoToolsInstalled()) {
-      await execAsync(`mongorestore --uri="${mongoUri}" --drop "${extractedPath}"`);
+      await spawnAsync('mongorestore', [`--uri=${mongoUri}`, '--drop', extractedPath]);
     } else {
       throw new Error('mongorestore not available. Manual restore required.');
     }
@@ -275,8 +331,16 @@ const restoreFromBackup = async (backupPath) => {
       timestamp: new Date().toISOString()
     };
   } catch (error) {
-    logger.error('? Restore failed:', error);
-    throw error;
+    logger.error('? Restore failed:', error.message);
+
+    ErrorLog.logError({
+      type: 'backup_failure',
+      message: `Restore operation failed: ${error.message}`,
+      source: 'service'
+    }).catch(e => logger.error('ErrorLog write failed:', e.message));
+
+    // Re-throw without leaking internal paths to the caller
+    throw new Error('Restore failed. Check server logs for details.');
   }
 };
 

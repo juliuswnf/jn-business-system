@@ -25,16 +25,16 @@ import { sanitizeInput } from './middleware/sanitizationMiddleware.js';
 import { initSentry, sentryErrorHandler } from './config/sentry.js';
 
 // NO-SHOW-KILLER Workers
-import { startConfirmationSender } from './workers/confirmationSenderWorker.js';
-import { startAutoCancelWorker } from './workers/autoCancelWorker.js';
-import { startWaitlistMatcher } from './workers/waitlistMatcherWorker.js';
-import { startReminderWorker } from './workers/reminderWorker.js';
-import { startNoShowChargeWorker } from './workers/noShowChargeWorker.js';
-import { startSubscriptionExpiryWorker } from './workers/subscriptionExpiryWorker.js';
+import { startConfirmationSender, stopConfirmationSender } from './workers/confirmationSenderWorker.js';
+import { startAutoCancelWorker, stopAutoCancelWorker } from './workers/autoCancelWorker.js';
+import { startWaitlistMatcher, stopWaitlistMatcher } from './workers/waitlistMatcherWorker.js';
+import { startReminderWorker, stopReminderWorker } from './workers/reminderWorker.js';
+import { startNoShowChargeWorker, stopNoShowChargeWorker } from './workers/noShowChargeWorker.js';
+import { startSubscriptionExpiryWorker, stopSubscriptionExpiryWorker } from './workers/subscriptionExpiryWorker.js';
 
 // Marketing Automation Workers
-import { startMarketingCampaignWorker } from './workers/marketingCampaignWorker.js';
-import { startMarketingAnalyticsWorker } from './workers/marketingAnalyticsWorker.js';
+import { startMarketingCampaignWorker, stopMarketingCampaignWorker } from './workers/marketingCampaignWorker.js';
+import { startMarketingAnalyticsWorker, stopMarketingAnalyticsWorker } from './workers/marketingAnalyticsWorker.js';
 
 // Suppress iconv-lite encoding warning (UTF-8 is correctly used)
 process.env.ICONV_PURE = '1';
@@ -720,37 +720,38 @@ process.on('uncaughtException', (error) => {
 });
 
 // ==================== GRACEFUL SHUTDOWN ====================
-process.on('SIGTERM', async () => {
-  logger.info('\n?? SIGTERM signal received: Closing HTTP server');
-  if (emailWorkerIntervals) {
-    emailQueueWorker.stopWorker(emailWorkerIntervals);
-  }
-  if (lifecycleWorkerIntervalId) {
-    lifecycleEmailWorker.stopLifecycleEmailWorker();
-  }
-  server.close(async () => {
-    logger.info('? HTTP server closed');
-    await mongoose.connection.close();
-    logger.info('? MongoDB connection closed');
-    process.exit(0);
-  });
-});
+const gracefulShutdown = async (signal) => {
+  logger.info(`\n?? ${signal} signal received: initiating graceful shutdown`);
 
-process.on('SIGINT', async () => {
-  logger.info('\n?? SIGINT signal received: Closing HTTP server');
+  // 1. Stop all workers first (prevent double-firing during drain)
+  stopConfirmationSender();
+  stopAutoCancelWorker();
+  stopReminderWorker();
+  stopWaitlistMatcher();
+  stopNoShowChargeWorker();
+  stopSubscriptionExpiryWorker();
+  stopMarketingCampaignWorker();
+  stopMarketingAnalyticsWorker();
   if (emailWorkerIntervals) {
     emailQueueWorker.stopWorker(emailWorkerIntervals);
   }
-  if (lifecycleWorkerIntervalId) {
-    lifecycleEmailWorker.stopLifecycleEmailWorker();
-  }
+  lifecycleEmailWorker.stopLifecycleEmailWorker();
+  logger.info('? All workers stopped');
+
+  // 2. Close HTTP server (stop accepting new connections)
   server.close(async () => {
     logger.info('? HTTP server closed');
+
+    // 3. Close MongoDB connection
     await mongoose.connection.close();
     logger.info('? MongoDB connection closed');
+
     process.exit(0);
   });
-});
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // ==================== START SERVER ====================
 startServer();
