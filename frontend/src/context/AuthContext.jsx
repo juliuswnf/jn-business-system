@@ -5,10 +5,29 @@ import { captureError, captureMessage } from '../utils/errorTracking';
 // Create Context
 export const AuthContext = createContext();
 
+const SKIP_AUTH_INIT_ONCE_KEY = 'jn:skipAuthInitOnce';
+const PROTECTED_PATH_PREFIXES = ['/dashboard', '/customer', '/ceo', '/admin', '/employee', '/sessions'];
+
+function hasLocalAuthHint() {
+  const hasCookieHint = document.cookie.split('; ').some(row => row.startsWith('XSRF-TOKEN='));
+  return Boolean(
+    localStorage.getItem('jnUser') ||
+    localStorage.getItem('user') ||
+    localStorage.getItem('jnAuthToken') ||
+    localStorage.getItem('token') ||
+    hasCookieHint
+  );
+}
+
+async function fetchUserProfile() {
+  const response = await api.get('/auth/profile', {
+    validateStatus: (status) => status === 200 || status === 401
+  });
+  return response;
+}
+
 // AuthProvider Component
 export const AuthProvider = ({ children }) => {
-  const SKIP_AUTH_INIT_ONCE_KEY = 'jn:skipAuthInitOnce';
-  const PROTECTED_PATH_PREFIXES = ['/dashboard', '/customer', '/ceo', '/admin', '/employee', '/sessions'];
   const [user, setUser] = useState(null);
   const [isAuthenticated, isAuthenticatedSet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,101 +41,52 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       const currentPath = window.location.pathname || '/';
       const isProtectedPath = PROTECTED_PATH_PREFIXES.some((prefix) => currentPath.startsWith(prefix));
-      const hasCookieHint = document.cookie
-        .split('; ')
-        .some((row) => row.startsWith('XSRF-TOKEN='));
-      const hasAuthHint = Boolean(
-        localStorage.getItem('jnUser') ||
-        localStorage.getItem('user') ||
-        localStorage.getItem('jnAuthToken') ||
-        localStorage.getItem('token') ||
-        hasCookieHint
-      );
 
       const shouldSkipInitOnce = sessionStorage.getItem(SKIP_AUTH_INIT_ONCE_KEY) === '1';
       if (shouldSkipInitOnce) {
-        // Always clear the one-time flag immediately to avoid carrying it into the next navigation.
         sessionStorage.removeItem(SKIP_AUTH_INIT_ONCE_KEY);
-
-        // Only skip profile init on public routes (post-logout convenience).
-        // Never skip on protected routes, otherwise login redirects can bounce back to /login.
         if (!isProtectedPath) {
-          if (isMounted) {
-            setUser(null);
-            isAuthenticatedSet(false);
-            setIsLoading(false);
-          }
+          if (isMounted) { setUser(null); isAuthenticatedSet(false); setIsLoading(false); }
           return;
         }
       }
 
-      // On public pages without auth hints, skip profile check to avoid expected 401 noise on hard refresh
-      if (!isProtectedPath && !hasAuthHint) {
-        if (isMounted) {
-          setUser(null);
-          isAuthenticatedSet(false);
-          setIsLoading(false);
-        }
+      if (!isProtectedPath && !hasLocalAuthHint()) {
+        if (isMounted) { setUser(null); isAuthenticatedSet(false); setIsLoading(false); }
         return;
       }
 
       try {
-        // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-        // Check if user is authenticated by calling the profile endpoint
-        const response = await api.get('/auth/profile', {
-          validateStatus: (status) => status === 200 || status === 401
-        });
-
+        const response = await fetchUserProfile();
         if (response.status === 401) {
-          if (isMounted) {
-            setUser(null);
-            isAuthenticatedSet(false);
-          }
+          if (isMounted) { setUser(null); isAuthenticatedSet(false); }
           return;
         }
-
         if (isMounted && response.data.success) {
-          const user = response.data.user;
-          setUser(user);
+          setUser(response.data.user);
           isAuthenticatedSet(true);
-          // Access token will be sent automatically via interceptor from cookie
         } else if (isMounted) {
-          // If response is not successful, clear state
           setUser(null);
           isAuthenticatedSet(false);
         }
       } catch (err) {
-        // Not authenticated or token expired - this is normal if user is not logged in
-        // ✅ FIX: Don't treat 401 as an error - it's expected when user is not logged in
-        const isExpected401 = err.response?.status === 401;
-        
         if (isMounted) {
           setUser(null);
           isAuthenticatedSet(false);
-          // Clear any leftover localStorage tokens
           localStorage.removeItem('token');
           localStorage.removeItem('jnAuthToken');
           localStorage.removeItem('jnUser');
           localStorage.removeItem('user');
           localStorage.removeItem('tempUser');
         }
-        
-        // Only log if it's not an expected 401 (user not logged in)
-        if (!isExpected401 && err.response?.status !== 401) {
-        }
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) { setIsLoading(false); }
       }
     };
 
     initializeAuth();
     
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
   // Login function

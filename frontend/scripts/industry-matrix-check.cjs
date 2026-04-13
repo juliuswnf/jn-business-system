@@ -53,48 +53,48 @@ async function loginAs(page, credentials) {
   }
 }
 
+async function runChecks(page, scenario) {
+  for (const check of scenario.checks) {
+    await page.goto(`http://localhost:5173${check.route}`, { waitUntil: 'networkidle' });
+    const currentUrl = page.url();
+    const pass = check.expected === 'allow'
+      ? currentUrl.includes(check.route)
+      : currentUrl.includes('/pricing');
+    const status = pass ? 'PASS' : 'FAIL';
+    console.log(`${status} scenario=${scenario.label} route=${check.route} url=${currentUrl} expected=${check.expected}`);
+    if (!pass) return false;
+  }
+
+  await page.goto(`http://localhost:5173${scenario.publicSlug}`, { waitUntil: 'networkidle' });
+  const publicUrl = page.url();
+  const publicPass = publicUrl.includes(scenario.publicSlug);
+  const publicStatus = publicPass ? 'PASS' : 'FAIL';
+  console.log(`${publicStatus} scenario=${scenario.label} publicBooking=${scenario.publicSlug} url=${publicUrl}`);
+  return publicPass;
+}
+
+async function runScenario(browser, scenario) {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  try {
+    await loginAs(page, scenario.credentials);
+    return await runChecks(page, scenario);
+  } catch (error) {
+    console.log(`FAIL scenario=${scenario.label} setup=${error.message}`);
+    return false;
+  } finally {
+    await context.close();
+  }
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true });
   let hasFailure = false;
 
   try {
     for (const scenario of scenarios) {
-      const context = await browser.newContext();
-      const page = await context.newPage();
-
-      try {
-        await loginAs(page, scenario.credentials);
-
-        for (const check of scenario.checks) {
-          await page.goto(`http://localhost:5173${check.route}`, { waitUntil: 'networkidle' });
-          const currentUrl = page.url();
-
-          const pass = check.expected === 'allow'
-            ? currentUrl.includes(check.route)
-            : currentUrl.includes('/pricing');
-
-          const status = pass ? 'PASS' : 'FAIL';
-          console.log(`${status} scenario=${scenario.label} route=${check.route} url=${currentUrl} expected=${check.expected}`);
-
-          if (!pass) {
-            hasFailure = true;
-          }
-        }
-
-        await page.goto(`http://localhost:5173${scenario.publicSlug}`, { waitUntil: 'networkidle' });
-        const publicUrl = page.url();
-        const publicPass = publicUrl.includes(scenario.publicSlug);
-        const publicStatus = publicPass ? 'PASS' : 'FAIL';
-        console.log(`${publicStatus} scenario=${scenario.label} publicBooking=${scenario.publicSlug} url=${publicUrl}`);
-        if (!publicPass) {
-          hasFailure = true;
-        }
-      } catch (error) {
-        console.log(`FAIL scenario=${scenario.label} setup=${error.message}`);
-        hasFailure = true;
-      } finally {
-        await context.close();
-      }
+      const passed = await runScenario(browser, scenario);
+      if (!passed) hasFailure = true;
     }
   } finally {
     await browser.close();

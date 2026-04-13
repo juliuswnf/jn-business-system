@@ -2,21 +2,21 @@
   'use strict';
 
   function initWidget(container) {
-    var slug = container.getAttribute('data-salon');
+    const slug = container.dataset.salon;
     if (!slug) {
       console.error('[JN Widget] Missing data-salon attribute on #jn-booking-widget');
       return;
     }
 
-    var origin = (container.getAttribute('data-origin') || 'https://app.jn-business-system.de').replace(/\/$/, '');
-    var src = origin + '/s/' + encodeURIComponent(slug);
+    const origin = (container.dataset.origin || 'https://app.jn-business-system.de').replace(/\/$/, '');
+    const src = origin + '/s/' + encodeURIComponent(slug);
 
     // Wrapper keeps relative positioning for the loader overlay
-    var wrapper = document.createElement('div');
+    const wrapper = document.createElement('div');
     wrapper.style.cssText = 'position:relative;width:100%;min-height:600px;background:#f9fafb;border-radius:8px;overflow:hidden;';
 
     // Loader overlay
-    var loader = document.createElement('div');
+    const loader = document.createElement('div');
     loader.style.cssText = [
       'position:absolute;inset:0;',
       'display:flex;flex-direction:column;align-items:center;justify-content:center;',
@@ -24,7 +24,7 @@
       'font-family:system-ui,sans-serif;color:#6b7280;gap:12px;'
     ].join('');
 
-    var spinner = document.createElement('div');
+    const spinner = document.createElement('div');
     spinner.style.cssText = [
       'width:36px;height:36px;',
       'border:3px solid #e5e7eb;',
@@ -35,13 +35,13 @@
 
     // Inject keyframe once
     if (!document.getElementById('jn-widget-style')) {
-      var style = document.createElement('style');
+      const style = document.createElement('style');
       style.id = 'jn-widget-style';
       style.textContent = '@keyframes jn-spin{to{transform:rotate(360deg)}}';
       document.head.appendChild(style);
     }
 
-    var loaderText = document.createElement('span');
+    const loaderText = document.createElement('span');
     loaderText.style.cssText = 'font-size:14px;';
     loaderText.textContent = 'Buchungssystem wird geladen…';
 
@@ -49,7 +49,7 @@
     loader.appendChild(loaderText);
 
     // iFrame
-    var iframe = document.createElement('iframe');
+    const iframe = document.createElement('iframe');
     iframe.src = src;
     iframe.title = 'Online-Buchung';
     iframe.setAttribute('loading', 'lazy');
@@ -67,7 +67,7 @@
     });
 
     // If iframe fails to load within 10 s, show a fallback link
-    var fallbackTimer = setTimeout(function () {
+    const fallbackTimer = setTimeout(function () {
       if (loader.style.display !== 'none') {
         loaderText.innerHTML = 'Konnte nicht geladen werden. <a href="' + src + '" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;">Hier öffnen</a>';
         spinner.style.display = 'none';
@@ -87,8 +87,8 @@
   }
 
   function run() {
-    var containers = document.querySelectorAll('#jn-booking-widget[data-salon], .jn-booking-widget[data-salon]');
-    for (var i = 0; i < containers.length; i++) {
+    const containers = document.querySelectorAll('#jn-booking-widget[data-salon], .jn-booking-widget[data-salon]');
+    for (let i = 0; i < containers.length; i++) {
       initWidget(containers[i]);
     }
   }

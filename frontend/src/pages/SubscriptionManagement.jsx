@@ -17,6 +17,36 @@ import DowngradeWarningModal from '../components/subscription/DowngradeWarningMo
  * - Billing history
  */
 
+function LoadingView() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <svg className="animate-spin h-12 w-12 text-gray-900 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p className="mt-4 text-gray-700">Lade Subscription-Informationen...</p>
+      </div>
+    </div>
+  );
+}
+
+function ErrorView({ error, onBack }) {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="max-w-md p-8 bg-white rounded-xl shadow-sm text-center">
+        <svg className="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 className="mt-4 text-xl font-bold text-gray-900">{error}</h3>
+        <button onClick={onBack} className="mt-6 px-6 py-2 bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-100">
+          Zurück zum Kontrollpanel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const SubscriptionManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -83,64 +113,9 @@ const SubscriptionManagement = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <svg
-            className="animate-spin h-12 w-12 text-gray-900 mx-auto"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          <p className="mt-4 text-gray-700">Lade Subscription-Informationen...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingView />;
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md p-8 bg-white rounded-xl shadow-sm text-center">
-          <svg
-            className="w-16 h-16 text-red-500 mx-auto"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h3 className="mt-4 text-xl font-bold text-gray-900">{error}</h3>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-6 px-6 py-2 bg-gray-100 text-gray-900 rounded-xl hover:bg-gray-100"
-          >
-            Zurück zum Kontrollpanel
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (error) return <ErrorView error={error} onBack={() => navigate('/')} />;
 
   if (showUpgrade) {
     return (

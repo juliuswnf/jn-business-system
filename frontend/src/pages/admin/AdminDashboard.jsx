@@ -4,6 +4,35 @@ import { CalendarIcon, UsersIcon, CogIcon, CodeBracketIcon, CheckCircleIcon, Exc
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
 import { api } from '../../utils/api';
 
+async function loadSetupProgress(setSetupProgress) {
+  try {
+    const salonRes = await api.get('/salons/my-salon').catch(() => null);
+    if (salonRes?.data) {
+      const salon = salonRes.data.data || salonRes.data.salon || salonRes.data;
+      setSetupProgress(prev => ({
+        ...prev,
+        hasAddress: !!(salon.address?.city || salon.address?.street),
+        hasOpeningHours: !!(salon.businessHours || salon.openingHours),
+        hasGoogleReview: !!salon.googleReviewUrl
+      }));
+    }
+
+    const servicesRes = await api.get('/services').catch(() => null);
+    if (servicesRes?.data) {
+      const services = servicesRes.data.data || servicesRes.data.services || [];
+      setSetupProgress(prev => ({ ...prev, hasServices: services.length > 0 }));
+    }
+
+    const bookingsRes = await api.get('/bookings?limit=1').catch(() => null);
+    if (bookingsRes?.data) {
+      const bookings = bookingsRes.data.bookings || bookingsRes.data.data || [];
+      setSetupProgress(prev => ({ ...prev, hasFirstBooking: bookings.length > 0 }));
+    }
+  } catch (_error) {
+    // ignore – non-critical setup check
+  }
+}
+
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     todayBookings: 0,
@@ -30,44 +59,7 @@ const AdminDashboard = () => {
   }, []);
 
   const fetchSetupProgress = async () => {
-    // ? SECURITY FIX: Use central api instance
-    try {
-      // Check salon info
-      const salonRes = await api.get('/salons/my-salon').catch(() => null);
-      if (salonRes?.data) {
-        const salonData = salonRes.data;
-        const salon = salonData.data || salonData.salon || salonData;
-        setSetupProgress(prev => ({
-          ...prev,
-          hasAddress: !!(salon.address?.city || salon.address?.street),
-          hasOpeningHours: !!(salon.businessHours || salon.openingHours),
-          hasGoogleReview: !!salon.googleReviewUrl
-        }));
-      }
-
-      // Check services
-      const servicesRes = await api.get('/services').catch(() => null);
-      if (servicesRes?.data) {
-        const servicesData = servicesRes.data;
-        const services = servicesData.data || servicesData.services || [];
-        setSetupProgress(prev => ({
-          ...prev,
-          hasServices: services.length > 0
-        }));
-      }
-
-      // Check bookings
-      const bookingsRes = await api.get('/bookings?limit=1').catch(() => null);
-      if (bookingsRes?.data) {
-        const bookingsData = bookingsRes.data;
-        const bookings = bookingsData.bookings || bookingsData.data || [];
-        setSetupProgress(prev => ({
-          ...prev,
-          hasFirstBooking: bookings.length > 0
-        }));
-      }
-    } catch (error) {
-    }
+    await loadSetupProgress(setSetupProgress);
   };
 
   const fetchStats = async () => {

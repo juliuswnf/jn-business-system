@@ -698,7 +698,45 @@ export const deleteBooking = async (req, res) => {
   }
 };
 
-// ==================== MARK AS NO-SHOW ====================
+// ==================== NO-SHOW HELPERS ====================
+
+async function chargeNoShowFee(booking) {
+  const feeAmount = booking.salonId.noShowKiller.feeAmount || 1500;
+  if (booking.salonId.stripe?.connectedAccountId && booking.salonId.stripe?.chargesEnabled) {
+    const { chargeNoShowFeeConnect } = await import('../services/stripeConnectService.js');
+    const chargeResult = await chargeNoShowFeeConnect(booking, booking.salonId);
+    await Booking.findByIdAndUpdate(booking._id, { $set: { 'noShowFee.charged': true, 'noShowFee.amount': feeAmount, 'noShowFee.chargeId': chargeResult.chargeId, 'noShowFee.transferId': chargeResult.transferId || null, 'noShowFee.chargedAt': new Date(), 'noShowFee.breakdown': chargeResult.breakdown } });
+  } else {
+    const { chargeNoShowFee: chargeFn } = await import('../services/stripeService.js');
+    const paymentIntent = await chargeFn(booking.stripeCustomerId, booking.paymentMethodId, feeAmount, `No-Show-Gebühr - ${booking.salonId.name}`, { bookingId: booking._id.toString(), salonId: booking.salonId._id.toString(), type: 'no_show_fee' });
+    const stripeFee = Math.round(25 + (feeAmount * 0.014));
+    await Booking.findByIdAndUpdate(booking._id, { $set: { 'noShowFee.charged': true, 'noShowFee.amount': feeAmount, 'noShowFee.chargeId': paymentIntent.id, 'noShowFee.chargedAt': new Date(), 'noShowFee.breakdown': { totalCharged: feeAmount, stripeFee, salonReceives: feeAmount - stripeFee, platformCommission: 0 } } });
+  }
+  return feeAmount;
+}
+
+async function sendNoShowFeeEmail(booking, feeAmount) {
+  const emailService = (await import('../services/emailService.js')).default;
+  const dateStr = new Date(booking.bookingDate).toLocaleDateString('de-DE');
+  const timeStr = new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  await emailService.sendEmail({
+    to: booking.customerEmail,
+    subject: `No-Show-Gebühr wurde berechnet - ${booking.salonId.name}`,
+    text: `Hallo ${booking.customerName},\n\nSie sind nicht zu Ihrem Termin erschienen:\n\nTermin: ${dateStr} um ${timeStr}\nSalon: ${booking.salonId.name}\n\nNo-Show-Gebühr: €${(feeAmount / 100).toFixed(2)}\nDie Gebühr wurde von Ihrer hinterlegten Kreditkarte abgebucht.\n\nBei Fragen kontaktieren Sie bitte:\n${booking.salonId.email} | ${booking.salonId.phone || ''}\n\nMit freundlichen Grüßen\n${booking.salonId.name}`,
+    html: `<h2>No-Show-Gebühr wurde berechnet</h2><p>Hallo ${booking.customerName},</p><p>Sie sind nicht zu Ihrem Termin erschienen:</p><ul><li><strong>Termin:</strong> ${dateStr} um ${timeStr}</li><li><strong>Salon:</strong> ${booking.salonId.name}</li></ul><p><strong>No-Show-Gebühr: €${(feeAmount / 100).toFixed(2)}</strong></p><p>Die Gebühr wurde von Ihrer hinterlegten Kreditkarte abgebucht.</p><p>Bei Fragen kontaktieren Sie bitte:<br>${booking.salonId.email}${booking.salonId.phone ? ` | ${booking.salonId.phone}` : ''}</p>`
+  });
+}
+
+async function sendNoShowFeeFailureEmail(booking, errorMessage) {
+  const emailService = (await import('../services/emailService.js')).default;
+  await emailService.sendEmail({
+    to: booking.salonId.email,
+    subject: '⚠️ No-Show-Gebühr konnte nicht abgebucht werden',
+    text: `Die No-Show-Gebühr für ${booking.customerName} (${booking.customerEmail}) konnte nicht abgebucht werden.\n\nGrund: ${errorMessage}\n\nBitte kontaktieren Sie den Kunden für manuelle Abrechnung.`,
+    html: `<h2>⚠️ No-Show-Gebühr konnte nicht abgebucht werden</h2><p>Die No-Show-Gebühr für <strong>${booking.customerName}</strong> (${booking.customerEmail}) konnte nicht abgebucht werden.</p><p><strong>Grund:</strong> ${errorMessage}</p><p>Bitte kontaktieren Sie den Kunden für manuelle Abrechnung.</p>`
+  });
+}
+
 
 export const markAsNoShow = async (req, res) => {
   try {
@@ -757,83 +795,10 @@ export const markAsNoShow = async (req, res) => {
     let feeCharged = false;
     if (booking.salonId?.noShowKiller?.enabled && booking.paymentMethodId) {
       try {
-        const feeAmount = booking.salonId.noShowKiller.feeAmount || 1500; // Default €15.00
-
-        // ✅ Use Stripe Connect if available, otherwise fallback to regular Stripe
-        let chargeResult;
-        if (booking.salonId.stripe?.connectedAccountId && booking.salonId.stripe?.chargesEnabled) {
-          // Use Stripe Connect (direct payout to salon)
-          const stripeConnectService = await import('../services/stripeConnectService.js');
-          chargeResult = await stripeConnectService.chargeNoShowFeeConnect(booking, booking.salonId);
-
-          await Booking.findByIdAndUpdate(booking._id, {
-            $set: {
-              'noShowFee.charged': true,
-              'noShowFee.amount': feeAmount,
-              'noShowFee.chargeId': chargeResult.chargeId,
-              'noShowFee.transferId': chargeResult.transferId || null,
-              'noShowFee.chargedAt': new Date(),
-              'noShowFee.breakdown': chargeResult.breakdown
-            }
-          });
-        } else {
-          // Fallback to regular Stripe (platform account)
-          const stripeService = await import('../services/stripeService.js');
-          const paymentIntent = await stripeService.chargeNoShowFee(
-            booking.stripeCustomerId,
-            booking.paymentMethodId,
-            feeAmount,
-            `No-Show-Gebühr - ${booking.salonId.name}`,
-            {
-              bookingId: booking._id.toString(),
-              salonId: booking.salonId._id.toString(),
-              type: 'no_show_fee'
-            }
-          );
-
-          // Calculate breakdown for regular Stripe
-          const stripeFee = Math.round(25 + (feeAmount * 0.014)); // €0.25 + 1.4%
-          const salonReceives = feeAmount - stripeFee;
-
-          await Booking.findByIdAndUpdate(booking._id, {
-            $set: {
-              'noShowFee.charged': true,
-              'noShowFee.amount': feeAmount,
-              'noShowFee.chargeId': paymentIntent.id,
-              'noShowFee.chargedAt': new Date(),
-              'noShowFee.breakdown': {
-                totalCharged: feeAmount,
-                stripeFee: stripeFee,
-                salonReceives: salonReceives,
-                platformCommission: 0
-              }
-            }
-          });
-        }
-
+        const feeAmount = await chargeNoShowFee(booking);
         feeCharged = true;
         logger.info(`✅ No-Show-Fee charged: €${feeAmount / 100} for booking ${booking._id}`);
-
-        // Send email to customer about No-Show-Fee
-        const emailService = (await import('../services/emailService.js')).default;
-        await emailService.sendEmail({
-          to: booking.customerEmail,
-          subject: `No-Show-Gebühr wurde berechnet - ${booking.salonId.name}`,
-          text: `Hallo ${booking.customerName},\n\nSie sind nicht zu Ihrem Termin erschienen:\n\nTermin: ${new Date(booking.bookingDate).toLocaleDateString('de-DE')} um ${new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}\nSalon: ${booking.salonId.name}\n\nNo-Show-Gebühr: €${(feeAmount / 100).toFixed(2)}\nDie Gebühr wurde von Ihrer hinterlegten Kreditkarte abgebucht.\n\nBei Fragen kontaktieren Sie bitte:\n${booking.salonId.email} | ${booking.salonId.phone || ''}\n\nMit freundlichen Grüßen\n${booking.salonId.name}`,
-          html: `
-            <h2>No-Show-Gebühr wurde berechnet</h2>
-            <p>Hallo ${booking.customerName},</p>
-            <p>Sie sind nicht zu Ihrem Termin erschienen:</p>
-            <ul>
-              <li><strong>Termin:</strong> ${new Date(booking.bookingDate).toLocaleDateString('de-DE')} um ${new Date(booking.bookingDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</li>
-              <li><strong>Salon:</strong> ${booking.salonId.name}</li>
-            </ul>
-            <p><strong>No-Show-Gebühr: €${(feeAmount / 100).toFixed(2)}</strong></p>
-            <p>Die Gebühr wurde von Ihrer hinterlegten Kreditkarte abgebucht.</p>
-            <p>Bei Fragen kontaktieren Sie bitte:<br>${booking.salonId.email}${booking.salonId.phone ? ` | ${booking.salonId.phone}` : ''}</p>
-          `
-        });
-
+        await sendNoShowFeeEmail(booking, feeAmount);
       } catch (error) {
         await Booking.findByIdAndUpdate(booking._id, {
           $set: {
@@ -842,17 +807,8 @@ export const markAsNoShow = async (req, res) => {
             'noShowFee.attemptedAt': new Date()
           }
         });
-
         logger.error(`❌ Failed to charge No-Show-Fee: ${error.message}`);
-
-        // Notify salon about failed charge
-        const emailService = (await import('../services/emailService.js')).default;
-        await emailService.sendEmail({
-          to: booking.salonId.email,
-          subject: '⚠️ No-Show-Gebühr konnte nicht abgebucht werden',
-          text: `Die No-Show-Gebühr für ${booking.customerName} (${booking.customerEmail}) konnte nicht abgebucht werden.\n\nGrund: ${error.message}\n\nBitte kontaktieren Sie den Kunden für manuelle Abrechnung.`,
-          html: `<h2>⚠️ No-Show-Gebühr konnte nicht abgebucht werden</h2><p>Die No-Show-Gebühr für <strong>${booking.customerName}</strong> (${booking.customerEmail}) konnte nicht abgebucht werden.</p><p><strong>Grund:</strong> ${error.message}</p><p>Bitte kontaktieren Sie den Kunden für manuelle Abrechnung.</p>`
-        });
+        await sendNoShowFeeFailureEmail(booking, error.message);
       }
     } else if (booking.salonId?.noShowKiller?.enabled && !booking.paymentMethodId) {
       // No payment method available
@@ -925,15 +881,15 @@ export const undoNoShow = async (req, res) => {
         if (booking.noShowFee.transferId) {
           // Charge was made via Stripe Connect — must refund through the Connect
           // service so the transfer reversal is handled correctly.
-          const stripeConnectService = await import('../services/stripeConnectService.js');
-          const connectRefund = await stripeConnectService.refundNoShowFee(
+          const { refundNoShowFee: connectRefundFn } = await import('../services/stripeConnectService.js');
+          const connectRefund = await connectRefundFn(
             booking.noShowFee.chargeId,
             booking.noShowFee.amount
           );
           refund = { id: connectRefund.refundId };
         } else {
-          const stripeService = await import('../services/stripeService.js');
-          refund = await stripeService.refundNoShowFee(booking.noShowFee.chargeId);
+          const { refundNoShowFee } = await import('../services/stripeService.js');
+          refund = await refundNoShowFee(booking.noShowFee.chargeId);
         }
 
         booking.noShowFee.refunded = true;

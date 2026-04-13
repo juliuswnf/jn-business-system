@@ -189,6 +189,37 @@ export async function rotateKeys() {
   }
 }
 
+async function reEncryptClinicalNote(note, newVersion) {
+  const decrypted = {
+    chiefComplaint: note.chiefComplaint ? decrypt(note.chiefComplaint) : null,
+    diagnosis: note.diagnosis ? decrypt(note.diagnosis) : null,
+    treatmentPlan: note.treatmentPlan ? decrypt(note.treatmentPlan) : null,
+    medications: note.medications ? decrypt(note.medications) : null,
+    notes: note.notes ? decrypt(note.notes) : null
+  };
+  const encrypted = {
+    chiefComplaint: decrypted.chiefComplaint ? encrypt(decrypted.chiefComplaint, newVersion) : null,
+    diagnosis: decrypted.diagnosis ? encrypt(decrypted.diagnosis, newVersion) : null,
+    treatmentPlan: decrypted.treatmentPlan ? encrypt(decrypted.treatmentPlan, newVersion) : null,
+    medications: decrypted.medications ? encrypt(decrypted.medications, newVersion) : null,
+    notes: decrypted.notes ? encrypt(decrypted.notes, newVersion) : null
+  };
+  await ClinicalNote.findByIdAndUpdate(note._id, {
+    ...encrypted,
+    keyVersion: newVersion,
+    lastEncrypted: new Date()
+  });
+}
+
+async function reEncryptConsentForm(form, newVersion) {
+  const decryptedSignature = decrypt(form.signature);
+  const encryptedSignature = encrypt(decryptedSignature, newVersion);
+  await ConsentForm.findByIdAndUpdate(form._id, {
+    signature: encryptedSignature,
+    keyVersion: newVersion
+  });
+}
+
 /**
  * Re-encrypt all PHI data with new key
  */
@@ -196,68 +227,26 @@ async function reEncryptAllData(oldVersion, newVersion) {
   try {
     logger.info('Re-encrypting all PHI data...');
 
-    // Re-encrypt Clinical Notes
-    const clinicalNotes = await ClinicalNote.find({
-      keyVersion: oldVersion
-    }).lean();
-
+    const clinicalNotes = await ClinicalNote.find({ keyVersion: oldVersion }).lean();
     logger.info(`Found ${clinicalNotes.length} clinical notes to re-encrypt`);
 
     for (const note of clinicalNotes) {
       try {
-        // Decrypt with old key
-        const decrypted = {
-          chiefComplaint: note.chiefComplaint ? decrypt(note.chiefComplaint) : null,
-          diagnosis: note.diagnosis ? decrypt(note.diagnosis) : null,
-          treatmentPlan: note.treatmentPlan ? decrypt(note.treatmentPlan) : null,
-          medications: note.medications ? decrypt(note.medications) : null,
-          notes: note.notes ? decrypt(note.notes) : null
-        };
-
-        // Encrypt with new key
-        const encrypted = {
-          chiefComplaint: decrypted.chiefComplaint ? encrypt(decrypted.chiefComplaint, newVersion) : null,
-          diagnosis: decrypted.diagnosis ? encrypt(decrypted.diagnosis, newVersion) : null,
-          treatmentPlan: decrypted.treatmentPlan ? encrypt(decrypted.treatmentPlan, newVersion) : null,
-          medications: decrypted.medications ? encrypt(decrypted.medications, newVersion) : null,
-          notes: decrypted.notes ? encrypt(decrypted.notes, newVersion) : null
-        };
-
-        // Update record
-        await ClinicalNote.findByIdAndUpdate(note._id, {
-          ...encrypted,
-          keyVersion: newVersion,
-          lastEncrypted: new Date()
-        });
-
+        await reEncryptClinicalNote(note, newVersion);
       } catch (error) {
         logger.error(`Failed to re-encrypt clinical note ${note._id}:`, error);
-        // Continue with other notes
       }
     }
 
-    // Re-encrypt Consent Forms (signatures are PHI)
     const consentForms = await ConsentForm.find({
       keyVersion: oldVersion,
       signature: { $exists: true }
     }).lean();
-
     logger.info(`Found ${consentForms.length} consent forms to re-encrypt`);
 
     for (const form of consentForms) {
       try {
-        // Decrypt with old key
-        const decryptedSignature = decrypt(form.signature);
-
-        // Encrypt with new key
-        const encryptedSignature = encrypt(decryptedSignature, newVersion);
-
-        // Update record
-        await ConsentForm.findByIdAndUpdate(form._id, {
-          signature: encryptedSignature,
-          keyVersion: newVersion
-        });
-
+        await reEncryptConsentForm(form, newVersion);
       } catch (error) {
         logger.error(`Failed to re-encrypt consent form ${form._id}:`, error);
       }

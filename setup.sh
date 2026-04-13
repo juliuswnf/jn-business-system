@@ -21,14 +21,14 @@ fi
 
 # Copy environment files
 echo "📋 Setting up environment files..."
-if [ ! -f "backend/.env" ]; then
+if [[ ! -f "backend/.env" ]]; then
     cp .env.example backend/.env
     echo "✅ Created backend/.env"
 else
     echo "⏭️  backend/.env already exists"
 fi
 
-if [ ! -f "frontend/.env.local" ]; then
+if [[ ! -f "frontend/.env.local" ]]; then
     cp frontend/.env.example frontend/.env.local
     echo "✅ Created frontend/.env.local"
 else
@@ -53,7 +53,7 @@ sleep 10
 # Check if MongoDB is ready
 echo "🔍 Checking MongoDB..."
 docker-compose exec -T mongodb mongosh admin --eval "db.adminCommand('ping')" > /dev/null 2>&1
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     echo "✅ MongoDB is ready"
 else
     echo "⚠️  MongoDB is still starting..."

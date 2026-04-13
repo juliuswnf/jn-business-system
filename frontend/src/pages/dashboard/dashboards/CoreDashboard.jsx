@@ -4,6 +4,18 @@ import { Link } from 'react-router-dom';
 import { usePlanAccess } from '../../../hooks/usePlanAccess';
 import { useDashboardData } from './useDashboardData';
 
+const STATUS_BADGE_STYLES = {
+  confirmed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  booked: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  pending: 'bg-amber-50 text-amber-700 border-amber-200'
+};
+
+const STATUS_LABELS = {
+  confirmed: 'Bestätigt',
+  booked: 'Gebucht',
+  pending: 'Ausstehend'
+};
+
 export default function CoreDashboard({
   title,
   subtitle,
@@ -56,33 +68,9 @@ export default function CoreDashboard({
     return appointment.customerName || 'Unbekannter Kunde';
   };
 
-  const getStatusBadgeStyles = (status) => {
-    if (status === 'confirmed' || status === 'booked') {
-      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    }
+  const getStatusBadgeStyles = (status) => STATUS_BADGE_STYLES[status] || 'bg-gray-50 text-gray-700 border-gray-200';
 
-    if (status === 'pending') {
-      return 'bg-amber-50 text-amber-700 border-amber-200';
-    }
-
-    return 'bg-gray-50 text-gray-700 border-gray-200';
-  };
-
-  const getStatusLabel = (status) => {
-    if (status === 'confirmed') {
-      return 'Bestätigt';
-    }
-
-    if (status === 'booked') {
-      return 'Gebucht';
-    }
-
-    if (status === 'pending') {
-      return 'Ausstehend';
-    }
-
-    return status || 'Unbekannt';
-  };
+  const getStatusLabel = (status) => STATUS_LABELS[status] || status || 'Unbekannt';
 
   const quickActions = [
     { label: 'Termine verwalten', desc: 'Alle Buchungen', to: '/dashboard/bookings', tier: 'starter' },

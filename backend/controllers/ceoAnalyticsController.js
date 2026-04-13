@@ -311,6 +311,74 @@ export const getChurnAnalysis = async (req, res) => {
 };
 
 // ==================== GET AT-RISK STUDIOS ====================
+
+function calculateStudioRisk(studio, recentCountMap, totalCountMap, now) {
+  const fourteenDaysAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+  const riskFactors = [];
+  let riskScore = 0;
+
+  const lastLogin = studio.owner?.lastLogin;
+  if (!lastLogin) {
+    riskFactors.push('Noch nie eingeloggt');
+    riskScore += 30;
+  } else if (lastLogin < fourteenDaysAgo) {
+    riskFactors.push(`Letzter Login: ${Math.floor((now - lastLogin) / (1000 * 60 * 60 * 24))} Tage`);
+    riskScore += lastLogin < thirtyDaysAgo ? 25 : 15;
+  }
+
+  const recentBookings = recentCountMap.get(studio._id.toString()) ?? 0;
+  const totalBookings = totalCountMap.get(studio._id.toString()) ?? 0;
+
+  if (totalBookings === 0) {
+    riskFactors.push('Keine Buchungen');
+    riskScore += 30;
+  } else if (recentBookings === 0) {
+    riskFactors.push('Keine Buchungen letzte 7 Tage');
+    riskScore += 20;
+  }
+
+  if (studio.subscription?.status === 'trial') {
+    const trialEnds = new Date(studio.subscription.trialEndsAt);
+    const daysLeft = Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24));
+    if (daysLeft <= 7 && daysLeft > 0) {
+      riskFactors.push(`Trial endet in ${daysLeft} Tagen`);
+      riskScore += 20;
+    } else if (daysLeft <= 0) {
+      riskFactors.push('Trial abgelaufen');
+      riskScore += 35;
+    }
+  }
+
+  return { riskScore, riskFactors, recentBookings, totalBookings, lastLogin };
+}
+
+function buildAtRiskEntry(studio, recentCountMap, totalCountMap, now) {
+  const { riskScore, riskFactors, recentBookings, totalBookings, lastLogin } =
+    calculateStudioRisk(studio, recentCountMap, totalCountMap, now);
+  if (riskScore < 20) return null;
+  return {
+    id: studio._id,
+    name: studio.name,
+    slug: studio.slug,
+    owner: {
+      name: studio.owner?.name || 'Unbekannt',
+      email: studio.owner?.email || 'N/A',
+      lastLogin
+    },
+    subscription: {
+      status: studio.subscription?.status,
+      plan: studio.subscription?.plan,
+      trialEndsAt: studio.subscription?.trialEndsAt
+    },
+    stats: { totalBookings, recentBookings },
+    riskScore,
+    riskLevel: riskScore >= 50 ? 'high' : riskScore >= 30 ? 'medium' : 'low',
+    riskFactors,
+    createdAt: studio.createdAt
+  };
+}
+
 export const getAtRiskStudios = async (req, res) => {
   try {
     const Booking = (await import('../models/Booking.js')).default;
@@ -320,11 +388,8 @@ export const getAtRiskStudios = async (req, res) => {
       'subscription.status': { $in: ['active', 'trial'] }
     }).populate('owner', 'name email lastLogin').lean().maxTimeMS(5000);
 
-    const atRiskStudios = [];
     const now = new Date();
     const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
-    const fourteenDaysAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
-    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
 
     // Pre-fetch booking counts for all studios in 2 aggregations instead of 2×N queries
     const studioIds = studios.map(s => s._id);
@@ -341,72 +406,9 @@ export const getAtRiskStudios = async (req, res) => {
     const recentCountMap = new Map(recentCountDocs.map(r => [r._id.toString(), r.count]));
     const totalCountMap = new Map(totalCountDocs.map(r => [r._id.toString(), r.count]));
 
-    for (const studio of studios) {
-      const riskFactors = [];
-      let riskScore = 0;
-
-      // Check last login
-      const lastLogin = studio.owner?.lastLogin;
-      if (!lastLogin) {
-        riskFactors.push('Noch nie eingeloggt');
-        riskScore += 30;
-      } else if (lastLogin < fourteenDaysAgo) {
-        riskFactors.push(`Letzter Login: ${Math.floor((now - lastLogin) / (1000 * 60 * 60 * 24))} Tage`);
-        riskScore += lastLogin < thirtyDaysAgo ? 25 : 15;
-      }
-
-      // Check booking activity (use pre-fetched counts)
-      const recentBookings = recentCountMap.get(studio._id.toString()) ?? 0;
-      const totalBookings = totalCountMap.get(studio._id.toString()) ?? 0;
-
-      if (totalBookings === 0) {
-        riskFactors.push('Keine Buchungen');
-        riskScore += 30;
-      } else if (recentBookings === 0) {
-        riskFactors.push('Keine Buchungen letzte 7 Tage');
-        riskScore += 20;
-      }
-
-      // Check trial ending soon
-      if (studio.subscription?.status === 'trial') {
-        const trialEnds = new Date(studio.subscription.trialEndsAt);
-        const daysLeft = Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24));
-        if (daysLeft <= 7 && daysLeft > 0) {
-          riskFactors.push(`Trial endet in ${daysLeft} Tagen`);
-          riskScore += 20;
-        } else if (daysLeft <= 0) {
-          riskFactors.push('Trial abgelaufen');
-          riskScore += 35;
-        }
-      }
-
-      // Only include if there are risk factors
-      if (riskScore >= 20) {
-        atRiskStudios.push({
-          id: studio._id,
-          name: studio.name,
-          slug: studio.slug,
-          owner: {
-            name: studio.owner?.name || 'Unbekannt',
-            email: studio.owner?.email || 'N/A',
-            lastLogin: lastLogin
-          },
-          subscription: {
-            status: studio.subscription?.status,
-            plan: studio.subscription?.plan,
-            trialEndsAt: studio.subscription?.trialEndsAt
-          },
-          stats: {
-            totalBookings,
-            recentBookings
-          },
-          riskScore,
-          riskLevel: riskScore >= 50 ? 'high' : riskScore >= 30 ? 'medium' : 'low',
-          riskFactors,
-          createdAt: studio.createdAt
-        });
-      }
-    }
+    const atRiskStudios = studios
+      .map(studio => buildAtRiskEntry(studio, recentCountMap, totalCountMap, now))
+      .filter(Boolean);
 
     // Sort by risk score descending
     atRiskStudios.sort((a, b) => b.riskScore - a.riskScore);

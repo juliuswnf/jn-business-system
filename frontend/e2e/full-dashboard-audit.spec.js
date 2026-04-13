@@ -241,6 +241,23 @@ async function auditPage(page, url, errors) {
 }
 
 /**
+ * Helper: click a single tab and check for errors
+ */
+async function clickTabAndCheckErrors(page, tab, url, errors) {
+  try {
+    const tabText = await tab.innerText().catch(() => 'unnamed-tab');
+    await tab.click();
+    await page.waitForTimeout(500);
+    const errorVisible = await page.locator('text=/error|fehler|something went wrong/i').first().isVisible().catch(() => false);
+    if (errorVisible) {
+      errors.push({ url, type: 'tab-click-error', detail: `Tab "${tabText}" caused an error` });
+    }
+  } catch {
+    // Tab click failed, skip
+  }
+}
+
+/**
  * Helper: test interactive elements on a page
  */
 async function testInteractiveElements(page, url, errors) {
@@ -259,24 +276,7 @@ async function testInteractiveElements(page, url, errors) {
 
     // Click through tabs
     for (let i = 0; i < Math.min(tabCount, 10); i++) {
-      try {
-        const tab = tabs.nth(i);
-        const tabText = await tab.innerText().catch(() => `tab-${i}`);
-        await tab.click();
-        await page.waitForTimeout(500);
-
-        // Check for errors after tab click
-        const errorVisible = await page.locator('text=/error|fehler|something went wrong/i').first().isVisible().catch(() => false);
-        if (errorVisible) {
-          errors.push({
-            url,
-            type: 'tab-click-error',
-            detail: `Tab "${tabText}" caused an error`,
-          });
-        }
-      } catch {
-        // Tab click failed, skip
-      }
+      await clickTabAndCheckErrors(page, tabs.nth(i), url, errors);
     }
 
     // Test dropdowns / select elements
@@ -430,28 +430,32 @@ test.describe('Customer Dashboard Audit', () => {
 // ============================================================
 // Reporting helper
 // ============================================================
+function logErrorEntry(err) {
+  console.log(`\n  Page: ${err.url || 'N/A'}`);
+  if (err.type) console.log(`    Type: ${err.type}`);
+  if (err.detail) console.log(`    Detail: ${err.detail}`);
+  if (err.navigationError) console.log(`    Navigation Error: ${err.navigationError}`);
+  if (err.wasRedirected) console.log(`    Redirected to: ${err.finalUrl}`);
+  if (err.isBlank) console.log(`    ⚠️ BLANK PAGE`);
+  if (err.errorBoundary) console.log(`    ⚠️ ERROR BOUNDARY VISIBLE`);
+  if (err.pageErrors?.length) console.log(`    JS Errors: ${err.pageErrors.join('; ')}`);
+  if (err.consoleErrors?.length) {
+    for (const ce of err.consoleErrors) {
+      console.log(`    Console Error: ${ce.substring(0, 200)}`);
+    }
+  }
+  if (err.failedRequests?.length) {
+    for (const req of err.failedRequests) {
+      console.log(`    Failed Request: ${req.status} ${req.url}`);
+    }
+  }
+}
+
 function reportErrors(role, errors) {
   if (errors.length > 0) {
     console.log(`\n🔴 ${role} DASHBOARD ERRORS (${errors.length}):`);
     for (const err of errors) {
-      console.log(`\n  Page: ${err.url || 'N/A'}`);
-      if (err.type) console.log(`    Type: ${err.type}`);
-      if (err.detail) console.log(`    Detail: ${err.detail}`);
-      if (err.navigationError) console.log(`    Navigation Error: ${err.navigationError}`);
-      if (err.wasRedirected) console.log(`    Redirected to: ${err.finalUrl}`);
-      if (err.isBlank) console.log(`    ⚠️ BLANK PAGE`);
-      if (err.errorBoundary) console.log(`    ⚠️ ERROR BOUNDARY VISIBLE`);
-      if (err.pageErrors?.length) console.log(`    JS Errors: ${err.pageErrors.join('; ')}`);
-      if (err.consoleErrors?.length) {
-        for (const ce of err.consoleErrors) {
-          console.log(`    Console Error: ${ce.substring(0, 200)}`);
-        }
-      }
-      if (err.failedRequests?.length) {
-        for (const req of err.failedRequests) {
-          console.log(`    Failed Request: ${req.status} ${req.url}`);
-        }
-      }
+      logErrorEntry(err);
     }
   } else {
     console.log(`\n✅ All ${role} pages passed`);

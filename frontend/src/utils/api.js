@@ -32,7 +32,7 @@ api.interceptors.request.use(
     
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => { throw error; }
 );
 
 api.interceptors.response.use(
@@ -47,15 +47,12 @@ api.interceptors.response.use(
     );
 
     if (isExpected401) {
-      return Promise.reject(error);
+      throw error;
     }
 
     // Silently handle 404 errors for confirmations endpoint
-    // (not all bookings have confirmations, so 404 is expected)
     if (error.response?.status === 404 && originalRequest?.url?.includes('/confirmations/')) {
-      // Suppress console errors for expected 404s on confirmations
-      // The component will handle this gracefully
-      return Promise.reject(error);
+      throw error;
     }
 
     // Handle subscription required (paywall)
@@ -64,7 +61,7 @@ api.interceptors.response.use(
       if (!blocked.some((p) => window.location.pathname.startsWith(p))) {
         window.location.href = '/pending-payment';
       }
-      return Promise.reject(error);
+      throw error;
     }
 
     // Skip redirect for login/register endpoints - let the component handle the error
@@ -74,59 +71,52 @@ api.interceptors.response.use(
                            originalRequest?.url?.includes('/auth/employee-login');
 
     if (isAuthEndpoint) {
-      // Don't redirect for login failures - let the login form show the error
-      return Promise.reject(error);
+      throw error;
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
-      // Prevent infinite loop - if refresh-token also returns 401, stop retrying
-      if (originalRequest?.url?.includes('/auth/refresh-token')) {
-        localStorage.removeItem('jnAuthToken');
-        localStorage.removeItem('jnUser');
-        localStorage.removeItem('user');
-        // Don't redirect if already on login page
-        if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login';
-        }
-        // Silently reject - this is expected when not logged in
-        return Promise.reject(error);
-      }
-      
-      try {
-        // ? SECURITY FIX: Refresh token is now in HTTP-only cookie, no need to get from localStorage
-        const response = await axios.post(`${API_URL}/auth/refresh-token`, {}, {
-          withCredentials: true // Send cookies
-        });
-
-        if (response.data.success) {
-          // ? SECURITY FIX: New tokens are set as HTTP-only cookies by backend
-          // No need to store in localStorage or set header manually
-          // Browser will send cookies automatically with withCredentials: true
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        // ? SECURITY FIX: Tokens are in HTTP-only cookies, cleared by backend on logout
-        // Clear any leftover localStorage data
-        localStorage.removeItem('jnAuthToken');
-        localStorage.removeItem('jnUser');
-        localStorage.removeItem('user');
-        // Only redirect if not already on login page to prevent loops
-        if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login';
-        }
-        // Silently reject if it's an expected 401 (user not logged in)
-        if (isExpected401) {
-          return Promise.reject(refreshError);
-        }
-        return Promise.reject(refreshError);
-      }
+      return handleTokenRefresh(originalRequest, error, isExpected401);
     }
 
-    return Promise.reject(error);
+    throw error;
   }
 );
+
+async function handleTokenRefresh(originalRequest, error, isExpected401) {
+  // Prevent infinite loop - if refresh-token also returns 401, stop retrying
+  if (originalRequest?.url?.includes('/auth/refresh-token')) {
+    localStorage.removeItem('jnAuthToken');
+    localStorage.removeItem('jnUser');
+    localStorage.removeItem('user');
+    if (!window.location.pathname.includes('/login')) {
+      window.location.href = '/login';
+    }
+    throw error;
+  }
+
+  try {
+    // ? SECURITY FIX: Refresh token is now in HTTP-only cookie, no need to get from localStorage
+    const response = await axios.post(`${API_URL}/auth/refresh-token`, {}, {
+      withCredentials: true // Send cookies
+    });
+
+    if (response.data.success) {
+      return api(originalRequest);
+    }
+  } catch (refreshError) {
+    // ? SECURITY FIX: Tokens are in HTTP-only cookies, cleared by backend on logout
+    localStorage.removeItem('jnAuthToken');
+    localStorage.removeItem('jnUser');
+    localStorage.removeItem('user');
+    if (!window.location.pathname.includes('/login')) {
+      window.location.href = '/login';
+    }
+    throw refreshError;
+  }
+
+  throw error;
+}
 
 export const authAPI = {
   login: (email, password, rememberMe = false) => api.post('/auth/login', { email, password, rememberMe }),

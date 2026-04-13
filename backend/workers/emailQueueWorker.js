@@ -140,101 +140,150 @@ const processEmailQueue = async () => {
   }
 };
 
+async function sendDirectQueueEmail(queueItem) {
+  const result = await emailService.sendEmail({
+    to: queueItem.to,
+    subject: queueItem.subject,
+    body: queueItem.body,
+    html: queueItem.html || queueItem.body.replace(/\n/g, '<br>')
+  });
+  queueItem.status = 'sent';
+  queueItem.sentAt = new Date();
+  queueItem.attempts = (queueItem.attempts || 0) + 1;
+  await queueItem.save();
+  logger.log(`✅ Email sent successfully: ${queueItem._id} | MessageID: ${result?.messageId || 'N/A'}`);
+}
+
+async function markQueueItemNotFound(queueItem, message, code) {
+  queueItem.status = 'failed';
+  queueItem.error = { message, code };
+  queueItem.attempts = (queueItem.attempts || 0) + 1;
+  await queueItem.save();
+}
+
+function renderEmailForType(type, salon, booking, language) {
+  switch (type) {
+    case 'reminder':
+      return emailTemplateService.renderReminderEmail(salon, booking, language);
+    case 'review':
+      return emailTemplateService.renderReviewEmail(salon, booking, language);
+    case 'confirmation':
+      return emailTemplateService.renderConfirmationEmail(salon, booking, language);
+    default:
+      throw new Error(`Unknown email type: ${type}`);
+  }
+}
+
+async function handleEmailSendError(queueItem, error, salonRef) {
+  logger.error(`❌ Failed to send email ${queueItem._id}:`, error.message);
+  logger.error(`   Error stack: ${error.stack}`);
+
+  ErrorLog.logError({
+    type: 'error',
+    message: `EmailQueue: failed to process queue item ${queueItem._id}: ${error.message}`,
+    source: 'worker',
+    salonId: salonRef || null,
+    stackTrace: error.stack
+  }).catch(e => logger.error('[EmailQueue] ErrorLog write failed:', e.message));
+
+  const isTransient = isTransientError(error);
+  queueItem.attempts = (queueItem.attempts || 0) + 1;
+  queueItem.retryCount = (queueItem.retryCount || 0) + 1;
+  queueItem.lastAttemptAt = new Date();
+  queueItem.error = { message: error.message, stack: error.stack, code: error.code || 'UNKNOWN', isTransient };
+
+  if (!isTransient || queueItem.attempts >= queueItem.maxAttempts) {
+    queueItem.status = 'failed';
+    queueItem.nextRetryAt = null;
+    logger.error(`💀 Email ${queueItem._id} failed after ${queueItem.attempts} attempts - ${isTransient ? 'MAX RETRIES REACHED' : 'PERMANENT FAILURE'}`);
+
+    const criticalTypes = ['confirmation', 'payment_receipt', 'booking_confirmation'];
+    if (criticalTypes.includes(queueItem.type)) {
+      try {
+        await alertingService.sendAlert({
+          type: 'email_failure',
+          severity: 'critical',
+          title: `Critical Email Failed: ${queueItem.type}`,
+          message: `Failed to send ${queueItem.type} email after ${queueItem.attempts} attempts`,
+          details: { emailId: queueItem._id, recipient: queueItem.to, error: error.message, isTransient }
+        });
+      } catch (alertError) {
+        logger.error('Failed to send alert for email failure:', alertError);
+      }
+    }
+
+    try {
+      await EmailLog.create({
+        companyId: salonRef,
+        recipientEmail: queueItem.to || 'unknown',
+        subject: `Failed: ${queueItem.type}`,
+        emailType: 'general',
+        status: 'failed',
+        error: error.message,
+        sentAt: new Date(),
+        attempts: queueItem.attempts
+      });
+    } catch (logError) {
+      logger.warn(`⚠️  Failed to log email failure: ${logError.message}`);
+    }
+  } else {
+    const backoffMinutes = queueItem.attempts === 1 ? 1 : queueItem.attempts === 2 ? 5 : 15;
+    queueItem.nextRetryAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
+    queueItem.status = 'pending';
+    logger.log(`🔄 Scheduled retry #${queueItem.attempts} in ${backoffMinutes} minutes (transient error)`);
+  }
+  await queueItem.save();
+}
+
 /**
  * Process a single email queue item
  * @param {Object} queueItem - EmailQueue document
  */
 const processEmailQueueItem = async (queueItem, bookingMap = new Map(), salonMap = new Map()) => {
-  // Declare outside try so catch block can access them
-  let bookingRef;
   let salonRef;
   try {
-    logger.log(`?? Processing email: ${queueItem._id} | Type: ${queueItem.type} | To: ${queueItem.to || 'N/A'}`);
+    logger.log(`📧 Processing email: ${queueItem._id} | Type: ${queueItem.type} | To: ${queueItem.to || 'N/A'}`);
 
-    bookingRef = queueItem.booking || queueItem.bookingId;
+    const bookingRef = queueItem.booking || queueItem.bookingId;
     salonRef = queueItem.salon || queueItem.salonId;
 
-    // If no bookingId, treat as direct email (notification/custom)
     if (!bookingRef) {
-      logger.log(`?? Direct email (no booking) - sending to: ${queueItem.to}`);
-
-      // Send direct email
-      const result = await emailService.sendEmail({
-        to: queueItem.to,
-        subject: queueItem.subject,
-        body: queueItem.body,
-        html: queueItem.html || queueItem.body.replace(/\n/g, '<br>')
-      });
-
-      // Mark as sent
-      queueItem.status = 'sent';
-      queueItem.sentAt = new Date();
-      queueItem.attempts = (queueItem.attempts || 0) + 1;
-      await queueItem.save();
-
-      logger.log(`? Email sent successfully: ${queueItem._id} | MessageID: ${result?.messageId || 'N/A'}`);
+      logger.log(`📨 Direct email (no booking) - sending to: ${queueItem.to}`);
+      await sendDirectQueueEmail(queueItem);
       return;
     }
 
-    // Get booking with related data
     const booking = bookingMap.get(String(bookingRef));
     if (!booking) {
-      logger.warn(`??  Booking not found: ${bookingRef}`);
-      queueItem.status = 'failed';
-      queueItem.error = {
-        message: 'Booking not found',
-        code: 'BOOKING_NOT_FOUND'
-      };
-      queueItem.attempts = (queueItem.attempts || 0) + 1;
-      await queueItem.save();
+      logger.warn(`⚠️  Booking not found: ${bookingRef}`);
+      await markQueueItemNotFound(queueItem, 'Booking not found', 'BOOKING_NOT_FOUND');
       return;
     }
-    // Get salon
+
     const bookingSalonId = booking.salonId?._id || booking.salonId;
     const salon = salonMap.get(String(bookingSalonId || salonRef));
     if (!salon) {
-      logger.warn('??  Salon not found');
-      queueItem.status = 'failed';
-      queueItem.error = {
-        message: 'Salon not found',
-        code: 'SALON_NOT_FOUND'
-      };
-      await queueItem.save();
+      logger.warn('⚠️  Salon not found');
+      await markQueueItemNotFound(queueItem, 'Salon not found', 'SALON_NOT_FOUND');
       return;
     }
-    // Get language preference
+
     const language = emailTemplateService.getEmailLanguage(salon, booking);
-    let emailData;
-    // Render email based on type
-    switch (queueItem.type) {
-    case 'reminder':
-      emailData = emailTemplateService.renderReminderEmail(salon, booking, language);
-      break;
-    case 'review':
-      emailData = emailTemplateService.renderReviewEmail(salon, booking, language);
-      break;
-    case 'confirmation':
-      emailData = emailTemplateService.renderConfirmationEmail(salon, booking, language);
-      break;
-    default:
-      throw new Error(`Unknown email type: ${queueItem.type}`);
-    }
-    // Send email
+    const emailData = renderEmailForType(queueItem.type, salon, booking, language);
+
     const result = await emailService.sendEmail({
       to: booking.customerEmail,
       subject: emailData.subject,
       text: emailData.body,
-      html: emailData.body.replace(/\n/g, '<br>') // Simple HTML conversion
+      html: emailData.body.replace(/\n/g, '<br>')
     });
-    // Mark as sent
+
     queueItem.status = 'sent';
     queueItem.sentAt = new Date();
     queueItem.attempts = (queueItem.attempts || 0) + 1;
     await queueItem.save();
+    logger.log(`✅ Email sent successfully: ${queueItem._id} | To: ${booking.customerEmail} | MessageID: ${result?.messageId || 'N/A'}`);
 
-    logger.log(`? Email sent successfully: ${queueItem._id} | To: ${booking.customerEmail} | MessageID: ${result?.messageId || 'N/A'}`);
-
-    // Log successful send (with required fields)
     try {
       await EmailLog.create({
         companyId: salon._id,
@@ -249,89 +298,12 @@ const processEmailQueueItem = async (queueItem, bookingMap = new Map(), salonMap
         userId: booking.customerId
       });
     } catch (logError) {
-      // Non-blocking
-      logger.warn(`??  Failed to log email: ${logError.message}`);
+      logger.warn(`⚠️  Failed to log email: ${logError.message}`);
     }
 
-    logger.log(`?? Sent ${queueItem.type} email (booking: ${booking._id})`);
+    logger.log(`📧 Sent ${queueItem.type} email (booking: ${booking._id})`);
   } catch (error) {
-    logger.error(`? Failed to send email ${queueItem._id}:`, error.message);
-    logger.error(`   Error stack: ${error.stack}`);
-
-    ErrorLog.logError({
-      type: 'error',
-      message: `EmailQueue: failed to process queue item ${queueItem._id}: ${error.message}`,
-      source: 'worker',
-      salonId: salonRef || null,
-      stackTrace: error.stack
-    }).catch(e => logger.error('[EmailQueue] ErrorLog write failed:', e.message));
-
-    // ? SECURITY FIX: Determine if error is transient or permanent
-    const isTransient = isTransientError(error);
-
-    // Increment retry counter
-    queueItem.attempts = (queueItem.attempts || 0) + 1;
-    queueItem.retryCount = (queueItem.retryCount || 0) + 1;
-    queueItem.lastAttemptAt = new Date();
-    queueItem.error = {
-      message: error.message,
-      stack: error.stack,
-      code: error.code || 'UNKNOWN',
-      isTransient
-    };
-
-    // If permanent error or max retries reached, mark as failed
-    if (!isTransient || queueItem.attempts >= queueItem.maxAttempts) {
-      queueItem.status = 'failed';
-      queueItem.nextRetryAt = null;
-      logger.error(`?? Email ${queueItem._id} failed after ${queueItem.attempts} attempts - ${isTransient ? 'MAX RETRIES REACHED' : 'PERMANENT FAILURE'}`);
-
-      // ? SECURITY FIX: Alert for critical emails that failed
-      const criticalTypes = ['confirmation', 'payment_receipt', 'booking_confirmation'];
-      if (criticalTypes.includes(queueItem.type)) {
-        try {
-          await alertingService.sendAlert({
-            type: 'email_failure',
-            severity: 'critical',
-            title: `Critical Email Failed: ${queueItem.type}`,
-            message: `Failed to send ${queueItem.type} email after ${queueItem.attempts} attempts`,
-            details: {
-              emailId: queueItem._id,
-              recipient: queueItem.to,
-              error: error.message,
-              isTransient
-            }
-          });
-        } catch (alertError) {
-          logger.error('Failed to send alert for email failure:', alertError);
-        }
-      }
-
-      // Log failed send (with required fields, non-blocking)
-      try {
-        await EmailLog.create({
-          companyId: salonRef,
-          recipientEmail: queueItem.to || 'unknown',
-          subject: `Failed: ${queueItem.type}`,
-          emailType: 'general',
-          status: 'failed',
-          error: error.message,
-          sentAt: new Date(),
-          attempts: queueItem.attempts
-        });
-      } catch (logError) {
-        // Non-blocking
-        logger.warn(`??  Failed to log email failure: ${logError.message}`);
-      }
-    } else {
-      // ? SECURITY FIX: Schedule retry with exponential backoff (1min, 5min, 15min)
-      const backoffMinutes = queueItem.attempts === 1 ? 1 :
-                            queueItem.attempts === 2 ? 5 : 15;
-      queueItem.nextRetryAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
-      queueItem.status = 'pending'; // Keep as pending for retry
-      logger.log(`?? Scheduled retry #${queueItem.attempts} in ${backoffMinutes} minutes (transient error)`);
-    }
-    await queueItem.save();
+    await handleEmailSendError(queueItem, error, salonRef);
   }
 };
 

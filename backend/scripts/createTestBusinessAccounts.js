@@ -91,6 +91,48 @@ const generateSlug = (baseName) => {
     .substring(0, 50);
 };
 
+async function createSingleTestAccount(account) {
+  const existingUser = await User.findOne({ email: account.email });
+  if (existingUser) {
+    logger.warn(`✗ User with email ${account.email} already exists - skipping`);
+    logger.info('');
+    return 'skipped';
+  }
+
+  const hashedPassword = await hashPassword(TEST_PASSWORD);
+  const user = await User.create({
+    email: account.email,
+    password: hashedPassword,
+    name: account.name,
+    phone: PHONE,
+    role: 'salon_owner',
+    emailVerified: true,
+    isActive: true
+  });
+  logger.info(`[1/3] Created User: ${account.email}`);
+
+  const salonSlug = generateSlug(`test-${account.key}`);
+  const salon = await Salon.create({
+    name: account.name,
+    slug: salonSlug,
+    businessType: BUSINESS_TYPES[account.key],
+    ...(account.key === 'other' ? { customBusinessTypeName: 'Pet Grooming / Sonstige' } : {}),
+    email: account.email,
+    owner: user._id,
+    phone: PHONE,
+    isActive: true,
+    subscription: { status: 'trial', tier: 'enterprise' }
+  });
+  logger.info(`[2/3] Created Salon: ${account.name} (${BUSINESS_TYPES[account.key]})`);
+
+  user.salonId = salon._id;
+  await user.save();
+  logger.info(`[3/3] Linked Salon to User`);
+  logger.info('========================================');
+  logger.info('');
+  return 'created';
+}
+
 // Main function
 const createTestBusinessAccounts = async () => {
   const createdAccounts = [];
@@ -118,77 +160,15 @@ const createTestBusinessAccounts = async () => {
 
     for (const account of TEST_ACCOUNTS) {
       try {
-        // Check if user already exists
-        let existingUser = await User.findOne({ email: account.email });
-
-        if (existingUser) {
-          logger.warn(`✗ User with email ${account.email} already exists - skipping`);
-          logger.info('');
-          skippedCount++;
-          createdAccounts.push({
-            key: account.key,
-            label: account.label,
-            email: account.email,
-            password: TEST_PASSWORD,
-            status: 'skipped'
-          });
-          continue;
-        }
-
-        // Step 1: Hash password
-        const hashedPassword = await hashPassword(TEST_PASSWORD);
-
-        // Step 2: Create User FIRST (before Salon)
-        const user = await User.create({
-          email: account.email,
-          password: hashedPassword,
-          name: account.name,
-          phone: PHONE,
-          role: 'salon_owner',
-          emailVerified: true,
-          isActive: true
-        });
-
-        logger.info(`[1/3] Created User: ${account.email}`);
-
-        // Step 3: Create Salon with owner and email reference
-        const salonSlug = generateSlug(`test-${account.key}`);
-
-        const salon = await Salon.create({
-          name: account.name,
-          slug: salonSlug,
-          businessType: BUSINESS_TYPES[account.key],
-          ...(account.key === 'other' ? { customBusinessTypeName: 'Pet Grooming / Sonstige' } : {}),
-          email: account.email,
-          owner: user._id,
-          phone: PHONE,
-          isActive: true,
-          subscription: {
-            status: 'trial',
-            tier: 'enterprise'
-          }
-        });
-
-        logger.info(`[2/3] Created Salon: ${account.name} (${BUSINESS_TYPES[account.key]})`);
-
-        // Step 4: Link Salon to User
-        user.salonId = salon._id;
-        await user.save();
-
-        logger.info(`[3/3] Linked Salon to User`);
-        logger.info('========================================');
-        logger.info('');
-
-        // Add to success list
+        const status = await createSingleTestAccount(account);
+        if (status === 'skipped') { skippedCount++; } else { successCount++; }
         createdAccounts.push({
           key: account.key,
           label: account.label,
           email: account.email,
           password: TEST_PASSWORD,
-          status: 'created'
+          status
         });
-
-        successCount++;
       } catch (error) {
         logger.error(`Error creating account for ${account.key}:`);
         logger.error(`  Message: ${error.message}`);
@@ -204,7 +184,6 @@ const createTestBusinessAccounts = async () => {
             status: 'skipped'
           });
         } else {
-          // Log validation errors
           if (error.errors) {
             Object.keys(error.errors).forEach(field => {
               logger.error(`  ${field}: ${error.errors[field].message}`);

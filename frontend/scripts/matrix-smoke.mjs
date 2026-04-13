@@ -85,6 +85,80 @@ async function checkRoute(page, route) {
   };
 }
 
+function buildAccountRoutes(account) {
+  if (account.kind === 'business') {
+    const routes = [...businessCommonRoutes];
+    if (account.tier === 'professional' || account.tier === 'enterprise') {
+      routes.push(...businessProRoutes);
+    }
+    if (account.tier === 'enterprise') {
+      routes.push(...businessEnterpriseRoutes);
+    }
+    if (industryRoutes[account.industry]) {
+      routes.push(...industryRoutes[account.industry]);
+    }
+    return routes;
+  }
+  if (account.kind === 'employee') {
+    return ['/employee/dashboard', '/dashboard', '/dashboard/bookings'];
+  }
+  if (account.kind === 'customer') {
+    return ['/customer/dashboard', '/customer/booking', '/customer/settings', '/customer/support'];
+  }
+  return [];
+}
+
+async function runAccount(browser, account) {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  const jsErrors = [];
+  const failedRequests = [];
+
+  page.on('pageerror', (err) => jsErrors.push(err.message));
+  page.on('requestfailed', (req) => {
+    const url = req.url();
+    if (!url.includes('favicon.ico')) {
+      failedRequests.push(`${req.method()} ${url} => ${req.failure()?.errorText || 'FAILED'}`);
+    }
+  });
+
+  const row = {
+    account: accountLabel(account),
+    email: account.email,
+    loginOk: false,
+    loginUrl: null,
+    routes: [],
+    jsErrors: [],
+    failedRequests: []
+  };
+
+  try {
+    await page.goto(`${TARGET_BASE_URL}${account.loginPath}`, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    await page.fill('input#email, input[type="email"]', account.email);
+    await page.fill('input#password, input[type="password"]', PASSWORD);
+    await page.click('button[type="submit"]');
+    await page.waitForTimeout(1500);
+
+    row.loginUrl = page.url();
+    row.loginOk = row.loginUrl.includes(account.expectedPath);
+
+    if (row.loginOk) {
+      for (const route of buildAccountRoutes(account)) {
+        row.routes.push(await checkRoute(page, route));
+      }
+    }
+  } catch (error) {
+    row.jsErrors.push(`runner-exception: ${error.message}`);
+  }
+
+  row.jsErrors.push(...jsErrors);
+  row.failedRequests.push(...failedRequests);
+
+  await context.close();
+  return row;
+}
+
 async function run() {
   const browser = await chromium.launch({ headless: true });
   const rows = [];
@@ -96,79 +170,7 @@ async function run() {
   ];
 
   for (const account of accounts) {
-    const context = await browser.newContext();
-    const page = await context.newPage();
-
-    const jsErrors = [];
-    const failedRequests = [];
-
-    page.on('pageerror', (err) => jsErrors.push(err.message));
-    page.on('requestfailed', (req) => {
-      const url = req.url();
-      if (!url.includes('favicon.ico')) {
-        failedRequests.push(`${req.method()} ${url} => ${req.failure()?.errorText || 'FAILED'}`);
-      }
-    });
-
-    const row = {
-      account: accountLabel(account),
-      email: account.email,
-      loginOk: false,
-      loginUrl: null,
-      routes: [],
-      jsErrors: [],
-      failedRequests: []
-    };
-
-    try {
-      await page.goto(`${TARGET_BASE_URL}${account.loginPath}`, { waitUntil: 'domcontentloaded', timeout: 25000 });
-      await page.fill('input#email, input[type="email"]', account.email);
-      await page.fill('input#password, input[type="password"]', PASSWORD);
-      await page.click('button[type="submit"]');
-      await page.waitForTimeout(1500);
-
-      row.loginUrl = page.url();
-      row.loginOk = row.loginUrl.includes(account.expectedPath);
-
-      if (row.loginOk) {
-        if (account.kind === 'business') {
-          const routes = [...businessCommonRoutes];
-          if (account.tier === 'professional' || account.tier === 'enterprise') {
-            routes.push(...businessProRoutes);
-          }
-          if (account.tier === 'enterprise') {
-            routes.push(...businessEnterpriseRoutes);
-          }
-          if (industryRoutes[account.industry]) {
-            routes.push(...industryRoutes[account.industry]);
-          }
-
-          for (const route of routes) {
-            row.routes.push(await checkRoute(page, route));
-          }
-        }
-
-        if (account.kind === 'employee') {
-          for (const route of ['/employee/dashboard', '/dashboard', '/dashboard/bookings']) {
-            row.routes.push(await checkRoute(page, route));
-          }
-        }
-
-        if (account.kind === 'customer') {
-          for (const route of ['/customer/dashboard', '/customer/booking', '/customer/settings', '/customer/support']) {
-            row.routes.push(await checkRoute(page, route));
-          }
-        }
-      }
-    } catch (error) {
-      row.jsErrors.push(`runner-exception: ${error.message}`);
-    }
-
-    row.jsErrors.push(...jsErrors);
-    row.failedRequests.push(...failedRequests);
-    rows.push(row);
-
-    await context.close();
+    rows.push(await runAccount(browser, account));
   }
 
   await browser.close();

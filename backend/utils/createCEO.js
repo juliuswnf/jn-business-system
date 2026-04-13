@@ -50,6 +50,43 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, salt);
 };
 
+async function promptRequired(label) {
+  let value = '';
+  while (!value) {
+    value = await question(`${label}: `);
+    if (!value) { logger.log(`❌ ${label} is required`); }
+  }
+  return value;
+}
+
+async function promptEmail(label) {
+  while (true) {
+    const email = await question(`${label}: `);
+    if (!validateEmail(email)) { logger.log('❌ Invalid email format'); continue; }
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) { logger.log('❌ Email already exists'); continue; }
+    return email;
+  }
+}
+
+async function promptPassword() {
+  while (true) {
+    const password = await question('Password (min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special): ');
+    if (!validatePassword(password)) {
+      logger.log('❌ Password does not meet requirements');
+      logger.log('   Requirements: min 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character\n');
+      continue;
+    }
+    const confirmPassword = await question('Confirm Password: ');
+    if (password.length !== confirmPassword.length ||
+        !crypto.timingSafeEqual(Buffer.from(password), Buffer.from(confirmPassword))) {
+      logger.log('❌ Passwords do not match\n');
+      continue;
+    }
+    return password;
+  }
+}
+
 export const createCEO = async () => {
   try {
     logger.log('\n================================');
@@ -70,50 +107,9 @@ export const createCEO = async () => {
 
     logger.log('Please enter CEO details:\n');
 
-    let name = '';
-    while (!name) {
-      name = await question('Full Name: ');
-      if (!name) {logger.log('❌ Name is required');}
-    }
-
-    let email = '';
-    let isValidEmail = false;
-    while (!isValidEmail) {
-      email = await question('Email Address: ');
-      if (!validateEmail(email)) {
-        logger.log('❌ Invalid email format');
-        continue;
-      }
-
-      const existingUser = await User.findOne({ email: email.toLowerCase() });
-      if (existingUser) {
-        logger.log('❌ Email already exists');
-        continue;
-      }
-
-      isValidEmail = true;
-    }
-
-    let password = '';
-    let isValidPassword = false;
-    while (!isValidPassword) {
-      password = await question('Password (min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special): ');
-      if (!validatePassword(password)) {
-        logger.log('❌ Password does not meet requirements');
-        logger.log('   Requirements: min 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character\n');
-        continue;
-      }
-
-      const confirmPassword = await question('Confirm Password: ');
-      // Timing-safe comparison for password confirmation
-      if (password.length !== confirmPassword.length ||
-          !crypto.timingSafeEqual(Buffer.from(password), Buffer.from(confirmPassword))) {
-        logger.log('❌ Passwords do not match\n');
-        continue;
-      }
-
-      isValidPassword = true;
-    }
+    const name = await promptRequired('Full Name');
+    const email = await promptEmail('Email Address');
+    const password = await promptPassword();
 
     const hashedPassword = await hashPassword(password);
 
@@ -154,39 +150,17 @@ export const createBusinessSettings = async (ceo) => {
       return existingSettings;
     }
 
-    let businessName = '';
-    while (!businessName) {
-      businessName = await question('Business Name: ');
-      if (!businessName) {logger.log('❌ Business name is required');}
-    }
+    const businessName = await promptRequired('Business Name');
 
     let businessEmail = '';
     while (!businessEmail) {
       businessEmail = await question('Business Email: ');
-      if (!validateEmail(businessEmail)) {
-        logger.log('❌ Invalid email format\n');
-        continue;
-      }
-      break;
+      if (!validateEmail(businessEmail)) { logger.log('❌ Invalid email format\n'); businessEmail = ''; }
     }
 
-    let businessPhone = '';
-    while (!businessPhone) {
-      businessPhone = await question('Business Phone (e.g., +49123456789): ');
-      if (!businessPhone) {logger.log('❌ Phone is required');}
-    }
-
-    let businessCity = '';
-    while (!businessCity) {
-      businessCity = await question('Business City: ');
-      if (!businessCity) {logger.log('❌ City is required');}
-    }
-
-    let businessZipCode = '';
-    while (!businessZipCode) {
-      businessZipCode = await question('Business Zip Code: ');
-      if (!businessZipCode) {logger.log('❌ Zip code is required');}
-    }
+    const businessPhone = await promptRequired('Business Phone (e.g., +49123456789)');
+    const businessCity = await promptRequired('Business City');
+    const businessZipCode = await promptRequired('Business Zip Code');
 
     const businessSettings = await BusinessSettings.create({
       companyId: ceo._id,

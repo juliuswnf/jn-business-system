@@ -217,43 +217,61 @@ const stopNodeService = async (port) => {
 };
 
 // ==================== GET SERVICE STATUS ====================
+
+async function resolveServiceStatus(service) {
+  if (service.type === 'cloud') return 'running';
+  if (service.type === 'optional') return 'disabled';
+  if (service.type === 'docker') return (await checkDockerContainer(service.containerName)) ? 'running' : 'stopped';
+  return (await checkPortInUse(service.port)) ? 'running' : 'stopped';
+}
+
+async function doStartService(service, serviceId) {
+  if (service.type === 'cloud') return { status: 200, body: { success: true, message: `${service.name} is a cloud service and is always running`, status: 'running' } };
+  if (service.type === 'optional') return { status: 200, body: { success: true, message: `${service.name} is optional and not required for basic functionality`, status: 'disabled' } };
+  if (service.type === 'docker') {
+    if (await checkDockerContainer(service.containerName)) return { status: 200, body: { success: true, message: `${service.name} is already running`, status: 'running' } };
+    const result = await startDockerContainer(service);
+    return result.success
+      ? { status: 200, body: { success: true, message: `${service.name} started successfully`, status: 'running' } }
+      : { status: 500, body: { success: false, message: `Failed to start ${service.name}: ${result.message}` } };
+  }
+  // Node.js service
+  if (await checkPortInUse(service.port)) return { status: 200, body: { success: true, message: `${service.name} is already running`, status: 'running' } };
+  if (serviceId === 'backend') return { status: 200, body: { success: true, message: 'Backend is the current process', status: 'running' } };
+  const result = await startNodeService(service, serviceId);
+  if (!result.success) return { status: 500, body: { success: false, message: `Failed to start ${service.name}: ${result.message}` } };
+  logger.log(`? Started ${service.name}`);
+  await new Promise(resolve => setTimeout(resolve, 4000));
+  const nowRunning = await checkPortInUse(service.port);
+  return { status: 200, body: { success: true, message: `${service.name} ${nowRunning ? 'started successfully' : 'is starting...'}`, status: nowRunning ? 'running' : 'starting', pid: result.pid } };
+}
+
+async function doStopService(service, serviceId) {
+  if (serviceId === 'backend') return { status: 400, body: { success: false, message: 'Cannot stop backend server while it is handling requests' } };
+  if (service.type === 'cloud') return { status: 400, body: { success: false, message: `${service.name} is a cloud service and cannot be stopped from here` } };
+  if (service.type === 'optional') return { status: 200, body: { success: true, message: `${service.name} is optional and not running`, status: 'disabled' } };
+  if (service.type === 'docker') {
+    const result = await stopDockerContainer(service.containerName);
+    return result.success
+      ? { status: 200, body: { success: true, message: `${service.name} stopped successfully`, status: 'stopped' } }
+      : { status: 500, body: { success: false, message: `Failed to stop ${service.name}: ${result.message}` } };
+  }
+  await stopNodeService(service.port);
+  delete runningProcesses[serviceId];
+  logger.log(`? Stopped ${service.name}`);
+  return { status: 200, body: { success: true, message: `${service.name} stopped successfully`, status: 'stopped' } };
+}
+
 export const getServiceStatus = async (req, res) => {
   try {
     if (req.user.role !== 'ceo') {
       return res.status(403).json({ success: false, message: 'Access denied - CEO only' });
     }
-
     const { serviceId } = req.params;
     const service = SERVICES[serviceId];
-
-    if (!service) {
-      return res.status(404).json({ success: false, message: 'Service not found' });
-    }
-
-    let status = 'unknown';
-
-    if (service.type === 'cloud') {
-      // Cloud service (MongoDB Atlas) - always running if we can connect
-      // Since the backend is connected (we're handling this request), MongoDB is working
-      status = 'running';
-    } else if (service.type === 'optional') {
-      // Optional service (Redis) - not required, show as disabled
-      status = 'disabled';
-    } else if (service.type === 'docker') {
-      const isRunning = await checkDockerContainer(service.containerName);
-      status = isRunning ? 'running' : 'stopped';
-    } else {
-      const portInUse = await checkPortInUse(service.port);
-      status = portInUse ? 'running' : 'stopped';
-    }
-
-    res.status(200).json({
-      success: true,
-      service: serviceId,
-      status,
-      port: service.port,
-      type: service.type
-    });
+    if (!service) return res.status(404).json({ success: false, message: 'Service not found' });
+    const status = await resolveServiceStatus(service);
+    res.status(200).json({ success: true, service: serviceId, status, port: service.port, type: service.type });
   } catch (error) {
     logger.error('GetServiceStatus Error:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -263,102 +281,12 @@ export const getServiceStatus = async (req, res) => {
 // ==================== START SERVICE ====================
 export const startService = async (req, res) => {
   try {
-    if (req.user.role !== 'ceo') {
-      return res.status(403).json({ success: false, message: 'Access denied - CEO only' });
-    }
-
+    if (req.user.role !== 'ceo') return res.status(403).json({ success: false, message: 'Access denied - CEO only' });
     const { serviceId } = req.params;
     const service = SERVICES[serviceId];
-
-    if (!service) {
-      return res.status(404).json({ success: false, message: 'Service not found' });
-    }
-
-    // Cloud services (MongoDB Atlas) - always running, can't be started/stopped
-    if (service.type === 'cloud') {
-      return res.status(200).json({
-        success: true,
-        message: `${service.name} is a cloud service and is always running`,
-        status: 'running'
-      });
-    }
-
-    // Optional services (Redis) - not needed, Docker not installed
-    if (service.type === 'optional') {
-      return res.status(200).json({
-        success: true,
-        message: `${service.name} is optional and not required for basic functionality`,
-        status: 'disabled'
-      });
-    }
-
-    if (service.type === 'docker') {
-      // Check if already running
-      const isRunning = await checkDockerContainer(service.containerName);
-      if (isRunning) {
-        return res.status(200).json({
-          success: true,
-          message: `${service.name} is already running`,
-          status: 'running'
-        });
-      }
-
-      const result = await startDockerContainer(service);
-      if (result.success) {
-        logger.log(`? Started Docker container: ${service.containerName}`);
-        return res.status(200).json({
-          success: true,
-          message: `${service.name} started successfully`,
-          status: 'running'
-        });
-      } else {
-        return res.status(500).json({
-          success: false,
-          message: `Failed to start ${service.name}: ${result.message}`
-        });
-      }
-    } else {
-      // Node.js service
-      const portInUse = await checkPortInUse(service.port);
-      if (portInUse) {
-        return res.status(200).json({
-          success: true,
-          message: `${service.name} is already running`,
-          status: 'running'
-        });
-      }
-
-      // Can't start backend from here (it's already running)
-      if (serviceId === 'backend') {
-        return res.status(200).json({
-          success: true,
-          message: 'Backend is the current process',
-          status: 'running'
-        });
-      }
-
-      const result = await startNodeService(service, serviceId);
-      if (result.success) {
-        logger.log(`? Started ${service.name}`);
-
-        // Wait a bit for the service to start
-        await new Promise(resolve => setTimeout(resolve, 4000));
-
-        const nowRunning = await checkPortInUse(service.port);
-
-        return res.status(200).json({
-          success: true,
-          message: `${service.name} ${nowRunning ? 'started successfully' : 'is starting...'}`,
-          status: nowRunning ? 'running' : 'starting',
-          pid: result.pid
-        });
-      } else {
-        return res.status(500).json({
-          success: false,
-          message: `Failed to start ${service.name}: ${result.message}`
-        });
-      }
-    }
+    if (!service) return res.status(404).json({ success: false, message: 'Service not found' });
+    const { status, body } = await doStartService(service, serviceId);
+    return res.status(status).json(body);
   } catch (error) {
     logger.error('StartService Error:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -368,68 +296,12 @@ export const startService = async (req, res) => {
 // ==================== STOP SERVICE ====================
 export const stopService = async (req, res) => {
   try {
-    if (req.user.role !== 'ceo') {
-      return res.status(403).json({ success: false, message: 'Access denied - CEO only' });
-    }
-
+    if (req.user.role !== 'ceo') return res.status(403).json({ success: false, message: 'Access denied - CEO only' });
     const { serviceId } = req.params;
     const service = SERVICES[serviceId];
-
-    if (!service) {
-      return res.status(404).json({ success: false, message: 'Service not found' });
-    }
-
-    // Don't stop backend
-    if (serviceId === 'backend') {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot stop backend server while it is handling requests'
-      });
-    }
-
-    // Cloud services (MongoDB Atlas) - can't be stopped
-    if (service.type === 'cloud') {
-      return res.status(400).json({
-        success: false,
-        message: `${service.name} is a cloud service and cannot be stopped from here`
-      });
-    }
-
-    // Optional services (Redis) - not running anyway
-    if (service.type === 'optional') {
-      return res.status(200).json({
-        success: true,
-        message: `${service.name} is optional and not running`,
-        status: 'disabled'
-      });
-    }
-
-    if (service.type === 'docker') {
-      const result = await stopDockerContainer(service.containerName);
-      if (result.success) {
-        logger.log(`? Stopped Docker container: ${service.containerName}`);
-        return res.status(200).json({
-          success: true,
-          message: `${service.name} stopped successfully`,
-          status: 'stopped'
-        });
-      } else {
-        return res.status(500).json({
-          success: false,
-          message: `Failed to stop ${service.name}: ${result.message}`
-        });
-      }
-    } else {
-      await stopNodeService(service.port);
-      delete runningProcesses[serviceId];
-      logger.log(`? Stopped ${service.name}`);
-
-      return res.status(200).json({
-        success: true,
-        message: `${service.name} stopped successfully`,
-        status: 'stopped'
-      });
-    }
+    if (!service) return res.status(404).json({ success: false, message: 'Service not found' });
+    const { status, body } = await doStopService(service, serviceId);
+    return res.status(status).json(body);
   } catch (error) {
     logger.error('StopService Error:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -439,109 +311,33 @@ export const stopService = async (req, res) => {
 // ==================== START ALL SERVICES ====================
 export const startAllServices = async (req, res) => {
   try {
-    if (req.user.role !== 'ceo') {
-      return res.status(403).json({ success: false, message: 'Access denied - CEO only' });
-    }
+    if (req.user.role !== 'ceo') return res.status(403).json({ success: false, message: 'Access denied - CEO only' });
 
     const results = [];
     const startOrder = ['mongodb', 'redis', 'backend', 'frontend'];
 
     for (const serviceId of startOrder) {
       const service = SERVICES[serviceId];
-
       try {
-        // Skip cloud services (always running)
-        if (service.type === 'cloud') {
-          results.push({
-            service: serviceId,
-            success: true,
-            message: 'Cloud service (always running)',
-            status: 'running'
-          });
-          continue;
-        }
+        if (service.type === 'cloud') { results.push({ service: serviceId, success: true, message: 'Cloud service (always running)', status: 'running' }); continue; }
+        if (service.type === 'optional') { results.push({ service: serviceId, success: true, message: 'Optional (not required)', status: 'disabled' }); continue; }
 
-        // Skip optional services (not needed)
-        if (service.type === 'optional') {
-          results.push({
-            service: serviceId,
-            success: true,
-            message: 'Optional (not required)',
-            status: 'disabled'
-          });
-          continue;
-        }
+        const isRunning = service.type === 'docker'
+          ? await checkDockerContainer(service.containerName)
+          : await checkPortInUse(service.port);
+        if (isRunning) { results.push({ service: serviceId, success: true, message: 'Already running', status: 'running' }); continue; }
 
-        // Check if already running
-        let isRunning = false;
-        if (service.type === 'docker') {
-          isRunning = await checkDockerContainer(service.containerName);
-        } else {
-          isRunning = await checkPortInUse(service.port);
-        }
-
-        if (isRunning) {
-          results.push({
-            service: serviceId,
-            success: true,
-            message: 'Already running',
-            status: 'running'
-          });
-          continue;
-        }
-
-        // Start service
-        if (service.type === 'docker') {
-          const result = await startDockerContainer(service);
-          results.push({
-            service: serviceId,
-            success: result.success,
-            message: result.success ? 'Started successfully' : result.message,
-            status: result.success ? 'running' : 'error'
-          });
-        } else {
-          // Skip backend since it's already running
-          if (serviceId === 'backend') {
-            results.push({
-              service: serviceId,
-              success: true,
-              message: 'Already running (current process)',
-              status: 'running'
-            });
-            continue;
-          }
-
-          const result = await startNodeService(service, serviceId);
-          results.push({
-            service: serviceId,
-            success: result.success,
-            message: result.success ? 'Started successfully' : result.message,
-            status: result.success ? 'starting' : 'error',
-            pid: result.pid
-          });
-        }
-
-        // Wait between starts
+        const { body } = await doStartService(service, serviceId);
+        results.push({ service: serviceId, ...body });
         await new Promise(resolve => setTimeout(resolve, 2000));
-
       } catch (error) {
         logger.error(`Failed to start ${serviceId}:`, error);
-        results.push({
-          service: serviceId,
-          success: false,
-          message: error.message,
-          status: 'error'
-        });
+        results.push({ service: serviceId, success: false, message: error.message, status: 'error' });
       }
     }
 
     logger.log('?? Start all services completed');
-
-    res.status(200).json({
-      success: true,
-      message: 'Services started',
-      results
-    });
+    res.status(200).json({ success: true, message: 'Services started', results });
   } catch (error) {
     logger.error('StartAllServices Error:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });

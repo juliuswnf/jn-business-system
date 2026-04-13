@@ -329,6 +329,47 @@ export const deleteBackup = (backupFile) => {
   }
 };
 
+async function runBackupOption(option) {
+  if (option === '1') {
+    await backupFullDatabase(false);
+  } else if (option === '2') {
+    await backupFullDatabase(true);
+  } else if (option === '3') {
+    logger.log('\nAvailable collections: users, customers, services, bookings, reviews, payments, employees, appointments, businessSettings');
+    const collections = await question('Enter collection names (comma-separated): ');
+    const collectionNames = collections.split(',').map(c => c.trim());
+    await backupSelectedCollections(collectionNames);
+  } else if (option === '4') {
+    const backups = listBackups();
+    if (backups.length > 0) {
+      const backupNum = await question('Enter backup number to restore: ');
+      const backupFile = backups[parseInt(backupNum) - 1];
+      if (backupFile) {
+        const confirm = await question('⚠️  This will overwrite existing data. Continue? (yes/no): ');
+        if (confirm.toLowerCase() === 'yes') {
+          await restoreFromBackup(backupFile);
+        }
+      }
+    }
+  } else if (option === '5') {
+    listBackups();
+  } else if (option === '6') {
+    const backups = listBackups();
+    if (backups.length > 0) {
+      const backupNum = await question('Enter backup number to delete: ');
+      const backupFile = backups[parseInt(backupNum) - 1];
+      if (backupFile) {
+        const confirm = await question(`Delete ${backupFile}? (yes/no): `);
+        if (confirm.toLowerCase() === 'yes') {
+          deleteBackup(backupFile);
+        }
+      }
+    }
+  } else {
+    logger.log('\n❌ Invalid option\n');
+  }
+}
+
 const interactiveMode = async () => {
   try {
     logger.log('================================');
@@ -344,45 +385,7 @@ const interactiveMode = async () => {
     logger.log('6. Delete backup\n');
 
     const option = await question('Choose option (1-6): ');
-
-    if (option === '1') {
-      await backupFullDatabase(false);
-    } else if (option === '2') {
-      await backupFullDatabase(true);
-    } else if (option === '3') {
-      logger.log('\nAvailable collections: users, customers, services, bookings, reviews, payments, employees, appointments, businessSettings');
-      const collections = await question('Enter collection names (comma-separated): ');
-      const collectionNames = collections.split(',').map(c => c.trim());
-      await backupSelectedCollections(collectionNames);
-    } else if (option === '4') {
-      const backups = listBackups();
-      if (backups.length > 0) {
-        const backupNum = await question('Enter backup number to restore: ');
-        const backupFile = backups[parseInt(backupNum) - 1];
-        if (backupFile) {
-          const confirm = await question('⚠️  This will overwrite existing data. Continue? (yes/no): ');
-          if (confirm.toLowerCase() === 'yes') {
-            await restoreFromBackup(backupFile);
-          }
-        }
-      }
-    } else if (option === '5') {
-      listBackups();
-    } else if (option === '6') {
-      const backups = listBackups();
-      if (backups.length > 0) {
-        const backupNum = await question('Enter backup number to delete: ');
-        const backupFile = backups[parseInt(backupNum) - 1];
-        if (backupFile) {
-          const confirm = await question(`Delete ${backupFile}? (yes/no): `);
-          if (confirm.toLowerCase() === 'yes') {
-            deleteBackup(backupFile);
-          }
-        }
-      }
-    } else {
-      logger.log('\n❌ Invalid option\n');
-    }
+    await runBackupOption(option);
 
     rl.close();
     process.exit(0);

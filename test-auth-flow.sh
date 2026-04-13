@@ -24,7 +24,7 @@ TESTS_FAILED=0
 
 # Function to print test result
 print_test() {
-    if [ $1 -eq 0 ]; then
+    if [[ $1 -eq 0 ]]; then
         echo -e "${GREEN}✅ $2${NC}"
         ((TESTS_PASSED++))
     else
@@ -102,7 +102,7 @@ else
 fi
 
 # Note: Secure flag only in production
-if [ "$NODE_ENV" = "production" ]; then
+if [[ "$NODE_ENV" = "production" ]]; then
     if check_secure "$LOGIN_RESPONSE"; then
         print_test 0 "Cookie has Secure flag (Production)"
     else
@@ -116,7 +116,7 @@ fi
 echo ""
 echo "🎫 Test 3: Access Token in Response Body"
 ACCESS_TOKEN=$(echo "$LOGIN_RESPONSE" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
-if [ -n "$ACCESS_TOKEN" ]; then
+if [[ -n "$ACCESS_TOKEN" ]]; then
     print_test 0 "Access token returned in response body"
     echo "  Token (first 20 chars): ${ACCESS_TOKEN:0:20}..."
 else
@@ -128,7 +128,7 @@ echo ""
 echo "💾 Test 4: Save Cookies for Subsequent Requests"
 COOKIE_JAR="cookies.txt"
 echo "$LOGIN_RESPONSE" | grep -i "set-cookie" > "$COOKIE_JAR"
-if [ -s "$COOKIE_JAR" ]; then
+if [[ -s "$COOKIE_JAR" ]]; then
     print_test 0 "Cookies saved to cookie jar"
 else
     print_test 1 "Cookies saved to cookie jar"
@@ -137,13 +137,13 @@ fi
 # Test 5: Use access token for authenticated request
 echo ""
 echo "🔑 Test 5: Authenticated Request with Access Token"
-if [ -n "$ACCESS_TOKEN" ]; then
+if [[ -n "$ACCESS_TOKEN" ]]; then
     PROFILE_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$API_URL/auth/profile" \
       -H "Authorization: Bearer $ACCESS_TOKEN" \
       -H "Content-Type: application/json")
     
     HTTP_CODE=$(echo "$PROFILE_RESPONSE" | tail -n1)
-    if [ "$HTTP_CODE" = "200" ]; then
+    if [[ "$HTTP_CODE" = "200" ]]; then
         print_test 0 "Authenticated request with access token successful"
     else
         print_test 1 "Authenticated request with access token successful (HTTP $HTTP_CODE)"
@@ -172,7 +172,7 @@ if echo "$REFRESH_RESPONSE" | grep -q '"success":true'; then
     
     # Extract new access token
     NEW_ACCESS_TOKEN=$(echo "$REFRESH_RESPONSE" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
-    if [ -n "$NEW_ACCESS_TOKEN" ] && [ "$NEW_ACCESS_TOKEN" != "$ACCESS_TOKEN" ]; then
+    if [[ -n "$NEW_ACCESS_TOKEN" && "$NEW_ACCESS_TOKEN" != "$ACCESS_TOKEN" ]]; then
         print_test 0 "New access token generated (token rotation)"
     else
         print_test 1 "New access token generated (token rotation)"
@@ -201,13 +201,13 @@ fi
 # Test 8: Verify token is invalidated after logout
 echo ""
 echo "🔒 Test 8: Verify Token Invalidated After Logout"
-if [ -n "$NEW_ACCESS_TOKEN" ]; then
+if [[ -n "$NEW_ACCESS_TOKEN" ]]; then
     INVALID_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$API_URL/auth/profile" \
       -H "Authorization: Bearer $NEW_ACCESS_TOKEN" \
       -H "Content-Type: application/json")
     
     HTTP_CODE=$(echo "$INVALID_RESPONSE" | tail -n1)
-    if [ "$HTTP_CODE" = "401" ]; then
+    if [[ "$HTTP_CODE" = "401" ]]; then
         print_test 0 "Token invalidated after logout (401 expected)"
     else
         print_test 1 "Token invalidated after logout (got HTTP $HTTP_CODE)"
@@ -228,7 +228,7 @@ echo -e "${GREEN}✅ Passed: $TESTS_PASSED${NC}"
 echo -e "${RED}❌ Failed: $TESTS_FAILED${NC}"
 echo ""
 
-if [ $TESTS_FAILED -eq 0 ]; then
+if [[ $TESTS_FAILED -eq 0 ]]; then
     echo -e "${GREEN}🎉 All tests passed!${NC}"
     exit 0
 else

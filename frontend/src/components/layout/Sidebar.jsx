@@ -325,6 +325,41 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
     return labels[role] || role;
   };
 
+  const renderChildItem = (child, idx) => {
+    const childLocked = child.tier && !hasTier(child.tier);
+    const childActive = isActive(child.path);
+
+    if (childLocked) {
+      return (
+        <div
+          key={idx}
+          className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[12.5px] text-gray-300 cursor-not-allowed"
+        >
+          <span className="truncate">{child.label}</span>
+          <Lock size={10} className="shrink-0 ml-auto" />
+        </div>
+      );
+    }
+
+    return (
+      <Link
+        key={idx}
+        to={child.path}
+        onClick={() => onClose?.()}
+        className={`
+          flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[12.5px]
+          transition-colors duration-150
+          ${childActive
+            ? 'text-gray-900 font-medium bg-gray-100'
+            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+          }
+        `}
+      >
+        <span className="truncate">{child.label}</span>
+      </Link>
+    );
+  };
+
   const renderNavItem = (item) => {
     const Icon = item.icon;
     const hasChildren = item.children && item.children.length > 0;
@@ -364,40 +399,7 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
 
           {isExpanded && !sectionLocked && (
             <div className="mt-0.5 ml-4 pl-3 border-l border-gray-100">
-              {item.children.map((child, idx) => {
-                const childLocked = child.tier && !hasTier(child.tier);
-                const childActive = isActive(child.path);
-
-                if (childLocked) {
-                  return (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[12.5px] text-gray-300 cursor-not-allowed"
-                    >
-                      <span className="truncate">{child.label}</span>
-                      <Lock size={10} className="shrink-0 ml-auto" />
-                    </div>
-                  );
-                }
-
-                return (
-                  <Link
-                    key={idx}
-                    to={child.path}
-                    onClick={() => onClose?.()}
-                    className={`
-                      flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[12.5px]
-                      transition-colors duration-150
-                      ${childActive
-                        ? 'text-gray-900 font-medium bg-gray-100'
-                        : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
-                      }
-                    `}
-                  >
-                    <span className="truncate">{child.label}</span>
-                  </Link>
-                );
-              })}
+              {item.children.map((child, idx) => renderChildItem(child, idx))}
             </div>
           )}
         </div>

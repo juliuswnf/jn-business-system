@@ -22,6 +22,61 @@ const getStripe = () => {
   return stripe;
 };
 
+async function dispatchStripeEvent(event) {
+  switch (event.type) {
+    case 'checkout.session.completed':
+      await handleCheckoutSessionCompleted(event.data.object);
+      break;
+    case 'customer.subscription.created':
+      await handleSubscriptionCreated(event.data.object);
+      break;
+    case 'customer.subscription.updated':
+      await handleSubscriptionUpdated(event.data.object);
+      break;
+    case 'customer.subscription.deleted':
+      await handleSubscriptionDeleted(event.data.object);
+      break;
+    case 'customer.subscription.trial_will_end':
+      await handleTrialWillEnd(event.data.object);
+      break;
+    case 'invoice.paid':
+      await stripeService.handleSuccessfulPayment(event.data.object);
+      logger.log('✅ Invoice paid successfully');
+      break;
+    case 'invoice.payment_failed':
+      await stripeService.handleFailedPayment(event.data.object);
+      logger.log('❌ Invoice payment failed');
+      break;
+    case 'invoice.payment_action_required':
+      await handlePaymentActionRequired(event.data.object);
+      break;
+    case 'payment_intent.succeeded':
+      if (event.data.object.metadata?.bookingId) {
+        await handlePaymentIntentSucceeded(event.data.object);
+      } else {
+        logger.info('✅ Payment intent succeeded (no associated booking):', event.data.object.id);
+      }
+      break;
+    case 'payment_intent.payment_failed':
+      logger.log('❌ Payment failed:', event.data.object.id);
+      break;
+    case 'charge.refunded':
+      logger.log('💰 Charge refunded:', event.data.object.id);
+      break;
+    case 'customer.created':
+      logger.log('👤 Customer created:', event.data.object.id);
+      break;
+    case 'customer.updated':
+      logger.log('👤 Customer updated:', event.data.object.id);
+      break;
+    case 'customer.deleted':
+      logger.log('👤 Customer deleted:', event.data.object.id);
+      break;
+    default:
+      logger.log(`ℹ️ Unhandled webhook event type: ${event.type}`);
+  }
+}
+
 /**
  * Handle Stripe Webhooks
  * POST /api/webhooks/stripe
@@ -96,83 +151,7 @@ export const handleStripeWebhook = async (req, res) => {
     }
 
     try {
-      // Handle different event types
-    switch (event.type) {
-    // ==================== CHECKOUT EVENTS ====================
-
-    case 'checkout.session.completed':
-      await handleCheckoutSessionCompleted(event.data.object);
-      break;
-
-    // ==================== SUBSCRIPTION EVENTS ====================
-
-    case 'customer.subscription.created':
-      await handleSubscriptionCreated(event.data.object);
-      break;
-
-    case 'customer.subscription.updated':
-      await handleSubscriptionUpdated(event.data.object);
-      break;
-
-    case 'customer.subscription.deleted':
-      await handleSubscriptionDeleted(event.data.object);
-      break;
-
-    case 'customer.subscription.trial_will_end':
-      await handleTrialWillEnd(event.data.object);
-      break;
-
-      // ==================== INVOICE EVENTS ====================
-
-    case 'invoice.paid':
-      await stripeService.handleSuccessfulPayment(event.data.object);
-      logger.log('✅ Invoice paid successfully');
-      break;
-
-    case 'invoice.payment_failed':
-      await stripeService.handleFailedPayment(event.data.object);
-      logger.log('❌ Invoice payment failed');
-      break;
-
-    case 'invoice.payment_action_required':
-      await handlePaymentActionRequired(event.data.object);
-      break;
-
-      // ==================== PAYMENT EVENTS ====================
-
-    case 'payment_intent.succeeded':
-      if (event.data.object.metadata?.bookingId) {
-        await handlePaymentIntentSucceeded(event.data.object);
-      } else {
-        logger.info('✅ Payment intent succeeded (no associated booking):', event.data.object.id);
-      }
-      break;
-
-    case 'payment_intent.payment_failed':
-      logger.log('❌ Payment failed:', event.data.object.id);
-      break;
-
-    case 'charge.refunded':
-      logger.log('💰 Charge refunded:', event.data.object.id);
-      break;
-
-      // ==================== CUSTOMER EVENTS ====================
-
-    case 'customer.created':
-      logger.log('👤 Customer created:', event.data.object.id);
-      break;
-
-    case 'customer.updated':
-      logger.log('👤 Customer updated:', event.data.object.id);
-      break;
-
-    case 'customer.deleted':
-      logger.log('👤 Customer deleted:', event.data.object.id);
-      break;
-
-    default:
-      logger.log(`ℹ️ Unhandled webhook event type: ${event.type}`);
-    }
+      await dispatchStripeEvent(event);
 
       // ? Mark event as successfully processed
       await stripeEventRecord.markProcessed();

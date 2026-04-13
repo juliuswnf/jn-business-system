@@ -18,7 +18,7 @@ RAILWAY_DOMAIN="your-railway-domain.up.railway.app"
 VERCEL_DOMAIN="jn-automation.vercel.app"
 
 # Check if domains are set
-if [ "$RAILWAY_DOMAIN" = "your-railway-domain.up.railway.app" ]; then
+if [[ "$RAILWAY_DOMAIN" = "your-railway-domain.up.railway.app" ]]; then
     echo -e "${RED}❌ Error: Please update RAILWAY_DOMAIN in this script${NC}"
     echo "   Find your domain: Railway Dashboard → Service → Settings → Domains"
     exit 1
@@ -32,7 +32,7 @@ echo ""
 echo "1️⃣  Testing Backend Health..."
 HEALTH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://$RAILWAY_DOMAIN/health")
 
-if [ "$HEALTH_RESPONSE" = "200" ]; then
+if [[ "$HEALTH_RESPONSE" = "200" ]]; then
     echo -e "   ${GREEN}✅ Backend Health: OK (200)${NC}"
 else
     echo -e "   ${RED}❌ Backend Health: FAILED ($HEALTH_RESPONSE)${NC}"
@@ -42,7 +42,7 @@ fi
 echo "2️⃣  Testing Database Connection..."
 DB_STATUS=$(curl -s "https://$RAILWAY_DOMAIN/health" | grep -o '"database":[^,}]*' | grep -o 'healthy\|ERROR\|unhealthy')
 
-if [ "$DB_STATUS" = "healthy" ]; then
+if [[ "$DB_STATUS" = "healthy" ]]; then
     echo -e "   ${GREEN}✅ Database: Connected${NC}"
 else
     echo -e "   ${RED}❌ Database: $DB_STATUS${NC}"
@@ -52,7 +52,7 @@ fi
 echo "3️⃣  Testing Stripe Integration..."
 STRIPE_STATUS=$(curl -s "https://$RAILWAY_DOMAIN/health" | grep -o '"stripe":[^}]*' | grep -o 'healthy\|ERROR\|unhealthy')
 
-if [ "$STRIPE_STATUS" = "healthy" ]; then
+if [[ "$STRIPE_STATUS" = "healthy" ]]; then
     echo -e "   ${GREEN}✅ Stripe: Configured${NC}"
 else
     echo -e "   ${YELLOW}⚠️  Stripe: $STRIPE_STATUS${NC}"
@@ -62,7 +62,7 @@ fi
 echo "4️⃣  Testing Email Queue..."
 EMAIL_STATUS=$(curl -s "https://$RAILWAY_DOMAIN/health" | grep -o '"emailQueue":[^}]*' | grep -o 'healthy\|ERROR\|unhealthy')
 
-if [ "$EMAIL_STATUS" = "healthy" ]; then
+if [[ "$EMAIL_STATUS" = "healthy" ]]; then
     echo -e "   ${GREEN}✅ Email Queue: Running${NC}"
 else
     echo -e "   ${YELLOW}⚠️  Email Queue: $EMAIL_STATUS${NC}"
@@ -72,7 +72,7 @@ fi
 echo "5️⃣  Testing Frontend..."
 FRONTEND_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://$VERCEL_DOMAIN")
 
-if [ "$FRONTEND_RESPONSE" = "200" ]; then
+if [[ "$FRONTEND_RESPONSE" = "200" ]]; then
     echo -e "   ${GREEN}✅ Frontend: Accessible (200)${NC}"
 else
     echo -e "   ${RED}❌ Frontend: FAILED ($FRONTEND_RESPONSE)${NC}"
@@ -82,7 +82,7 @@ fi
 echo "6️⃣  Testing API Connectivity (CORS)..."
 API_TEST=$(curl -s -H "Origin: https://$VERCEL_DOMAIN" -I "https://$RAILWAY_DOMAIN/api/system/version" | grep -i "access-control-allow-origin")
 
-if [ ! -z "$API_TEST" ]; then
+if [[ ! -z "$API_TEST" ]]; then
     echo -e "   ${GREEN}✅ CORS: Configured${NC}"
 else
     echo -e "   ${RED}❌ CORS: Not configured (check CORS_ORIGIN variable)${NC}"

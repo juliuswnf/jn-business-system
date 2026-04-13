@@ -16,6 +16,35 @@ import { tierHasFeature } from '../config/pricing.js';
 
 const router = express.Router();
 
+async function resolveWidgetSalonId(req) {
+  let salonId = req.user.salonId;
+  if (!salonId && req.user.role === 'salon_owner') {
+    const salon = await Salon.findOne({ owner: req.user._id });
+    if (salon) {
+      salonId = salon._id;
+      req.user.salonId = salonId;
+      await req.user.save();
+    }
+  }
+  return salonId;
+}
+
+async function getOrCreateWidget(salonId) {
+  let widget = await Widget.findOne({ salonId });
+  if (!widget) {
+    try {
+      widget = await Widget.createForSalon(salonId, {});
+    } catch (error) {
+      if (error.message === 'Widget already exists for this salon') {
+        widget = await Widget.findOne({ salonId });
+      } else {
+        throw error;
+      }
+    }
+  }
+  return widget;
+}
+
 /**
  * Widget Routes - Embeddable Booking Widget API
  * Mixed: Public endpoints (slug-based) + Protected endpoints (auth required)
@@ -25,18 +54,7 @@ const router = express.Router();
 // Get widget config for authenticated user's salon
 router.get('/config', authMiddleware.protect, async (req, res) => {
   try {
-    let salonId = req.user.salonId;
-
-    // If salonId not in user, try to find salon by owner
-    if (!salonId && req.user.role === 'salon_owner') {
-      const salon = await Salon.findOne({ owner: req.user._id });
-      if (salon) {
-        salonId = salon._id;
-        // Update user with salonId for future requests
-        req.user.salonId = salonId;
-        await req.user.save();
-      }
-    }
+    const salonId = await resolveWidgetSalonId(req);
 
     if (!salonId) {
       return res.status(404).json({
@@ -45,22 +63,7 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
       });
     }
 
-    // Get or create widget
-    let widget = await Widget.findOne({ salonId });
-
-    if (!widget) {
-      // Create default widget if it doesn't exist
-      try {
-        widget = await Widget.createForSalon(salonId, {});
-      } catch (error) {
-        // If widget was created by another request, fetch it
-        if (error.message === 'Widget already exists for this salon') {
-          widget = await Widget.findOne({ salonId });
-        } else {
-          throw error;
-        }
-      }
-    }
+    const widget = await getOrCreateWidget(salonId);
 
     // Get salon info for widget config
     const salon = await Salon.findById(salonId)
@@ -100,18 +103,7 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
 // Update widget config for authenticated user's salon
 router.put('/config', authMiddleware.protect, async (req, res) => {
   try {
-    let salonId = req.user.salonId;
-
-    // If salonId not in user, try to find salon by owner
-    if (!salonId && req.user.role === 'salon_owner') {
-      const salon = await Salon.findOne({ owner: req.user._id });
-      if (salon) {
-        salonId = salon._id;
-        // Update user with salonId for future requests
-        req.user.salonId = salonId;
-        await req.user.save();
-      }
-    }
+    const salonId = await resolveWidgetSalonId(req);
 
     if (!salonId) {
       return res.status(404).json({
@@ -120,21 +112,7 @@ router.put('/config', authMiddleware.protect, async (req, res) => {
       });
     }
 
-    // Get or create widget
-    let widget = await Widget.findOne({ salonId });
-
-    if (!widget) {
-      try {
-        widget = await Widget.createForSalon(salonId, {});
-      } catch (error) {
-        // If widget was created by another request, fetch it
-        if (error.message === 'Widget already exists for this salon') {
-          widget = await Widget.findOne({ salonId });
-        } else {
-          throw error;
-        }
-      }
-    }
+    const widget = await getOrCreateWidget(salonId);
 
     // Update widget configuration
     const { primaryColor, backgroundColor, accentColor, borderRadius, fontFamily, buttonText, headerText, showLogo, selectedServices } = req.body;

@@ -71,6 +71,32 @@ export const getBranding = async (req, res) => {
  * Update branding settings
  * PUT /api/branding
  */
+
+const COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
+
+function validateBrandingColors({ primaryColor, secondaryColor, accentColor }) {
+  if (primaryColor && !COLOR_REGEX.test(primaryColor)) {
+    return 'Ungültiges Farbformat für Primärfarbe. Verwenden Sie #RRGGBB.';
+  }
+  if (secondaryColor && !COLOR_REGEX.test(secondaryColor)) {
+    return 'Ungültiges Farbformat für Sekundärfarbe. Verwenden Sie #RRGGBB.';
+  }
+  if (accentColor && !COLOR_REGEX.test(accentColor)) {
+    return 'Ungültiges Farbformat für Akzentfarbe. Verwenden Sie #RRGGBB.';
+  }
+  return null;
+}
+
+function checkBrandingPermissions(tier, showPoweredBy) {
+  if (tier === 'starter') {
+    return 'Custom Branding ist ab dem Professional-Tarif verfügbar. Bitte upgraden Sie Ihr Abonnement.';
+  }
+  if (showPoweredBy === false && tier !== 'enterprise') {
+    return 'White-Label (ohne "Powered by JN Business System") ist nur im Enterprise-Tarif verfügbar.';
+  }
+  return null;
+}
+
 export const updateBranding = async (req, res) => {
   try {
     const salonId = req.user.salonId;
@@ -99,43 +125,16 @@ export const updateBranding = async (req, res) => {
       });
     }
 
-    // Check tier for permissions
     const tier = salon.subscription?.tier || 'starter';
 
-    if (tier === 'starter') {
-      return res.status(403).json({
-        success: false,
-        error: 'Custom Branding ist ab dem Professional-Tarif verfügbar. Bitte upgraden Sie Ihr Abonnement.'
-      });
+    const permissionError = checkBrandingPermissions(tier, showPoweredBy);
+    if (permissionError) {
+      return res.status(403).json({ success: false, error: permissionError });
     }
 
-    // White-label (showPoweredBy = false) is Enterprise only
-    if (showPoweredBy === false && tier !== 'enterprise') {
-      return res.status(403).json({
-        success: false,
-        error: 'White-Label (ohne "Powered by JN Business System") ist nur im Enterprise-Tarif verfügbar.'
-      });
-    }
-
-    // Validate color format
-    const colorRegex = /^#[0-9A-Fa-f]{6}$/;
-    if (primaryColor && !colorRegex.test(primaryColor)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Ungültiges Farbformat für Primärfarbe. Verwenden Sie #RRGGBB.'
-      });
-    }
-    if (secondaryColor && !colorRegex.test(secondaryColor)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Ungültiges Farbformat für Sekundärfarbe. Verwenden Sie #RRGGBB.'
-      });
-    }
-    if (accentColor && !colorRegex.test(accentColor)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Ungültiges Farbformat für Akzentfarbe. Verwenden Sie #RRGGBB.'
-      });
+    const colorError = validateBrandingColors({ primaryColor, secondaryColor, accentColor });
+    if (colorError) {
+      return res.status(400).json({ success: false, error: colorError });
     }
 
     // Update branding

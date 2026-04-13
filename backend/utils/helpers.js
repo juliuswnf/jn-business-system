@@ -309,31 +309,28 @@ export const cryptoHelpers = {
   },
 
   encryptString: (str, key) => {
-    // SECURITY FIX: Use createCipheriv instead of deprecated createCipher
-    // Generate a random IV for each encryption
-    const iv = crypto.randomBytes(16);
-    const keyBuffer = crypto.scryptSync(key, 'salt', 32); // Derive 32-byte key
-    const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
-    let encrypted = cipher.update(str, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    // Prepend IV to encrypted data (IV doesn't need to be secret)
-    return iv.toString('hex') + ':' + encrypted;
+    // AES-256-GCM: authenticated encryption with 96-bit IV and auth tag
+    const iv = crypto.randomBytes(12); // 96-bit IV for GCM
+    const keyBuffer = Buffer.from(key, 'hex'); // 32-byte (64-char hex) key
+    const cipher = crypto.createCipheriv('aes-256-gcm', keyBuffer, iv);
+    const encrypted = Buffer.concat([cipher.update(str, 'utf8'), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+    return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString('hex')}`;
   },
 
-  decryptString: (encrypted, key) => {
-    // SECURITY FIX: Use createDecipheriv instead of deprecated createDecipher
+  decryptString: (data, key) => {
     try {
-      const parts = encrypted.split(':');
-      if (parts.length !== 2) {
+      const parts = data.split(':');
+      if (parts.length !== 3) {
         throw new Error('Invalid encrypted format');
       }
       const iv = Buffer.from(parts[0], 'hex');
-      const encryptedData = parts[1];
-      const keyBuffer = crypto.scryptSync(key, 'salt', 32); // Derive 32-byte key
-      const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
-      let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      return decrypted;
+      const authTag = Buffer.from(parts[1], 'hex');
+      const encryptedData = Buffer.from(parts[2], 'hex');
+      const keyBuffer = Buffer.from(key, 'hex'); // 32-byte (64-char hex) key
+      const decipher = crypto.createDecipheriv('aes-256-gcm', keyBuffer, iv);
+      decipher.setAuthTag(authTag);
+      return Buffer.concat([decipher.update(encryptedData), decipher.final()]).toString('utf8');
     } catch (error) {
       throw new Error('Decryption failed: ' + error.message);
     }

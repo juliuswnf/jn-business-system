@@ -99,7 +99,7 @@ export default class TwilioProvider extends ISMSProvider {
 
       // Build signature string
       let signatureString = url;
-      const sortedKeys = Object.keys(payload).sort();
+      const sortedKeys = Object.keys(payload).sort((a, b) => a.localeCompare(b));
       for (const key of sortedKeys) {
         if (key !== 'url') {
           signatureString += key + payload[key];

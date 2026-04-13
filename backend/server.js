@@ -449,6 +449,50 @@ io.on('connection', (socket) => {
 });
 
 // ==================== MONGODB CONNECTION ====================
+function validateMongoPassword(mongoURI) {
+  if (process.env.NODE_ENV !== 'production' && process.env.VALIDATE_MONGODB_PASSWORD !== 'true') return;
+  const passwordMatch = mongoURI.match(/mongodb(\+srv)?:\/\/([^:]+):([^@]+)@/);
+  if (!passwordMatch) return;
+  const password = passwordMatch[3];
+  const weakPasswords = [
+    'password', 'admin', '123456', 'mongodb', 'root', 'test',
+    'password123', 'admin123', '12345678', 'qwerty', 'letmein',
+    'welcome', 'monkey', '1234567890', 'abc123', 'password1',
+    'Password1', 'Admin123', 'root123', 'mongodb123'
+  ];
+  if (password.length < 16) {
+    throw new Error('MongoDB password is too weak. Minimum 16 characters required in production.');
+  }
+  if (weakPasswords.some(weak => password.toLowerCase().includes(weak.toLowerCase()))) {
+    throw new Error('MongoDB password is too weak. Use a stronger, unique password.');
+  }
+  const hasNumber = /\d/.test(password);
+  const hasLetter = /[a-zA-Z]/.test(password);
+  if (!hasNumber || !hasLetter) {
+    logger.warn('⚠️ SECURITY: MongoDB password should contain both letters and numbers');
+  }
+  logger.info('✅ MongoDB password validation passed');
+}
+
+function validateJwtSecret() {
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET is required for authentication. Set it in your .env file.');
+  }
+  if (process.env.NODE_ENV !== 'production' && process.env.VALIDATE_JWT_SECRET !== 'true') return;
+  if (jwtSecret.length < 32) {
+    throw new Error('JWT_SECRET is too weak. Minimum 32 characters required in production.');
+  }
+  const weakSecrets = [
+    'secret', 'jwt_secret', 'your-secret-key', 'change-me', '12345678901234567890123456789012',
+    'test', 'dev', 'development', 'production', 'jwtsecret', 'secretkey'
+  ];
+  if (weakSecrets.some(weak => jwtSecret.toLowerCase().includes(weak.toLowerCase()))) {
+    throw new Error('JWT_SECRET is too weak. Use a stronger, randomly generated secret.');
+  }
+  logger.info('✅ JWT_SECRET validation passed');
+}
+
 const connectDatabase = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI;
@@ -465,81 +509,10 @@ const connectDatabase = async () => {
     }
 
     // ? SECURITY FIX: Validate MongoDB password strength
-    if (process.env.NODE_ENV === 'production' || process.env.VALIDATE_MONGODB_PASSWORD === 'true') {
-      const passwordMatch = mongoURI.match(/mongodb(\+srv)?:\/\/([^:]+):([^@]+)@/);
-      if (passwordMatch) {
-        const password = passwordMatch[3];
-
-        // List of weak/common passwords
-        const weakPasswords = [
-          'password', 'admin', '123456', 'mongodb', 'root', 'test',
-          'password123', 'admin123', '12345678', 'qwerty', 'letmein',
-          'welcome', 'monkey', '1234567890', 'abc123', 'password1',
-          'Password1', 'Admin123', 'root123', 'mongodb123'
-        ];
-
-        // Check password length (minimum 16 characters in production)
-        if (password.length < 16) {
-          logger.error('? SECURITY: MongoDB password is too short!');
-          logger.error(`? Password length: ${password.length} characters (minimum: 16)`);
-          logger.error('? Use a strong password with at least 16 characters');
-          throw new Error('MongoDB password is too weak. Minimum 16 characters required in production.');
-        }
-
-        // Check against weak passwords list
-        if (weakPasswords.some(weak => password.toLowerCase().includes(weak.toLowerCase()))) {
-          logger.error('? SECURITY: MongoDB password is too weak!');
-          logger.error('? Password contains common/weak patterns');
-          logger.error('? Use a unique, strong password with letters, numbers, and special characters');
-          throw new Error('MongoDB password is too weak. Use a stronger, unique password.');
-        }
-
-        // Check for basic complexity (at least one number and one letter)
-        const hasNumber = /\d/.test(password);
-        const hasLetter = /[a-zA-Z]/.test(password);
-
-        if (!hasNumber || !hasLetter) {
-          logger.warn('? SECURITY: MongoDB password should contain both letters and numbers');
-          logger.warn('? Consider using a more complex password for better security');
-        }
-
-        logger.info('? MongoDB password validation passed');
-      }
-    }
+    validateMongoPassword(mongoURI);
 
     // ? SECURITY FIX: Validate JWT Secret strength
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      logger.error('? SECURITY: JWT_SECRET is not configured!');
-      throw new Error('JWT_SECRET is required for authentication. Set it in your .env file.');
-    }
-
-    if (process.env.NODE_ENV === 'production' || process.env.VALIDATE_JWT_SECRET === 'true') {
-      // Check JWT Secret length (minimum 32 characters)
-      if (jwtSecret.length < 32) {
-        logger.error('? SECURITY: JWT_SECRET is too short!');
-        logger.error(`? Secret length: ${jwtSecret.length} characters (minimum: 32)`);
-        logger.error('? Use a strong secret with at least 32 characters');
-        logger.error('? Generate a secure secret: openssl rand -base64 32');
-        throw new Error('JWT_SECRET is too weak. Minimum 32 characters required in production.');
-      }
-
-      // List of weak/common secrets
-      const weakSecrets = [
-        'secret', 'jwt_secret', 'your-secret-key', 'change-me', '12345678901234567890123456789012',
-        'test', 'dev', 'development', 'production', 'jwtsecret', 'secretkey'
-      ];
-
-      // Check against weak secrets list
-      if (weakSecrets.some(weak => jwtSecret.toLowerCase().includes(weak.toLowerCase()))) {
-        logger.error('? SECURITY: JWT_SECRET is too weak!');
-        logger.error('? Secret contains common/weak patterns');
-        logger.error('? Use a unique, random secret generated with: openssl rand -base64 32');
-        throw new Error('JWT_SECRET is too weak. Use a stronger, randomly generated secret.');
-      }
-
-      logger.info('? JWT_SECRET validation passed');
-    }
+    validateJwtSecret();
 
     // Log sanitized URI for debugging (hide password)
     const sanitizedUri = mongoURI.replace(/:([^:@]+)@/, ':****@');

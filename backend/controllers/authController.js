@@ -74,44 +74,68 @@ const createRefreshToken = async (userId, deviceInfo = {}) => {
 
 // ==================== REGISTER ====================
 
+// ----- register helpers -----
+function validateRegisterInput({ email, password, firstName, lastName, name, role }) {
+  const fullName = name || (firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName);
+  if (!email || !password || !fullName) {
+    return { error: 'Bitte geben Sie E-Mail-Adresse, Passwort und Name ein', fullName, userRole: null };
+  }
+  if (!isValidEmail(email)) {
+    return { error: 'Bitte geben Sie eine gültige E-Mail-Adresse ein', fullName, userRole: null };
+  }
+  const pwdResult = validatePassword(password);
+  if (!pwdResult.valid) {
+    return { error: pwdResult.message, fullName, userRole: null };
+  }
+  const allowedRoles = ['customer', 'employee', 'salon_owner', 'ceo'];
+  return { error: null, fullName, userRole: allowedRoles.includes(role) ? role : 'customer' };
+}
+
+async function prepareSalonOwnerSetup(companyName, businessType) {
+  const SalonModel = (await import('../models/Salon.js')).default;
+  let slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const existingSlug = await SalonModel.findOne({ slug }).maxTimeMS(5000);
+  if (existingSlug) slug = `${slug}-${Date.now().toString(36)}`;
+  const validBusinessTypes = [
+    'hair-salon', 'beauty-salon', 'spa-wellness', 'tattoo-piercing',
+    'medical-aesthetics', 'personal-training', 'physiotherapy',
+    'barbershop', 'nail-salon', 'massage-therapy', 'yoga-studio',
+    'pilates-studio', 'other'
+  ];
+  const selectedBusinessType = businessType && validBusinessTypes.includes(businessType)
+    ? businessType : 'hair-salon';
+  return { SalonModel, slug, selectedBusinessType };
+}
+
+async function sendRegistrationEmails(user, salon) {
+  if (!salon) return;
+  logger.info(`Salon created for new owner: ${salon.name} (${salon.slug})`);
+  try {
+    const emailService = (await import('../services/emailService.js')).default;
+    await emailService.sendWelcomeEmail(user, salon);
+  } catch (emailError) {
+    logger.warn('Welcome email failed:', emailError.message);
+  }
+  try {
+    await LifecycleEmail.scheduleForNewSalon(salon, user);
+    logger.info(`Lifecycle emails scheduled for: ${salon.name}`);
+  } catch (lifecycleError) {
+    logger.warn('Lifecycle email scheduling failed:', lifecycleError.message);
+  }
+}
+
 export const register = async (req, res) => {
   try {
     const {
-      email, password, firstName, lastName, name, role, phone,
+      email, password, phone,
       companyName, companyAddress, companyCity, companyZip, plan, businessType
     } = req.body;
 
-    // Combine firstName + lastName OR use name
-    const fullName = name || (firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName);
-
-    // Validate input
-    if (!email || !password || !fullName) {
-      return res.status(400).json({
-        success: false,
-        message: 'Bitte geben Sie E-Mail-Adresse, Passwort und Name ein'
-      });
+    const validation = validateRegisterInput(req.body);
+    if (validation.error) {
+      return res.status(400).json({ success: false, message: validation.error });
     }
-
-    // Validate email format
-    if (!isValidEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Bitte geben Sie eine gültige E-Mail-Adresse ein'
-      });
-    }
-
-    // Validate password strength
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.valid) {
-      return res.status(400).json({
-        success: false,
-        message: passwordValidation.message
-      });
-    }
-
-    // Validate role (only allow specific roles — 'admin' is not a valid User role)
-    const allowedRoles = ['customer', 'employee', 'salon_owner', 'ceo'];
-    const userRole = allowedRoles.includes(role) ? role : 'customer';
+    const { fullName, userRole } = validation;
 
     // Check if user exists - ensure email is string to prevent NoSQL injection
     const existingUser = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000);
@@ -139,30 +163,22 @@ export const register = async (req, res) => {
     }
 
     // Compute slug + businessType before transaction (read-only checks)
-    let SalonModel = null;
-    let slug = null;
-    let selectedBusinessType = null;
+    let salonConfig = null;
     if (userRole === 'salon_owner' && companyName) {
-      SalonModel = (await import('../models/Salon.js')).default;
-
-      slug = companyName.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-
-      const existingSlug = await SalonModel.findOne({ slug }).maxTimeMS(5000);
-      if (existingSlug) {
-        slug = `${slug}-${Date.now().toString(36)}`;
-      }
-
-      const validBusinessTypes = [
-        'hair-salon', 'beauty-salon', 'spa-wellness', 'tattoo-piercing',
-        'medical-aesthetics', 'personal-training', 'physiotherapy',
-        'barbershop', 'nail-salon', 'massage-therapy', 'yoga-studio',
-        'pilates-studio', 'other'
-      ];
-      selectedBusinessType = businessType && validBusinessTypes.includes(businessType)
-        ? businessType
-        : 'hair-salon';
+      const { SalonModel, slug, selectedBusinessType } = await prepareSalonOwnerSetup(companyName, businessType);
+      salonConfig = {
+        SalonModel,
+        salonDoc: {
+          name: companyName, slug, email, phone: phone || '',
+          businessType: selectedBusinessType,
+          address: {
+            street: companyAddress || '', city: companyCity || '',
+            postalCode: companyZip || '', country: 'Deutschland'
+          },
+          isActive: true,
+          subscription: { status: 'trial_pending', tier: plan || 'starter' }
+        }
+      };
     }
 
     // Create user + salon atomically — Salon failure rolls back the user too
@@ -170,36 +186,13 @@ export const register = async (req, res) => {
     const txSession = await mongoose.startSession();
     try {
       txSession.startTransaction();
-
       [user] = await User.create([userData], { session: txSession });
-
-      if (userRole === 'salon_owner' && companyName) {
-        [salon] = await SalonModel.create(
-          [{
-            name: companyName,
-            slug,
-            owner: user._id,
-            email,
-            phone: phone || '',
-            businessType: selectedBusinessType,
-            address: {
-              street: companyAddress || '',
-              city: companyCity || '',
-              postalCode: companyZip || '',
-              country: 'Deutschland'
-            },
-            isActive: true,
-            subscription: {
-              status: 'trial_pending',
-              tier: plan || 'starter'
-            }
-          }],
-          { session: txSession }
-        );
+      if (salonConfig) {
+        const { SalonModel, salonDoc } = salonConfig;
+        [salon] = await SalonModel.create([{ ...salonDoc, owner: user._id }], { session: txSession });
         user.salonId = salon._id;
         await user.save({ session: txSession });
       }
-
       await txSession.commitTransaction();
     } catch (txError) {
       await txSession.abortTransaction();
@@ -208,25 +201,7 @@ export const register = async (req, res) => {
       txSession.endSession();
     }
 
-    if (salon) {
-      logger.info(`Salon created for new owner: ${salon.name} (${salon.slug})`);
-
-      // Queue welcome email
-      try {
-        const emailService = (await import('../services/emailService.js')).default;
-        await emailService.sendWelcomeEmail(user, salon);
-      } catch (emailError) {
-        logger.warn('Welcome email failed:', emailError.message);
-      }
-
-      // Schedule lifecycle emails for trial nurturing
-      try {
-        await LifecycleEmail.scheduleForNewSalon(salon, user);
-        logger.info(`Lifecycle emails scheduled for: ${salon.name}`);
-      } catch (lifecycleError) {
-        logger.warn('Lifecycle email scheduling failed:', lifecycleError.message);
-      }
-    }
+    await sendRegistrationEmails(user, salon);
 
     // Generate access token (short-lived: 15 minutes)
     const accessToken = generateToken(user._id, '15m');
@@ -434,6 +409,106 @@ const isIPWhitelisted = (clientIP) => {
   });
 };
 
+// Returns a response object { status, body } or null if credentials are valid.
+async function checkCEORateLimit(clientIP, email, password, ipAttempts, now) {
+  if (!isIPWhitelisted(clientIP)) {
+    logger.error(`[CEO-SECURITY] ? BLOCKED - IP not whitelisted: ${clientIP}`);
+    return { status: 403, body: { success: false, message: 'Zugriff verweigert' } };
+  }
+  if (now - ipAttempts.lastAttempt > 30 * 60 * 1000) ipAttempts.count = 0;
+  if (ipAttempts.count >= 5) {
+    const waitTime = Math.min(ipAttempts.count * 60, 300);
+    logger.error(`[CEO-SECURITY] BLOCKED - Too many attempts from IP: ${clientIP}`);
+    return { status: 429, body: { success: false, message: `Zu viele Versuche. Bitte warten Sie ${waitTime} Sekunden.` } };
+  }
+  if (!email || !password) {
+    ipAttempts.count++; ipAttempts.lastAttempt = now; ceoLoginAttempts.set(clientIP, ipAttempts);
+    return { status: 400, body: { success: false, message: 'Bitte E-Mail und Passwort angeben' } };
+  }
+  return null;
+}
+
+// Handles the full 2FA flow for CEO login after password is verified.
+// Returns a response object { status, body } to be sent to the client.
+async function handleCEOTwoFactor(user, twoFactorCode, clientIP, email, ipAttempts, now, rememberMe, req, res) {
+  logger.info(`[CEO-SECURITY] 2FA Check - twoFactorEnabled: ${user.twoFactorEnabled}, twoFactorSecret: ${user.twoFactorSecret ? 'exists' : 'null'}, twoFactorCode provided: ${twoFactorCode ? 'yes' : 'no'}`);
+
+  if (!user.twoFactorEnabled) {
+    // Try to complete 2FA setup if code provided
+    if (twoFactorCode && user.twoFactorSecret) {
+      logger.info(`[CEO-SECURITY] Attempting 2FA setup verification with code: ${twoFactorCode}`);
+      const isValidToken = authenticator.verify({
+        token: twoFactorCode.toString().replace(/\s/g, ''),
+        secret: user.twoFactorSecret
+      });
+      if (isValidToken) {
+        user.twoFactorEnabled = true;
+        await user.save();
+        ceoLoginAttempts.delete(clientIP);
+        await user.resetLoginAttempts();
+        const token = generateToken(user._id, '30d');
+        logger.info(`[CEO-SECURITY] ? 2FA setup completed and CEO logged in: ${user.email}, IP: ${clientIP}`);
+        return { status: 200, body: { success: true, token, user: user.toJSON(), message: '2FA erfolgreich eingerichtet. Willkommen im CEO Bereich!' } };
+      }
+      logger.warn(`[CEO-SECURITY] Invalid 2FA code during setup: ${email}, IP: ${clientIP}`);
+      return { status: 401, body: { success: false, message: 'Ungültiger 2FA-Code. Bitte versuchen Sie es erneut.' } };
+    }
+    // 2FA setup required
+    logger.warn(`[CEO-SECURITY] 2FA not enabled for CEO: ${email}, IP: ${clientIP}`);
+    let secret = user.twoFactorSecret;
+    if (!secret) {
+      secret = authenticator.generateSecret();
+      user.twoFactorSecret = secret;
+      await user.save();
+    }
+    const otpauth = authenticator.keyuri(user.email, 'JN-Business-System-CEO', secret);
+    const qrCode = await QRCode.toDataURL(otpauth);
+    return { status: 200, body: { success: false, requiresTwoFactorSetup: true, message: '2FA ist für CEO-Zugang Pflicht. Bitte richten Sie die Zwei-Faktor-Authentifizierung ein.', qrCode, setupInstructions: 'Scannen Sie den QR-Code mit einer Authenticator-App (Google Authenticator, Authy, etc.)' } };
+  }
+
+  // 2FA is enabled — code required
+  if (!twoFactorCode) {
+    logger.info(`[CEO-SECURITY] 2FA code required for: ${email}, IP: ${clientIP}`);
+    return { status: 200, body: { success: false, requiresTwoFactor: true, message: 'Bitte geben Sie Ihren 2FA-Code ein' } };
+  }
+
+  const cleanCode = twoFactorCode.toString().replace(/\s/g, '');
+  if (isTotpCodeUsed(user._id.toString(), cleanCode)) {
+    ipAttempts.count++; ipAttempts.lastAttempt = now; ceoLoginAttempts.set(clientIP, ipAttempts);
+    logger.warn(`[CEO-SECURITY] Failed - TOTP code replay detected: ${email}, IP: ${clientIP}`);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return { status: 401, body: { success: false, message: 'Ungültiger 2FA-Code' } };
+  }
+
+  const isValidToken = authenticator.verify({ token: cleanCode, secret: user.twoFactorSecret });
+  if (!isValidToken) {
+    ipAttempts.count++; ipAttempts.lastAttempt = now; ceoLoginAttempts.set(clientIP, ipAttempts);
+    logger.warn(`[CEO-SECURITY] Failed - Invalid 2FA code: ${email}, Code: ${cleanCode}, IP: ${clientIP}`);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return { status: 401, body: { success: false, message: 'Ungültiger 2FA-Code' } };
+  }
+
+  // Full success
+  markTotpCodeUsed(user._id.toString(), cleanCode);
+  ceoLoginAttempts.delete(clientIP);
+  await user.resetLoginAttempts();
+
+  const accessToken = generateToken(user._id, '1d');
+  const refreshToken = await createRefreshToken(user._id, {
+    userAgent: req.headers['user-agent'],
+    ipAddress: clientIP,
+    rememberMe: Boolean(rememberMe)
+  });
+
+  logger.info(`[CEO-SECURITY] ✅ SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
+
+  res.cookie('refreshToken', refreshToken, getCookieOptions({ rememberMe: Boolean(rememberMe), maxAge: 7 * 24 * 60 * 60 * 1000, path: '/api/auth' }));
+  res.cookie('accessToken', accessToken, getCookieOptions({ rememberMe: Boolean(rememberMe), maxAge: 24 * 60 * 60 * 1000, path: '/' }));
+  generateCSRFToken(req, res, () => {});
+
+  return { status: 200, body: { success: true, expiresIn: 24 * 60 * 60, user: user.toJSON(), message: 'Willkommen im CEO Bereich' } };
+}
+
 export const ceoLogin = async (req, res) => {
   const clientIP = req.ip || req.socket.remoteAddress || 'unknown';
   const userAgent = req.headers['user-agent'] || 'unknown';
@@ -441,270 +516,50 @@ export const ceoLogin = async (req, res) => {
   try {
     const { email, password, twoFactorCode, rememberMe = false } = req.body;
 
-    // SECURITY: Log all CEO login attempts with full details
     logger.warn(`[CEO-SECURITY] Login attempt - IP: ${clientIP}, Email: ${email || 'not provided'}, UA: ${userAgent.substring(0, 50)}`);
 
-    // SECURITY: Check IP Whitelist FIRST
-    if (!isIPWhitelisted(clientIP)) {
-      logger.error(`[CEO-SECURITY] ? BLOCKED - IP not whitelisted: ${clientIP}`);
-      // Don't reveal that it's an IP block - generic message
-      return res.status(403).json({
-        success: false,
-        message: 'Zugriff verweigert'
-      });
-    }
-
-    // Check for brute force from this IP
     const ipAttempts = ceoLoginAttempts.get(clientIP) || { count: 0, lastAttempt: 0 };
     const now = Date.now();
 
-    // Reset counter after 30 minutes
-    if (now - ipAttempts.lastAttempt > 30 * 60 * 1000) {
-      ipAttempts.count = 0;
-    }
+    const rateLimitResult = await checkCEORateLimit(clientIP, email, password, ipAttempts, now);
+    if (rateLimitResult) return res.status(rateLimitResult.status).json(rateLimitResult.body);
 
-    // Block if too many attempts (more than 5 in 30 min)
-    if (ipAttempts.count >= 5) {
-      const waitTime = Math.min(ipAttempts.count * 60, 300); // Max 5 min wait
-      logger.error(`[CEO-SECURITY] BLOCKED - Too many attempts from IP: ${clientIP}`);
-      return res.status(429).json({
-        success: false,
-        message: `Zu viele Versuche. Bitte warten Sie ${waitTime} Sekunden.`
-      });
-    }
-
-    // Validate input
-    if (!email || !password) {
-      ipAttempts.count++;
-      ipAttempts.lastAttempt = now;
-      ceoLoginAttempts.set(clientIP, ipAttempts);
-      return res.status(400).json({
-        success: false,
-        message: 'Bitte E-Mail und Passwort angeben'
-      });
-    }
-
-    // Find user with password field AND 2FA fields (twoFactorSecret has select: false) - ensure email is string
     const user = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000).select('+password +twoFactorSecret');
 
     if (!user) {
-      ipAttempts.count++;
-      ipAttempts.lastAttempt = now;
-      ceoLoginAttempts.set(clientIP, ipAttempts);
+      ipAttempts.count++; ipAttempts.lastAttempt = now; ceoLoginAttempts.set(clientIP, ipAttempts);
       logger.warn(`[CEO-SECURITY] Failed - Email not found: ${email}, IP: ${clientIP}`);
-
-      // Add delay to slow down brute force
       await new Promise(resolve => setTimeout(resolve, 1000 * ipAttempts.count));
-
-      return res.status(401).json({
-        success: false,
-        message: 'Ungültige Anmeldedaten'
-      });
+      return res.status(401).json({ success: false, message: 'Ungültige Anmeldedaten' });
     }
 
-    // SECURITY: Verify user is CEO - no other role allowed
     if (user.role !== 'ceo') {
-      ipAttempts.count += 2; // Double penalty for wrong role attempt
-      ipAttempts.lastAttempt = now;
-      ceoLoginAttempts.set(clientIP, ipAttempts);
+      ipAttempts.count += 2; ipAttempts.lastAttempt = now; ceoLoginAttempts.set(clientIP, ipAttempts);
       logger.error(`[CEO-SECURITY] ALERT - Non-CEO attempted access: ${email} (role: ${user.role}), IP: ${clientIP}`);
-
-      // Add significant delay
       await new Promise(resolve => setTimeout(resolve, 3000));
-
-      return res.status(403).json({
-        success: false,
-        message: 'Zugriff verweigert'
-      });
+      return res.status(403).json({ success: false, message: 'Zugriff verweigert' });
     }
 
-    // Check if account is locked
     if (user.isLocked) {
       logger.warn(`[CEO-SECURITY] Locked account attempt: ${email}, IP: ${clientIP}`);
-      return res.status(403).json({
-        success: false,
-        message: 'Konto gesperrt. Zu viele Fehlversuche.'
-      });
+      return res.status(403).json({ success: false, message: 'Konto gesperrt. Zu viele Fehlversuche.' });
     }
 
-    // Compare password
     const isPasswordCorrect = await user.comparePassword(password);
-
     if (!isPasswordCorrect) {
-      ipAttempts.count++;
-      ipAttempts.lastAttempt = now;
-      ceoLoginAttempts.set(clientIP, ipAttempts);
+      ipAttempts.count++; ipAttempts.lastAttempt = now; ceoLoginAttempts.set(clientIP, ipAttempts);
       logger.warn(`[CEO-SECURITY] Failed - Wrong password: ${email}, IP: ${clientIP}`);
       await user.incLoginAttempts();
-
-      // Add delay
       await new Promise(resolve => setTimeout(resolve, 1000 * ipAttempts.count));
-
-      return res.status(401).json({
-        success: false,
-        message: 'Ungültige Anmeldedaten'
-      });
+      return res.status(401).json({ success: false, message: 'Ungültige Anmeldedaten' });
     }
 
     // ==================== 2FA MANDATORY FOR CEO ====================
-    // CEO MUST have 2FA enabled - no exceptions
-
-    logger.info(`[CEO-SECURITY] 2FA Check - twoFactorEnabled: ${user.twoFactorEnabled}, twoFactorSecret: ${user.twoFactorSecret ? 'exists' : 'null'}, twoFactorCode provided: ${twoFactorCode ? 'yes' : 'no'}`);
-
-    // If 2FA is not enabled yet
-    if (!user.twoFactorEnabled) {
-      // Check if user is trying to verify a setup code
-      if (twoFactorCode && user.twoFactorSecret) {
-        logger.info(`[CEO-SECURITY] Attempting 2FA setup verification with code: ${twoFactorCode}`);
-        // User has a secret and is sending a code - verify it to complete setup
-        const isValidToken = authenticator.verify({
-          token: twoFactorCode.toString().replace(/\s/g, ''),
-          secret: user.twoFactorSecret
-        });
-
-        if (isValidToken) {
-          // Code is valid - enable 2FA and complete login
-          user.twoFactorEnabled = true;
-          await user.save();
-
-          // Reset counters and generate token
-          ceoLoginAttempts.delete(clientIP);
-          await user.resetLoginAttempts();
-          const token = generateToken(user._id, '30d');
-
-          logger.info(`[CEO-SECURITY] ? 2FA setup completed and CEO logged in: ${user.email}, IP: ${clientIP}`);
-
-          return res.status(200).json({
-            success: true,
-            token,
-            user: user.toJSON(),
-            message: '2FA erfolgreich eingerichtet. Willkommen im CEO Bereich!'
-          });
-        } else {
-          // Invalid code during setup
-          logger.warn(`[CEO-SECURITY] Invalid 2FA code during setup: ${email}, IP: ${clientIP}`);
-          return res.status(401).json({
-            success: false,
-            message: 'Ungültiger 2FA-Code. Bitte versuchen Sie es erneut.'
-          });
-        }
-      }
-
-      // No code provided or no secret yet - generate/show setup
-      logger.warn(`[CEO-SECURITY] 2FA not enabled for CEO: ${email}, IP: ${clientIP}`);
-
-      // Only generate new secret if none exists
-      let secret = user.twoFactorSecret;
-      if (!secret) {
-        secret = authenticator.generateSecret();
-        user.twoFactorSecret = secret;
-        await user.save();
-      }
-
-      const otpauth = authenticator.keyuri(user.email, 'JN-Business-System-CEO', secret);
-      const qrCode = await QRCode.toDataURL(otpauth);
-
-      return res.status(200).json({
-        success: false,
-        requiresTwoFactorSetup: true,
-        message: '2FA ist für CEO-Zugang Pflicht. Bitte richten Sie die Zwei-Faktor-Authentifizierung ein.',
-        qrCode,
-        setupInstructions: 'Scannen Sie den QR-Code mit einer Authenticator-App (Google Authenticator, Authy, etc.)'
-      });
-    }
-
-    // 2FA is enabled - verify code
-    if (!twoFactorCode) {
-      logger.info(`[CEO-SECURITY] 2FA code required for: ${email}, IP: ${clientIP}`);
-      return res.status(200).json({
-        success: false,
-        requiresTwoFactor: true,
-        message: 'Bitte geben Sie Ihren 2FA-Code ein'
-      });
-    }
-
-    // Verify 2FA code - clean up the code first (remove spaces, ensure string)
-    const cleanCode = twoFactorCode.toString().replace(/\s/g, '');
-
-    // TOTP replay guard: reject codes already used within the current 90s window
-    if (isTotpCodeUsed(user._id.toString(), cleanCode)) {
-      ipAttempts.count++;
-      ipAttempts.lastAttempt = now;
-      ceoLoginAttempts.set(clientIP, ipAttempts);
-      logger.warn(`[CEO-SECURITY] Failed - TOTP code replay detected: ${email}, IP: ${clientIP}`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      return res.status(401).json({ success: false, message: 'Ungültiger 2FA-Code' });
-    }
-
-    const isValidToken = authenticator.verify({
-      token: cleanCode,
-      secret: user.twoFactorSecret
-    });
-
-    if (!isValidToken) {
-      ipAttempts.count++;
-      ipAttempts.lastAttempt = now;
-      ceoLoginAttempts.set(clientIP, ipAttempts);
-      logger.warn(`[CEO-SECURITY] Failed - Invalid 2FA code: ${email}, Code: ${cleanCode}, IP: ${clientIP}`);
-
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      return res.status(401).json({
-        success: false,
-        message: 'Ungültiger 2FA-Code'
-      });
-    }
-
-    // ==================== FULL SUCCESS ====================
-    // Password correct + 2FA verified
-
-    // Mark this TOTP code as used to prevent replay within the same 30s window
-    markTotpCodeUsed(user._id.toString(), cleanCode);
-
-    // Reset all counters
-    ceoLoginAttempts.delete(clientIP);
-    await user.resetLoginAttempts();
-
-    // Generate access token (CEO gets longer session: 1 day)
-    const accessToken = generateToken(user._id, '1d');
-
-    // Generate and store refresh token
-    const refreshToken = await createRefreshToken(user._id, {
-      userAgent: req.headers['user-agent'],
-      ipAddress: clientIP,
-      rememberMe: Boolean(rememberMe)
-    });
-
-    logger.info(`[CEO-SECURITY] ✅ SUCCESS - CEO logged in with 2FA: ${user.email}, IP: ${clientIP}`);
-
-    // Set secure HTTP-only cookies for both tokens
-    res.cookie('refreshToken', refreshToken, getCookieOptions({
-      rememberMe: Boolean(rememberMe),
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/api/auth'
-    }));
-
-    res.cookie('accessToken', accessToken, getCookieOptions({
-      rememberMe: Boolean(rememberMe),
-      maxAge: 24 * 60 * 60 * 1000,
-      path: '/'
-    }));
-
-    // ? SECURITY FIX: Generate CSRF token for state-changing operations
-    generateCSRFToken(req, res, () => {});
-
-    res.status(200).json({
-      success: true,
-      expiresIn: 24 * 60 * 60, // 1 day in seconds
-      user: user.toJSON(),
-      message: 'Willkommen im CEO Bereich'
-    });
+    const twoFactorResult = await handleCEOTwoFactor(user, twoFactorCode, clientIP, email, ipAttempts, now, rememberMe, req, res);
+    return res.status(twoFactorResult.status).json(twoFactorResult.body);
   } catch (error) {
     logger.error(`[CEO-SECURITY] ERROR: ${error.message}, IP: ${clientIP}`);
-    res.status(500).json({
-      success: false,
-      message: 'Login fehlgeschlagen'
-    });
+    res.status(500).json({ success: false, message: 'Login fehlgeschlagen' });
   }
 };
 
@@ -1075,147 +930,97 @@ const BLOCKED_EMAIL_DOMAINS = [
   'throwaway.email', 'temp-mail.org', 'getnada.com', 'mohmal.com'
 ];
 
+async function applyTimingDelay(startTime, minMs = 500) {
+  const delay = Math.max(0, minMs - (Date.now() - startTime));
+  if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+}
+
+// Returns { error, normalizedEmail } or null if ok, always applying timing delay.
+async function validateForgotPasswordEmail(email, clientIp, startTime) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const normalizedEmail = email.toLowerCase().trim();
+  if (!emailRegex.test(normalizedEmail)) {
+    logger.warn(`?? Invalid email format provided: ${email} from IP: ${clientIp}`);
+    await applyTimingDelay(startTime);
+    return { error: true, normalizedEmail };
+  }
+  const emailDomain = normalizedEmail.split('@')[1];
+  if (BLOCKED_EMAIL_DOMAINS.includes(emailDomain)) {
+    logger.warn(`🚫 Blocked email domain attempted: ${emailDomain} from IP: ${clientIp}`);
+    await applyTimingDelay(startTime);
+    return { error: true, normalizedEmail };
+  }
+  return { error: false, normalizedEmail };
+}
+
 export const forgotPassword = async (req, res) => {
-  const startTime = Date.now(); // For timing attack protection
+  const startTime = Date.now();
+  const SAFE_RESPONSE = { success: true, message: 'If this email is registered, a reset link will be sent' };
   try {
     const { email, role } = req.body;
     const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
 
-    // Validate input
     if (!email) {
-      // Constant delay for timing attack protection
-      const delay = Math.max(0, 500 - (Date.now() - startTime));
-      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
-      return res.status(400).json({
-        success: false,
-        message: 'E-Mail-Adresse ist erforderlich'
-      });
+      await applyTimingDelay(startTime);
+      return res.status(400).json({ success: false, message: 'E-Mail-Adresse ist erforderlich' });
     }
 
-    // Find user - normalize email (schema already has lowercase: true, but be safe)
-    const normalizedEmail = email.toLowerCase().trim();
-
-    // Validate email format before database query
+    const emailValidation = await validateForgotPasswordEmail(email, clientIp, startTime);
+    if (emailValidation.error) return res.status(200).json(SAFE_RESPONSE);
+    const { normalizedEmail } = emailValidation;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(normalizedEmail)) {
-      logger.warn(`?? Invalid email format provided: ${email} from IP: ${clientIp}`);
-      // Constant delay
-      const delay = Math.max(0, 500 - (Date.now() - startTime));
-      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
-      return res.status(200).json({
-        success: true,
-        message: 'If this email is registered, a reset link will be sent'
-      });
-    }
 
-    // Check for blocked email domains
-    const emailDomain = normalizedEmail.split('@')[1];
-    if (BLOCKED_EMAIL_DOMAINS.includes(emailDomain)) {
-      logger.warn(`🚫 Blocked email domain attempted: ${emailDomain} from IP: ${clientIp}`);
-      // Constant delay
-      const delay = Math.max(0, 500 - (Date.now() - startTime));
-      if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
-      return res.status(200).json({
-        success: true,
-        message: 'If this email is registered, a reset link will be sent'
-      });
-    }
-
-    // Find user - schema already enforces lowercase, so direct match should work
-    const user = await User.findOne({
-      email: normalizedEmail,
-      isActive: true
-    }).maxTimeMS(5000);
-
-    // Constant delay regardless of whether user exists (timing attack protection)
-    const processingTime = Date.now() - startTime;
-    const delay = Math.max(0, 500 - processingTime);
-    if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+    const user = await User.findOne({ email: normalizedEmail, isActive: true }).maxTimeMS(5000);
+    await applyTimingDelay(startTime);
 
     if (!user) {
-      // Don't reveal if email exists (security best practice)
       logger.warn(`?? Password reset requested for non-existent or inactive email: ${normalizedEmail} from IP: ${clientIp}`);
-      return res.status(200).json({
-        success: true,
-        message: 'If this email is registered, a reset link will be sent'
-      });
+      return res.status(200).json(SAFE_RESPONSE);
     }
 
-    // Check if account is locked due to too many reset attempts
     if (user.passwordResetLockUntil && user.passwordResetLockUntil > Date.now()) {
       const minutesLeft = Math.ceil((user.passwordResetLockUntil - Date.now()) / (1000 * 60));
       logger.warn(`🔒 Password reset blocked - account locked: ${normalizedEmail} from IP: ${clientIp}. Lock expires in ${minutesLeft} minutes.`);
-      return res.status(200).json({
-        success: true,
-        message: 'If this email is registered, a reset link will be sent'
-      });
+      return res.status(200).json(SAFE_RESPONSE);
     }
 
-    // Validate role match if role is provided
     if (role) {
-      const expectedRoles = role === 'business'
-        ? ['salon_owner', 'employee', 'ceo']
-        : role === 'customer'
-        ? ['customer']
-        : null;
-
+      const expectedRoles = role === 'business' ? ['salon_owner', 'employee', 'ceo'] : role === 'customer' ? ['customer'] : null;
       if (expectedRoles && !expectedRoles.includes(user.role)) {
-        // Don't reveal if email exists (security best practice)
         logger.warn(`?? Password reset requested for email ${normalizedEmail} with wrong role. Expected: ${role}, Found: ${user.role}`);
-        return res.status(200).json({
-          success: true,
-          message: 'If this email is registered, a reset link will be sent'
-        });
+        return res.status(200).json(SAFE_RESPONSE);
       }
     }
 
-    // Double-check: Only proceed if user exists and is valid
-    if (!user || !user._id) {
+    if (!user._id) {
       logger.error(`?? Critical: User object invalid after validation for email: ${normalizedEmail}`);
-      return res.status(200).json({
-        success: true,
-        message: 'If this email is registered, a reset link will be sent'
-      });
+      return res.status(200).json(SAFE_RESPONSE);
     }
 
-    // Generate reset token (this will check for lock and throw if locked)
     let resetToken;
     try {
       resetToken = user.getPasswordResetToken();
       await user.save();
     } catch (tokenError) {
-      // Handle account lock error
       if (tokenError.message.includes('locked')) {
         logger.warn(`🔒 ${tokenError.message} for email: ${normalizedEmail} from IP: ${clientIp}`);
-        return res.status(200).json({
-          success: true,
-          message: 'If this email is registered, a reset link will be sent'
-        });
+        return res.status(200).json(SAFE_RESPONSE);
       }
       throw tokenError;
     }
 
-    // Final validation: Ensure user still exists and is valid before sending email
     const verifiedUser = await User.findById(user._id).maxTimeMS(5000);
     if (!verifiedUser || !verifiedUser.isActive) {
       logger.error(`?? Critical: User ${user._id} not found or inactive before sending reset email`);
-      return res.status(200).json({
-        success: true,
-        message: 'If this email is registered, a reset link will be sent'
-      });
+      return res.status(200).json(SAFE_RESPONSE);
     }
 
-    // Send email with reset link
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     const firstName = verifiedUser.name?.split(' ')[0] || verifiedUser.name || 'dort';
 
-    // Validate email format before sending (emailRegex already declared above)
     if (!emailRegex.test(verifiedUser.email)) {
       logger.error(`?? Invalid email format for user ${verifiedUser._id}: ${verifiedUser.email}`);
-      return res.status(200).json({
-        success: true,
-        message: 'If this email is registered, a reset link will be sent'
-      });
+      return res.status(200).json(SAFE_RESPONSE);
     }
 
     try {

@@ -160,6 +160,85 @@ function isCritical(result) {
   );
 }
 
+async function checkStarterRoutes(page, label, tier, allErrors) {
+  console.log(`\n📦 [${label}] Testing starter routes...`);
+  for (const route of STARTER_ROUTES) {
+    const result = await auditPage(page, route);
+    const redirectedToLogin = result.finalUrl?.includes('/login');
+    if (isCritical(result) || redirectedToLogin) {
+      allErrors.push({ route, tier: 'starter', ...result, category: 'STARTER_ROUTE_FAILURE' });
+      console.log(`  ❌ ${route} — JS errors: ${result.pageErrors.length}, blank: ${result.isBlank}, nav: ${result.navigationError || 'ok'}`);
+    } else {
+      console.log(`  ✅ ${route}`);
+    }
+  }
+}
+
+async function checkProRoutes(page, label, tier, allErrors) {
+  console.log(`\n📦 [${label}] Testing professional routes...`);
+  for (const route of PROFESSIONAL_ROUTES) {
+    const result = await auditPage(page, route);
+    const redirectedToPricing = result.finalUrl?.includes('/pricing');
+    if (tier === 'starter') {
+      if (redirectedToPricing) {
+        console.log(`  ✅ ${route} → /pricing (correctly tier-gated)`);
+      } else if (isCritical(result)) {
+        allErrors.push({ route, tier: 'professional', ...result, category: 'TIER_GATE_CRASH' });
+        console.log(`  ❌ ${route} — should redirect but crashed: ${result.pageErrors.join('; ')}`);
+      } else {
+        console.log(`  ⚠️ ${route} — loaded for starter (may not be tier-gated)`);
+      }
+    } else {
+      if (isCritical(result)) {
+        allErrors.push({ route, tier: 'professional', ...result, category: 'PRO_ROUTE_FAILURE' });
+        console.log(`  ❌ ${route} — JS errors: ${result.pageErrors.length}, blank: ${result.isBlank}`);
+      } else {
+        console.log(`  ✅ ${route}`);
+      }
+    }
+  }
+}
+
+async function checkEnterpriseRoutes(page, label, tier, allErrors) {
+  console.log(`\n📦 [${label}] Testing enterprise routes...`);
+  for (const route of ENTERPRISE_ROUTES) {
+    const result = await auditPage(page, route);
+    const redirectedToPricing = result.finalUrl?.includes('/pricing');
+    if (tier === 'enterprise') {
+      if (isCritical(result)) {
+        allErrors.push({ route, tier: 'enterprise', ...result, category: 'ENTERPRISE_ROUTE_FAILURE' });
+        console.log(`  ❌ ${route} — JS errors: ${result.pageErrors.length}, blank: ${result.isBlank}`);
+      } else {
+        console.log(`  ✅ ${route}`);
+      }
+    } else {
+      if (redirectedToPricing) {
+        console.log(`  ✅ ${route} → /pricing (correctly tier-gated)`);
+      } else if (isCritical(result)) {
+        allErrors.push({ route, tier: 'enterprise', ...result, category: 'TIER_GATE_CRASH' });
+        console.log(`  ❌ ${route} — should redirect but crashed: ${result.pageErrors.join('; ')}`);
+      } else {
+        console.log(`  ⚠️ ${route} — loaded for ${tier} (may not be tier-gated)`);
+      }
+    }
+  }
+}
+
+async function checkIndustryRoutes(page, label, industry, allErrors) {
+  const industrySpecific = INDUSTRY_ROUTES[industry] || [];
+  if (industrySpecific.length === 0) return;
+  console.log(`\n📦 [${label}] Testing industry-specific routes...`);
+  for (const route of industrySpecific) {
+    const result = await auditPage(page, route);
+    if (isCritical(result)) {
+      allErrors.push({ route, tier: 'industry', ...result, category: 'INDUSTRY_ROUTE_FAILURE' });
+      console.log(`  ❌ ${route} — ${result.pageErrors.join('; ')}`);
+    } else {
+      console.log(`  ✅ ${route}`);
+    }
+  }
+}
+
 // ============ TESTS ============
 
 for (const industry of INDUSTRIES) {
@@ -181,90 +260,10 @@ for (const industry of INDUSTRIES) {
 
         const allErrors = [];
 
-        // --- STARTER ROUTES (should always work) ---
-        console.log(`\n📦 [${label}] Testing starter routes...`);
-        for (const route of STARTER_ROUTES) {
-          const result = await auditPage(page, route);
-          const redirectedToLogin = result.finalUrl?.includes('/login');
-          const redirectedToPricing = result.finalUrl?.includes('/pricing');
-
-          if (isCritical(result) || redirectedToLogin) {
-            allErrors.push({ route, tier: 'starter', ...result, category: 'STARTER_ROUTE_FAILURE' });
-            console.log(`  ❌ ${route} — JS errors: ${result.pageErrors.length}, blank: ${result.isBlank}, nav: ${result.navigationError || 'ok'}`);
-          } else {
-            console.log(`  ✅ ${route}`);
-          }
-        }
-
-        // --- PROFESSIONAL ROUTES ---
-        console.log(`\n📦 [${label}] Testing professional routes...`);
-        for (const route of PROFESSIONAL_ROUTES) {
-          const result = await auditPage(page, route);
-          const redirectedToPricing = result.finalUrl?.includes('/pricing');
-
-          if (tier === 'starter') {
-            // Should redirect to /pricing — that's correct behavior
-            if (redirectedToPricing) {
-              console.log(`  ✅ ${route} → /pricing (correctly tier-gated)`);
-            } else if (isCritical(result)) {
-              allErrors.push({ route, tier: 'professional', ...result, category: 'TIER_GATE_CRASH' });
-              console.log(`  ❌ ${route} — should redirect but crashed: ${result.pageErrors.join('; ')}`);
-            } else {
-              // Loaded without redirect — might be okay if the route doesn't have tier check
-              console.log(`  ⚠️ ${route} — loaded for starter (may not be tier-gated)`);
-            }
-          } else {
-            // professional/enterprise should have access
-            if (isCritical(result)) {
-              allErrors.push({ route, tier: 'professional', ...result, category: 'PRO_ROUTE_FAILURE' });
-              console.log(`  ❌ ${route} — JS errors: ${result.pageErrors.length}, blank: ${result.isBlank}`);
-            } else {
-              console.log(`  ✅ ${route}`);
-            }
-          }
-        }
-
-        // --- ENTERPRISE ROUTES ---
-        console.log(`\n📦 [${label}] Testing enterprise routes...`);
-        for (const route of ENTERPRISE_ROUTES) {
-          const result = await auditPage(page, route);
-          const redirectedToPricing = result.finalUrl?.includes('/pricing');
-
-          if (tier === 'enterprise') {
-            // Should have full access
-            if (isCritical(result)) {
-              allErrors.push({ route, tier: 'enterprise', ...result, category: 'ENTERPRISE_ROUTE_FAILURE' });
-              console.log(`  ❌ ${route} — JS errors: ${result.pageErrors.length}, blank: ${result.isBlank}`);
-            } else {
-              console.log(`  ✅ ${route}`);
-            }
-          } else {
-            // starter/professional should redirect to /pricing
-            if (redirectedToPricing) {
-              console.log(`  ✅ ${route} → /pricing (correctly tier-gated)`);
-            } else if (isCritical(result)) {
-              allErrors.push({ route, tier: 'enterprise', ...result, category: 'TIER_GATE_CRASH' });
-              console.log(`  ❌ ${route} — should redirect but crashed: ${result.pageErrors.join('; ')}`);
-            } else {
-              console.log(`  ⚠️ ${route} — loaded for ${tier} (may not be tier-gated)`);
-            }
-          }
-        }
-
-        // --- INDUSTRY-SPECIFIC ROUTES ---
-        const industrySpecific = INDUSTRY_ROUTES[industry] || [];
-        if (industrySpecific.length > 0) {
-          console.log(`\n📦 [${label}] Testing industry-specific routes...`);
-          for (const route of industrySpecific) {
-            const result = await auditPage(page, route);
-            if (isCritical(result)) {
-              allErrors.push({ route, tier: 'industry', ...result, category: 'INDUSTRY_ROUTE_FAILURE' });
-              console.log(`  ❌ ${route} — ${result.pageErrors.join('; ')}`);
-            } else {
-              console.log(`  ✅ ${route}`);
-            }
-          }
-        }
+        await checkStarterRoutes(page, label, tier, allErrors);
+        await checkProRoutes(page, label, tier, allErrors);
+        await checkEnterpriseRoutes(page, label, tier, allErrors);
+        await checkIndustryRoutes(page, label, industry, allErrors);
 
         // --- SUMMARY ---
         console.log(`\n📊 [${label}] Summary:`);

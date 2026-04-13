@@ -175,80 +175,57 @@ export default function OnboardingWizard() {
     setWidgetCode(code);
   };
 
+  const saveStep = async (step) => {
+    switch (step) {
+      case 1:
+        if (!studioInfo.name || !studioInfo.email) {
+          showNotification('Bitte fülle alle Pflichtfelder aus', 'error');
+          return false;
+        }
+        await salonAPI.update({ name: studioInfo.name, email: studioInfo.email, phone: studioInfo.phone });
+        break;
+      case 2:
+        if (!address.city) {
+          showNotification('Bitte gib mindestens die Stadt an', 'error');
+          return false;
+        }
+        await salonAPI.update({ address });
+        break;
+      case 3:
+        await salonAPI.update({ openingHours });
+        break;
+      case 4: {
+        const validServices = services.filter(s => s.name && s.name.trim() && s.price > 0);
+        if (validServices.length === 0) {
+          showNotification('Füge mindestens einen Service mit Name und Preis hinzu', 'error');
+          return false;
+        }
+        for (const service of validServices) {
+          if (!service._id) {
+            await serviceAPI.create({ name: service.name.trim(), duration: service.duration || 30, price: service.price });
+          } else {
+            await serviceAPI.update(service._id, { name: service.name.trim(), duration: service.duration || 30, price: service.price });
+          }
+        }
+        break;
+      }
+      case 5:
+        await salonAPI.update({ googleReviewLink });
+        break;
+      case 6:
+        await salonAPI.update({ onboardingCompleted: true });
+        showNotification('Onboarding abgeschlossen! Dein Studio ist bereit.', 'success');
+        navigate('/dashboard');
+        return 'done';
+    }
+    return true;
+  };
+
   const handleNext = async () => {
     setSaving(true);
     try {
-      // Save current step data
-      switch (currentStep) {
-        case 1:
-          if (!studioInfo.name || !studioInfo.email) {
-            showNotification('Bitte fülle alle Pflichtfelder aus', 'error');
-            setSaving(false);
-            return;
-          }
-          await salonAPI.update({ 
-            name: studioInfo.name, 
-            email: studioInfo.email, 
-            phone: studioInfo.phone 
-          });
-          break;
-
-        case 2:
-          if (!address.city) {
-            showNotification('Bitte gib mindestens die Stadt an', 'error');
-            setSaving(false);
-            return;
-          }
-          await salonAPI.update({ address });
-          break;
-
-        case 3:
-          await salonAPI.update({ openingHours });
-          break;
-
-        case 4: {
-          const validServices = services.filter(s => s.name && s.name.trim() && s.price > 0);
-          if (validServices.length === 0) {
-            showNotification('Füge mindestens einen Service mit Name und Preis hinzu', 'error');
-            setSaving(false);
-            return;
-          }
-          try {
-            for (const service of validServices) {
-              if (!service._id) {
-                await serviceAPI.create({
-                  name: service.name.trim(),
-                  duration: service.duration || 30,
-                  price: service.price
-                });
-              } else {
-                await serviceAPI.update(service._id, {
-                  name: service.name.trim(),
-                  duration: service.duration || 30,
-                  price: service.price
-                });
-              }
-            }
-          } catch (serviceError) {
-            showNotification('Fehler beim Speichern der Services: ' + (serviceError.response?.data?.message || serviceError.message), 'error');
-            setSaving(false);
-            return;
-          }
-          break;
-        }
-
-        case 5:
-          await salonAPI.update({ googleReviewLink });
-          break;
-
-        case 6:
-          // Complete onboarding
-          await salonAPI.update({ onboardingCompleted: true });
-          showNotification('Onboarding abgeschlossen! Dein Studio ist bereit.', 'success');
-          navigate('/dashboard');
-          return;
-      }
-
+      const result = await saveStep(currentStep);
+      if (result === false || result === 'done') return;
       setCurrentStep(prev => Math.min(prev + 1, 6));
       showNotification('Gespeichert!', 'success');
     } catch (error) {

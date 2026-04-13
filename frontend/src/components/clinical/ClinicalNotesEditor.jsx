@@ -3,6 +3,182 @@ import { Shield, Lock, Eye, AlertTriangle, Save, FileText, Clock, User } from 'l
 import api from '../../utils/api';
 import { captureError } from '../../utils/errorTracking';
 
+function NoteListItem({ note, isSelected, onSelect }) {
+  return (
+    <button
+      key={note._id}
+      onClick={() => onSelect(note)}
+      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+        isSelected
+          ? 'border-gray-200 bg-gray-50'
+          : 'border-gray-200 hover:border-gray-300 bg-white'
+      }`}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex-1">
+          <p className="font-semibold text-gray-900 text-sm">
+            {new Date(note.visitDate).toLocaleDateString('de-DE', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            })}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {note.practitionerId?.name || 'Unknown Practitioner'}
+          </p>
+        </div>
+        <Lock className="w-4 h-4 text-gray-600 flex-shrink-0" />
+      </div>
+      {note.diagnosis && (
+        <p className="text-xs text-gray-600 line-clamp-2">{note.diagnosis}</p>
+      )}
+    </button>
+  );
+}
+
+function NoteFormFields({ formData, isEditing, setFormData }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Chief Complaint</label>
+        {isEditing ? (
+          <input
+            type="text"
+            value={formData.chiefComplaint}
+            onChange={(e) => setFormData({ ...formData, chiefComplaint: e.target.value })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Patient's main concern..."
+          />
+        ) : (
+          <p className="text-gray-900 bg-gray-50 p-3 rounded-xl">{formData.chiefComplaint || 'N/A'}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Diagnosis</label>
+        {isEditing ? (
+          <textarea
+            value={formData.diagnosis}
+            onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
+            rows={3}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Diagnosis and ICD codes..."
+          />
+        ) : (
+          <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">{formData.diagnosis || 'N/A'}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Treatment Plan</label>
+        {isEditing ? (
+          <textarea
+            value={formData.treatmentPlan}
+            onChange={(e) => setFormData({ ...formData, treatmentPlan: e.target.value })}
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Recommended treatments and procedures..."
+          />
+        ) : (
+          <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">{formData.treatmentPlan || 'N/A'}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Medications</label>
+        {isEditing ? (
+          <textarea
+            value={formData.medications}
+            onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
+            rows={3}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Prescribed medications and dosages..."
+          />
+        ) : (
+          <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">{formData.medications || 'N/A'}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
+        {isEditing ? (
+          <textarea
+            value={formData.notes}
+            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            rows={5}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Additional observations, patient feedback, etc..."
+          />
+        ) : (
+          <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">{formData.notes || 'N/A'}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          <Clock className="w-4 h-4 inline mr-1" />
+          Follow-up Date
+        </label>
+        {isEditing ? (
+          <input
+            type="date"
+            value={formData.followUpDate}
+            onChange={(e) => setFormData({ ...formData, followUpDate: e.target.value })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        ) : (
+          <p className="text-gray-900 bg-gray-50 p-3 rounded-xl">
+            {formData.followUpDate
+              ? new Date(formData.followUpDate).toLocaleDateString('de-DE', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })
+              : 'No follow-up scheduled'}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NoteMetadata({ note }) {
+  return (
+    <div className="pt-6 border-t">
+      <h3 className="text-sm font-semibold text-gray-700 mb-3">Record Metadata</h3>
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <p className="text-gray-400">Created by</p>
+          <p className="text-gray-900 font-medium flex items-center">
+            <User className="w-4 h-4 mr-1" />
+            {note.practitionerId?.name || 'Unknown'}
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-400">Visit Date</p>
+          <p className="text-gray-900 font-medium">
+            {new Date(note.visitDate).toLocaleDateString('de-DE')}
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-400">Last Modified</p>
+          <p className="text-gray-900 font-medium">
+            {new Date(note.updatedAt).toLocaleDateString('de-DE')}
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-400">Access Count</p>
+          <p className="text-gray-900 font-medium flex items-center">
+            <Eye className="w-4 h-4 mr-1" />
+            {note.accessCount || 0} times
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ClinicalNotesEditor({ customerId, salonId }) {
   const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
@@ -174,36 +350,12 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
             ) : (
               <div className="space-y-3">
                 {notes.map((note) => (
-                  <button
+                  <NoteListItem
                     key={note._id}
-                    onClick={() => handleViewNote(note)}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                      selectedNote?._id === note._id
-                        ? 'border-gray-200 bg-gray-50'
-                        : 'border-gray-200 hover:border-gray-300 bg-white'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900 text-sm">
-                          {new Date(note.visitDate).toLocaleDateString('de-DE', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {note.practitionerId?.name || 'Unknown Practitioner'}
-                        </p>
-                      </div>
-                      <Lock className="w-4 h-4 text-gray-600 flex-shrink-0" />
-                    </div>
-                    {note.diagnosis && (
-                      <p className="text-xs text-gray-600 line-clamp-2">
-                        {note.diagnosis}
-                      </p>
-                    )}
-                  </button>
+                    note={note}
+                    isSelected={selectedNote?._id === note._id}
+                    onSelect={handleViewNote}
+                  />
                 ))}
               </div>
             )}
@@ -234,133 +386,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
 
             {selectedNote || isEditing ? (
               <div className="space-y-6">
-                {/* Chief Complaint */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Chief Complaint
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={formData.chiefComplaint}
-                      onChange={(e) => setFormData({ ...formData, chiefComplaint: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Patient's main concern..."
-                    />
-                  ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl">
-                      {formData.chiefComplaint || 'N/A'}
-                    </p>
-                  )}
-                </div>
-
-                {/* Diagnosis */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Diagnosis
-                  </label>
-                  {isEditing ? (
-                    <textarea
-                      value={formData.diagnosis}
-                      onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
-                      rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Diagnosis and ICD codes..."
-                    />
-                  ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
-                      {formData.diagnosis || 'N/A'}
-                    </p>
-                  )}
-                </div>
-
-                {/* Treatment Plan */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Treatment Plan
-                  </label>
-                  {isEditing ? (
-                    <textarea
-                      value={formData.treatmentPlan}
-                      onChange={(e) => setFormData({ ...formData, treatmentPlan: e.target.value })}
-                      rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Recommended treatments and procedures..."
-                    />
-                  ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
-                      {formData.treatmentPlan || 'N/A'}
-                    </p>
-                  )}
-                </div>
-
-                {/* Medications */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Medications
-                  </label>
-                  {isEditing ? (
-                    <textarea
-                      value={formData.medications}
-                      onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
-                      rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Prescribed medications and dosages..."
-                    />
-                  ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
-                      {formData.medications || 'N/A'}
-                    </p>
-                  )}
-                </div>
-
-                {/* Additional Notes */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional Notes
-                  </label>
-                  {isEditing ? (
-                    <textarea
-                      value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Additional observations, patient feedback, etc..."
-                    />
-                  ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl whitespace-pre-wrap">
-                      {formData.notes || 'N/A'}
-                    </p>
-                  )}
-                </div>
-
-                {/* Follow-up Date */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Clock className="w-4 h-4 inline mr-1" />
-                    Follow-up Date
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="date"
-                      value={formData.followUpDate}
-                      onChange={(e) => setFormData({ ...formData, followUpDate: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 bg-gray-50 p-3 rounded-xl">
-                      {formData.followUpDate 
-                        ? new Date(formData.followUpDate).toLocaleDateString('de-DE', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })
-                        : 'No follow-up scheduled'
-                      }
-                    </p>
-                  )}
-                </div>
+                <NoteFormFields formData={formData} isEditing={isEditing} setFormData={setFormData} />
 
                 {/* Action Buttons */}
                 {isEditing && (
@@ -382,39 +408,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                 )}
 
                 {/* Metadata */}
-                {selectedNote && !isEditing && (
-                  <div className="pt-6 border-t">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Record Metadata</h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-400">Created by</p>
-                        <p className="text-gray-900 font-medium flex items-center">
-                          <User className="w-4 h-4 mr-1" />
-                          {selectedNote.practitionerId?.name || 'Unknown'}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Visit Date</p>
-                        <p className="text-gray-900 font-medium">
-                          {new Date(selectedNote.visitDate).toLocaleDateString('de-DE')}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Last Modified</p>
-                        <p className="text-gray-900 font-medium">
-                          {new Date(selectedNote.updatedAt).toLocaleDateString('de-DE')}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Access Count</p>
-                        <p className="text-gray-900 font-medium flex items-center">
-                          <Eye className="w-4 h-4 mr-1" />
-                          {selectedNote.accessCount || 0} times
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {selectedNote && !isEditing && <NoteMetadata note={selectedNote} />}
               </div>
             ) : (
               <div className="text-center py-16 text-gray-400">

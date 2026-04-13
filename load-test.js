@@ -9,7 +9,7 @@ import { Rate } from 'k6/metrics';
 const errorRate = new Rate('errors');
 
 // Test configuration
-export let options = {
+export const options = {
   stages: [
     { duration: '1m', target: 20 },    // Warm-up: 20 users
     { duration: '2m', target: 100 },   // Load: 100 users

@@ -377,6 +377,75 @@ const StatCard = ({ title, value, iconType, color, subtitle }) => {
   );
 };
 
+const ERROR_BORDER = {
+  resolved: 'border-gray-200 opacity-60',
+  critical: 'border-red-500/50',
+  error: 'border-orange-500/30',
+  warning: 'border-yellow-500/30'
+};
+
+const ERROR_ICON_BG = {
+  resolved: 'bg-green-500/20',
+  critical: 'bg-red-500/20',
+  error: 'bg-orange-500/20',
+  warning: 'bg-yellow-500/20'
+};
+
+const ERROR_BADGE = {
+  resolved: 'bg-green-500/20 text-green-600',
+  critical: 'bg-red-500/20 text-red-600',
+  error: 'bg-orange-500/20 text-orange-400',
+  warning: 'bg-yellow-500/20 text-yellow-600'
+};
+
+const ERROR_BADGE_LABEL = { resolved: 'Gelöst', critical: 'Kritisch', error: 'Fehler', warning: 'Warnung' };
+
+function errorTypeKey(error) {
+  return error.resolved ? 'resolved' : (error.type || 'warning');
+}
+
+const ErrorListItem = ({ error, isSelected, onSelect, formatTimestamp }) => {
+  const typeKey = errorTypeKey(error);
+  return (
+    <div
+      key={error.id}
+      onClick={() => onSelect(error)}
+      className={`bg-white/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-white ${
+        isSelected ? 'ring-2 ring-indigo-500' : ''
+      } ${ERROR_BORDER[typeKey]}`}
+    >
+      <div className="flex items-start gap-4">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${ERROR_ICON_BG[typeKey]}`}>
+          {error.resolved ? (
+            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className={`w-5 h-5 ${error.type === 'critical' ? 'text-red-600' : error.type === 'error' ? 'text-orange-400' : 'text-yellow-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className={`font-medium ${error.resolved ? 'text-gray-400' : 'text-gray-900'}`}>{error.message}</p>
+              <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-400">
+                <span>{formatTimestamp(error.timestamp)}</span>
+                {error.source && <span className="capitalize">• {error.source}</span>}
+                {error.salon && <span>• {error.salon.name}</span>}
+              </div>
+            </div>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${ERROR_BADGE[typeKey]}`}>
+              {ERROR_BADGE_LABEL[typeKey]}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ErrorsTab = ({ errors, onResolve }) => {
   const [filter, setFilter] = useState('all');
   const [selectedError, setSelectedError] = useState(null);
@@ -463,70 +532,13 @@ const ErrorsTab = ({ errors, onResolve }) => {
         ) : (
           <div className="space-y-3">
             {filteredErrors.map((error) => (
-              <div
+              <ErrorListItem
                 key={error.id}
-                onClick={() => setSelectedError(selectedError?.id === error.id ? null : error)}
-                className={`bg-white/50 border rounded-xl p-4 cursor-pointer transition-all hover:bg-white ${
-                  selectedError?.id === error.id ? 'ring-2 ring-indigo-500' : ''
-                } ${
-                  error.resolved
-                    ? 'border-gray-200 opacity-60'
-                    : error.type === 'critical'
-                    ? 'border-red-500/50'
-                    : error.type === 'error'
-                    ? 'border-orange-500/30'
-                    : 'border-yellow-500/30'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      error.resolved
-                        ? 'bg-green-500/20'
-                        : error.type === 'critical'
-                        ? 'bg-red-500/20'
-                        : error.type === 'error'
-                        ? 'bg-orange-500/20'
-                        : 'bg-yellow-500/20'
-                    }`}
-                  >
-                    {error.resolved ? (
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg className={`w-5 h-5 ${error.type === 'critical' ? 'text-red-600' : error.type === 'error' ? 'text-orange-400' : 'text-yellow-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className={`font-medium ${error.resolved ? 'text-gray-400' : 'text-gray-900'}`}>
-                          {error.message}
-                        </p>
-                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-400">
-                          <span>{formatTimestamp(error.timestamp)}</span>
-                          {error.source && <span className="capitalize">• {error.source}</span>}
-                          {error.salon && <span>• {error.salon.name}</span>}
-                        </div>
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                        error.resolved
-                          ? 'bg-green-500/20 text-green-600'
-                          : error.type === 'critical'
-                          ? 'bg-red-500/20 text-red-600'
-                          : error.type === 'error'
-                          ? 'bg-orange-500/20 text-orange-400'
-                          : 'bg-yellow-500/20 text-yellow-600'
-                      }`}>
-                        {error.resolved ? 'Gelöst' : error.type === 'critical' ? 'Kritisch' : error.type === 'error' ? 'Fehler' : 'Warnung'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                error={error}
+                isSelected={selectedError?.id === error.id}
+                onSelect={(e) => setSelectedError(selectedError?.id === e.id ? null : e)}
+                formatTimestamp={formatTimestamp}
+              />
             ))}
           </div>
         )}
@@ -1298,17 +1310,7 @@ const SystemControlTab = () => {
 
       if (data.success) {
         addLog('[OK] Alle Services werden gestartet...', 'success');
-        // Update all service statuses
-        data.results?.forEach(result => {
-          if (result.success) {
-            setServices(prev => prev.map(s =>
-              s.id === result.service ? { ...s, status: 'running' } : s
-            ));
-            addLog(`  > ${result.service} gestartet`, 'success');
-          } else {
-            addLog(`  X ${result.service}: ${result.message}`, 'error');
-          }
-        });
+        applyStartAllResults(data.results);
       } else {
         addLog(`[ERR] Fehler: ${data.message}`, 'error');
       }
@@ -1319,6 +1321,19 @@ const SystemControlTab = () => {
       // Refresh status after a delay
       setTimeout(() => services.forEach(s => checkServiceStatus(s.id)), 3000);
     }
+  };
+
+  const applyStartAllResults = (results) => {
+    results?.forEach(result => {
+      if (result.success) {
+        setServices(prev => prev.map(s =>
+          s.id === result.service ? { ...s, status: 'running' } : s
+        ));
+        addLog(`  > ${result.service} gestartet`, 'success');
+      } else {
+        addLog(`  X ${result.service}: ${result.message}`, 'error');
+      }
+    });
   };
 
   // Stop all services
@@ -1345,26 +1360,22 @@ const SystemControlTab = () => {
   };
 
   // Get status color
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'running': return 'bg-green-500';
-      case 'stopped': return 'bg-red-500';
-      case 'starting': return 'bg-yellow-500 animate-pulse';
-      case 'error': return 'bg-red-600';
-      default: return 'bg-gray-500';
-    }
+  const STATUS_COLOR = {
+    running: 'bg-green-500',
+    stopped: 'bg-red-500',
+    starting: 'bg-yellow-500 animate-pulse',
+    error: 'bg-red-600'
   };
+  const getStatusColor = (status) => STATUS_COLOR[status] || 'bg-gray-500';
 
   // Get status text
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'running': return 'Läuft';
-      case 'stopped': return 'Gestoppt';
-      case 'starting': return 'Startet...';
-      case 'error': return 'Fehler';
-      default: return 'Unbekannt';
-    }
+  const STATUS_TEXT = {
+    running: 'Läuft',
+    stopped: 'Gestoppt',
+    starting: 'Startet...',
+    error: 'Fehler'
   };
+  const getStatusText = (status) => STATUS_TEXT[status] || 'Unbekannt';
 
   // Get type icon - returns SVG element
   const getTypeIcon = (type) => {

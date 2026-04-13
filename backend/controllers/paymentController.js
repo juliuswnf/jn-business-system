@@ -250,6 +250,21 @@ export const getPaymentHistory = async (req, res) => {
 
 // ==================== REFUND PAYMENT (Full or Partial) ====================
 
+function computeRefundAmount(payment, requestedAmount) {
+  const alreadyRefunded = payment.refundedAmount || 0;
+  const maxRefundable = payment.amount - alreadyRefunded;
+  if (requestedAmount) {
+    if (!validateAmount(requestedAmount)) {
+      return { error: 'Invalid refund amount' };
+    }
+    if (requestedAmount > maxRefundable) {
+      return { error: `Maximum refundable amount is ${maxRefundable.toFixed(2)} EUR` };
+    }
+    return { refundAmount: requestedAmount, maxRefundable };
+  }
+  return { refundAmount: maxRefundable, maxRefundable };
+}
+
 export const refundPayment = async (req, res) => {
   try {
     const { paymentId, reason, amount } = req.body;
@@ -296,32 +311,11 @@ export const refundPayment = async (req, res) => {
     }
 
     // Calculate refundable amount
-    const alreadyRefunded = payment.refundedAmount || 0;
-    const maxRefundable = payment.amount - alreadyRefunded;
-
-    // Determine refund amount (partial or full)
-    let refundAmount;
-    const isPartialRefund = amount && amount < maxRefundable;
-
-    if (amount) {
-      // Partial refund requested
-      if (!validateAmount(amount)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid refund amount'
-        });
-      }
-      if (amount > maxRefundable) {
-        return res.status(400).json({
-          success: false,
-          message: `Maximum refundable amount is ${maxRefundable.toFixed(2)} EUR`
-        });
-      }
-      refundAmount = amount;
-    } else {
-      // Full refund of remaining amount
-      refundAmount = maxRefundable;
+    const { refundAmount, maxRefundable, error: amountError } = computeRefundAmount(payment, amount);
+    if (amountError) {
+      return res.status(400).json({ success: false, message: amountError });
     }
+    const isPartialRefund = amount && amount < maxRefundable;
 
     // Create refund with Stripe first (external side-effect before DB writes)
     const refund = await getStripe().refunds.create({

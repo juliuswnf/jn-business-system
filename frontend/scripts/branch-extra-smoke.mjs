@@ -21,6 +21,58 @@ const routes = ['/dashboard', '/dashboard/bookings', '/dashboard/services', '/da
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function tryLoginWithRetry(page, email, passwords, baseUrl) {
+  let loggedIn = false;
+  let usedPassword = '';
+  let blockedByRateLimit = false;
+
+  // Retry once after waiting when auth limiter responds with 429 message.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.goto(`${baseUrl}/login/business`, { waitUntil: 'domcontentloaded', timeout: 25000 });
+
+    for (const password of passwords) {
+      await page.fill('input#email, input[type="email"]', email);
+      await page.fill('input#password, input[type="password"]', password);
+      await page.click('button[type="submit"]');
+      await page.waitForTimeout(1500);
+
+      if (page.url().includes('/dashboard')) {
+        loggedIn = true;
+        usedPassword = password;
+        break;
+      }
+
+      const body = await page.locator('body').innerText();
+      if (/zu viele anfragen|too many requests/i.test(body)) {
+        blockedByRateLimit = true;
+        break;
+      }
+    }
+
+    if (loggedIn) break;
+    if (!blockedByRateLimit) break;
+
+    console.log(`RATE_LIMIT_WAIT ${email} -> waiting 65s before retry`);
+    await sleep(65000);
+    blockedByRateLimit = false;
+  }
+
+  return { loggedIn, usedPassword };
+}
+
+async function checkPageRoutes(page, routeList, baseUrl) {
+  for (const route of routeList) {
+    await page.goto(`${baseUrl}${route}`, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    await page.waitForTimeout(250);
+    const body = (await page.locator('body').innerText()).slice(0, 2000);
+
+    if (/something went wrong|unexpected application error|interner serverfehler|internal server error/i.test(body)) {
+      return { ok: false, route };
+    }
+  }
+  return { ok: true, route: null };
+}
+
 async function run() {
   const browser = await chromium.launch({ headless: true });
   let failed = 0;
@@ -30,40 +82,7 @@ async function run() {
     const page = await context.newPage();
 
     try {
-      let loggedIn = false;
-      let usedPassword = '';
-      let blockedByRateLimit = false;
-
-      // Retry once after waiting when auth limiter responds with 429 message.
-      for (let attempt = 0; attempt < 2; attempt += 1) {
-        await page.goto(`${TARGET_BASE_URL}/login/business`, { waitUntil: 'domcontentloaded', timeout: 25000 });
-
-        for (const password of PASSWORDS) {
-          await page.fill('input#email, input[type="email"]', email);
-          await page.fill('input#password, input[type="password"]', password);
-          await page.click('button[type="submit"]');
-          await page.waitForTimeout(1500);
-
-          if (page.url().includes('/dashboard')) {
-            loggedIn = true;
-            usedPassword = password;
-            break;
-          }
-
-          const body = await page.locator('body').innerText();
-          if (/zu viele anfragen|too many requests/i.test(body)) {
-            blockedByRateLimit = true;
-            break;
-          }
-        }
-
-        if (loggedIn) break;
-        if (!blockedByRateLimit) break;
-
-        console.log(`RATE_LIMIT_WAIT ${email} -> waiting 65s before retry`);
-        await sleep(65000);
-        blockedByRateLimit = false;
-      }
+      const { loggedIn, usedPassword } = await tryLoginWithRetry(page, email, PASSWORDS, TARGET_BASE_URL);
 
       if (!loggedIn) {
         failed += 1;
@@ -76,16 +95,10 @@ async function run() {
 
       console.log(`OK_LOGIN ${email} (password=${usedPassword})`);
 
-      for (const route of routes) {
-        await page.goto(`${TARGET_BASE_URL}${route}`, { waitUntil: 'domcontentloaded', timeout: 25000 });
-        await page.waitForTimeout(250);
-        const body = (await page.locator('body').innerText()).slice(0, 2000);
-
-        if (/something went wrong|unexpected application error|interner serverfehler|internal server error/i.test(body)) {
-          failed += 1;
-          console.log(`FAIL_ROUTE ${email} ${route} -> ${page.url()}`);
-          break;
-        }
+      const { ok, route: failedRoute } = await checkPageRoutes(page, routes, TARGET_BASE_URL);
+      if (!ok) {
+        failed += 1;
+        console.log(`FAIL_ROUTE ${email} ${failedRoute} -> ${page.url()}`);
       }
     } catch (error) {
       failed += 1;
