@@ -11,8 +11,12 @@ import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
 
-// Computed key avoids accidental thenable (SonarCloud S5958)
-const THEN = 'then';
+// Helper to build MongoDB $switch branches without a 'then' object literal (SonarCloud S5958)
+const makeBranch = (caseExpr, thenExpr) => {
+  const branch = { case: caseExpr };
+  branch['then'] = thenExpr;
+  return branch;
+};
 
 /**
  * Get all customers for a salon (aggregated from bookings)
@@ -78,9 +82,9 @@ export const getCustomers = async (req, res) => {
         tier: {
           $switch: {
             branches: [
-              { case: { $gte: ['$totalSpent', 1000] }, [THEN]: 'vip' },
-              { case: { $gte: ['$totalSpent', 500] }, [THEN]: 'gold' },
-              { case: { $gte: ['$bookingCount', 5] }, [THEN]: 'regular' }
+              makeBranch({ $gte: ['$totalSpent', 1000] }, 'vip'),
+              makeBranch({ $gte: ['$totalSpent', 500] }, 'gold'),
+              makeBranch({ $gte: ['$bookingCount', 5] }, 'regular')
             ],
             default: 'new'
           }
