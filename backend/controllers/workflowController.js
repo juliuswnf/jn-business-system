@@ -59,6 +59,12 @@ export const enableWorkflow = async (req, res) => {
       });
     }
 
+    if (typeof salonId !== 'string') {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    // .find() returns value from static array, breaking taint chain
+    const safeIndustry = ALLOWED_INDUSTRIES.find(i => i === String(industry));
+
     const salon = await Salon.findById(salonId)
       .select('subscription.tier subscription.status businessName')
       .lean();
@@ -83,7 +89,7 @@ export const enableWorkflow = async (req, res) => {
       });
     }
 
-    const existingWorkflow = await IndustryWorkflow.findOne({ salonId, industry }).lean();
+    const existingWorkflow = await IndustryWorkflow.findOne({ salonId, industry: safeIndustry }).lean();
     const isAlreadyEnabled = existingWorkflow?.enabled === true;
 
     if (tier === 'professional' && !isAlreadyEnabled) {
@@ -101,7 +107,7 @@ export const enableWorkflow = async (req, res) => {
       }
     }
 
-    const workflow = await IndustryWorkflow.enableWorkflow(salonId, industry, features);
+    const workflow = await IndustryWorkflow.enableWorkflow(salonId, safeIndustry, features);
 
     logger.info(`Workflow enabled: ${industry} for salon ${salonId}`);
 
@@ -165,8 +171,10 @@ export const updateWorkflowConfig = async (req, res) => {
     if (req.user?.role !== 'ceo' && req.user?.salonId?.toString() !== salonId) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
+    // .find() returns value from static array, breaking taint chain
+    const safeIndustryUpdate = ALLOWED_INDUSTRIES.find(i => i === String(industry));
 
-    const workflow = await IndustryWorkflow.findOne({ salonId, industry });
+    const workflow = await IndustryWorkflow.findOne({ salonId, industry: safeIndustryUpdate });
 
     if (!workflow) {
       return res.status(404).json({
@@ -784,8 +792,12 @@ export const getSalonPackages = async (req, res) => {
       deletedAt: null
     };
 
-    if (filters.type && ALLOWED_PACKAGE_TYPES.includes(String(filters.type))) {
-      query.type = String(filters.type);
+    // .find() returns value from static array, breaking taint chain
+    const safePackageType = typeof filters.type === 'string'
+      ? ALLOWED_PACKAGE_TYPES.find(t => t === filters.type)
+      : undefined;
+    if (safePackageType) {
+      query.type = safePackageType;
     }
 
     if (filters.status) {
@@ -1109,8 +1121,12 @@ export const getPortfolio = async (req, res) => {
       status: 'completed'
     };
 
-    if (industry && ALLOWED_INDUSTRIES.includes(String(industry))) {
-      query.industry = String(industry);
+    // .find() returns value from static array, breaking taint chain
+    const safePortfolioIndustry = typeof industry === 'string'
+      ? ALLOWED_INDUSTRIES.find(i => i === industry)
+      : undefined;
+    if (safePortfolioIndustry) {
+      query.industry = safePortfolioIndustry;
     }
 
     let projects = await WorkflowProject.find(query)

@@ -143,7 +143,11 @@ export const getCustomerConsents = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Tenant context required' });
     }
 
-    if (consentType && ALLOWED_CONSENT_TYPES.includes(String(consentType))) query.consentType = String(consentType);
+    // .find() returns value from static array, breaking taint chain
+    const safeConsentTypeFilter = typeof consentType === 'string'
+      ? ALLOWED_CONSENT_TYPES.find(t => t === consentType)
+      : undefined;
+    if (safeConsentTypeFilter) query.consentType = safeConsentTypeFilter;
     if (typeof isActive !== 'undefined') query.isActive = isActive === 'true';
 
     const consents = await ConsentForm.find(query)
@@ -249,7 +253,10 @@ export const checkConsentValidity = async (req, res) => {
     }
 
     const { customerId, consentType: rawConsentType } = req.params;
-    const consentType = ALLOWED_CONSENT_TYPES.includes(String(rawConsentType)) ? String(rawConsentType) : null;
+    // .find() returns value from static array, breaking taint chain
+    const consentType = typeof rawConsentType === 'string'
+      ? ALLOWED_CONSENT_TYPES.find(t => t === rawConsentType) ?? null
+      : null;
     if (!consentType) {
       return res.status(400).json({ success: false, message: 'Invalid consent type' });
     }
@@ -301,7 +308,9 @@ export const getExpiringConsents = async (req, res) => {
     const { salonId: requestedSalonId } = req.params;
     const { daysAhead = 30 } = req.query;
 
-    const targetSalonId = req.user.role === 'ceo' ? requestedSalonId : req.user.salonId?.toString();
+    const rawTargetId = req.user.role === 'ceo' ? requestedSalonId : req.user.salonId?.toString();
+    // Ensure salonId is a plain string (prevents object-operator injection)
+    const targetSalonId = typeof rawTargetId === 'string' ? rawTargetId : null;
 
     if (!targetSalonId) {
       return res.status(403).json({ success: false, message: 'Tenant context required' });

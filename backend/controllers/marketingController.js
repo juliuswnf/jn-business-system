@@ -371,7 +371,9 @@ export const getRecipients = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
     }
 
-    const recipientStatus = ALLOWED_RECIPIENT_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
+    const recipientStatus = typeof req.query.status === 'string'
+      ? ALLOWED_RECIPIENT_STATUSES.find(s => s === req.query.status)
+      : undefined;
     const query = { campaignId: campaign._id };
     if (recipientStatus) query.status = recipientStatus;
 
@@ -575,6 +577,11 @@ async function checkTierLimits(salonId, tier = 'starter') {
  * Find target customers for campaign
  */
 async function findTargetCustomers(campaign, salonId) {
+  // Validate campaign rule numbers to safe integers (they may originate from user input)
+  const safeMinBookingsReferral = Math.max(1, Math.floor(Number(campaign.rules.minBookings) || 3));
+  const safeMinBookingsLoyalty = Math.max(1, Math.floor(Number(campaign.rules.minBookings) || 10));
+  const safeMaxRecipients = Math.min(1000, Math.max(1, Math.floor(Number(campaign.rules.maxRecipients) || 100)));
+
   let query = {};
 
   switch (campaign.type) {
@@ -615,12 +622,10 @@ async function findTargetCustomers(campaign, salonId) {
     case 'referral': {
       // Find active customers who can refer friends
       // Target: Customers with 3+ bookings (loyal customers who are likely to refer)
-      const minBookings = campaign.rules.minBookings || 3;
-
       const referralCustomers = await Booking.aggregate([
         { $match: { salonId } },
         { $group: { _id: '$customerId', count: { $sum: 1 } } },
-        { $match: { count: { $gte: minBookings } } }
+        { $match: { count: { $gte: safeMinBookingsReferral } } }
       ]);
 
       const referralCustomerIds = referralCustomers.map(r => r._id);
@@ -631,11 +636,13 @@ async function findTargetCustomers(campaign, salonId) {
       break;
     }
     case 'loyalty': {
-      const loyalCustomerIds = await Booking.aggregate([
+      // Avoid .then() on aggregate — use explicit await
+      const loyalResults = await Booking.aggregate([
         { $match: { salonId } },
         { $group: { _id: '$customerId', count: { $sum: 1 }, totalSpent: { $sum: '$totalPrice' } } },
-        { $match: { count: { $gte: campaign.rules.minBookings || 10 } } }
-      ]).then(results => results.map(r => r._id));
+        { $match: { count: { $gte: safeMinBookingsLoyalty } } }
+      ]);
+      const loyalCustomerIds = loyalResults.map(r => r._id);
 
       query = {
         _id: { $in: loyalCustomerIds },
@@ -649,16 +656,18 @@ async function findTargetCustomers(campaign, salonId) {
       };
   }
 
-  // Filter already sent
+  // Build _id exclusion filter as an explicit object literal (not dynamic $nin assignment)
   const alreadySent = await MarketingRecipient.distinct('customerId', {
     campaignId: campaign._id
   });
 
-  query._id = query._id || {};
-  query._id.$nin = alreadySent;
+  const existingIn = query._id?.$in ?? null;
+  query._id = existingIn
+    ? { $in: existingIn, $nin: alreadySent }
+    : { $nin: alreadySent };
 
   const customers = await User.find(query)
-    .limit(campaign.rules.maxRecipients || 100)
+    .limit(safeMaxRecipients)
     .select('name email phoneNumber');
 
   return customers;

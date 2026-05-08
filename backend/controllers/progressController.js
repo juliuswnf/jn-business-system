@@ -157,9 +157,25 @@ export const getClientProgressHistory = async (req, res) => {
 
     if (salonId) query.salonId = salonId;
     if (startDate || endDate) {
-      query.recordedAt = {};
-      if (startDate) query.recordedAt.$gte = new Date(startDate);
-      if (endDate) query.recordedAt.$lte = new Date(endDate);
+      // typeof guards prevent object-operator injection via nested query strings
+      if (startDate && typeof startDate !== 'string') {
+        return res.status(400).json({ success: false, message: 'Invalid startDate' });
+      }
+      if (endDate && typeof endDate !== 'string') {
+        return res.status(400).json({ success: false, message: 'Invalid endDate' });
+      }
+      const dateRange = {};
+      if (startDate) {
+        const d = new Date(startDate);
+        if (isNaN(d.getTime())) return res.status(400).json({ success: false, message: 'Invalid startDate' });
+        dateRange.$gte = d;
+      }
+      if (endDate) {
+        const d = new Date(endDate);
+        if (isNaN(d.getTime())) return res.status(400).json({ success: false, message: 'Invalid endDate' });
+        dateRange.$lte = d;
+      }
+      query.recordedAt = dateRange;
     }
 
     const progressEntries = await ProgressEntry.find(query)
@@ -300,20 +316,22 @@ export const getWeightTrend = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
     const salonId = rawSalonId || null;
+    // Clamp months to a safe integer (prevents date manipulation via user input)
+    const safeMonths = Math.min(60, Math.max(1, Math.floor(Number(months) || 6)));
 
     const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - parseInt(months));
+    startDate.setMonth(startDate.getMonth() - safeMonths);
 
-    const query = {
+    const weightQuery = {
       customerId,
       recordedAt: { $gte: startDate },
       'weight.value': { $exists: true },
       deletedAt: null
     };
 
-    if (salonId) query.salonId = salonId;
+    if (salonId) weightQuery.salonId = salonId;
 
-    const weightEntries = await ProgressEntry.find(query)
+    const weightEntries = await ProgressEntry.find(weightQuery)
       .sort({ recordedAt: 1 }).lean().maxTimeMS(5000)
       .select('recordedAt weight')
       .lean();
@@ -351,12 +369,18 @@ export const getPerformanceTrend = async (req, res) => {
     };
 
     if (salonId) query.salonId = salonId;
-    if (safeExercise) query[`performance.${safeExercise}`] = { $exists: true };
+    // Avoid dynamic query key from user input — filter exercise in app code instead
 
-    const performanceEntries = await ProgressEntry.find(query)
+    const allPerformanceEntries = await ProgressEntry.find(query)
       .sort({ recordedAt: 1 }).lean().maxTimeMS(5000)
       .select('recordedAt performance')
       .lean();
+
+    const performanceEntries = safeExercise
+      ? allPerformanceEntries.filter(
+          e => Object.prototype.hasOwnProperty.call(e.performance ?? {}, safeExercise)
+        )
+      : allPerformanceEntries;
 
     return res.json({
       success: true,

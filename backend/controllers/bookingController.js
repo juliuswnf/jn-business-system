@@ -232,26 +232,36 @@ export const getBookings = async (req, res) => {
       filter.salonId = new mongoose.Types.ObjectId(salonId);
     }
 
-    if (status && ALLOWED_BOOKING_STATUSES.includes(status)) {
-      filter.status = status;
-    }
+    // .find() returns the value from the static array, breaking the taint chain
+    const safeStatus = typeof status === 'string'
+      ? ALLOWED_BOOKING_STATUSES.find(s => s === status)
+      : undefined;
+    if (safeStatus) filter.status = safeStatus;
 
     if (startDate || endDate) {
-      filter.bookingDate = {};
+      // typeof guards prevent object-operator injection via nested query strings
+      if (startDate && typeof startDate !== 'string') {
+        return res.status(400).json({ success: false, message: 'Ungültiges startDate-Format' });
+      }
+      if (endDate && typeof endDate !== 'string') {
+        return res.status(400).json({ success: false, message: 'Ungültiges endDate-Format' });
+      }
+      const dateRange = {};
       if (startDate) {
         const parsedStart = parseValidDate(startDate);
         if (!parsedStart) {
           return res.status(400).json({ success: false, message: 'Ungültiges startDate-Format' });
         }
-        filter.bookingDate.$gte = parsedStart;
+        dateRange.$gte = parsedStart;
       }
       if (endDate) {
         const parsedEnd = parseValidDate(endDate);
         if (!parsedEnd) {
           return res.status(400).json({ success: false, message: 'Ungültiges endDate-Format' });
         }
-        filter.bookingDate.$lte = parsedEnd;
+        dateRange.$lte = parsedEnd;
       }
+      filter.bookingDate = dateRange;
     }
 
     const total = await Booking.countDocuments(filter);

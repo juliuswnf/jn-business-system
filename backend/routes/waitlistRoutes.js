@@ -62,7 +62,7 @@ const resolveSalonFromReference = async (salonReference) => {
   }
 
   if (isObjectId(salonReference)) {
-    return Salon.findById(salonReference)
+    return Salon.findById(new mongoose.Types.ObjectId(String(salonReference)))
       .select('_id slug businessName subscription')
       .lean();
   }
@@ -190,10 +190,13 @@ router.post('/', requirePublicWaitlistFeature, async (req, res) => {
     }
     const safeCustomerId = new mongoose.Types.ObjectId(customerId);
 
+    // salonId was resolved from DB by requirePublicWaitlistFeature middleware
+    const resolvedSalonId = typeof salonId === 'string' ? salonId : String(salonId);
+
     // Check if already on waitlist
     const existing = await Waitlist.findOne({
       customerId: safeCustomerId,
-      salonId,
+      salonId: resolvedSalonId,
       status: 'active'
     });
 

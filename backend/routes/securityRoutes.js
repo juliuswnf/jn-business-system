@@ -119,11 +119,23 @@ router.get('/audit-logs', async (req, res) => {
       category: 'security'
     };
 
+    const ALLOWED_SEVERITIES = ['low', 'medium', 'high', 'critical', 'info'];
     if (severity) {
-      query.status = severity;
+      // .find() returns value from static array, breaking taint chain
+      const safeSeverity = typeof severity === 'string'
+        ? ALLOWED_SEVERITIES.find(s => s === severity)
+        : undefined;
+      if (safeSeverity) query.status = safeSeverity;
     }
 
     if (startDate || endDate) {
+      // typeof guards prevent object-operator injection via nested query strings
+      if (startDate && typeof startDate !== 'string') {
+        return res.status(400).json({ success: false, message: 'Invalid startDate' });
+      }
+      if (endDate && typeof endDate !== 'string') {
+        return res.status(400).json({ success: false, message: 'Invalid endDate' });
+      }
       query.createdAt = {};
       const parsedStart = startDate ? new Date(String(startDate)) : null;
       const parsedEnd = endDate ? new Date(String(endDate)) : null;

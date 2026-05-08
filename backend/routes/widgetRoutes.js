@@ -445,6 +445,10 @@ publicRouter.post('/book/:slug', publicBookingLimiter, validateBooking, async (r
       });
     }
 
+    if (typeof customerEmail !== 'string') {
+      return res.status(400).json({ success: false, message: 'Invalid customerEmail' });
+    }
+
     let customer = await User.findOne({ email: customerEmail });
 
     if (!customer) {

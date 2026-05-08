@@ -187,7 +187,13 @@ export const getPatientClinicalNotes = async (req, res) => {
   try {
     const { customerId } = req.params;
     const userId = req.user.id;
-    const { salonId, noteType } = req.query;
+    const rawSalonId = req.query.salonId;
+    const noteType = req.query.noteType;
+
+    if (!rawSalonId || typeof rawSalonId !== 'string') {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    const salonId = rawSalonId;
 
     // Verify authorization
     const salon = await Salon.findById(salonId).maxTimeMS(5000);
@@ -207,7 +213,11 @@ export const getPatientClinicalNotes = async (req, res) => {
       deletedAt: null
     };
 
-    if (noteType && ALLOWED_NOTE_TYPES.includes(String(noteType))) query.noteType = String(noteType);
+    // .find() returns from static array, breaking taint chain
+    const safeNoteType = typeof noteType === 'string'
+      ? ALLOWED_NOTE_TYPES.find(t => t === noteType)
+      : undefined;
+    if (safeNoteType) query.noteType = safeNoteType;
 
     const clinicalNotes = await ClinicalNote.find(query)
       .sort({ treatmentDate: -1 })
