@@ -2,6 +2,7 @@
 import Salon from '../models/Salon.js';
 import AuditLog from '../models/AuditLog.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_NOTE_TYPES = ['assessment', 'treatment', 'follow_up', 'consultation', 'consent', 'progress', 'discharge', 'general'];
 
@@ -185,8 +186,14 @@ export const getClinicalNote = async (req, res) => {
 // ==================== GET PATIENT CLINICAL NOTES ====================
 export const getPatientClinicalNotes = async (req, res) => {
   try {
-    const { customerId } = req.params;
+    const { customerId: rawCustomerId } = req.params;
     const userId = req.user.id;
+
+    if (!rawCustomerId || !mongoose.isValidObjectId(rawCustomerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    const customerId = new mongoose.Types.ObjectId(rawCustomerId);
+
     const rawSalonId = req.query.salonId;
     const noteType = req.query.noteType;
 
