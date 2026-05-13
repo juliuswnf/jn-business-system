@@ -2,6 +2,15 @@ import express from 'express';
 import request from 'supertest';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
+// Valid 24-char hex ObjectId strings required by isValidObjectId security checks
+const SALON_A_ID = '507f191e810c19729de860e1';
+const SALON_B_ID = '507f191e810c19729de860e2';
+const CUSTOMER_1_ID = '507f191e810c19729de860e3';
+const CONSENT_1_ID = '507f191e810c19729de860e4';
+const PAYMENT_1_ID = '507f191e810c19729de860e5';
+const PAYMENT_2_ID = '507f191e810c19729de860e6';
+const BOOKING_2_ID = '507f191e810c19729de860e7';
+
 const mockConsentFind = jest.fn();
 const mockConsentFindOne = jest.fn();
 const mockConsentFindById = jest.fn();
@@ -202,8 +211,8 @@ const createAppWithPaymentRoutes = () => {
   return app;
 };
 
-const salonOwnerSalonA = JSON.stringify({ id: 'owner-a', role: 'salon_owner', salonId: 'salonA' });
-const ceoUser = JSON.stringify({ id: 'ceo-1', role: 'ceo' });
+const salonOwnerSalonA = JSON.stringify({ id: '507f191e810c19729de860e8', role: 'salon_owner', salonId: SALON_A_ID });
+const ceoUser = JSON.stringify({ id: '507f191e810c19729de860e9', role: 'ceo' });
 
 describe('Tenant boundary integration: Consent', () => {
   beforeEach(() => {
@@ -213,7 +222,7 @@ describe('Tenant boundary integration: Consent', () => {
   it('blocks unauthenticated access to protected consent endpoints', async () => {
     const app = createAppWithConsentRoutes();
 
-    const response = await request(app).get('/consent/customer/customer-1');
+    const response = await request(app).get(`/consent/customer/${CUSTOMER_1_ID}`);
 
     expect(response.status).toBe(401);
   });
@@ -225,30 +234,30 @@ describe('Tenant boundary integration: Consent', () => {
     );
 
     const response = await request(app)
-      .get('/consent/customer/customer-1?salonId=salonB')
+      .get(`/consent/customer/${CUSTOMER_1_ID}?salonId=${SALON_B_ID}`)
       .set('x-test-user', salonOwnerSalonA);
 
     expect(response.status).toBe(200);
     expect(mockConsentFind).toHaveBeenCalledWith(
       expect.objectContaining({
-        customerId: 'customer-1',
-        salonId: 'salonA'
+        customerId: expect.any(Object), // ObjectId cast from CUSTOMER_1_ID
+        salonId: SALON_A_ID             // raw string from req.user.salonId (trusted)
       })
     );
-    expect(mockConsentFind.mock.calls[0][0].salonId).not.toBe('salonB');
+    expect(mockConsentFind.mock.calls[0][0].salonId).not.toBe(SALON_B_ID);
   });
 
   it('returns 403 for cross-tenant consent detail access', async () => {
     const app = createAppWithConsentRoutes();
     mockConsentFindById.mockReturnValue(
       createChainedQuery({
-        result: { _id: 'consent-1', salonId: 'salonB' },
+        result: { _id: CONSENT_1_ID, salonId: SALON_B_ID },
         terminal: 'maxTimeAfterLean'
       })
     );
 
     const response = await request(app)
-      .get('/consent/consent-1')
+      .get(`/consent/${CONSENT_1_ID}`)
       .set('x-test-user', salonOwnerSalonA);
 
     expect(response.status).toBe(403);
@@ -261,13 +270,13 @@ describe('Tenant boundary integration: Consent', () => {
     );
 
     const response = await request(app)
-      .get('/consent/check/customer-1/treatment')
+      .get(`/consent/check/${CUSTOMER_1_ID}/treatment`)
       .set('x-test-user', salonOwnerSalonA);
 
     expect(response.status).toBe(200);
     expect(response.body.hasValidConsent).toBe(false);
     expect(mockConsentFindOne).toHaveBeenCalledWith(
-      expect.objectContaining({ customerId: 'customer-1', salonId: 'salonA' })
+      expect.objectContaining({ customerId: expect.any(Object), salonId: SALON_A_ID })
     );
   });
 });
@@ -284,12 +293,12 @@ describe('Tenant boundary integration: CRM', () => {
       .mockReturnValueOnce(createAggregateChain([{ total: 0 }]));
 
     const response = await request(app)
-      .get('/crm/customers?salonId=salonB')
+      .get(`/crm/customers?salonId=${SALON_B_ID}`)
       .set('x-test-user', salonOwnerSalonA);
 
     expect(response.status).toBe(200);
     const firstPipeline = mockBookingAggregate.mock.calls[0][0];
-    expect(firstPipeline[0]).toEqual({ $match: { salonId: 'salonA' } });
+    expect(firstPipeline[0]).toEqual({ $match: { salonId: SALON_A_ID } });
   });
 
   it('returns 400 when authenticated user has no salon context', async () => {
@@ -321,12 +330,12 @@ describe('Tenant boundary integration: Payments', () => {
     );
 
     const response = await request(app)
-      .get('/payments/history?salonId=salonB')
+      .get(`/payments/history?salonId=${SALON_B_ID}`)
       .set('x-test-user', salonOwnerSalonA);
 
     expect(response.status).toBe(200);
     expect(mockPaymentCountDocuments).toHaveBeenCalledWith(
-      expect.objectContaining({ salonId: 'salonA' })
+      expect.objectContaining({ salonId: SALON_A_ID })
     );
   });
 
@@ -343,12 +352,12 @@ describe('Tenant boundary integration: Payments', () => {
     );
 
     const response = await request(app)
-      .get('/payments/history?salonId=salonB')
+      .get(`/payments/history?salonId=${SALON_B_ID}`)
       .set('x-test-user', ceoUser);
 
     expect(response.status).toBe(200);
     expect(mockPaymentCountDocuments).toHaveBeenCalledWith(
-      expect.objectContaining({ salonId: 'salonB' })
+      expect.objectContaining({ salonId: expect.objectContaining({ _bsontype: 'ObjectId' }) })
     );
   });
 
@@ -357,14 +366,14 @@ describe('Tenant boundary integration: Payments', () => {
     mockPaymentFindById.mockReturnValue({
       populate: jest.fn().mockReturnValue({
         maxTimeMS: jest.fn().mockResolvedValue({
-          _id: 'payment-1',
-          bookingId: { salonId: 'salonB' }
+          _id: PAYMENT_1_ID,
+          bookingId: { salonId: SALON_B_ID }
         })
       })
     });
 
     const response = await request(app)
-      .get('/payments/payment-1')
+      .get(`/payments/${PAYMENT_1_ID}`)
       .set('x-test-user', salonOwnerSalonA);
 
     expect(response.status).toBe(403);
@@ -374,8 +383,8 @@ describe('Tenant boundary integration: Payments', () => {
       const app = createAppWithPaymentRoutes();
       mockPaymentFindById.mockReturnValue({
         maxTimeMS: jest.fn().mockResolvedValue({
-          _id: 'payment-2',
-          bookingId: 'booking-2',
+          _id: PAYMENT_2_ID,
+          bookingId: BOOKING_2_ID,
           amount: 120,
           status: 'completed',
           refundedAmount: 0,
@@ -385,7 +394,7 @@ describe('Tenant boundary integration: Payments', () => {
       mockBookingFindById.mockReturnValue({
         select: jest.fn().mockReturnValue({
           maxTimeMS: jest.fn().mockResolvedValue({
-            salonId: 'salonB'
+            salonId: SALON_B_ID
           })
         })
       });
@@ -393,7 +402,7 @@ describe('Tenant boundary integration: Payments', () => {
       const response = await request(app)
         .post('/payments/refund')
         .set('x-test-user', salonOwnerSalonA)
-        .send({ paymentId: 'payment-2', amount: 10, reason: 'requested_by_customer' });
+        .send({ paymentId: PAYMENT_2_ID, amount: 10, reason: 'requested_by_customer' });
 
       expect(response.status).toBe(403);
     });

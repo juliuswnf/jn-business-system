@@ -59,7 +59,7 @@ describe('workflow entitlement in enableWorkflow', () => {
     mockSalonQuery({ subscription: { tier: 'starter', status: 'active' } });
 
     const req = createMockRequest({
-      user: { salonId: 's1' },
+      user: { salonId: '507f1f77bcf86cd799439011' },
       body: { industry: 'tattoo' }
     });
     const res = createMockResponse();
@@ -76,7 +76,7 @@ describe('workflow entitlement in enableWorkflow', () => {
     mockIndustryCountDocuments.mockResolvedValue(1);
 
     const req = createMockRequest({
-      user: { salonId: 's2' },
+      user: { salonId: '507f1f77bcf86cd799439012' },
       body: { industry: 'medical' }
     });
     const res = createMockResponse();
@@ -96,7 +96,7 @@ describe('workflow entitlement in enableWorkflow', () => {
     });
 
     const req = createMockRequest({
-      user: { salonId: 's3' },
+      user: { salonId: '507f1f77bcf86cd799439013' },
       body: { industry: 'tattoo', features: ['consultation'] }
     });
     const res = createMockResponse();
@@ -105,6 +105,10 @@ describe('workflow entitlement in enableWorkflow', () => {
 
     expect(res.statusCode).toBe(201);
     expect(res.jsonData.success).toBe(true);
-    expect(mockIndustryEnableWorkflow).toHaveBeenCalledWith('s3', 'tattoo', ['consultation']);
+    expect(mockIndustryEnableWorkflow).toHaveBeenCalledWith(
+      expect.objectContaining({ _bsontype: 'ObjectId' }),
+      'tattoo',
+      ['consultation']
+    );
   });
 });

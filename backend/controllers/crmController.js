@@ -103,7 +103,7 @@ export const getCustomers = async (req, res) => {
     aggregation.push({ $skip: skip });
     aggregation.push({ $limit: limit });
 
-    const customers = await Booking.aggregate(aggregation).option({ maxTimeMS: 5000 });
+    const customers = await Booking.aggregate(aggregation).maxTimeMS(5000);
 
     // Get total count
     const countAggregation = [
@@ -111,7 +111,7 @@ export const getCustomers = async (req, res) => {
       { $group: { _id: '$customerEmail' } },
       { $count: 'total' }
     ];
-    const countResult = await Booking.aggregate(countAggregation).option({ maxTimeMS: 5000 });
+    const countResult = await Booking.aggregate(countAggregation).maxTimeMS(5000);
     const totalCount = countResult[0]?.total || 0;
 
     res.status(200).json({
