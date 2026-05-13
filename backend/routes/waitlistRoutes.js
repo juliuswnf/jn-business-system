@@ -67,7 +67,7 @@ const resolveSalonFromReference = async (salonReference) => {
       .lean();
   }
 
-  return Salon.findOne({ slug: salonReference })
+  return Salon.findOne({ slug: String(salonReference).replace(/[^\w-]/g, '').substring(0, 100) })
     .select('_id slug businessName subscription')
     .lean();
 };
@@ -191,7 +191,11 @@ router.post('/', requirePublicWaitlistFeature, async (req, res) => {
     const safeCustomerId = new mongoose.Types.ObjectId(customerId);
 
     // salonId was resolved from DB by requirePublicWaitlistFeature middleware
-    const resolvedSalonId = typeof salonId === 'string' ? salonId : String(salonId);
+    // Cast to ObjectId — breaks any taint chain from the original request
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+    const resolvedSalonId = new mongoose.Types.ObjectId(String(salonId));
 
     // Check if already on waitlist
     const existing = await Waitlist.findOne({
@@ -272,7 +276,13 @@ router.get('/:salonId', authMiddleware.protect, requireWaitlistFeature, async (r
       });
     }
 
-    const waitlist = await Waitlist.find({ salonId, status: 'active' })
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.params into query
+    const safeSalonIdWL = new mongoose.Types.ObjectId(salonId);
+
+    const waitlist = await Waitlist.find({ salonId: safeSalonIdWL, status: 'active' })
       .populate('customerId', 'firstName lastName phone email')
       .populate('preferredService', 'name duration price')
       .sort({ priorityScore: -1 }); // Highest priority first

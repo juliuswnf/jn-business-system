@@ -197,10 +197,11 @@ export const getPatientClinicalNotes = async (req, res) => {
     const rawSalonId = req.query.salonId;
     const noteType = req.query.noteType;
 
-    if (!rawSalonId || typeof rawSalonId !== 'string') {
+    if (!rawSalonId || typeof rawSalonId !== 'string' || !mongoose.isValidObjectId(rawSalonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId' });
     }
-    const salonId = rawSalonId;
+    // Cast to ObjectId breaks taint chain — rawSalonId (user string) never enters the query
+    const salonId = new mongoose.Types.ObjectId(rawSalonId);
 
     // Verify authorization
     const salon = await Salon.findById(salonId).maxTimeMS(5000);

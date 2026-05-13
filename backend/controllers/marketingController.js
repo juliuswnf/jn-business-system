@@ -7,6 +7,7 @@ import Salon from '../models/Salon.js';
 import { sendSMS } from '../services/smsService.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_CAMPAIGN_STATUSES = ['draft', 'active', 'paused', 'completed', 'cancelled'];
 const ALLOWED_RECIPIENT_STATUSES = ['pending', 'sent', 'delivered', 'failed', 'unsubscribed'];
@@ -514,6 +515,10 @@ export const getLimits = async (req, res) => {
  * Check tier limits for marketing campaigns
  */
 async function checkTierLimits(salonId, tier = 'starter') {
+  // Ensure salonId is a typed ObjectId — breaks any taint chain from call sites
+  const safeSalonId = salonId instanceof mongoose.Types.ObjectId
+    ? salonId
+    : new mongoose.Types.ObjectId(String(salonId));
   const tierConfig = {
     starter: {
       maxActiveCampaigns: 1,
@@ -541,7 +546,7 @@ async function checkTierLimits(salonId, tier = 'starter') {
 
   const config = tierConfig[tier] || tierConfig.starter;
   const activeCampaigns = await MarketingCampaign.countDocuments({
-    salonId,
+    salonId: safeSalonId,
     status: 'active'
   });
 
@@ -551,7 +556,7 @@ async function checkTierLimits(salonId, tier = 'starter') {
   startOfMonth.setHours(0, 0, 0, 0);
 
   const smsUsed = await MarketingRecipient.countDocuments({
-    campaignId: { $in: await MarketingCampaign.find({ salonId }).distinct('_id') },
+    campaignId: { $in: await MarketingCampaign.find({ salonId: safeSalonId }).distinct('_id') },
     sentAt: { $gte: startOfMonth }
   });
 
@@ -666,7 +671,9 @@ async function findTargetCustomers(campaign, salonId) {
     ? { $in: existingIn, $nin: alreadySent }
     : { $nin: alreadySent };
 
-  const customers = await User.find(query)
+  // sanitizeFilter strips any $-operators that may have crept in via campaign rules
+  const safeQuery = mongoose.sanitizeFilter(query);
+  const customers = await User.find(safeQuery)
     .limit(safeMaxRecipients)
     .select('name email phoneNumber');
 

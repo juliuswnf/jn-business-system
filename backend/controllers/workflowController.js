@@ -7,6 +7,7 @@ import Membership from '../models/Membership.js';
 import Booking from '../models/Booking.js';
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_INDUSTRIES = ['tattoo', 'salon', 'barbershop', 'medical', 'wellness', 'fitness', 'nail', 'beauty', 'spa', 'piercing', 'aesthetics'];
 const ALLOWED_PACKAGE_TYPES = ['session', 'treatment', 'membership', 'bundle', 'subscription', 'custom'];
@@ -62,10 +63,15 @@ export const enableWorkflow = async (req, res) => {
     if (typeof salonId !== 'string') {
       return res.status(400).json({ success: false, message: 'Invalid salonId' });
     }
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.user/req.body into queries
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
     // .find() returns value from static array, breaking taint chain
     const safeIndustry = ALLOWED_INDUSTRIES.find(i => i === String(industry));
 
-    const salon = await Salon.findById(salonId)
+    const salon = await Salon.findById(safeSalonId)
       .select('subscription.tier subscription.status businessName')
       .lean();
 
@@ -89,11 +95,11 @@ export const enableWorkflow = async (req, res) => {
       });
     }
 
-    const existingWorkflow = await IndustryWorkflow.findOne({ salonId, industry: safeIndustry }).lean();
+    const existingWorkflow = await IndustryWorkflow.findOne({ salonId: safeSalonId, industry: safeIndustry }).lean();
     const isAlreadyEnabled = existingWorkflow?.enabled === true;
 
     if (tier === 'professional' && !isAlreadyEnabled) {
-      const enabledCount = await IndustryWorkflow.countDocuments({ salonId, enabled: true });
+      const enabledCount = await IndustryWorkflow.countDocuments({ salonId: safeSalonId, enabled: true });
 
       if (enabledCount >= 1) {
         return res.status(403).json({
@@ -107,7 +113,7 @@ export const enableWorkflow = async (req, res) => {
       }
     }
 
-    const workflow = await IndustryWorkflow.enableWorkflow(salonId, safeIndustry, features);
+    const workflow = await IndustryWorkflow.enableWorkflow(safeSalonId, safeIndustry, features);
 
     logger.info(`Workflow enabled: ${industry} for salon ${salonId}`);
 
@@ -167,14 +173,20 @@ export const updateWorkflowConfig = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid industry' });
     }
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
     // Enforce tenant isolation: only the owning salon or CEO may update
     if (req.user?.role !== 'ceo' && req.user?.salonId?.toString() !== salonId) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
+    // Cast to ObjectId — breaks taint chain from req.params into queries
+    const safeSalonIdUpdate = new mongoose.Types.ObjectId(salonId);
     // .find() returns value from static array, breaking taint chain
     const safeIndustryUpdate = ALLOWED_INDUSTRIES.find(i => i === String(industry));
 
-    const workflow = await IndustryWorkflow.findOne({ salonId, industry: safeIndustryUpdate });
+    const workflow = await IndustryWorkflow.findOne({ salonId: safeSalonIdUpdate, industry: safeIndustryUpdate });
 
     if (!workflow) {
       return res.status(404).json({
@@ -788,7 +800,7 @@ export const getSalonPackages = async (req, res) => {
     };
 
     const query = {
-      salonId,
+      salonId: safeSalonIdPkg,
       deletedAt: null
     };
 
@@ -800,7 +812,7 @@ export const getSalonPackages = async (req, res) => {
       query.type = safePackageType;
     }
 
-    if (filters.status) {
+    if (typeof filters.status === 'string') {
       query.isActive = filters.status === 'active';
     }
 
@@ -1113,11 +1125,17 @@ export const pauseMembership = async (req, res) => {
 // GET /api/portfolio/:salonId - Public portfolio gallery
 export const getPortfolio = async (req, res) => {
   try {
-    const { salonId } = req.params;
+    const { salonId: rawSalonIdPortfolio } = req.params;
     const { industry, limit } = req.query;
 
+    if (!rawSalonIdPortfolio || !mongoose.isValidObjectId(rawSalonIdPortfolio)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.params into query
+    const safeSalonIdPortfolio = new mongoose.Types.ObjectId(rawSalonIdPortfolio);
+
     const query = {
-      salonId,
+      salonId: safeSalonIdPortfolio,
       status: 'completed'
     };
 
@@ -1140,7 +1158,7 @@ export const getPortfolio = async (req, res) => {
     for (const project of projects) {
       // Check photo consent
       const hasConsent = await Consent.hasValidConsent(
-        salonId,
+        safeSalonIdPortfolio,
         project.customerId,
         'photo_consent'
       );

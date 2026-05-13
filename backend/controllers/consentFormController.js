@@ -3,6 +3,7 @@ import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 import { generateConsentPDF } from '../utils/pdfGenerator.js';
 import { validateUrl } from '../utils/securityHelpers.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_CONSENT_TYPES = ['general', 'photo', 'gdpr', 'treatment', 'minor', 'tattoo', 'medical', 'aftercare', 'liability'];
 
@@ -133,8 +134,14 @@ export const getCustomerConsents = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Authentication required' });
     }
 
-    const { customerId } = req.params;
+    const { customerId: rawCustomerId } = req.params;
     const { consentType, isActive } = req.query;
+
+    if (!rawCustomerId || !mongoose.isValidObjectId(rawCustomerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.params into query
+    const customerId = new mongoose.Types.ObjectId(rawCustomerId);
 
     let query;
     try {
@@ -252,7 +259,14 @@ export const checkConsentValidity = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Authentication required' });
     }
 
-    const { customerId, consentType: rawConsentType } = req.params;
+    const { customerId: rawCustomerId2, consentType: rawConsentType } = req.params;
+
+    if (!rawCustomerId2 || !mongoose.isValidObjectId(rawCustomerId2)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.params into query
+    const customerId = new mongoose.Types.ObjectId(rawCustomerId2);
+
     // .find() returns value from static array, breaking taint chain
     const consentType = typeof rawConsentType === 'string'
       ? ALLOWED_CONSENT_TYPES.find(t => t === rawConsentType) ?? null

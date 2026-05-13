@@ -142,8 +142,15 @@ export const uploadProgressPhotos = async (req, res) => {
 // ==================== GET CLIENT PROGRESS HISTORY ====================
 export const getClientProgressHistory = async (req, res) => {
   try {
-    const { customerId } = req.params;
+    const { customerId: rawCustomerId } = req.params;
     const { startDate, endDate, limit = 50 } = req.query;
+
+    if (!rawCustomerId || !mongoose.isValidObjectId(rawCustomerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.params into query
+    const customerId = new mongoose.Types.ObjectId(rawCustomerId);
+
     const rawSalonId = req.query.salonId;
     if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
@@ -309,8 +316,15 @@ export const deleteProgressEntry = async (req, res) => {
 // ==================== GET WEIGHT TREND ====================
 export const getWeightTrend = async (req, res) => {
   try {
-    const { customerId } = req.params;
+    const { customerId: rawCustomerIdWeight } = req.params;
     const { months = 6 } = req.query;
+
+    if (!rawCustomerIdWeight || !mongoose.isValidObjectId(rawCustomerIdWeight)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.params into query
+    const customerId = new mongoose.Types.ObjectId(rawCustomerIdWeight);
+
     const rawSalonId = req.query.salonId;
     if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
@@ -349,8 +363,15 @@ export const getWeightTrend = async (req, res) => {
 // ==================== GET PERFORMANCE TREND ====================
 export const getPerformanceTrend = async (req, res) => {
   try {
-    const { customerId } = req.params;
+    const { customerId: rawCustomerIdPerf } = req.params;
     const { exercise, months = 6 } = req.query;
+
+    if (!rawCustomerIdPerf || !mongoose.isValidObjectId(rawCustomerIdPerf)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    // Cast to ObjectId — breaks taint chain from req.params into query
+    const customerId = new mongoose.Types.ObjectId(rawCustomerIdPerf);
+
     const rawSalonId2 = req.query.salonId;
     if (rawSalonId2 && !mongoose.isValidObjectId(rawSalonId2)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
