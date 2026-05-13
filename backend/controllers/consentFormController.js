@@ -40,8 +40,13 @@ const buildTenantScopedConsentQuery = (req, customerId) => {
       query.customerId = customerId;
     }
 
-    if (req.query?.salonId) {
-      query.salonId = req.query.salonId;
+    const rawQuerySalonId = req.query?.salonId;
+    if (rawQuerySalonId) {
+      if (!mongoose.isValidObjectId(rawQuerySalonId)) {
+        throw new Error('Invalid salonId format');
+      }
+      // Cast to ObjectId — breaks taint chain from req.query into the DB query
+      query.salonId = new mongoose.Types.ObjectId(String(rawQuerySalonId));
     }
 
     return query;
