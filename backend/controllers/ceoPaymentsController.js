@@ -6,7 +6,10 @@
 
 import Salon from '../models/Salon.js';
 import Payment from '../models/Payment.js';
-import { escapeRegExp } from '../utils/securityHelpers.js';\n\nconst ALLOWED_PAYMENT_STATUSES = ['pending', 'completed', 'failed', 'refunded', 'partially_refunded', 'cancelled'];\nconst ALLOWED_PAYMENT_TYPES = ['subscription', 'booking', 'refund', 'connect', 'manual'];
+import { escapeRegExp } from '../utils/securityHelpers.js';
+
+const ALLOWED_PAYMENT_STATUSES = ['pending', 'completed', 'failed', 'refunded', 'partially_refunded', 'cancelled'];
+const ALLOWED_PAYMENT_TYPES = ['subscription', 'booking', 'refund', 'connect', 'manual'];
 
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
