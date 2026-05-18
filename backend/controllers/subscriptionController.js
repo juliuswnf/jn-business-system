@@ -23,6 +23,20 @@ const PRICE_MAP_YEARLY = {
   enterprise: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY
 };
 
+const resolveFrontendBaseUrl = () => {
+  const baseUrl = (process.env.FRONTEND_URL || '').trim().replace(/\/$/, '');
+
+  if (!baseUrl) {
+    throw new Error('FRONTEND_URL is required for Stripe redirects');
+  }
+
+  if (process.env.NODE_ENV === 'production' && /(localhost|127\.0\.0\.1)/i.test(baseUrl)) {
+    throw new Error('FRONTEND_URL must point to a production domain in production');
+  }
+
+  return baseUrl;
+};
+
 /**
  * Create Stripe Checkout Session
  * POST /api/subscriptions/checkout
@@ -60,7 +74,7 @@ export const createCheckout = async (req, res) => {
     }
 
     // Build URLs — include session_id for the success page to verify
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const baseUrl = resolveFrontendBaseUrl();
     const successUrl = `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&plan=${planId}`;
     const cancelUrl = `${baseUrl}/pricing?subscription=cancelled`;
 
@@ -105,7 +119,7 @@ export const createPortal = async (req, res) => {
       });
     }
 
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const baseUrl = resolveFrontendBaseUrl();
     const returnUrl = `${baseUrl}/dashboard/settings`;
 
     const session = await createBillingPortalSession(salon, returnUrl);

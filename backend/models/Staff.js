@@ -61,6 +61,7 @@ const staffSchema = new mongoose.Schema(
 );
 
 staffSchema.index({ studioId: 1, status: 1 });
+staffSchema.index({ studioId: 1 });
 staffSchema.index({ studioId: 1, email: 1 }, { unique: true });
 
 export default mongoose.model('Staff', staffSchema);

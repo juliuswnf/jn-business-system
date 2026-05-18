@@ -179,6 +179,7 @@ const tattooProjectSchema = new mongoose.Schema({
 });
 
 // ==================== Indexes ====================
+tattooProjectSchema.index({ salonId: 1 });
 tattooProjectSchema.index({ salonId: 1, status: 1 });
 tattooProjectSchema.index({ customerId: 1 });
 tattooProjectSchema.index({ artistId: 1 });

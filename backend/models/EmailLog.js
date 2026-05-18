@@ -139,6 +139,7 @@ const emailLogSchema = new mongoose.Schema(
 emailLogSchema.index({ companyId: 1, recipientEmail: 1, sentAt: -1 });
 emailLogSchema.index({ companyId: 1, status: 1, sentAt: -1 });
 emailLogSchema.index({ companyId: 1, createdAt: -1 });
+emailLogSchema.index({ salonId: 1, createdAt: -1 });
 
 // ✅ Email type queries
 emailLogSchema.index({ companyId: 1, emailType: 1, status: 1 });

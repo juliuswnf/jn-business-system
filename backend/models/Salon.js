@@ -317,7 +317,7 @@ const salonSchema = new mongoose.Schema({
   subscription: {
     status: {
       type: String,
-      enum: ['trial_pending', 'trial', 'active', 'past_due', 'canceled', 'inactive'],
+      enum: ['trial_pending', 'trial', 'active', 'past_due', 'canceled', 'inactive', 'expired'],
       default: 'trial_pending'
     },
     // Pricing Tier (starter/professional/enterprise)

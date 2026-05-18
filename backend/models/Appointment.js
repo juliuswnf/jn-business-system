@@ -64,6 +64,7 @@ const appointmentSchema = new mongoose.Schema(
 
 appointmentSchema.index({ studioId: 1, startTime: 1 });
 appointmentSchema.index({ studioId: 1, status: 1, startTime: 1 });
+appointmentSchema.index({ studioId: 1, status: 1 });
 appointmentSchema.index({ studioId: 1, customerId: 1, startTime: -1 });
 appointmentSchema.index({ studioId: 1, staffId: 1, startTime: 1 });
 

@@ -359,6 +359,8 @@ const paymentSchema = new mongoose.Schema(
 // ? Primary queries
 paymentSchema.index({ companyId: 1, status: 1, createdAt: -1 });
 paymentSchema.index({ companyId: 1, createdAt: -1 });
+paymentSchema.index({ salonId: 1, createdAt: -1 });
+paymentSchema.index({ salonId: 1, status: 1 });
 
 // ? Customer queries
 paymentSchema.index({ companyId: 1, customerId: 1, createdAt: -1 }, { sparse: true });

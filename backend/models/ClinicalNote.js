@@ -178,6 +178,7 @@ const clinicalNoteSchema = new mongoose.Schema(
 );
 
 // ==================== INDEXES ====================
+clinicalNoteSchema.index({ salonId: 1, customerId: 1 });
 clinicalNoteSchema.index({ salonId: 1, customerId: 1, treatmentDate: -1 });
 clinicalNoteSchema.index({ practitionerId: 1, treatmentDate: -1 });
 clinicalNoteSchema.index({ salonId: 1, noteType: 1 });

@@ -164,6 +164,7 @@ const tattooSessionSchema = new mongoose.Schema({
 // ==================== Indexes ====================
 tattooSessionSchema.index({ projectId: 1, sessionNumber: 1 });
 tattooSessionSchema.index({ bookingId: 1 });
+tattooSessionSchema.index({ salonId: 1 });
 tattooSessionSchema.index({ salonId: 1, status: 1 });
 tattooSessionSchema.index({ scheduledDate: 1 });
 

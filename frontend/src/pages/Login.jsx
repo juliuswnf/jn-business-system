@@ -1,30 +1,12 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 
 const Login = () => {
-  const [clickCount, setClickCount] = useState(0);
-
-  // Triple-click on logo to access CEO login
-  const handleLogoClick = () => {
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-
-    if (newCount >= 3) {
-      window.location.href = '/_.admin';
-      setClickCount(0);
-    }
-
-    // Reset after 2 seconds
-    setTimeout(() => setClickCount(0), 2000);
-  };
-
   return (
     <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8 p-8 bg-gray-50 border border-gray-100 rounded-2xl">
         <div className="text-center">
           <h1
-            className="text-2xl font-semibold tracking-tight text-gray-900 mb-2 cursor-default select-none"
-            onClick={handleLogoClick}
+            className="text-2xl font-semibold tracking-tight text-gray-900 mb-2"
           >
             Willkommen bei JN Business System
           </h1>

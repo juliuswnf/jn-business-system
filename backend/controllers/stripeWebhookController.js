@@ -23,6 +23,17 @@ const getStripe = () => {
   return stripe;
 };
 
+const STRIPE_SUBSCRIPTION_STATUS_MAP = {
+  trialing: 'trial',
+  active: 'active',
+  past_due: 'past_due',
+  incomplete: 'inactive',
+  incomplete_expired: 'expired',
+  unpaid: 'expired',
+  canceled: 'expired',
+  paused: 'inactive'
+};
+
 async function dispatchStripeEvent(event) {
   switch (event.type) {
     case 'checkout.session.completed':
@@ -250,18 +261,7 @@ const handleSubscriptionCreated = async (subscription) => {
 
     salon.subscription.stripeSubscriptionId = subscription.id;
 
-    // Map Stripe subscription status to internal status
-    const statusMap = {
-      trialing: 'trial',
-      active: 'active',
-      past_due: 'past_due',
-      incomplete: 'inactive',
-      incomplete_expired: 'inactive',
-      unpaid: 'past_due',
-      canceled: 'canceled',
-      paused: 'inactive'
-    };
-    salon.subscription.status = statusMap[subscription.status] ?? 'inactive';
+    salon.subscription.status = STRIPE_SUBSCRIPTION_STATUS_MAP[subscription.status] ?? 'inactive';
     salon.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
 
@@ -303,18 +303,7 @@ const handleSubscriptionUpdated = async (subscription) => {
     const oldStatus = salon.subscription.status;
     const oldTier = salon.subscription.tier;
 
-    // Map Stripe subscription status to internal status
-    const statusMap = {
-      trialing: 'trial',
-      active: 'active',
-      past_due: 'past_due',
-      incomplete: 'inactive',
-      incomplete_expired: 'inactive',
-      unpaid: 'past_due',
-      canceled: 'canceled',
-      paused: 'inactive'
-    };
-    salon.subscription.status = statusMap[subscription.status] ?? 'inactive';
+    salon.subscription.status = STRIPE_SUBSCRIPTION_STATUS_MAP[subscription.status] ?? 'inactive';
     salon.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
     salon.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
     salon.subscription.cancelAtPeriodEnd = subscription.cancel_at_period_end;
@@ -361,10 +350,12 @@ const handleSubscriptionDeleted = async (subscription) => {
       return;
     }
 
-    salon.subscription.status = 'canceled';
+    salon.subscription.status = 'expired';
+    salon.subscription.currentPeriodEnd = new Date();
+    salon.subscription.cancelAtPeriodEnd = false;
     await salon.save();
 
-    logger.log(`✅ Subscription deleted for salon: ${salon.slug}`);
+    logger.log(`✅ Subscription expired for salon: ${salon.slug}`);
 
     // Send email notification to salon owner
     try {

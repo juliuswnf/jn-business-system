@@ -93,6 +93,7 @@ const workflowProjectSchema = new mongoose.Schema({
 });
 
 // Indexes
+workflowProjectSchema.index({ salonId: 1 });
 workflowProjectSchema.index({ salonId: 1, status: 1 });
 workflowProjectSchema.index({ customerId: 1 });
 workflowProjectSchema.index({ industry: 1 });

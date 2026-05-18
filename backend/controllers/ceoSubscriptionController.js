@@ -81,6 +81,7 @@ export const getSubscriptionStats = async (req, res) => {
     const trial = await Salon.countDocuments({ 'subscription.status': 'trial' });
     const pastDue = await Salon.countDocuments({ 'subscription.status': 'past_due' });
     const canceled = await Salon.countDocuments({ 'subscription.status': 'canceled' });
+    const expired = await Salon.countDocuments({ 'subscription.status': 'expired' });
     const inactive = await Salon.countDocuments({ 'subscription.status': 'inactive' });
 
     // Calculate MRR (Monthly Recurring Revenue)
@@ -94,6 +95,7 @@ export const getSubscriptionStats = async (req, res) => {
         trial,
         pastDue,
         canceled,
+        expired,
         inactive,
         activePercentage: total > 0 ? ((active / total) * 100).toFixed(2) : 0,
         trialPercentage: total > 0 ? ((trial / total) * 100).toFixed(2) : 0
@@ -209,7 +211,7 @@ export const updateSubscriptionStatus = async (req, res) => {
     const { salonId } = req.params;
     const { status } = req.body;
 
-    const validStatuses = ['trial', 'active', 'past_due', 'canceled', 'inactive'];
+    const validStatuses = ['trial', 'active', 'past_due', 'canceled', 'inactive', 'expired'];
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({

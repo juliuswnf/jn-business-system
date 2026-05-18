@@ -369,6 +369,9 @@ const serviceSchema = new mongoose.Schema(
 
 // ==================== INDEXES (OPTIMIZED) ====================
 
+serviceSchema.index({ salonId: 1 });
+serviceSchema.index({ salonId: 1, isAvailable: 1 });
+serviceSchema.index({ salonId: 1, status: 1 });
 serviceSchema.index({ companyId: 1, category: 1, status: 1 });
 serviceSchema.index({ companyId: 1, status: 1, createdAt: -1 });
 serviceSchema.index({ slug: 1 });

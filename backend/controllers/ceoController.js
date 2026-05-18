@@ -495,7 +495,7 @@ export const getSubscriptionInfo = async (req, res) => {
       'subscription.status': 'trial'
     });
     const inactiveSubscriptions = await Salon.countDocuments({
-      'subscription.status': { $in: ['inactive', 'canceled', 'past_due'] }
+      'subscription.status': { $in: ['inactive', 'canceled', 'expired', 'past_due'] }
     });
 
     res.status(200).json({
@@ -853,7 +853,7 @@ export const getAllCustomers = async (req, res) => {
     } else if (status === 'trial') {
       filter['subscription.status'] = 'trial';
     } else if (status === 'inactive') {
-      filter['subscription.status'] = { $in: ['inactive', 'canceled', 'past_due'] };
+      filter['subscription.status'] = { $in: ['inactive', 'canceled', 'expired', 'past_due'] };
     }
 
     // Filter by plan type

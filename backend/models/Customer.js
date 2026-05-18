@@ -234,6 +234,7 @@ const customerSchema = new mongoose.Schema(
 
 // ==================== INDEXES ====================
 
+customerSchema.index({ salonId: 1 });
 customerSchema.index({ salonId: 1, email: 1 }, { unique: true });
 customerSchema.index({ salonId: 1, phone: 1 });
 customerSchema.index({ salonId: 1, lastName: 1, firstName: 1 });

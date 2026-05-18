@@ -129,7 +129,7 @@ export const cancelSubscription = async (salon, immediately = false) => {
     if (immediately) {
       // Cancel immediately
       subscription = await getStripe().subscriptions.cancel(subscriptionId);
-      salon.subscription.status = 'canceled';
+      salon.subscription.status = 'expired';
     } else {
       // Cancel at period end
       subscription = await getStripe().subscriptions.update(subscriptionId, {

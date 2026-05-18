@@ -3,6 +3,14 @@ import logger from '../utils/logger.js';
 
 const MarketingTemplateSchema = new mongoose.Schema(
   {
+    salonId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Salon',
+      default: null,
+      index: true,
+      sparse: true
+    },
+
     // Template info
     name: {
       type: String,
@@ -99,6 +107,10 @@ const MarketingTemplateSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+MarketingTemplateSchema.index({ salonId: 1 });
+MarketingTemplateSchema.index({ salonId: 1, type: 1 });
+MarketingTemplateSchema.index({ tier: 1, active: 1, popular: -1, name: 1 });
 
 // Static method: Seed default templates
 MarketingTemplateSchema.statics.seedTemplates = async function() {

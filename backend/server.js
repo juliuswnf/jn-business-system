@@ -20,7 +20,6 @@ import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import { initializeCronJobs } from './services/cronService.js';
 import emailQueueWorker from './workers/emailQueueWorker.js';
 import lifecycleEmailWorker from './workers/lifecycleEmailWorker.js';
-import { getHealthStatus } from './services/healthCheckService.js';
 import alertingService from './services/alertingService.js';
 import { sanitizeInput } from './middleware/sanitizationMiddleware.js';
 import { initSentry, sentryErrorHandler } from './config/sentry.js';
@@ -121,6 +120,15 @@ const ENVIRONMENT = process.env.NODE_ENV || 'development';
 
 // Create HTTP Server for Socket.IO
 const server = http.createServer(app);
+let isShuttingDown = false;
+const openConnections = new Set();
+
+server.on('connection', (connection) => {
+  openConnections.add(connection);
+  connection.on('close', () => {
+    openConnections.delete(connection);
+  });
+});
 
 // Socket.IO Configuration
 const io = new SocketIOServer(server, {
@@ -187,6 +195,20 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
+app.use((req, res, next) => {
+  const isHealthCheck = req.path === '/health' || req.path === '/api/health';
+
+  if (isShuttingDown && !isHealthCheck) {
+    res.set('Connection', 'close');
+    return res.status(503).json({
+      success: false,
+      message: 'Server is shutting down, try again shortly'
+    });
+  }
+
+  return next();
+});
+
 app.use(generalLimiter);
 
 // ==================== HEALTH CHECK ROUTES ====================
@@ -250,22 +272,15 @@ if (ENVIRONMENT === 'development') {
 app.use(requestTimingMiddleware);
 
 // ==================== HEALTH CHECK ====================
-app.get('/health', async (req, res) => {
-  try {
-    const health = await getHealthStatus();
-    health.emailWorker = emailWorkerIntervals ? 'running' : 'stopped';
+app.get('/health', (req, res) => {
+  const dbConnected = mongoose.connection.readyState === 1;
 
-    const statusCode = health.status === 'healthy' ? 200 :
-                       health.status === 'degraded' ? 200 : 503;
-
-    res.status(statusCode).json(health);
-  } catch (error) {
-    res.status(503).json({
-      status: 'unhealthy',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
+  res.status(dbConnected ? 200 : 503).json({
+    status: dbConnected ? 'ok' : 'error',
+    db: dbConnected ? 'connected' : 'disconnected',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
 });
 
 // ==================== SENTRY TEST ENDPOINT ====================
@@ -720,6 +735,11 @@ process.on('uncaughtException', (error) => {
 
 // ==================== GRACEFUL SHUTDOWN ====================
 const gracefulShutdown = async (signal) => {
+  if (isShuttingDown) {
+    return;
+  }
+
+  isShuttingDown = true;
   logger.info(`\n?? ${signal} signal received: initiating graceful shutdown`);
 
   // 1. Stop all workers first (prevent double-firing during drain)
@@ -737,15 +757,45 @@ const gracefulShutdown = async (signal) => {
   lifecycleEmailWorker.stopLifecycleEmailWorker();
   logger.info('? All workers stopped');
 
+  io.close(() => {
+    logger.info('? Socket.IO server closed');
+  });
+
+  const forceShutdownTimer = setTimeout(async () => {
+    logger.warn('?? Graceful shutdown timeout (10s) reached, forcing close');
+
+    openConnections.forEach((connection) => {
+      connection.destroy();
+    });
+
+    try {
+      await mongoose.connection.close();
+      logger.info('? MongoDB connection closed (forced path)');
+    } catch (error) {
+      logger.error('?? Error closing MongoDB during forced shutdown:', error.message);
+    }
+
+    process.exit(1);
+  }, 10000);
+
+  if (typeof forceShutdownTimer.unref === 'function') {
+    forceShutdownTimer.unref();
+  }
+
   // 2. Close HTTP server (stop accepting new connections)
-  server.close(async () => {
+  server.close(async (serverCloseError) => {
+    clearTimeout(forceShutdownTimer);
     logger.info('? HTTP server closed');
 
     // 3. Close MongoDB connection
-    await mongoose.connection.close();
-    logger.info('? MongoDB connection closed');
+    try {
+      await mongoose.connection.close();
+      logger.info('? MongoDB connection closed');
+    } catch (error) {
+      logger.error('?? Error closing MongoDB connection:', error.message);
+    }
 
-    process.exit(0);
+    process.exit(serverCloseError ? 1 : 0);
   });
 };
 

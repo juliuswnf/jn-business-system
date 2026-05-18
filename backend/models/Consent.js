@@ -134,6 +134,7 @@ const consentSchema = new mongoose.Schema({
 });
 
 // ==================== Indexes ====================
+consentSchema.index({ salonId: 1, customerId: 1 });
 consentSchema.index({ salonId: 1, customerId: 1, type: 1 });
 consentSchema.index({ projectId: 1 });
 consentSchema.index({ status: 1, expiresAt: 1 });

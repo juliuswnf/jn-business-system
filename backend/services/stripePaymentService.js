@@ -572,7 +572,7 @@ class StripePaymentService {
       if (immediately) {
         // Cancel immediately
         canceledSubscription = await this.stripe.subscriptions.cancel(subscription.id);
-        salon.subscription.status = 'canceled';
+        salon.subscription.status = 'expired';
       } else {
         // Cancel at period end
         canceledSubscription = await this.stripe.subscriptions.update(subscription.id, {

@@ -186,6 +186,7 @@ const MarketingCampaignSchema = new mongoose.Schema(
 
 // Compound indexes
 MarketingCampaignSchema.index({ salonId: 1, status: 1 });
+MarketingCampaignSchema.index({ salonId: 1, createdAt: -1 });
 MarketingCampaignSchema.index({ status: 1, 'stats.nextRunAt': 1 });
 
 // Virtual for ROI calculation
