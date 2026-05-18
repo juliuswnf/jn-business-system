@@ -29,19 +29,19 @@ const validateAmount = (amount) => {
 
 export const createPaymentIntent = async (req, res) => {
   try {
-    const { bookingId, amount } = req.body;
+    const { bookingId } = req.body;
 
-    if (!bookingId || !amount) {
+    if (!bookingId) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide booking ID and amount'
+        message: 'Please provide booking ID'
       });
     }
 
-    if (!validateAmount(amount)) {
+    if (!mongoose.isValidObjectId(bookingId)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid amount (must be between 0.01 and 999999.99 EUR)'
+        message: 'Invalid booking ID format'
       });
     }
 
@@ -61,8 +61,16 @@ export const createPaymentIntent = async (req, res) => {
       });
     }
 
+    const expectedAmount = Number(booking.price);
+    if (!validateAmount(expectedAmount)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid booking amount'
+      });
+    }
+
     const paymentIntent = await getStripe().paymentIntents.create({
-      amount: Math.round(amount * 100),
+      amount: Math.round(expectedAmount * 100),
       currency: 'eur',
       metadata: {
         bookingId: bookingId.toString()

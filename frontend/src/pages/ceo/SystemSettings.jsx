@@ -1,27 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../hooks/useNotification';
+import { api } from '../../utils/api';
 
 export default function SystemSettings() {
   const { showNotification } = useNotification();
   const [activeTab, setActiveTab] = useState('email');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
     email: {
       smtpHost: '',
       smtpPort: '',
       smtpUser: '',
-      smtpPassword: ''
-    },
-    stripe: {
-      publicKey: '',
-      secretKey: '',
-      webhookSecret: ''
+      smtpPassword: '',
+      smtpSecure: false,
+      fromEmail: '',
+      fromName: ''
     },
     sms: {
       provider: 'twilio',
       accountSid: '',
-      authToken: ''
+      authToken: '',
+      phoneNumber: ''
+    },
+    payment: {
+      stripePublicKey: '',
+      stripeSecretKey: '',
+      webhookSecret: ''
     }
   });
+
+  // Load settings on mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/ceo/system-settings');
+      if (response.data.success) {
+        setSettings(response.data.settings);
+      }
+    } catch (error) {
+      showNotification('Fehler beim Laden der Einstellungen', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (section, field, value) => {
     setSettings(prev => ({
@@ -35,11 +61,20 @@ export default function SystemSettings() {
 
   const handleSave = async () => {
     try {
-      // TODO: Integrate with API
-      // await settingsAPI.update(settings);
-      showNotification('Settings saved successfully', 'success');
+      setSaving(true);
+      const response = await api.put('/ceo/system-settings', {
+        email: settings.email,
+        sms: settings.sms,
+        payment: settings.payment
+      });
+      
+      if (response.data.success) {
+        showNotification('Einstellungen erfolgreich gespeichert', 'success');
+      }
     } catch (error) {
-      showNotification('Error saving settings', 'error');
+      showNotification('Fehler beim Speichern der Einstellungen', 'error');
+    } finally {
+      setSaving(false);
     }
   };
 

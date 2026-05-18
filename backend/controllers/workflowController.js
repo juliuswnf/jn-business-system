@@ -30,8 +30,7 @@ export const getAvailableIndustries = async (req, res) => {
     logger.error('Error fetching industries:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch industries',
-      error: error.message
+      message: 'Failed to fetch industries'
     });
   }
 };
@@ -126,8 +125,7 @@ export const enableWorkflow = async (req, res) => {
     logger.error('Error enabling workflow:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to enable workflow',
-      error: error.message
+      message: 'Failed to enable workflow'
     });
   }
 };
@@ -157,8 +155,7 @@ export const getSalonWorkflows = async (req, res) => {
     logger.error('Error fetching workflows:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch workflows',
-      error: error.message
+      message: 'Failed to fetch workflows'
     });
   }
 };
@@ -213,8 +210,7 @@ export const updateWorkflowConfig = async (req, res) => {
     logger.error('Error updating workflow:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update workflow',
-      error: error.message
+      message: 'Failed to update workflow'
     });
   }
 };
@@ -278,8 +274,7 @@ export const createProject = async (req, res) => {
     logger.error('Error creating project:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create project',
-      error: error.message
+      message: 'Failed to create project'
     });
   }
 };
@@ -316,8 +311,7 @@ export const getProjects = async (req, res) => {
     logger.error('Error fetching projects:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch projects',
-      error: error.message
+      message: 'Failed to fetch projects'
     });
   }
 };
@@ -358,8 +352,7 @@ export const getProject = async (req, res) => {
     logger.error('Error fetching project:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch project',
-      error: error.message
+      message: 'Failed to fetch project'
     });
   }
 };
@@ -399,8 +392,7 @@ export const updateProject = async (req, res) => {
     logger.error('Error updating project:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update project',
-      error: error.message
+      message: 'Failed to update project'
     });
   }
 };
@@ -435,8 +427,7 @@ export const deleteProject = async (req, res) => {
     logger.error('Error deleting project:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete project',
-      error: error.message
+      message: 'Failed to delete project'
     });
   }
 };
@@ -464,8 +455,7 @@ export const getProjectStats = async (req, res) => {
     logger.error('Error fetching stats:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch stats',
-      error: error.message
+      message: 'Failed to fetch stats'
     });
   }
 };
@@ -560,8 +550,7 @@ export const createSession = async (req, res) => {
     logger.error('Error creating session:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create session',
-      error: error.message
+      message: 'Failed to create session'
     });
   }
 };
@@ -582,8 +571,7 @@ export const getProjectSessions = async (req, res) => {
     logger.error('Error fetching sessions:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch sessions',
-      error: error.message
+      message: 'Failed to fetch sessions'
     });
   }
 };
@@ -594,15 +582,18 @@ export const updateSession = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid session ID format' });
+    }
+    const safeSessionId = new mongoose.Types.ObjectId(id);
+
     // Prevent updating status directly (use complete/cancel endpoints)
     delete updates.status;
     delete updates.completedAt;
 
-    const session = await WorkflowSession.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    );
+    const session = await WorkflowSession.findById(safeSessionId)
+      .populate('projectId', 'salonId')
+      .maxTimeMS(5000);
 
     if (!session) {
       return res.status(404).json({
@@ -610,6 +601,17 @@ export const updateSession = async (req, res) => {
         message: 'Session not found'
       });
     }
+
+    const ownerSalonId = session.projectId?.salonId || session.salonId;
+    if (req.user?.role !== 'ceo' && ownerSalonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    session.set(updates);
+    await session.save();
 
     logger.info(`Session updated: ${id}`);
 
@@ -622,8 +624,7 @@ export const updateSession = async (req, res) => {
     logger.error('Error updating session:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update session',
-      error: error.message
+      message: 'Failed to update session'
     });
   }
 };
@@ -656,8 +657,7 @@ export const completeSession = async (req, res) => {
     logger.error('Error completing session:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to complete session',
-      error: error.message
+      message: 'Failed to complete session'
     });
   }
 };
@@ -690,8 +690,7 @@ export const uploadSessionPhotos = async (req, res) => {
     logger.error('Error uploading photos:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to upload photos',
-      error: error.message
+      message: 'Failed to upload photos'
     });
   }
 };
@@ -722,8 +721,7 @@ export const deleteSessionPhoto = async (req, res) => {
     logger.error('Error deleting photo:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete photo',
-      error: error.message
+      message: 'Failed to delete photo'
     });
   }
 };
@@ -775,8 +773,7 @@ export const createPackage = async (req, res) => {
     logger.error('Error creating package:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create package',
-      error: error.message
+      message: 'Failed to create package'
     });
   }
 };
@@ -834,8 +831,7 @@ export const getSalonPackages = async (req, res) => {
     logger.error('Error fetching packages:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch packages',
-      error: error.message
+      message: 'Failed to fetch packages'
     });
   }
 };
@@ -844,12 +840,31 @@ export const getSalonPackages = async (req, res) => {
 export const getCustomerPackages = async (req, res) => {
   try {
     const { customerId } = req.params;
-    const { active } = req.query;
+    const { active, salonId: rawSalonId } = req.query;
 
-    const packages = await Package.getCustomerPackages(
-      customerId,
-      active === 'true'
-    );
+    if (!mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customer ID format' });
+    }
+    const safeCustomerId = new mongoose.Types.ObjectId(customerId);
+
+    const query = { customerId: safeCustomerId };
+
+    if (req.user?.role !== 'ceo') {
+      query.salonId = req.user.salonId;
+    } else if (rawSalonId) {
+      if (!mongoose.isValidObjectId(rawSalonId)) {
+        return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+      }
+      query.salonId = new mongoose.Types.ObjectId(rawSalonId);
+    }
+
+    if (active === 'true' || active === 'false') {
+      query.isActive = active === 'true';
+    }
+
+    const packages = await Package.find(query)
+      .sort({ createdAt: -1 })
+      .maxTimeMS(5000);
 
     res.json({
       success: true,
@@ -860,8 +875,7 @@ export const getCustomerPackages = async (req, res) => {
     logger.error('Error fetching customer packages:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch packages',
-      error: error.message
+      message: 'Failed to fetch packages'
     });
   }
 };
@@ -872,7 +886,17 @@ export const usePackageCredit = async (req, res) => {
     const { id } = req.params;
     const { bookingId } = req.body;
 
-    const packageData = await Package.findById(id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid package ID format' });
+    }
+    const safePackageId = new mongoose.Types.ObjectId(id);
+
+    if (bookingId && !mongoose.isValidObjectId(bookingId)) {
+      return res.status(400).json({ success: false, message: 'Invalid booking ID format' });
+    }
+    const safeBookingId = bookingId ? new mongoose.Types.ObjectId(bookingId) : null;
+
+    const packageData = await Package.findById(safePackageId).maxTimeMS(5000);
 
     if (!packageData) {
       return res.status(404).json({
@@ -881,11 +905,18 @@ export const usePackageCredit = async (req, res) => {
       });
     }
 
-    await packageData.useCredit(bookingId);
+    if (req.user?.role !== 'ceo' && packageData.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    await packageData.useCredit(safeBookingId);
 
     // Update booking to reference package
-    if (bookingId) {
-      await Booking.findByIdAndUpdate(bookingId, { packageId: id });
+    if (safeBookingId) {
+      await Booking.findByIdAndUpdate(safeBookingId, { packageId: safePackageId });
     }
 
     logger.info(`Package credit used: ${id}`);
@@ -899,7 +930,7 @@ export const usePackageCredit = async (req, res) => {
     logger.error('Error using package credit:', error);
     res.status(400).json({
       success: false,
-      message: error.message
+      message: 'Failed to use package credit'
     });
   }
 };
@@ -910,11 +941,15 @@ export const updatePackage = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    const packageData = await Package.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    );
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid package ID format' });
+    }
+    const safePackageId = new mongoose.Types.ObjectId(id);
+
+    delete updates.salonId;
+    delete updates.createdBy;
+
+    const packageData = await Package.findById(safePackageId).maxTimeMS(5000);
 
     if (!packageData) {
       return res.status(404).json({
@@ -922,6 +957,16 @@ export const updatePackage = async (req, res) => {
         message: 'Package not found'
       });
     }
+
+    if (req.user?.role !== 'ceo' && packageData.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    packageData.set(updates);
+    await packageData.save();
 
     logger.info(`Package updated: ${id}`);
 
@@ -934,8 +979,7 @@ export const updatePackage = async (req, res) => {
     logger.error('Error updating package:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update package',
-      error: error.message
+      message: 'Failed to update package'
     });
   }
 };
@@ -989,8 +1033,7 @@ export const createMembership = async (req, res) => {
     logger.error('Error creating membership:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create membership',
-      error: error.message
+      message: 'Failed to create membership'
     });
   }
 };
@@ -1016,8 +1059,7 @@ export const getSalonMemberships = async (req, res) => {
     logger.error('Error fetching memberships:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch memberships',
-      error: error.message
+      message: 'Failed to fetch memberships'
     });
   }
 };
@@ -1044,8 +1086,7 @@ export const getCustomerMembership = async (req, res) => {
     logger.error('Error fetching membership:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch membership',
-      error: error.message
+      message: 'Failed to fetch membership'
     });
   }
 };
@@ -1078,8 +1119,7 @@ export const cancelMembership = async (req, res) => {
     logger.error('Error cancelling membership:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to cancel membership',
-      error: error.message
+      message: 'Failed to cancel membership'
     });
   }
 };
@@ -1112,8 +1152,7 @@ export const pauseMembership = async (req, res) => {
     logger.error('Error pausing membership:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to pause membership',
-      error: error.message
+      message: 'Failed to pause membership'
     });
   }
 };
@@ -1189,8 +1228,7 @@ export const getPortfolio = async (req, res) => {
     logger.error('Error fetching portfolio:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch portfolio',
-      error: error.message
+      message: 'Failed to fetch portfolio'
     });
   }
 };

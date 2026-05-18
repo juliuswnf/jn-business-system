@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { captureError } from '../../utils/errorTracking';
+import socketService from '../../services/socketService';
 import {
   Calendar,
   Clock,
@@ -58,10 +59,49 @@ export default function Bookings() {
 
   // Socket.IO real-time updates
   useEffect(() => {
-    // TODO: Add Socket.IO connection when available
-    // socket.on('booking:confirmed', handleBookingConfirmed);
-    // return () => socket.off('booking:confirmed');
+    // Get access token for Socket.IO authentication
+    const token = localStorage.getItem('jnToken') || localStorage.getItem('token');
+    
+    if (token) {
+      // Connect to Socket.IO
+      socketService.connect(token);
+
+      // Subscribe to booking events
+      socketService.on('booking:created', handleBookingUpdate);
+      socketService.on('booking:updated', handleBookingUpdate);
+      socketService.on('booking:confirmed', handleBookingUpdate);
+      socketService.on('booking:cancelled', handleBookingUpdate);
+      socketService.on('booking:noshow', handleBookingUpdate);
+
+      console.log('📡 Subscribed to real-time booking updates');
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (token) {
+        socketService.off('booking:created');
+        socketService.off('booking:updated');
+        socketService.off('booking:confirmed');
+        socketService.off('booking:cancelled');
+        socketService.off('booking:noshow');
+      }
+    };
   }, []);
+
+  /**
+   * Handle real-time booking updates from Socket.IO
+   */
+  const handleBookingUpdate = (data) => {
+    console.log('📡 Received booking update:', data);
+    
+    // Show toast notification
+    if (data.message) {
+      toast.success(data.message);
+    }
+
+    // Reload bookings to reflect changes
+    loadBookings();
+  };
 
   /**
    * Load bookings from API with filters

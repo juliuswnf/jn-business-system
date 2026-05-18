@@ -5,6 +5,7 @@ import ceoMiddleware from '../middleware/ceoMiddleware.js';
 import ceoController from '../controllers/ceoController.js';
 import ceoSubscriptionController from '../controllers/ceoSubscriptionController.js';
 import * as systemController from '../controllers/systemController.js';
+import * as systemSettingsController from '../controllers/systemSettingsController.js';
 import * as ceoAnalyticsController from '../controllers/ceoAnalyticsController.js';
 import * as ceoEmailController from '../controllers/ceoEmailController.js';
 import * as ceoPaymentsController from '../controllers/ceoPaymentsController.js';
@@ -194,5 +195,11 @@ router.get('/backups/:backupId', ceoMiddleware.verifyCEOAuth, ceoBackupsControll
 router.delete('/backups/:backupId', ceoMiddleware.verifyCEOAuth, ceoBackupsController.deleteBackup);
 router.post('/backups/:backupId/restore', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, ceoBackupsController.restoreBackup);
 router.get('/backups/:backupId/download', ceoMiddleware.verifyCEOAuth, ceoBackupsController.downloadBackup);
+
+// ==================== SYSTEM SETTINGS ROUTES ====================
+router.get('/system-settings', ceoMiddleware.verifyCEOAuth, systemSettingsController.getSystemSettings);
+router.put('/system-settings', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, systemSettingsController.updateSystemSettings);
+router.post('/system-settings/test-email', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, systemSettingsController.testEmailSettings);
+router.post('/system-settings/test-sms', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, systemSettingsController.testSMSSettings);
 
 export default router;

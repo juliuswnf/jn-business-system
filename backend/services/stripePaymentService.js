@@ -29,19 +29,27 @@ class StripePaymentService {
 
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+    const requireEnv = (name) => {
+      const value = process.env[name];
+      if (!value) {
+        throw new Error(`${name} env var is missing`);
+      }
+      return value;
+    };
+
     // Stripe Price IDs from .env
     this.priceIds = {
       starter: {
-        monthly: process.env.STRIPE_STARTER_MONTHLY || 'price_1Sa2FXCfgv8Lqc0aJEHE6Y5r',
-        yearly: process.env.STRIPE_STARTER_YEARLY || 'price_1SbpU9Cfgv8Lqc0a2UKslNdB'
+        monthly: requireEnv('STRIPE_STARTER_MONTHLY'),
+        yearly: requireEnv('STRIPE_STARTER_YEARLY')
       },
       professional: {
-        monthly: process.env.STRIPE_PROFESSIONAL_MONTHLY || 'price_1Sa2FzCfgv8Lqc0aU7erudfl',
-        yearly: process.env.STRIPE_PROFESSIONAL_YEARLY || 'price_1SbpUTCfgv8Lqc0aMoJ2EBh4'
+        monthly: requireEnv('STRIPE_PROFESSIONAL_MONTHLY'),
+        yearly: requireEnv('STRIPE_PROFESSIONAL_YEARLY')
       },
       enterprise: {
-        monthly: process.env.STRIPE_ENTERPRISE_MONTHLY || 'price_1SbpSeCfgv8Lqc0aOsHZx11S',
-        yearly: process.env.STRIPE_ENTERPRISE_YEARLY || 'price_1SbpUmCfgv8Lqc0avzsttWvO'
+        monthly: requireEnv('STRIPE_ENTERPRISE_MONTHLY'),
+        yearly: requireEnv('STRIPE_ENTERPRISE_YEARLY')
       }
     };
 

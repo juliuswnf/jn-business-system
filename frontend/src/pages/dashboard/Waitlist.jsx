@@ -11,11 +11,22 @@ export default function Waitlist() {
   const [filter, setFilter] = useState('active'); // active, matched, expired
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
-  const [editForm, setEditForm] = useState({ preferredDate: '', preferredTime: '', notes: '' });
+    const [editForm, setEditForm] = useState({ preferredDate: '', preferredTime: '', notes: '' });
+  const [services, setServices] = useState([]);
+  const [addForm, setAddForm] = useState({
+    customerName: '',
+    customerPhone: '',
+    customerEmail: '',
+    serviceId: '',
+    preferredDate: '',
+    notes: ''
+  });
+  const [submittingAdd, setSubmittingAdd] = useState(false);
 
   // Fetch waitlist
   useEffect(() => {
     fetchWaitlist();
+    fetchServices();
   }, [filter]);
 
   const fetchWaitlist = async () => {

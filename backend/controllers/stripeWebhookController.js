@@ -5,6 +5,7 @@ import logger from '../utils/logger.js';
  */
 
 import Stripe from 'stripe';
+import mongoose from 'mongoose';
 import stripeService from '../services/stripeService.js';
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
@@ -465,7 +466,7 @@ const handlePaymentActionRequired = async (invoice) => {
 const handlePaymentIntentSucceeded = async (paymentIntent) => {
   try {
     const bookingId = paymentIntent.metadata?.bookingId;
-    if (!bookingId) return;
+    if (!bookingId || !mongoose.isValidObjectId(bookingId)) return;
 
     const booking = await Booking.findById(bookingId).maxTimeMS(5000);
     if (!booking) {
