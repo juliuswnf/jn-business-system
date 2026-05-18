@@ -633,7 +633,14 @@ export const signConsent = async (req, res) => {
     const { signature } = req.body;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || 'unknown';
-    const salonId = req.user.salonId || req.salon?._id;
+    const salonId = req.user.salonId;
+
+    if (!salonId) {
+      return res.status(400).json({
+        success: false,
+        error: 'No salon associated with user'
+      });
+    }
 
     const consent = await Consent.findOne({ _id: id, salonId });
     if (!consent) {

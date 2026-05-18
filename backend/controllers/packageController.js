@@ -2,6 +2,7 @@
 import CustomerPackage from '../models/CustomerPackage.js';
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
+import Payment from '../models/Payment.js';
 import logger from '../utils/logger.js';
 import mongoose from 'mongoose';
 
@@ -117,15 +118,71 @@ export const purchasePackage = async (req, res) => {
     const { id } = req.params;
     const { customerId, paymentId } = req.body;
 
-    const pkg = await Package.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid package ID format' });
+    }
+    if (!mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customer ID format' });
+    }
+    if (!paymentId || typeof paymentId !== 'string') {
+      return res.status(400).json({ success: false, message: 'Payment ID is required' });
+    }
+
+    const safePackageId = new mongoose.Types.ObjectId(id);
+    const safeCustomerId = new mongoose.Types.ObjectId(customerId);
+
+    const pkg = await Package.findById(safePackageId).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
+    }
+
+    if (req.user?.role !== 'ceo' && pkg.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
     }
 
     if (!pkg.isActive) {
       return res.status(400).json({
         success: false,
         message: 'Package is not available'
+      });
+    }
+
+    const payment = await Payment.findOne({
+      stripePaymentIntentId: paymentId,
+      status: 'completed'
+    }).maxTimeMS(5000);
+
+    if (!payment) {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment not found or not completed'
+      });
+    }
+
+    if (req.user?.role !== 'ceo' && payment.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Payment belongs to another salon'
+      });
+    }
+
+    const expectedAmount = Number(pkg.price);
+    const paidAmount = Number(payment.amount);
+    if (!Number.isFinite(expectedAmount) || !Number.isFinite(paidAmount) || paidAmount < expectedAmount) {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment amount does not match package price'
+      });
+    }
+
+    const alreadyUsedPayment = await CustomerPackage.findOne({ paymentId }).lean().maxTimeMS(5000);
+    if (alreadyUsedPayment) {
+      return res.status(409).json({
+        success: false,
+        message: 'Payment has already been used for a package purchase'
       });
     }
 
@@ -137,7 +194,7 @@ export const purchasePackage = async (req, res) => {
     // Create customer package
     const customerPackage = await CustomerPackage.create({
       salonId: pkg.salonId,
-      customerId,
+      customerId: safeCustomerId,
       packageId: pkg._id,
       purchasedAt: new Date(),
       purchasePrice: pkg.price,
@@ -175,10 +232,16 @@ export const getCustomerPackages = async (req, res) => {
     }
     const status = ALLOWED_PACKAGE_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
 
+    const safeCustomerId = new mongoose.Types.ObjectId(customerId);
+
     const query = {
-      customerId: new mongoose.Types.ObjectId(customerId),
+      customerId: safeCustomerId,
       deletedAt: null
     };
+
+    if (req.user?.role !== 'ceo') {
+      query.salonId = req.user.salonId;
+    }
 
     if (status) query.status = status;
 
@@ -204,18 +267,45 @@ export const usePackageSession = async (req, res) => {
     const { id } = req.params;
     const { bookingId } = req.body;
 
-    const customerPackage = await CustomerPackage.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid package ID format' });
+    }
+    const safeCustomerPackageId = new mongoose.Types.ObjectId(id);
+
+    if (bookingId && !mongoose.isValidObjectId(bookingId)) {
+      return res.status(400).json({ success: false, message: 'Invalid booking ID format' });
+    }
+    const safeBookingId = bookingId ? new mongoose.Types.ObjectId(bookingId) : null;
+
+    const customerPackage = await CustomerPackage.findById(safeCustomerPackageId).maxTimeMS(5000);
     if (!customerPackage) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
+    if (req.user?.role !== 'ceo' && customerPackage.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    if (safeBookingId) {
+      const booking = await Booking.findById(safeBookingId).maxTimeMS(5000);
+      if (!booking) {
+        return res.status(404).json({ success: false, message: 'Booking not found' });
+      }
+      if (booking.salonId?.toString() !== customerPackage.salonId?.toString()) {
+        return res.status(403).json({ success: false, message: 'Booking belongs to another salon' });
+      }
+    }
+
     // Use session
-    await customerPackage.useSession(bookingId);
+    await customerPackage.useSession(safeBookingId);
 
     // Update booking with package info
-    if (bookingId) {
-      await Booking.findByIdAndUpdate(bookingId, {
-        'packageUsage.packageId': id,
+    if (safeBookingId) {
+      await Booking.findByIdAndUpdate(safeBookingId, {
+        'packageUsage.packageId': safeCustomerPackageId,
         'packageUsage.sessionsUsed': 1
       });
     }
@@ -230,7 +320,7 @@ export const usePackageSession = async (req, res) => {
     logger.error('Error using package session:', error);
     return res.status(400).json({
       success: false,
-      message: error.message || 'Failed to use package session'
+      message: 'Failed to use package session'
     });
   }
 };
@@ -242,9 +332,21 @@ export const cancelPackage = async (req, res) => {
     const { reason } = req.body;
     const userId = req.user.id;
 
-    const customerPackage = await CustomerPackage.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid package ID format' });
+    }
+    const safeCustomerPackageId = new mongoose.Types.ObjectId(id);
+
+    const customerPackage = await CustomerPackage.findById(safeCustomerPackageId).maxTimeMS(5000);
     if (!customerPackage) {
       return res.status(404).json({ success: false, message: 'Package not found' });
+    }
+
+    if (req.user?.role !== 'ceo' && customerPackage.salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
     }
 
     if (customerPackage.status !== 'active') {

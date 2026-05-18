@@ -412,11 +412,31 @@ app.use(errorHandlerMiddleware.globalErrorHandler);
 // Only authenticated users may establish a Socket.IO connection.
 // Events are emitted server-side only from controllers — clients must NOT
 // be able to trigger broadcasts by sending custom events.
+const getCookieValue = (cookieHeader, name) => {
+  if (!cookieHeader || !name) {
+    return null;
+  }
+
+  const cookies = cookieHeader.split(';');
+  const key = `${name}=`;
+
+  for (const cookie of cookies) {
+    const trimmed = cookie.trim();
+    if (trimmed.startsWith(key)) {
+      return decodeURIComponent(trimmed.slice(key.length));
+    }
+  }
+
+  return null;
+};
+
 io.use((socket, next) => {
   try {
+    const cookieToken = getCookieValue(socket.handshake.headers?.cookie, 'accessToken');
     const token =
       socket.handshake.auth?.token ||
-      socket.handshake.headers?.authorization?.replace(/^Bearer\s+/i, '');
+      socket.handshake.headers?.authorization?.replace(/^Bearer\s+/i, '') ||
+      cookieToken;
 
     if (!token) {
       return next(new Error('Authentication required'));

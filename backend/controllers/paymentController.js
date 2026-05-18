@@ -25,6 +25,23 @@ const validateAmount = (amount) => {
   return !isNaN(amount) && amount > 0 && amount <= 999999.99;
 };
 
+const resolveScopedSalonId = (req, rawSalonId) => {
+  if (req.user?.role !== 'ceo') {
+    if (!req.user?.salonId) {
+      return { error: { status: 403, message: 'Access denied - No salon assigned to your account' } };
+    }
+
+    // For non-CEO users always force tenant scope to authenticated salon.
+    return { salonId: req.user.salonId };
+  }
+
+  if (rawSalonId) {
+    return { salonId: new mongoose.Types.ObjectId(rawSalonId) };
+  }
+
+  return { salonId: null };
+};
+
 // ==================== CREATE PAYMENT INTENT ====================
 
 export const createPaymentIntent = async (req, res) => {
@@ -44,8 +61,9 @@ export const createPaymentIntent = async (req, res) => {
         message: 'Invalid booking ID format'
       });
     }
+    const safeBookingId = new mongoose.Types.ObjectId(bookingId);
 
-    const booking = await Booking.findById(bookingId).maxTimeMS(5000);
+    const booking = await Booking.findById(safeBookingId).maxTimeMS(5000);
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -73,7 +91,7 @@ export const createPaymentIntent = async (req, res) => {
       amount: Math.round(expectedAmount * 100),
       currency: 'eur',
       metadata: {
-        bookingId: bookingId.toString()
+        bookingId: safeBookingId.toString()
       }
     });
 
@@ -109,6 +127,24 @@ export const processPayment = async (req, res) => {
       });
     }
 
+    if (!mongoose.isValidObjectId(bookingId)) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid booking ID format'
+      });
+    }
+    const safeBookingId = new mongoose.Types.ObjectId(bookingId);
+
+    const safeAmount = Number(amount);
+    if (!validateAmount(safeAmount)) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid payment amount'
+      });
+    }
+
     const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== 'succeeded') {
@@ -119,8 +155,16 @@ export const processPayment = async (req, res) => {
       });
     }
 
+    if (paymentIntent.amount !== Math.round(safeAmount * 100)) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Payment amount mismatch'
+      });
+    }
+
     // First check booking ownership before processing payment
-    const bookingCheck = await Booking.findById(bookingId).maxTimeMS(5000).session(session);
+    const bookingCheck = await Booking.findById(safeBookingId).maxTimeMS(5000).session(session);
     if (!bookingCheck) {
       await session.abortTransaction();
       return res.status(404).json({
@@ -149,7 +193,7 @@ export const processPayment = async (req, res) => {
 
     // Update booking within transaction
     const booking = await Booking.findByIdAndUpdate(
-      bookingId,
+      safeBookingId,
       {
         status: 'confirmed',
         paymentStatus: 'paid',
@@ -160,8 +204,8 @@ export const processPayment = async (req, res) => {
 
     // Create payment record within transaction
     const [payment] = await Payment.create([{
-      bookingId,
-      amount,
+      bookingId: safeBookingId,
+      amount: safeAmount,
       currency: 'EUR',
       paymentMethod,
       stripePaymentIntentId: paymentIntentId,
@@ -213,14 +257,15 @@ export const getPaymentHistory = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
     const bookingId = rawBookingId ? new mongoose.Types.ObjectId(rawBookingId) : undefined;
-    const salonId = rawSalonId ? new mongoose.Types.ObjectId(rawSalonId) : undefined;
+    const scopedSalon = resolveScopedSalonId(req, rawSalonId);
+    if (scopedSalon.error) {
+      return res.status(scopedSalon.error.status).json({ success: false, message: scopedSalon.error.message });
+    }
 
     let filter = {};
 
-    if (req.user && req.user.role !== 'ceo') {
-      filter.salonId = req.user.salonId || salonId;
-    } else if (salonId) {
-      filter.salonId = salonId;
+    if (scopedSalon.salonId) {
+      filter.salonId = scopedSalon.salonId;
     }
 
     if (bookingId) {
@@ -261,16 +306,19 @@ export const getPaymentHistory = async (req, res) => {
 function computeRefundAmount(payment, requestedAmount) {
   const alreadyRefunded = payment.refundedAmount || 0;
   const maxRefundable = payment.amount - alreadyRefunded;
-  if (requestedAmount) {
-    if (!validateAmount(requestedAmount)) {
-      return { error: 'Invalid refund amount' };
+  const hasRequestedAmount = requestedAmount !== undefined && requestedAmount !== null && requestedAmount !== '';
+  if (hasRequestedAmount) {
+    const normalizedRequestedAmount = Number(requestedAmount);
+
+    if (!validateAmount(normalizedRequestedAmount)) {
+      return { error: 'Invalid refund amount', alreadyRefunded };
     }
-    if (requestedAmount > maxRefundable) {
-      return { error: `Maximum refundable amount is ${maxRefundable.toFixed(2)} EUR` };
+    if (normalizedRequestedAmount > maxRefundable) {
+      return { error: `Maximum refundable amount is ${maxRefundable.toFixed(2)} EUR`, alreadyRefunded };
     }
-    return { refundAmount: requestedAmount, maxRefundable };
+    return { refundAmount: normalizedRequestedAmount, maxRefundable, alreadyRefunded };
   }
-  return { refundAmount: maxRefundable, maxRefundable };
+  return { refundAmount: maxRefundable, maxRefundable, alreadyRefunded };
 }
 
 export const refundPayment = async (req, res) => {
@@ -284,7 +332,15 @@ export const refundPayment = async (req, res) => {
       });
     }
 
-    const payment = await Payment.findById(paymentId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(paymentId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid payment ID format'
+      });
+    }
+    const safePaymentId = new mongoose.Types.ObjectId(paymentId);
+
+    const payment = await Payment.findById(safePaymentId).maxTimeMS(5000);
     if (!payment) {
       return res.status(404).json({
         success: false,
@@ -319,11 +375,11 @@ export const refundPayment = async (req, res) => {
     }
 
     // Calculate refundable amount
-    const { refundAmount, maxRefundable, error: amountError } = computeRefundAmount(payment, amount);
+    const { refundAmount, maxRefundable, alreadyRefunded, error: amountError } = computeRefundAmount(payment, amount);
     if (amountError) {
       return res.status(400).json({ success: false, message: amountError });
     }
-    const isPartialRefund = amount && amount < maxRefundable;
+    const isPartialRefund = refundAmount < maxRefundable;
 
     // Create refund with Stripe first (external side-effect before DB writes)
     const refund = await getStripe().refunds.create({
@@ -343,7 +399,7 @@ export const refundPayment = async (req, res) => {
       session.startTransaction();
 
       updatedPayment = await Payment.findByIdAndUpdate(
-        paymentId,
+        safePaymentId,
         {
           status: isFullyRefunded ? 'refunded' : 'partially_refunded',
           refundId: refund.id,
@@ -414,22 +470,32 @@ export const getRevenueAnalytics = async (req, res) => {
     if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
-    const salonId = rawSalonId ? new mongoose.Types.ObjectId(rawSalonId) : undefined;
+    const scopedSalon = resolveScopedSalonId(req, rawSalonId);
+    if (scopedSalon.error) {
+      return res.status(scopedSalon.error.status).json({ success: false, message: scopedSalon.error.message });
+    }
+
     let filter = { status: 'completed' };
 
-    if (req.user && req.user.role !== 'ceo') {
-      filter.salonId = req.user.salonId || salonId;
-    } else if (salonId) {
-      filter.salonId = salonId;
+    if (scopedSalon.salonId) {
+      filter.salonId = scopedSalon.salonId;
     }
 
     if (startDate || endDate) {
       filter.createdAt = {};
       if (startDate) {
-        filter.createdAt.$gte = new Date(startDate);
+        const safeStartDate = new Date(startDate);
+        if (isNaN(safeStartDate.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid startDate format' });
+        }
+        filter.createdAt.$gte = safeStartDate;
       }
       if (endDate) {
-        filter.createdAt.$lte = new Date(endDate);
+        const safeEndDate = new Date(endDate);
+        if (isNaN(safeEndDate.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid endDate format' });
+        }
+        filter.createdAt.$lte = safeEndDate;
       }
     }
 
@@ -587,7 +653,15 @@ export const getPaymentDetails = async (req, res) => {
   try {
     const { paymentId } = req.params;
 
-    const payment = await Payment.findById(paymentId)
+    if (!mongoose.isValidObjectId(paymentId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid payment ID format'
+      });
+    }
+    const safePaymentId = new mongoose.Types.ObjectId(paymentId);
+
+    const payment = await Payment.findById(safePaymentId)
       .populate('bookingId', 'salonId').maxTimeMS(5000);
 
     if (!payment) {

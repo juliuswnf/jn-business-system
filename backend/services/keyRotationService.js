@@ -9,11 +9,72 @@ import cron from 'node-cron';
  * HIPAA requires regular key rotation for PHI encryption
  */
 
+const getRequiredHexKey = (envName) => {
+  const raw = process.env[envName];
+  if (!raw) {
+    throw new Error(`${envName} environment variable is required`);
+  }
+
+  const normalized = raw.trim();
+  if (!/^[a-fA-F0-9]{64}$/.test(normalized)) {
+    throw new Error(`${envName} must be a 64-character hex string`);
+  }
+
+  return normalized;
+};
+
+const getOptionalHexKey = (envName) => {
+  const raw = process.env[envName];
+  if (!raw) {
+    return null;
+  }
+
+  const normalized = raw.trim();
+  if (!/^[a-fA-F0-9]{64}$/.test(normalized)) {
+    throw new Error(`${envName} must be a 64-character hex string`);
+  }
+
+  return normalized;
+};
+
+const parseRotationVersion = (rawValue, envName) => {
+  if (!rawValue) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(String(rawValue), 10);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    throw new Error(`${envName} must be a positive integer`);
+  }
+
+  return parsed;
+};
+
+const KEY_ROTATION_ENABLED = process.env.KEY_ROTATION_ENABLED === 'true';
+
+const getRotationCandidateFromEnv = () => {
+  const key = getOptionalHexKey('ENCRYPTION_KEY_NEXT');
+  const version = parseRotationVersion(process.env.ENCRYPTION_KEY_NEXT_VERSION, 'ENCRYPTION_KEY_NEXT_VERSION');
+
+  if (!key && !version) {
+    return null;
+  }
+
+  if (!key || !version) {
+    throw new Error('ENCRYPTION_KEY_NEXT and ENCRYPTION_KEY_NEXT_VERSION must both be set for rotation');
+  }
+
+  return {
+    key,
+    version
+  };
+};
+
 // Key storage (in production, use AWS KMS or Azure Key Vault)
 let ENCRYPTION_KEYS = {
   current: {
     version: 1,
-    key: process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex'),
+    key: getRequiredHexKey('ENCRYPTION_KEY'),
     createdAt: new Date(),
     rotatedAt: null
   },
@@ -145,12 +206,29 @@ function getKeyByVersion(version) {
  */
 export async function rotateKeys() {
   try {
+    if (!KEY_ROTATION_ENABLED) {
+      throw new Error('Key rotation is disabled. Set KEY_ROTATION_ENABLED=true only after secure vault setup.');
+    }
+
     logger.info('Starting encryption key rotation...');
+
+    const rotationCandidate = getRotationCandidateFromEnv();
+    if (!rotationCandidate) {
+      throw new Error('Missing ENCRYPTION_KEY_NEXT/ENCRYPTION_KEY_NEXT_VERSION for key rotation');
+    }
+
+    if (rotationCandidate.version <= ENCRYPTION_KEYS.current.version) {
+      throw new Error('ENCRYPTION_KEY_NEXT_VERSION must be greater than current key version');
+    }
+
+    if (rotationCandidate.key === ENCRYPTION_KEYS.current.key) {
+      throw new Error('ENCRYPTION_KEY_NEXT must be different from current ENCRYPTION_KEY');
+    }
 
     // Generate new key
     const newKey = {
-      version: ENCRYPTION_KEYS.current.version + 1,
-      key: crypto.randomBytes(32).toString('hex'),
+      version: rotationCandidate.version,
+      key: rotationCandidate.key,
       createdAt: new Date(),
       rotatedAt: null
     };
@@ -264,14 +342,18 @@ async function reEncryptAllData(oldVersion, newVersion) {
  * Store keys securely (production implementation)
  */
 async function storeKeysSecurely(_keys) {
+  const hasManagedKmsConfig = Boolean(process.env.KMS_KEY_ID || process.env.KEY_VAULT_URL);
+  if (!hasManagedKmsConfig) {
+    throw new Error('Secure key storage is not configured (KMS_KEY_ID or KEY_VAULT_URL required)');
+  }
+
   // In production, use:
   // - AWS KMS (Key Management Service)
   // - Azure Key Vault
   // - Google Cloud KMS
   // - HashiCorp Vault
 
-  // For now, log warning
-  logger.warn('PRODUCTION WARNING: Keys should be stored in secure vault (AWS KMS, Azure Key Vault, etc.)');
+  logger.info('Secure key storage configuration detected for rotation');
 
   // Example AWS KMS integration:
   /*
@@ -297,6 +379,11 @@ async function storeKeysSecurely(_keys) {
  * Schedule automatic key rotation (monthly)
  */
 export function scheduleKeyRotation() {
+  if (!KEY_ROTATION_ENABLED) {
+    logger.info('Encryption key rotation scheduler disabled (KEY_ROTATION_ENABLED is not true)');
+    return;
+  }
+
   // Run on 1st day of each month at 2 AM
   cron.schedule('0 2 1 * *', async () => {
     logger.info('Scheduled key rotation triggered');

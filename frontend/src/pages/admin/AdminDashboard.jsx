@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { CalendarIcon, UsersIcon, CogIcon, CodeBracketIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
 import { api } from '../../utils/api';
+import { useAuth } from '../../hooks/useAuth';
 
 async function loadSetupProgress(setSetupProgress) {
   try {
@@ -34,6 +35,7 @@ async function loadSetupProgress(setSetupProgress) {
 }
 
 const AdminDashboard = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     todayBookings: 0,
     upcomingBookings: 0,
@@ -51,7 +53,6 @@ const AdminDashboard = () => {
     hasFirstBooking: false
   });
   const [showSetup, setShowSetup] = useState(true);
-  const user = JSON.parse(localStorage.getItem('jnUser') || localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     fetchStats();
@@ -114,7 +115,7 @@ const AdminDashboard = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Business Kontrollpanel</h1>
-          <p className="text-gray-500 mt-2">Willkommen, {user.name || 'Admin'}</p>
+          <p className="text-gray-500 mt-2">Willkommen, {user?.name || 'Admin'}</p>
         </div>
 
         {loading ? (

@@ -253,12 +253,18 @@ progressEntrySchema.methods.getWeightChange = async function() {
 /**
  * Get progress summary for date range
  */
-progressEntrySchema.statics.getProgressSummary = async function(customerId, startDate, endDate) {
-  const entries = await this.find({
+progressEntrySchema.statics.getProgressSummary = async function(customerId, startDate, endDate, salonId = null) {
+  const query = {
     customerId,
     recordedAt: { $gte: startDate, $lte: endDate },
     deletedAt: null
-  }).sort({ recordedAt: 1 });
+  };
+
+  if (salonId) {
+    query.salonId = salonId;
+  }
+
+  const entries = await this.find(query).sort({ recordedAt: 1 });
 
   if (entries.length === 0) return null;
 

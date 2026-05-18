@@ -3,8 +3,10 @@ import { api } from '../../utils/api';
 import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { Clock, Users, Star, AlertCircle, CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function Waitlist() {
+  const { user, isLoading: authLoading } = useAuth();
   const [waitlist, setWaitlist] = useState([]);
   const [stats, setStats] = useState({ total: 0, highPriority: 0, mediumPriority: 0, lowPriority: 0 });
   const [loading, setLoading] = useState(true);
@@ -25,17 +27,18 @@ export default function Waitlist() {
 
   // Fetch waitlist
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
     fetchWaitlist();
     fetchServices();
-  }, [filter]);
+  }, [filter, authLoading, user?.salonId]);
 
   const fetchWaitlist = async () => {
     try {
       setLoading(true);
-      // Try both keys for user data (jnUser is standard, user is fallback)
-      const userStr = localStorage.getItem('jnUser') || localStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : {};
-      const salonId = user.salonId;
+      const salonId = user?.salonId;
 
       if (!salonId) {
         toast.error('Kein Salon zugeordnet');

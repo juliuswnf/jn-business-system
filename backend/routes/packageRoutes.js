@@ -26,10 +26,10 @@ router.post('/', protect, checkFeatureAccess('servicePackages'), createPackage);
 router.get('/salon/:salonId', getAvailablePackages);
 
 // Purchase package (Public/Protected)
-router.post('/:id/purchase', purchasePackage);
+router.post('/:id/purchase', protect, checkFeatureAccess('servicePackages'), purchasePackage);
 
 // Get customer's purchased packages (Public/Protected)
-router.get('/customer/:customerId', getCustomerPackages);
+router.get('/customer/:customerId', protect, checkFeatureAccess('servicePackages'), getCustomerPackages);
 
 // Use session from package (Protected)
 router.post('/customer-package/:id/use', protect, checkFeatureAccess('servicePackages'), usePackageSession);

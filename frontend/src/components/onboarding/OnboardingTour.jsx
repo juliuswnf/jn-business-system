@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 /**
  * Interactive Onboarding Tour Component
@@ -319,17 +320,24 @@ export default function OnboardingTour({ onComplete, onSkip }) {
  * Hook to check if tour should be shown
  */
 export function useTourStatus() {
+  const { user, isLoading } = useAuth();
   const [shouldShowTour, setShouldShowTour] = useState(false);
 
   useEffect(() => {
-    const tourCompleted = localStorage.getItem('jn_tour_completed');
-    const user = JSON.parse(localStorage.getItem('jnUser') || '{}');
-    
-    // Show tour for salon owners who haven't completed it
-    if (user.role === 'salon_owner' && !tourCompleted) {
-      setShouldShowTour(true);
+    if (isLoading) {
+      return;
     }
-  }, []);
+
+    const tourCompleted = localStorage.getItem('jn_tour_completed');
+
+    // Show tour for salon owners who haven't completed it
+    if (user?.role === 'salon_owner' && !tourCompleted) {
+      setShouldShowTour(true);
+      return;
+    }
+
+    setShouldShowTour(false);
+  }, [isLoading, user?.role]);
 
   const resetTour = () => {
     localStorage.removeItem('jn_tour_completed');

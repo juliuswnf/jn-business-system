@@ -274,7 +274,12 @@ export const incrementViews = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await ArtistPortfolio.findByIdAndUpdate(id, {
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid portfolio ID format' });
+    }
+    const safeId = new mongoose.Types.ObjectId(id);
+
+    await ArtistPortfolio.findByIdAndUpdate(safeId, {
       $inc: { views: 1 }
     });
 
@@ -290,11 +295,20 @@ export const incrementLikes = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid portfolio ID format' });
+    }
+    const safeId = new mongoose.Types.ObjectId(id);
+
     const portfolioItem = await ArtistPortfolio.findByIdAndUpdate(
-      id,
+      safeId,
       { $inc: { likes: 1 } },
       { new: true }
     );
+
+    if (!portfolioItem) {
+      return res.status(404).json({ success: false, message: 'Portfolio item not found' });
+    }
 
     return res.json({
       success: true,

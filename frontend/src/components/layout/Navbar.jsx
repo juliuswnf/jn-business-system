@@ -11,12 +11,6 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = async () => {
-    localStorage.removeItem('jnAuthToken');
-    localStorage.removeItem('jnUser');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('tempUser');
     await logout();
     setShowUserMenu(false);
     window.location.replace('/');

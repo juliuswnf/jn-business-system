@@ -21,11 +21,11 @@ const router = express.Router();
 // Create resource (Protected - Salon owner only)
 router.post('/', protect, createResource);
 
-// Get all resources for a salon (Public/Protected)
-router.get('/salon/:salonId', getSalonResources);
+// Get all resources for a salon (Protected - management)
+router.get('/salon/:salonId', protect, getSalonResources);
 
-// Get resource by ID (Public/Protected)
-router.get('/:id', getResourceById);
+// Get resource by ID (Protected - management)
+router.get('/:id', protect, getResourceById);
 
 // Check resource availability (Public - For booking flow)
 router.get('/:id/availability', checkResourceAvailability);

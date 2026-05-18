@@ -1,6 +1,7 @@
 import BAA from '../models/BAA.js';
 import cloudinary from '../utils/cloudinaryHelper.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 /**
  * Compliance Controller
@@ -96,18 +97,38 @@ export const createBaa = async (req, res) => {
  */
 export const updateBaa = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updates = req.body;
+    const { id: rawId } = req.params;
+    if (!rawId || !mongoose.isValidObjectId(rawId)) {
+      return res.status(400).json({ success: false, message: 'Invalid BAA id' });
+    }
 
-    const baa = await BAA.findByIdAndUpdate(
-      id,
+    const baaId = new mongoose.Types.ObjectId(rawId);
+    const baaFilter = { _id: baaId };
+
+    if (req.user.role !== 'ceo') {
+      if (!req.user.salonId) {
+        return res.status(403).json({ success: false, message: 'Salon context required' });
+      }
+      baaFilter.salonId = req.user.salonId;
+    }
+
+    const updates = { ...req.body };
+    delete updates._id;
+    delete updates.salonId;
+    delete updates.createdBy;
+    delete updates.lastReviewedBy;
+    delete updates.terminatedDate;
+    delete updates.terminationReason;
+
+    const baa = await BAA.findOneAndUpdate(
+      baaFilter,
       {
         ...updates,
         lastReviewedDate: new Date(),
         lastReviewedBy: req.user.id
       },
-      { new: true }
-    );
+      { new: true, runValidators: true }
+    ).maxTimeMS(5000);
 
     if (!baa) {
       return res.status(404).json({
@@ -135,10 +156,24 @@ export const updateBaa = async (req, res) => {
  */
 export const renewBaa = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id: rawId } = req.params;
     const { newExpirationDate } = req.body;
 
-    const baa = await BAA.findById(id).maxTimeMS(5000);
+    if (!rawId || !mongoose.isValidObjectId(rawId)) {
+      return res.status(400).json({ success: false, message: 'Invalid BAA id' });
+    }
+
+    const baaId = new mongoose.Types.ObjectId(rawId);
+    const baaFilter = { _id: baaId };
+
+    if (req.user.role !== 'ceo') {
+      if (!req.user.salonId) {
+        return res.status(403).json({ success: false, message: 'Salon context required' });
+      }
+      baaFilter.salonId = req.user.salonId;
+    }
+
+    const baa = await BAA.findOne(baaFilter).maxTimeMS(5000);
     if (!baa) {
       return res.status(404).json({
         success: false,
@@ -175,18 +210,32 @@ export const renewBaa = async (req, res) => {
  */
 export const terminateBaa = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id: rawId } = req.params;
     const { reason } = req.body;
 
-    const baa = await BAA.findByIdAndUpdate(
-      id,
+    if (!rawId || !mongoose.isValidObjectId(rawId)) {
+      return res.status(400).json({ success: false, message: 'Invalid BAA id' });
+    }
+
+    const baaId = new mongoose.Types.ObjectId(rawId);
+    const baaFilter = { _id: baaId };
+
+    if (req.user.role !== 'ceo') {
+      if (!req.user.salonId) {
+        return res.status(403).json({ success: false, message: 'Salon context required' });
+      }
+      baaFilter.salonId = req.user.salonId;
+    }
+
+    const baa = await BAA.findOneAndUpdate(
+      baaFilter,
       {
         status: 'terminated',
         terminatedDate: new Date(),
         terminationReason: reason
       },
-      { new: true }
-    );
+      { new: true, runValidators: true }
+    ).maxTimeMS(5000);
 
     if (!baa) {
       return res.status(404).json({

@@ -1,10 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { UIContext } from '../../context/UIContext';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function Sidebar() {
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const { user } = useAuth();
   const { sidebarOpen, closeSidebar } = useContext(UIContext);
 
   const isActive = (path) => location.pathname === path;
@@ -48,7 +49,7 @@ export default function Sidebar() {
           </h3>
 
           {menuItems.map((item) => {
-            const show = item.role === 'customer' || user.role === item.role;
+            const show = item.role === 'customer' || user?.role === item.role;
 
             return show ? (
               <Link

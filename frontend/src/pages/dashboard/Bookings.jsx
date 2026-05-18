@@ -59,32 +59,26 @@ export default function Bookings() {
 
   // Socket.IO real-time updates
   useEffect(() => {
-    // Get access token for Socket.IO authentication
-    const token = localStorage.getItem('jnToken') || localStorage.getItem('token');
-    
-    if (token) {
-      // Connect to Socket.IO
-      socketService.connect(token);
+    // Connect using HTTP-only cookie auth (no client-side token storage).
+    socketService.connect();
 
-      // Subscribe to booking events
-      socketService.on('booking:created', handleBookingUpdate);
-      socketService.on('booking:updated', handleBookingUpdate);
-      socketService.on('booking:confirmed', handleBookingUpdate);
-      socketService.on('booking:cancelled', handleBookingUpdate);
-      socketService.on('booking:noshow', handleBookingUpdate);
+    // Subscribe to booking events
+    socketService.on('booking:created', handleBookingUpdate);
+    socketService.on('booking:updated', handleBookingUpdate);
+    socketService.on('booking:confirmed', handleBookingUpdate);
+    socketService.on('booking:cancelled', handleBookingUpdate);
+    socketService.on('booking:noshow', handleBookingUpdate);
 
-      console.log('📡 Subscribed to real-time booking updates');
-    }
+    console.log('📡 Subscribed to real-time booking updates');
 
     // Cleanup on unmount
     return () => {
-      if (token) {
-        socketService.off('booking:created');
-        socketService.off('booking:updated');
-        socketService.off('booking:confirmed');
-        socketService.off('booking:cancelled');
-        socketService.off('booking:noshow');
-      }
+      socketService.off('booking:created');
+      socketService.off('booking:updated');
+      socketService.off('booking:confirmed');
+      socketService.off('booking:cancelled');
+      socketService.off('booking:noshow');
+      socketService.disconnect();
     };
   }, []);
 

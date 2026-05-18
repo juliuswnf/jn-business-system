@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { authAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';
+import { useAuth } from '../../hooks/useAuth';
 
 const EmailVerification = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { showNotification } = useNotification();
+  const { user } = useAuth();
   
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,6 +18,15 @@ const EmailVerification = () => {
   const [resendLoading, setResendLoading] = useState(false);
 
   const token = searchParams.get('token');
+
+  const getPostVerificationRoute = () => {
+    if (user?.role === 'ceo') return '/ceo/dashboard';
+    if (user?.role === 'admin') return '/admin/dashboard';
+    if (user?.role === 'employee') return '/employee/dashboard';
+    if (user?.role === 'salon_owner') return '/dashboard';
+    if (user?.role === 'customer') return '/customer/dashboard';
+    return '/login';
+  };
 
   useEffect(() => {
     if (token) {
@@ -30,8 +41,7 @@ const EmailVerification = () => {
       if (response.data.success) {
         showNotification('E-Mail erfolgreich bestätigt!', 'success');
         setTimeout(() => {
-          const user = JSON.parse(localStorage.getItem('user') || '{}');
-          navigate(`/${user.role || 'customer'}/dashboard`);
+          navigate(getPostVerificationRoute());
         }, 1500);
       }
     } catch (error) {
@@ -56,8 +66,7 @@ const EmailVerification = () => {
       if (response.data.success) {
         showNotification('E-Mail erfolgreich bestätigt!', 'success');
         setTimeout(() => {
-          const user = JSON.parse(localStorage.getItem('user') || '{}');
-          navigate(`/${user.role || 'customer'}/dashboard`);
+          navigate(getPostVerificationRoute());
         }, 1500);
       }
     } catch (error) {

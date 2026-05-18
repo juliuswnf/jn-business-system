@@ -11,6 +11,9 @@ import mongoose from 'mongoose';
 
 const ALLOWED_INDUSTRIES = ['tattoo', 'salon', 'barbershop', 'medical', 'wellness', 'fitness', 'nail', 'beauty', 'spa', 'piercing', 'aesthetics'];
 const ALLOWED_PACKAGE_TYPES = ['session', 'treatment', 'membership', 'bundle', 'subscription', 'custom'];
+const hasSalonAccess = (req, salonId) => {
+  return req.user?.role === 'ceo' || salonId?.toString() === req.user?.salonId?.toString();
+};
 
 /**
  * ==================== WORKFLOW MANAGEMENT ====================
@@ -361,18 +364,24 @@ export const getProject = async (req, res) => {
 export const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid project ID format' });
+    }
+    const safeProjectId = new mongoose.Types.ObjectId(id);
+    const updates = { ...req.body };
 
     // Prevent updating auto-calculated fields
+    delete updates._id;
+    delete updates.salonId;
+    delete updates.customerId;
+    delete updates.completedDate;
+    delete updates.completedBy;
+    delete updates.deletedAt;
+    delete updates.deletedBy;
     delete updates.progress;
     delete updates.completedSessions;
-    delete updates.completedDate;
 
-    const project = await WorkflowProject.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    );
+    const project = await WorkflowProject.findById(safeProjectId).maxTimeMS(5000);
 
     if (!project) {
       return res.status(404).json({
@@ -380,6 +389,16 @@ export const updateProject = async (req, res) => {
         message: 'Project not found'
       });
     }
+
+    if (!hasSalonAccess(req, project.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    project.set(updates);
+    await project.save();
 
     logger.info(`Project updated: ${id}`);
 
@@ -401,13 +420,24 @@ export const updateProject = async (req, res) => {
 export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid project ID format' });
+    }
+    const safeProjectId = new mongoose.Types.ObjectId(id);
 
-    const project = await WorkflowProject.findById(id);
+    const project = await WorkflowProject.findById(safeProjectId).maxTimeMS(5000);
 
     if (!project) {
       return res.status(404).json({
         success: false,
         message: 'Project not found'
+      });
+    }
+
+    if (!hasSalonAccess(req, project.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -479,10 +509,13 @@ export const createSession = async (req, res) => {
       bookingData
     } = req.body;
 
-    const salonId = req.user.salonId;
+    if (!mongoose.isValidObjectId(projectId)) {
+      return res.status(400).json({ success: false, message: 'Invalid project ID format' });
+    }
+    const safeProjectId = new mongoose.Types.ObjectId(projectId);
 
     // Get project
-    const project = await WorkflowProject.findById(projectId);
+    const project = await WorkflowProject.findById(safeProjectId).maxTimeMS(5000);
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -490,13 +523,22 @@ export const createSession = async (req, res) => {
       });
     }
 
+    if (!hasSalonAccess(req, project.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    const salonId = project.salonId;
+
     let session, booking;
 
     if (createBooking && bookingData) {
       // Create session with auto-booking
       const result = await WorkflowSession.createWithBooking(
         {
-          projectId,
+          projectId: safeProjectId,
           salonId,
           sessionNumber,
           phase,
@@ -518,7 +560,7 @@ export const createSession = async (req, res) => {
     } else {
       // Create session without booking
       session = await WorkflowSession.create({
-        projectId,
+        projectId: safeProjectId,
         salonId,
         sessionNumber,
         phase,
@@ -560,7 +602,30 @@ export const getProjectSessions = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    const sessions = await WorkflowSession.getProjectSessions(projectId);
+    if (!mongoose.isValidObjectId(projectId)) {
+      return res.status(400).json({ success: false, message: 'Invalid project ID format' });
+    }
+    const safeProjectId = new mongoose.Types.ObjectId(projectId);
+
+    const project = await WorkflowProject.findById(safeProjectId)
+      .select('salonId')
+      .maxTimeMS(5000);
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+
+    if (!hasSalonAccess(req, project.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    const sessions = await WorkflowSession.getProjectSessions(safeProjectId);
 
     res.json({
       success: true,
@@ -635,12 +700,27 @@ export const completeSession = async (req, res) => {
     const { id } = req.params;
     const { progress, notes } = req.body;
 
-    const session = await WorkflowSession.findById(id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid session ID format' });
+    }
+    const safeSessionId = new mongoose.Types.ObjectId(id);
+
+    const session = await WorkflowSession.findById(safeSessionId)
+      .populate('projectId', 'salonId')
+      .maxTimeMS(5000);
 
     if (!session) {
       return res.status(404).json({
         success: false,
         message: 'Session not found'
+      });
+    }
+
+    const ownerSalonId = session.projectId?.salonId || session.salonId;
+    if (!hasSalonAccess(req, ownerSalonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -668,12 +748,27 @@ export const uploadSessionPhotos = async (req, res) => {
     const { id } = req.params;
     const { photos } = req.body; // Array of { url, type, caption }
 
-    const session = await WorkflowSession.findById(id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid session ID format' });
+    }
+    const safeSessionId = new mongoose.Types.ObjectId(id);
+
+    const session = await WorkflowSession.findById(safeSessionId)
+      .populate('projectId', 'salonId')
+      .maxTimeMS(5000);
 
     if (!session) {
       return res.status(404).json({
         success: false,
         message: 'Session not found'
+      });
+    }
+
+    const ownerSalonId = session.projectId?.salonId || session.salonId;
+    if (!hasSalonAccess(req, ownerSalonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -700,12 +795,27 @@ export const deleteSessionPhoto = async (req, res) => {
   try {
     const { id, photoId } = req.params;
 
-    const session = await WorkflowSession.findById(id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid session ID format' });
+    }
+    const safeSessionId = new mongoose.Types.ObjectId(id);
+
+    const session = await WorkflowSession.findById(safeSessionId)
+      .populate('projectId', 'salonId')
+      .maxTimeMS(5000);
 
     if (!session) {
       return res.status(404).json({
         success: false,
         message: 'Session not found'
+      });
+    }
+
+    const ownerSalonId = session.projectId?.salonId || session.salonId;
+    if (!hasSalonAccess(req, ownerSalonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -781,12 +891,24 @@ export const createPackage = async (req, res) => {
 // GET /api/packages/:salonId - Get salon packages
 export const getSalonPackages = async (req, res) => {
   try {
-    const { salonId } = req.params;
+    const { salonId: rawSalonIdPkg } = req.params;
 
-    if (!salonId) {
+    if (!rawSalonIdPkg) {
       return res.status(400).json({
         success: false,
         message: 'Salon ID is required'
+      });
+    }
+
+    if (!mongoose.isValidObjectId(rawSalonIdPkg)) {
+      return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+    }
+    const safeSalonIdPkg = new mongoose.Types.ObjectId(rawSalonIdPkg);
+
+    if (!hasSalonAccess(req, safeSalonIdPkg)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -912,11 +1034,42 @@ export const usePackageCredit = async (req, res) => {
       });
     }
 
+    let booking = null;
+    if (safeBookingId) {
+      booking = await Booking.findById(safeBookingId)
+        .select('salonId')
+        .maxTimeMS(5000);
+
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: 'Booking not found'
+        });
+      }
+
+      if (!hasSalonAccess(req, booking.salonId)) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied - Resource belongs to another salon'
+        });
+      }
+
+      if (booking.salonId?.toString() !== packageData.salonId?.toString()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Booking and package must belong to the same salon'
+        });
+      }
+    }
+
     await packageData.useCredit(safeBookingId);
 
     // Update booking to reference package
-    if (safeBookingId) {
-      await Booking.findByIdAndUpdate(safeBookingId, { packageId: safePackageId });
+    if (booking) {
+      await Booking.findOneAndUpdate(
+        { _id: safeBookingId, salonId: packageData.salonId },
+        { packageId: safePackageId }
+      ).maxTimeMS(5000);
     }
 
     logger.info(`Package credit used: ${id}`);
@@ -1097,12 +1250,24 @@ export const cancelMembership = async (req, res) => {
     const { id } = req.params;
     const { reason } = req.body;
 
-    const membership = await Membership.findById(id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid membership ID format' });
+    }
+    const safeMembershipId = new mongoose.Types.ObjectId(id);
+
+    const membership = await Membership.findById(safeMembershipId).maxTimeMS(5000);
 
     if (!membership) {
       return res.status(404).json({
         success: false,
         message: 'Membership not found'
+      });
+    }
+
+    if (!hasSalonAccess(req, membership.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -1130,12 +1295,24 @@ export const pauseMembership = async (req, res) => {
     const { id } = req.params;
     const { reason } = req.body;
 
-    const membership = await Membership.findById(id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid membership ID format' });
+    }
+    const safeMembershipId = new mongoose.Types.ObjectId(id);
+
+    const membership = await Membership.findById(safeMembershipId).maxTimeMS(5000);
 
     if (!membership) {
       return res.status(404).json({
         success: false,
         message: 'Membership not found'
+      });
+    }
+
+    if (!hasSalonAccess(req, membership.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
       });
     }
 

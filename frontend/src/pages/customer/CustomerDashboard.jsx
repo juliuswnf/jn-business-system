@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { bookingAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';
 import { CalendarIcon, ClockIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../../hooks/useAuth';
 
 const CustomerDashboard = () => {
+  const { user } = useAuth();
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [pastBookings, setPastBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const { success, error } = useNotification();
 
@@ -51,7 +52,7 @@ const CustomerDashboard = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Meine Termine</h1>
-        <p className="text-sm text-gray-400 mt-1">Willkommen zurück, {user.name}!</p>
+        <p className="text-sm text-gray-400 mt-1">Willkommen zurück, {user?.name || 'Kunde'}!</p>
       </div>
 
       {/* Upcoming Bookings */}

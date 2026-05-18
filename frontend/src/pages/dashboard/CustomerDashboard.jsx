@@ -3,20 +3,16 @@ import { Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, User, ChevronRight } from 'lucide-react';
 import { bookingAPI, formatError } from '../../utils/api';
 import { useNotification } from '../../hooks/useNotification';
+import { useAuth } from '../../hooks/useAuth';
 
 const CustomerDashboard = () => {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
     const load = async () => {
       try {
         setLoading(true);

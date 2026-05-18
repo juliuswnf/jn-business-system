@@ -155,7 +155,18 @@ export const getClientProgressHistory = async (req, res) => {
     if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
-    const salonId = rawSalonId || null;
+    let salonId = null;
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied' });
+      }
+      if (rawSalonId && rawSalonId !== req.user.salonId?.toString()) {
+        return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+      }
+      salonId = new mongoose.Types.ObjectId(req.user.salonId);
+    } else if (rawSalonId) {
+      salonId = new mongoose.Types.ObjectId(rawSalonId);
+    }
 
     const query = {
       customerId,
@@ -207,8 +218,31 @@ export const getClientProgressHistory = async (req, res) => {
 // ==================== GET PROGRESS SUMMARY ====================
 export const getProgressSummary = async (req, res) => {
   try {
-    const { customerId } = req.params;
+    const { customerId: rawCustomerId } = req.params;
     const { startDate, endDate } = req.query;
+
+    if (!rawCustomerId || !mongoose.isValidObjectId(rawCustomerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+    const customerId = new mongoose.Types.ObjectId(rawCustomerId);
+
+    const rawSalonId = req.query.salonId;
+    if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    let salonId = null;
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied' });
+      }
+      if (rawSalonId && rawSalonId !== req.user.salonId?.toString()) {
+        return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+      }
+      salonId = new mongoose.Types.ObjectId(req.user.salonId);
+    } else if (rawSalonId) {
+      salonId = new mongoose.Types.ObjectId(rawSalonId);
+    }
 
     if (!startDate || !endDate) {
       return res.status(400).json({
@@ -217,10 +251,21 @@ export const getProgressSummary = async (req, res) => {
       });
     }
 
+    if (typeof startDate !== 'string' || typeof endDate !== 'string') {
+      return res.status(400).json({ success: false, message: 'Invalid date range' });
+    }
+
+    const safeStartDate = new Date(startDate);
+    const safeEndDate = new Date(endDate);
+    if (isNaN(safeStartDate.getTime()) || isNaN(safeEndDate.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid date range' });
+    }
+
     const summary = await ProgressEntry.getProgressSummary(
       customerId,
-      new Date(startDate),
-      new Date(endDate)
+      safeStartDate,
+      safeEndDate,
+      salonId
     );
 
     if (!summary) {
@@ -329,7 +374,18 @@ export const getWeightTrend = async (req, res) => {
     if (rawSalonId && !mongoose.isValidObjectId(rawSalonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
-    const salonId = rawSalonId || null;
+    let salonId = null;
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied' });
+      }
+      if (rawSalonId && rawSalonId !== req.user.salonId?.toString()) {
+        return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+      }
+      salonId = new mongoose.Types.ObjectId(req.user.salonId);
+    } else if (rawSalonId) {
+      salonId = new mongoose.Types.ObjectId(rawSalonId);
+    }
     // Clamp months to a safe integer (prevents date manipulation via user input)
     const safeMonths = Math.min(60, Math.max(1, Math.floor(Number(months) || 6)));
 
@@ -376,7 +432,18 @@ export const getPerformanceTrend = async (req, res) => {
     if (rawSalonId2 && !mongoose.isValidObjectId(rawSalonId2)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
-    const salonId = rawSalonId2 || null;
+    let salonId = null;
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied' });
+      }
+      if (rawSalonId2 && rawSalonId2 !== req.user.salonId?.toString()) {
+        return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+      }
+      salonId = new mongoose.Types.ObjectId(req.user.salonId);
+    } else if (rawSalonId2) {
+      salonId = new mongoose.Types.ObjectId(rawSalonId2);
+    }
     // Sanitize exercise key: only allow alphanumeric and underscores to prevent object key injection
     const safeExercise = exercise && /^[a-zA-Z0-9_]{1,50}$/.test(exercise) ? exercise : null;
 

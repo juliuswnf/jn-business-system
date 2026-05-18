@@ -1,17 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { salonAPI } from '../utils/api';
+import { useAuth } from './useAuth';
 
 // Roles that own all features — skip the salon info fetch
 const CEO_ROLES = ['ceo', 'admin'];
-
-const getCurrentUserRole = () => {
-  try {
-    const raw = localStorage.getItem('jnUser') || localStorage.getItem('user');
-    return raw ? JSON.parse(raw)?.role : null;
-  } catch {
-    return null;
-  }
-};
 
 const TIER_ORDER = ['starter', 'professional', 'enterprise'];
 
@@ -56,16 +48,35 @@ const compareTiers = (currentTier, requiredTier) => {
 };
 
 export const usePlanAccess = () => {
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [currentTier, setCurrentTier] = useState('starter');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
+    if (isAuthLoading) {
+      setIsLoading(true);
+      return () => {
+        isMounted = false;
+      };
+    }
+
     const loadTier = async () => {
+      if (isMounted) {
+        setIsLoading(true);
+      }
+
+      if (!user) {
+        if (isMounted) {
+          setCurrentTier('starter');
+          setIsLoading(false);
+        }
+        return;
+      }
+
       // CEO/admin users own all features — skip salon API call
-      const role = getCurrentUserRole();
-      if (CEO_ROLES.includes(role)) {
+      if (CEO_ROLES.includes(user.role)) {
         if (isMounted) {
           setCurrentTier('enterprise');
           setIsLoading(false);
@@ -98,7 +109,7 @@ export const usePlanAccess = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isAuthLoading, user]);
 
   const api = useMemo(() => ({
     currentTier,

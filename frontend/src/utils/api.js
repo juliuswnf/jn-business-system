@@ -86,9 +86,6 @@ api.interceptors.response.use(
 async function handleTokenRefresh(originalRequest, error, isExpected401) {
   // Prevent infinite loop - if refresh-token also returns 401, stop retrying
   if (originalRequest?.url?.includes('/auth/refresh-token')) {
-    localStorage.removeItem('jnAuthToken');
-    localStorage.removeItem('jnUser');
-    localStorage.removeItem('user');
     if (!window.location.pathname.includes('/login')) {
       window.location.href = '/login';
     }
@@ -105,10 +102,7 @@ async function handleTokenRefresh(originalRequest, error, isExpected401) {
       return api(originalRequest);
     }
   } catch (refreshError) {
-    // ? SECURITY FIX: Tokens are in HTTP-only cookies, cleared by backend on logout
-    localStorage.removeItem('jnAuthToken');
-    localStorage.removeItem('jnUser');
-    localStorage.removeItem('user');
+    // Tokens are HTTP-only cookies; on refresh failure redirect to login.
     if (!window.location.pathname.includes('/login')) {
       window.location.href = '/login';
     }

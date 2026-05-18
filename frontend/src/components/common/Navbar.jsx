@@ -1,20 +1,14 @@
 ﻿import React, { useContext, useRef, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { UIContext } from '../../context/UIContext';
-import { authAPI } from '../../utils/api';
-import { captureMessage } from '../../utils/errorTracking';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function Navbar() {
   const { toggleSidebar, sidebarOpen } = useContext(UIContext);
+  const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
-  // ? SECURITY FIX: Tokens are now in HTTP-only cookies
-  // For display purposes, we can get user from AuthContext or API
-  // For now, keep minimal localStorage access for backward compatibility
-  const token = localStorage.getItem('token'); // Temporary access token
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -27,18 +21,7 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await authAPI.logout();
-    } catch (error) {
-      captureMessage('Logout API failed', 'warning', { error: error.message });
-    }
-    // Clear ALL auth data from localStorage
-    localStorage.removeItem('jnAuthToken');
-    localStorage.removeItem('jnUser');
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    localStorage.removeItem('tempUser');
+    await logout();
     window.location.replace('/');
   };
 
@@ -67,7 +50,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
-          {token ? (
+          {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}

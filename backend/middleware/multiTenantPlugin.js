@@ -98,13 +98,12 @@ export const multiTenantPlugin = (schema, options = {}) => {
 
       // Check if first stage is $match with salonId
       if (!firstStage.$match || !firstStage.$match[tenantField]) {
-        logger.warn(`[MultiTenant] ?? Aggregation without ${tenantField} filter detected. Possible data leakage!`);
-        logger.warn(`[MultiTenant] Pipeline: ${JSON.stringify(pipeline[0])}`);
-
-        // In strict mode, throw error
         if (strictTenantMode) {
           throw new Error(`Aggregation MUST include ${tenantField} in first $match stage`);
         }
+
+        logger.warn(`[MultiTenant] ?? Aggregation without ${tenantField} filter detected. Possible data leakage!`);
+        logger.warn(`[MultiTenant] Pipeline: ${JSON.stringify(pipeline[0])}`);
       }
     }
   });

@@ -8,15 +8,9 @@ export const AuthContext = createContext();
 const SKIP_AUTH_INIT_ONCE_KEY = 'jn:skipAuthInitOnce';
 const PROTECTED_PATH_PREFIXES = ['/dashboard', '/customer', '/ceo', '/admin', '/employee', '/sessions'];
 
-function hasLocalAuthHint() {
+function hasSessionCookieHint() {
   const hasCookieHint = document.cookie.split('; ').some(row => row.startsWith('XSRF-TOKEN='));
-  return Boolean(
-    localStorage.getItem('jnUser') ||
-    localStorage.getItem('user') ||
-    localStorage.getItem('jnAuthToken') ||
-    localStorage.getItem('token') ||
-    hasCookieHint
-  );
+  return Boolean(hasCookieHint);
 }
 
 async function fetchUserProfile() {
@@ -32,7 +26,6 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, isAuthenticatedSet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [token, setToken] = useState(null);
 
   // Initialize auth - check if user is authenticated via API
   useEffect(() => {
@@ -51,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
 
-      if (!isProtectedPath && !hasLocalAuthHint()) {
+      if (!isProtectedPath && !hasSessionCookieHint()) {
         if (isMounted) { setUser(null); isAuthenticatedSet(false); setIsLoading(false); }
         return;
       }
@@ -73,11 +66,6 @@ export const AuthProvider = ({ children }) => {
         if (isMounted) {
           setUser(null);
           isAuthenticatedSet(false);
-          localStorage.removeItem('token');
-          localStorage.removeItem('jnAuthToken');
-          localStorage.removeItem('jnUser');
-          localStorage.removeItem('user');
-          localStorage.removeItem('tempUser');
         }
       } finally {
         if (isMounted) { setIsLoading(false); }
@@ -96,7 +84,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await authAPI.login(email, password);
-      const { token, user } = response.data;
+      const { user } = response.data;
 
       // ? SECURITY FIX: Tokens are now in HTTP-only cookies
       // Tokens are automatically sent by browser with withCredentials: true
@@ -125,7 +113,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await authAPI.register(userData);
-      const { token, user } = response.data;
+      const { user } = response.data;
 
       // ? SECURITY FIX: Tokens are now in HTTP-only cookies
       // Tokens are automatically sent by browser with withCredentials: true
@@ -160,16 +148,8 @@ export const AuthProvider = ({ children }) => {
 
       // Then clear local state
       setUser(null);
-      setToken(null);
       isAuthenticatedSet(false);
       setError(null);
-
-      // ? SECURITY FIX: Tokens are in HTTP-only cookies, cleared by backend
-      // Clear any leftover localStorage data
-      localStorage.removeItem('jnAuthToken');
-      localStorage.removeItem('jnUser');
-      localStorage.removeItem('user');
-      localStorage.removeItem('tempUser');
 
       // Skip exactly one initializeAuth profile call after redirect/reload
       sessionStorage.setItem(SKIP_AUTH_INIT_ONCE_KEY, '1');
@@ -179,7 +159,6 @@ export const AuthProvider = ({ children }) => {
       captureError(err, { context: 'logout' });
       // Still clear state even on error
       setUser(null);
-      setToken(null);
       isAuthenticatedSet(false);
       return { success: false, error: err.message };
     }
@@ -187,31 +166,34 @@ export const AuthProvider = ({ children }) => {
 
   // Verify token function
   const verifyToken = useCallback(async () => {
-    if (!token) {
+    try {
+      const response = await fetchUserProfile();
+      if (response.status === 401 || !response.data?.success) {
+        setUser(null);
+        isAuthenticatedSet(false);
+        return false;
+      }
+
+      if (response.data.user) {
+        setUser(response.data.user);
+        isAuthenticatedSet(true);
+        return true;
+      }
+
+      setUser(null);
+      isAuthenticatedSet(false);
+      return false;
+    } catch (err) {
+      captureError(err, { context: 'verifyToken' });
+      setUser(null);
       isAuthenticatedSet(false);
       return false;
     }
-
-    try {
-      const response = await authAPI.validateToken(token);
-
-      if (response.data.valid) {
-        return true;
-      } else {
-        logout();
-        return false;
-      }
-    } catch (err) {
-      captureError(err, { context: 'verifyToken' });
-      logout();
-      return false;
-    }
-  }, [token, logout]);
+  }, []);
 
   // Update user function
   const updateUser = useCallback((updatedUser) => {
     setUser(updatedUser);
-    localStorage.setItem('jnUser', JSON.stringify(updatedUser));
   }, []);
 
   // Context value
@@ -220,7 +202,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     isLoading,
     error,
-    token,
+    token: null,
     login,
     register,
     logout,

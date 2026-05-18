@@ -16,19 +16,19 @@ router.use(authMiddleware.protect);
 // Invite a new employee (salon_owner only)
 router.post('/invite', authMiddleware.requireRole('salon_owner'), employeeController.inviteEmployee);
 
-// Get all employees
-router.get('/', employeeController.getAllEmployees);
+// Get all employees (management only)
+router.get('/', authMiddleware.requireRole('salon_owner', 'ceo'), employeeController.getAllEmployees);
 
 // Get my stats (must be before /:employeeId)
 router.get('/my-stats', employeeController.getMyStats);
 
-// Get employee by ID
-router.get('/:employeeId', employeeController.getEmployeeById);
+// Get employee by ID (management only)
+router.get('/:employeeId', authMiddleware.requireRole('salon_owner', 'ceo'), employeeController.getEmployeeById);
 
-// Update employee
-router.put('/:employeeId', employeeController.updateEmployee);
+// Update employee (management only)
+router.put('/:employeeId', authMiddleware.requireRole('salon_owner', 'ceo'), employeeController.updateEmployee);
 
-// Delete employee
-router.delete('/:employeeId', employeeController.deleteEmployee);
+// Delete employee (management only)
+router.delete('/:employeeId', authMiddleware.requireRole('salon_owner', 'ceo'), employeeController.deleteEmployee);
 
 export default router;

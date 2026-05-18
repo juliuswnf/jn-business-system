@@ -10,7 +10,21 @@ import logger from '../utils/logger.js';
  */
 
 const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
-const ENCRYPTION_KEY = process.env.PHI_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+const getRequiredHexKey = (envName) => {
+  const raw = process.env[envName];
+  if (!raw) {
+    throw new Error(`${envName} environment variable is required`);
+  }
+
+  const normalized = raw.trim();
+  if (!/^[a-fA-F0-9]{64}$/.test(normalized)) {
+    throw new Error(`${envName} must be a 64-character hex string`);
+  }
+
+  return normalized;
+};
+
+const ENCRYPTION_KEY = getRequiredHexKey('PHI_ENCRYPTION_KEY');
 
 const clinicalNoteSchema = new mongoose.Schema(
   {

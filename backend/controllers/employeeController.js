@@ -1,5 +1,6 @@
 ﻿import logger from '../utils/logger.js';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Booking from '../models/Booking.js';
 
@@ -177,8 +178,16 @@ export const getEmployeeById = async (req, res) => {
     const salonId = req.user.salonId;
     const { employeeId } = req.params;
 
+    if (!employeeId || !mongoose.isValidObjectId(employeeId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid employeeId format'
+      });
+    }
+    const safeEmployeeId = new mongoose.Types.ObjectId(employeeId);
+
     const employee = await User.findOne({
-      _id: employeeId,
+      _id: safeEmployeeId,
       salonId,
       role: { $in: ['employee', 'manager'] }
     }).maxTimeMS(5000).select('name email phone role status isActive createdAt');
@@ -211,6 +220,14 @@ export const updateEmployee = async (req, res) => {
     const { employeeId } = req.params;
     const { name, phone, role, status } = req.body;
 
+    if (!employeeId || !mongoose.isValidObjectId(employeeId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid employeeId format'
+      });
+    }
+    const safeEmployeeId = new mongoose.Types.ObjectId(employeeId);
+
     // Whitelist allowed roles to prevent privilege escalation
     const ALLOWED_ROLES = ['employee', 'manager'];
     if (role !== undefined && !ALLOWED_ROLES.includes(role)) {
@@ -221,7 +238,7 @@ export const updateEmployee = async (req, res) => {
     }
 
     const employee = await User.findOneAndUpdate(
-      { _id: employeeId, salonId, role: { $in: ['employee', 'manager'] } },
+      { _id: safeEmployeeId, salonId, role: { $in: ['employee', 'manager'] } },
       { name, phone, role, status },
       { new: true, runValidators: true }
     );
@@ -254,8 +271,16 @@ export const deleteEmployee = async (req, res) => {
     const salonId = req.user.salonId;
     const { employeeId } = req.params;
 
+    if (!employeeId || !mongoose.isValidObjectId(employeeId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid employeeId format'
+      });
+    }
+    const safeEmployeeId = new mongoose.Types.ObjectId(employeeId);
+
     const employee = await User.findOneAndUpdate(
-      { _id: employeeId, salonId, role: { $in: ['employee', 'manager'] } },
+      { _id: safeEmployeeId, salonId, role: { $in: ['employee', 'manager'] } },
       { isActive: false },
       { new: true }
     );

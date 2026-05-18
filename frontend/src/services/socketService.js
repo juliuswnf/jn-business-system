@@ -9,9 +9,9 @@ class SocketService {
 
   /**
    * Connect to Socket.IO server
-   * @param {string} token - JWT access token for authentication
+    * @param {string|null} token - Optional JWT access token for backward compatibility
    */
-  connect(token) {
+    connect(token = null) {
     if (this.socket && this.connected) {
       console.log('Socket already connected');
       return;
@@ -20,10 +20,14 @@ class SocketService {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const SOCKET_URL = API_URL.replace('/api', ''); // Remove /api suffix
 
+    const authPayload = {};
+    if (token) {
+      authPayload.token = token;
+    }
+
     this.socket = io(SOCKET_URL, {
-      auth: {
-        token
-      },
+      auth: authPayload,
+      withCredentials: true,
       transports: ['websocket', 'polling'], // Try websocket first, fallback to polling
       reconnection: true,
       reconnectionDelay: 1000,

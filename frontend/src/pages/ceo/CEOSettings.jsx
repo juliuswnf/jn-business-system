@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import UserMenu from '../../components/common/UserMenu';
 import { useNotification } from '../../context/NotificationContext';
 import { api, API_URL } from '../../utils/api';
+import { useAuth } from '../../hooks/useAuth';
 
 const CEOSettings = () => {
+  const { user } = useAuth();
   const [activeSection, setActiveSection] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -44,23 +46,24 @@ const CEOSettings = () => {
     sessionTimeout: 30
   });
 
-  // Get user from localStorage
+  // Initialize profile data from authenticated user context
   useEffect(() => {
-    const storedUser = localStorage.getItem('jnUser') || localStorage.getItem('user');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setProfile({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        avatar: user.avatar || ''
-      });
-      setSecurity(prev => ({
-        ...prev,
-        twoFactorEnabled: user.twoFactorEnabled || false
-      }));
+    if (!user) {
+      return;
     }
-  }, []);
+
+    setProfile({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      avatar: user.avatar || ''
+    });
+
+    setSecurity(prev => ({
+      ...prev,
+      twoFactorEnabled: user.twoFactorEnabled || false
+    }));
+  }, [user]);
 
   // Save Profile
   const handleSaveProfile = async () => {

@@ -2,11 +2,14 @@
 import Salon from '../models/Salon.js';
 import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
-import { isValidObjectId } from '../utils/validation.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_RESOURCE_TYPES = ['room', 'equipment', 'staff', 'vehicle', 'chair', 'bed', 'table', 'other'];
 const ALLOWED_RESOURCE_CATEGORIES = ['general', 'medical', 'beauty', 'fitness', 'specialized', 'wellness'];
 const ALLOWED_RESOURCE_STATUSES = ['available', 'unavailable', 'maintenance', 'retired', 'active', 'inactive'];
+const hasSalonAccess = (req, salonId) => {
+  return req.user?.role === 'ceo' || salonId?.toString() === req.user?.salonId?.toString();
+};
 
 /**
  * Resource Controller
@@ -32,8 +35,13 @@ export const createResource = async (req, res) => {
 
     const userId = req.user.id;
 
+    if (!salonId || !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+    }
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Verify salon ownership
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -43,7 +51,7 @@ export const createResource = async (req, res) => {
     }
 
     const resource = await Resource.create({
-      salonId,
+      salonId: safeSalonId,
       name,
       type,
       category,
@@ -73,11 +81,23 @@ export const createResource = async (req, res) => {
 // ==================== GET SALON RESOURCES ====================
 export const getSalonResources = async (req, res) => {
   try {
-    const { salonId } = req.params;
+    const { salonId: rawSalonId } = req.params;
     const { type, category, status } = req.query;
 
+    if (!rawSalonId || !mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+    }
+    const safeSalonId = new mongoose.Types.ObjectId(rawSalonId);
+
+    if (!hasSalonAccess(req, safeSalonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     const query = {
-      salonId,
+      salonId: safeSalonId,
       deletedAt: null
     };
 
@@ -86,8 +106,9 @@ export const getSalonResources = async (req, res) => {
     if (status && ALLOWED_RESOURCE_STATUSES.includes(String(status))) query.status = String(status);
 
     const resources = await Resource.find(query)
-      .populate('compatibleServices', 'name duration').lean().maxTimeMS(5000)
+      .populate('compatibleServices', 'name duration')
       .sort({ type: 1, name: 1 })
+      .maxTimeMS(5000)
       .lean();
 
     return res.json({
@@ -107,13 +128,15 @@ export const getResourceById = async (req, res) => {
     const userRole = req.user?.role;
 
     // Validate ObjectId
-    if (!isValidObjectId(id)) {
+    if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ success: false, message: 'Invalid resource ID format' });
     }
+    const safeResourceId = new mongoose.Types.ObjectId(id);
 
-    const resource = await Resource.findById(id)
+    const resource = await Resource.findById(safeResourceId)
       .populate('compatibleServices', 'name duration price')
-      .lean().maxTimeMS(5000);
+      .maxTimeMS(5000)
+      .lean();
 
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
@@ -143,6 +166,11 @@ export const checkResourceAvailability = async (req, res) => {
     const { id } = req.params;
     const { dateTime, duration } = req.query;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid resource ID format' });
+    }
+    const safeResourceId = new mongoose.Types.ObjectId(id);
+
     if (!dateTime) {
       return res.status(400).json({
         success: false,
@@ -150,12 +178,15 @@ export const checkResourceAvailability = async (req, res) => {
       });
     }
 
-    const resource = await Resource.findById(id).maxTimeMS(5000);
+    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     const requestedDateTime = new Date(dateTime);
+    if (isNaN(requestedDateTime.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid dateTime format' });
+    }
     const isAvailable = resource.isAvailableAt(requestedDateTime);
 
     if (!isAvailable) {
@@ -168,10 +199,11 @@ export const checkResourceAvailability = async (req, res) => {
 
     // Check for overlapping bookings
     const endDateTime = new Date(requestedDateTime);
-    endDateTime.setMinutes(endDateTime.getMinutes() + (parseInt(duration) || 60));
+    const safeDuration = Math.max(1, Math.min(1440, parseInt(duration, 10) || 60));
+    endDateTime.setMinutes(endDateTime.getMinutes() + safeDuration);
 
     const overlappingBookings = await Booking.countDocuments({
-      resourceId: id,
+      resourceId: safeResourceId,
       bookingDate: {
         $gte: requestedDateTime,
         $lt: endDateTime
@@ -201,13 +233,28 @@ export const updateResource = async (req, res) => {
     const updateData = req.body;
     const userId = req.user.id;
 
-    const resource = await Resource.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid resource ID format' });
+    }
+    const safeResourceId = new mongoose.Types.ObjectId(id);
+
+    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
+    if (!hasSalonAccess(req, resource.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     // Verify authorization
     const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon not found' });
+    }
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -243,13 +290,28 @@ export const scheduleMaintenance = async (req, res) => {
     const { startDate, endDate, reason } = req.body;
     const userId = req.user.id;
 
-    const resource = await Resource.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid resource ID format' });
+    }
+    const safeResourceId = new mongoose.Types.ObjectId(id);
+
+    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
+    if (!hasSalonAccess(req, resource.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     // Verify authorization
     const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon not found' });
+    }
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -277,20 +339,35 @@ export const deleteResource = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const resource = await Resource.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid resource ID format' });
+    }
+    const safeResourceId = new mongoose.Types.ObjectId(id);
+
+    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
+    if (!hasSalonAccess(req, resource.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
     // Verify authorization
     const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon not found' });
+    }
     if (salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
     // Check for future bookings
     const futureBookings = await Booking.countDocuments({
-      resourceId: id,
+      resourceId: safeResourceId,
       bookingDate: { $gte: new Date() },
       status: { $nin: ['cancelled'] },
       deletedAt: null
@@ -323,6 +400,12 @@ export const getResourceUtilization = async (req, res) => {
   try {
     const { id } = req.params;
     const { startDate, endDate } = req.query;
+    const userId = req.user.id;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid resource ID format' });
+    }
+    const safeResourceId = new mongoose.Types.ObjectId(id);
 
     if (!startDate || !endDate) {
       return res.status(400).json({
@@ -331,17 +414,38 @@ export const getResourceUtilization = async (req, res) => {
       });
     }
 
-    const resource = await Resource.findById(id).maxTimeMS(5000);
+    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
+    if (!hasSalonAccess(req, resource.salonId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Resource belongs to another salon'
+      });
+    }
+
+    const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon not found' });
+    }
+    if (salon.owner.toString() !== userId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const safeStartDate = new Date(startDate);
+    const safeEndDate = new Date(endDate);
+    if (isNaN(safeStartDate.getTime()) || isNaN(safeEndDate.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid date range' });
+    }
+
     // Count bookings in date range
     const bookings = await Booking.find({
-      resourceId: id,
+      resourceId: safeResourceId,
       bookingDate: {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
+        $gte: safeStartDate,
+        $lte: safeEndDate
       },
       status: { $nin: ['cancelled'] },
       deletedAt: null
@@ -378,12 +482,21 @@ export const getResourceUtilization = async (req, res) => {
 // ==================== GET AVAILABLE RESOURCES FOR SERVICE ====================
 export const getAvailableResourcesForService = async (req, res) => {
   try {
-    const { salonId, serviceId } = req.params;
+    const { salonId: rawSalonId, serviceId: rawServiceId } = req.params;
     const { dateTime, duration } = req.query;
 
+    if (!mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+    }
+    if (!mongoose.isValidObjectId(rawServiceId)) {
+      return res.status(400).json({ success: false, message: 'Invalid service ID format' });
+    }
+    const safeSalonId = new mongoose.Types.ObjectId(rawSalonId);
+    const safeServiceId = new mongoose.Types.ObjectId(rawServiceId);
+
     const resources = await Resource.find({
-      salonId,
-      compatibleServices: serviceId,
+      salonId: safeSalonId,
+      compatibleServices: safeServiceId,
       isAvailable: true,
       status: 'active',
       deletedAt: null
@@ -396,16 +509,25 @@ export const getAvailableResourcesForService = async (req, res) => {
       });
     }
 
+    if (typeof dateTime !== 'string') {
+      return res.status(400).json({ success: false, message: 'Invalid dateTime format' });
+    }
+    const requestedDateTime = new Date(dateTime);
+    if (isNaN(requestedDateTime.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid dateTime format' });
+    }
+
     // Compute time window once outside the loop
-    const endDateTime = new Date(dateTime);
-    endDateTime.setMinutes(endDateTime.getMinutes() + (parseInt(duration) || 60));
+    const safeDuration = Math.max(1, Math.min(1440, parseInt(duration, 10) || 60));
+    const endDateTime = new Date(requestedDateTime);
+    endDateTime.setMinutes(endDateTime.getMinutes() + safeDuration);
 
     // Batch all countDocuments queries in parallel to avoid N+1
     const overlappingCounts = await Promise.all(
       resources.map(r =>
         Booking.countDocuments({
           resourceId: r._id,
-          bookingDate: { $gte: new Date(dateTime), $lt: endDateTime },
+          bookingDate: { $gte: requestedDateTime, $lt: endDateTime },
           status: { $nin: ['cancelled'] },
           deletedAt: null
         })
@@ -415,7 +537,7 @@ export const getAvailableResourcesForService = async (req, res) => {
     const availableResources = [];
     for (let i = 0; i < resources.length; i++) {
       const resource = resources[i];
-      const isAvailable = resource.isAvailableAt(new Date(dateTime));
+      const isAvailable = resource.isAvailableAt(requestedDateTime);
       const overlappingBookings = overlappingCounts[i];
 
       if (isAvailable && overlappingBookings < resource.capacity) {

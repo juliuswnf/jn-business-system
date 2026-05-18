@@ -305,12 +305,6 @@ const Sidebar = ({ isOpen = true, onClose = null }) => {
   }, [location.pathname, navigation]);
 
   const handleLogout = async () => {
-    localStorage.removeItem('jnAuthToken');
-    localStorage.removeItem('jnUser');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('tempUser');
     await logout();
     window.location.replace('/');
   };
