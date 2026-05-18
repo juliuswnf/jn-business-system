@@ -7,7 +7,8 @@ const plans = {
     id: 'starter',
     name: 'Starter',
     price: 129,
-    yearlyPrice: 99,
+    yearlyPrice: 1188,
+    yearlyMonthlyCost: 99,
     description: 'Perfekt für Solo-Studios & Einzelunternehmer',
     features: [
       '200 Buchungen / Monat',
@@ -23,7 +24,8 @@ const plans = {
     id: 'professional',
     name: 'Professional',
     price: 249,
-    yearlyPrice: 199,
+    yearlyPrice: 2388,
+    yearlyMonthlyCost: 199,
     description: 'Für wachsende Teams mit mehreren Mitarbeitern',
     features: [
       'Unbegrenzte Buchungen',
@@ -39,7 +41,8 @@ const plans = {
     id: 'enterprise',
     name: 'Enterprise',
     price: 599,
-    yearlyPrice: 479,
+    yearlyPrice: 5748,
+    yearlyMonthlyCost: 479,
     description: 'Für Unternehmen mit mehreren Standorten',
     features: [
       'Unbegrenzte Termine',
@@ -91,6 +94,10 @@ export default function Checkout() {
   }
 
   const handleStripeCheckout = async () => {
+    if (checkingAuth || loading) {
+      return;
+    }
+
     if (!isLoggedIn) {
       // Save plan selection and redirect to register
       sessionStorage.setItem('selectedPlan', JSON.stringify({
@@ -123,9 +130,10 @@ export default function Checkout() {
     }
   };
 
-  const price = isYearly ? plan.yearlyPrice : plan.price;
-  const vatAmount = (price * 0.19).toFixed(2);
-  const totalAmount = (price * 1.19).toFixed(2);
+  const baseAmount = isYearly ? plan.yearlyPrice : plan.price;
+  const vatAmount = (baseAmount * 0.19).toFixed(2);
+  const totalAmount = (baseAmount * 1.19).toFixed(2);
+  const billingSuffix = isYearly ? '/Jahr' : '/Monat';
 
   return (
     <div className="min-h-screen bg-white text-gray-900 py-12">
@@ -186,15 +194,20 @@ export default function Checkout() {
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-gray-700">
                 <span>{plan.name} Plan ({isYearly ? 'jährlich' : 'monatlich'})</span>
-                <span>€{price.toFixed(2)}</span>
+                <span>€{baseAmount.toFixed(2)}</span>
               </div>
+              {isYearly && (
+                <div className="text-sm text-gray-500">
+                  Entspricht €{plan.yearlyMonthlyCost.toFixed(2)} pro Monat bei jährlicher Zahlung.
+                </div>
+              )}
               <div className="flex justify-between text-gray-700">
                 <span>MwSt. (19%)</span>
                 <span>€{vatAmount}</span>
               </div>
               <div className="border-t border-gray-200 pt-3 flex justify-between font-semibold text-lg">
                 <span>Gesamt nach Testphase</span>
-                <span>€{totalAmount}/Monat</span>
+                <span>€{totalAmount}{billingSuffix}</span>
               </div>
             </div>
 
@@ -218,9 +231,9 @@ export default function Checkout() {
 
             <button
               onClick={handleStripeCheckout}
-              disabled={loading}
+              disabled={loading || checkingAuth}
               className={`w-full py-3 rounded-xl text-center font-semibold transition mb-4 ${
-                loading
+                (loading || checkingAuth)
                   ? 'bg-gray-400 text-white cursor-not-allowed'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}
@@ -233,6 +246,8 @@ export default function Checkout() {
                   </svg>
                   Wird geladen...
                 </span>
+              ) : checkingAuth ? (
+                'Prüfe Konto...'
               ) : isLoggedIn ? (
                 'Jetzt kostenpflichtig buchen'
               ) : (

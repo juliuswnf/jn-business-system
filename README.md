@@ -119,7 +119,9 @@ This creates 204 optimized indexes for performance.
 
 See detailed guides:
 - **[RAILWAY_VERCEL_SETUP.md](RAILWAY_VERCEL_SETUP.md)** - Step-by-step deployment
-- **[PRODUCTION_CHECKLIST.md](PRODUCTION_CHECKLIST.md)** - 10-point launch checklist
+- **[PRODUCTION_TESTING.md](PRODUCTION_TESTING.md)** - Production smoke plan (Go/No-Go)
+- **[GO_LIVE_SIGNOFF.md](GO_LIVE_SIGNOFF.md)** - Final launch sign-off template
+- **[release-checklists/README.md](release-checklists/README.md)** - Per-release checklist workflow
 
 **Quick Deploy:**
 ```bash
@@ -134,12 +136,17 @@ git push origin main  # Auto-deploys to Railway (backend) + Vercel (frontend)
 
 **Required:**
 - `MONGODB_URI` - MongoDB connection
-- `JWT_SECRET` - 256-bit secret key
+- `JWT_SECRET` - Access-Token secret (mind. 32 Zeichen)
+- `JWT_REFRESH_SECRET` - Refresh-Token secret
+- `FRONTEND_URL` - Basis-URL für Redirects/Links
+- `ENCRYPTION_KEY` - 32-byte hex key für Datenverschlüsselung
+- `PHI_ENCRYPTION_KEY` - 32-byte hex key für Clinical Notes (PHI)
 - `STRIPE_SECRET_KEY` - Payment processing
-- `TWILIO_*` - SMS notifications
-- `EMAIL_*` - SMTP configuration
+- `STRIPE_PRICE_*` - Stripe Price IDs für Checkout (Starter/Pro/Enterprise, monthly/yearly)
+- `EMAIL_*` oder `SMTP_*` - SMTP configuration (Alias-Support)
 
 **Optional:**
+- `TWILIO_*` - SMS notifications
 - `SENTRY_DSN` - Error tracking
 - `REDIS_URL` - Rate limiting
 
@@ -147,7 +154,7 @@ git push origin main  # Auto-deploys to Railway (backend) + Vercel (frontend)
 
 **Required:**
 - `VITE_API_URL` - Backend API endpoint
-- `VITE_STRIPE_PUBLIC_KEY` - Stripe public key
+- `VITE_STRIPE_PUBLISHABLE_KEY` - Stripe public key
 
 **Optional:**
 - `VITE_SENTRY_DSN` - Frontend error tracking
@@ -200,7 +207,9 @@ jn-business-system/
 │   │   └── utils/       # Frontend helpers
 │   └── vite.config.js   # Build configuration
 ├── scripts/             # Production health checks
-├── PRODUCTION_CHECKLIST.md
+├── PRODUCTION_TESTING.md
+├── GO_LIVE_SIGNOFF.md
+├── release-checklists/
 ├── RAILWAY_VERCEL_SETUP.md
 └── README.md
 

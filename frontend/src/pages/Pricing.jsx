@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
+import { useAuth } from '../hooks/useAuth';
 
 const plans = [
   {
@@ -138,6 +139,7 @@ const faq = [
 ];
 
 export default function Pricing() {
+  const { isAuthenticated } = useAuth();
   const [yearly, setYearly] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
@@ -146,6 +148,14 @@ export default function Pricing() {
     const monthlyCost = plan.price * 12;
     const yearlyCost = plan.yearlyPrice;
     return monthlyCost - yearlyCost;
+  };
+
+  const buildPlanCtaHref = (planId) => {
+    if (isAuthenticated) {
+      return `/checkout/${planId}${yearly ? '?billing=yearly' : ''}`;
+    }
+
+    return `/register?plan=${planId}${yearly ? '&billing=yearly' : ''}`;
   };
 
   return (
@@ -209,7 +219,7 @@ export default function Pricing() {
             Mehrere Standorte, White-Label, API-Zugang und unbegrenzte Mitarbeiter – alles in einem Plan.
           </p>
           <Link
-            to="/register"
+            to={isAuthenticated ? '/checkout/enterprise' : '/register?plan=enterprise'}
             className="inline-block px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition"
           >
             Jetzt loslegen
@@ -275,7 +285,7 @@ export default function Pricing() {
               </div>
 
               <Link
-                to={`/register?plan=${plan.id}${yearly ? '&billing=yearly' : ''}`}
+                to={buildPlanCtaHref(plan.id)}
                 className="block w-full py-4 rounded-xl text-center font-semibold transition mb-8 bg-gray-900 text-white hover:bg-gray-800"
               >
                 {plan.id === 'enterprise' ? 'Enterprise testen' : 'Jetzt starten'}

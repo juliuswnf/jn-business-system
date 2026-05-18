@@ -29,27 +29,40 @@ class StripePaymentService {
 
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const requireEnv = (name) => {
-      const value = process.env[name];
-      if (!value) {
-        throw new Error(`${name} env var is missing`);
+    const requireEnv = (...names) => {
+      for (const name of names) {
+        const value = process.env[name];
+        if (value) {
+          return value;
+        }
       }
-      return value;
+
+      throw new Error(`${names.join(' or ')} env var is missing`);
     };
 
     // Stripe Price IDs from .env
     this.priceIds = {
       starter: {
-        monthly: requireEnv('STRIPE_STARTER_MONTHLY'),
-        yearly: requireEnv('STRIPE_STARTER_YEARLY')
+        monthly: requireEnv('STRIPE_PRICE_STARTER_MONTHLY', 'STRIPE_STARTER_MONTHLY'),
+        yearly: requireEnv('STRIPE_PRICE_STARTER_YEARLY', 'STRIPE_STARTER_YEARLY')
       },
       professional: {
-        monthly: requireEnv('STRIPE_PROFESSIONAL_MONTHLY'),
-        yearly: requireEnv('STRIPE_PROFESSIONAL_YEARLY')
+        monthly: requireEnv(
+          'STRIPE_PRICE_PRO_MONTHLY',
+          'STRIPE_PRICE_PROFESSIONAL_MONTHLY',
+          'STRIPE_PROFESSIONAL_MONTHLY',
+          'STRIPE_PRO_MONTHLY'
+        ),
+        yearly: requireEnv(
+          'STRIPE_PRICE_PRO_YEARLY',
+          'STRIPE_PRICE_PROFESSIONAL_YEARLY',
+          'STRIPE_PROFESSIONAL_YEARLY',
+          'STRIPE_PRO_YEARLY'
+        )
       },
       enterprise: {
-        monthly: requireEnv('STRIPE_ENTERPRISE_MONTHLY'),
-        yearly: requireEnv('STRIPE_ENTERPRISE_YEARLY')
+        monthly: requireEnv('STRIPE_PRICE_ENTERPRISE_MONTHLY', 'STRIPE_ENTERPRISE_MONTHLY'),
+        yearly: requireEnv('STRIPE_PRICE_ENTERPRISE_YEARLY', 'STRIPE_ENTERPRISE_YEARLY')
       }
     };
 

@@ -1,154 +1,109 @@
-# 🚀 Launch Readiness Report
+# Launch Readiness Report
 
-**Stand**: $(date +"%Y-%m-%d %H:%M")  
-**Autor**: JN Senior Dev  
-**Status**: ✅ BEREIT FÜR LAUNCH
+Stand: 2026-05-19
+Owner: JN Senior Dev
+Status: READY FOR CONTROLLED GO-LIVE
 
----
+## 1. Executive Summary
 
-## ✅ Abgeschlossene Arbeiten
+Vorher:
+- Launch-Status war fragmentiert ueber mehrere Dateien.
+- Production-Tests waren nicht als kurzer Go/No-Go Smoke-Lauf strukturiert.
+- Revenue-kritische Frontend-Route von Pricing zu Checkout hatte Conversion-Risiko.
+- Stripe/Email ENV-Naming war nicht durchgaengig konsistent.
 
-### 1. Security Fixes (7/7)
-- ✅ **Bug #1 (CRITICAL)**: Payment amount validation gegen DB
-- ✅ **Bug #2 (HIGH)**: Workflow session ownership check
-- ✅ **Bug #3 (HIGH)**: Package ownership checks
-- ✅ **Bug #4 (MEDIUM)**: Stripe webhook bookingId validation
-- ✅ **Bug #5 (MEDIUM)**: Hardcoded Stripe price fallbacks entfernt
-- ✅ **Bug #6 (MEDIUM)**: Customer packages salon scope
-- ✅ **Bug #7 (LOW)**: Error.message leaks entfernt
+Nachher:
+- Ein ausfuehrbarer Smoke-Test-Plan ist vorhanden in PRODUCTION_TESTING.md.
+- Revenue-kritischer Pricing/Register/Checkout-Flow ist gehaertet.
+- ENV-Kompatibilitaet fuer Stripe Price IDs sowie EMAIL_*/SMTP_* ist konsistent.
+- Backend Unit + Integration Tests und Frontend Build sind gruen.
 
-### 2. Frontend TODOs (3/3)
-- ✅ **Waitlist Add Form**: Vollständig implementiert mit Validierung
-  - E.164 Phone Format Validation
-  - Customer Name/Phone/Email + Service Selection
-  - Duplicate Check by Phone/CustomerId
-  - Preferred Dates Support
-  
-- ✅ **Socket.IO Real-time Updates**: Vollständig implementiert
-  - Socket Service (/frontend/src/services/socketService.js)
-  - Bookings Page Integration
-  - Events: booking:created, booking:updated, booking:confirmed, booking:cancelled, booking:noshow
-  - Auto-reconnection mit exponential backoff
-  
-- ✅ **System Settings API**: Vollständig implementiert
-  - Backend Controller (/backend/controllers/systemSettingsController.js)
-  - CEO Routes Integration
-  - Frontend Integration (/frontend/src/pages/ceo/SystemSettings.jsx)
-  - SMTP/Stripe/SMS Configuration Support
-  - Sensitive Data Masking
+Warum das relevant ist:
+- Senkt Risiko fuer Checkout-Ausfaelle direkt beim Go-Live.
+- Erhoeht Deploy-Sicherheit durch klaren Gate-Prozess.
+- Reduziert Konfigurationsfehler bei Railway/Vercel Environment Setup.
 
-### 3. Tests
-- ✅ **Unit Tests**: 61/61 bestanden
-- ✅ **Integration Tests**: 16/16 bestanden
-- ✅ **Frontend Build**: Clean (4.71s, 0 Errors)
-- ✅ **Syntax Checks**: Alle geprüft, 0 Fehler
+## 2. Release Delta (Task 8 bis Task 10)
 
-### 4. Workers & Services
-- ✅ 10 aktive Worker laufen:
-  - NO-SHOW-KILLER: confirmation, auto-cancel, waitlist, reminder, no-show-charge, subscription-expiry
-  - Marketing: campaign, analytics
-  - System: email-queue, lifecycle-email
-- ✅ MongoDB Connection: Stabil
-- ✅ Server Boot: Clean, keine unhandled exceptions
+Frontend (Revenue-Pfad):
+- Pricing CTA ist auth-aware und routet konsistent.
+- Register uebernimmt Plan/Billing robust aus State, Query und Session.
+- Checkout zeigt korrekte Jahreswerte, blockiert Checkout waehrend Auth-Check.
 
----
+Backend/Config:
+- Stripe Price Mapping akzeptiert kanonische STRIPE_PRICE_* Keys plus Legacy-Aliase.
+- Breach Notification Service akzeptiert EMAIL_* und SMTP_* Aliase.
+- backend/.env.example enthaelt PHI_ENCRYPTION_KEY plus Rotations-Keys.
 
-## 📋 Deployment Vorbereitung
+Docs/Runbooks:
+- README ist auf aktuelle ENV-Namen und Anforderungen aktualisiert.
+- PRODUCTION_TESTING.md wurde als 45-60 Minuten Smoke-Plan neu aufgebaut
+  (Tech Gates, Happy Path, Failover, Rollback, Evidence).
 
-### Railway Backend (NOCH NICHT DEPLOYED)
-**Action Items**:
-1. Railway Dashboard öffnen
-2. Alle 49 ENV Variablen setzen (aus backend/.env kopieren)
-3. MongoDB Atlas Network Access: 0.0.0.0/0 (Railway nutzt dynamische IPs)
-4. Health Check: GET /health muss "healthy" zurückgeben
-5. Logs überwachen für Worker-Initialisierung
+## 3. Verification Gate (aktuell)
 
-**Kritische ENV Vars** (Priorität):
-- MONGODB_URI (absolute Pflicht)
-- JWT_SECRET, JWT_REFRESH_SECRET
-- STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_* (6 Werte)
-- EMAIL_*/SMTP_* Settings
-- TWILIO_* Settings
-- ENCRYPTION_KEY, PHI_ENCRYPTION_KEY
+Erfolgreich validiert:
+- Backend Unit Tests: 61/61 PASS
+- Backend Integration Tests: 16/16 PASS
+- Frontend Build: PASS
 
-### Vercel Frontend (NOCH NICHT DEPLOYED)
-**Action Items**:
-1. Vercel Dashboard öffnen
-2. ENV Variablen setzen:
-   - VITE_API_URL=https://jn-automation-production.up.railway.app/api
-   - VITE_STRIPE_PUBLIC_KEY=pk_live_51SNcw8Cfgv8Lqc0aSp0Poeg...
-3. Deployment triggern
-4. DNS überprüfen (falls Custom Domain)
+Verwendete Kommandos:
+- cd backend && npm test -- --testTimeout=15000 --forceExit
+- cd backend && node --no-warnings --experimental-vm-modules scripts/jestRunner.cjs --config jest.integration.config.js --testTimeout=20000 --forceExit
+- cd frontend && npm run build
 
----
+## 4. Deployment Readiness
 
-## 🧪 Production Testing Checklist
+Backend (Railway):
+- Muss mit finalen Production ENV Variablen deployed werden.
+- Health muss ueber /health und /api/system/health stabil 200 liefern.
+- Startup darf keine unhandled exceptions zeigen.
 
-**Hinweis**: Die meisten Features wurden bereits in Unit/Integration Tests geprüft.  
-Folgende **manuelle Tests** sollten nach Deployment durchgeführt werden:
+Frontend (Vercel):
+- Muss auf das produktive Backend zeigen.
+- Erforderlich: VITE_API_URL und VITE_STRIPE_PUBLISHABLE_KEY.
+- Nach Deploy sofort Smoke-Flow Pricing -> Checkout pruefen.
 
-### Must-Test (Kritisch)
-- [ ] **Auth Flow**: Register → Login → Token Refresh → Logout
-- [ ] **Booking Flow**: Neues Booking erstellen → Confirm → Cancel
-- [ ] **Payment Flow**: Stripe Payment Intent → Webhook → Booking Status Update
-- [ ] **Subscription Flow**: Stripe Checkout → Webhook → Salon Activation
-- [ ] **Email/SMS**: Confirmation Email/SMS sendet
-- [ ] **Socket.IO**: Real-time Updates im Bookings Dashboard
+Konfigurationsschwerpunkte:
+- Stripe: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_*
+- Email: EMAIL_* oder SMTP_* (Alias-kompatibel)
+- Security: ENCRYPTION_KEY, PHI_ENCRYPTION_KEY
 
-### Nice-to-Test (Optional)
-- [ ] **Waitlist**: Add Entry → Auto-assign bei Cancellation
-- [ ] **CRM**: Customer List → Export funktioniert
-- [ ] **CEO Dashboard**: Analytics laden korrekt
-- [ ] **System Settings**: SMTP/SMS Test funktioniert
-- [ ] **Mobile**: App läuft auf iOS/Android responsive
+## 5. Go/No-Go Criteria
 
----
+GO nur wenn alle Punkte erfuellt sind:
+- Phase A bis C aus PRODUCTION_TESTING.md sind PASS.
+- Checkout und Public Booking laufen end-to-end ohne manuelle Datenkorrektur.
+- Rollback-Pfad wurde vorab verifiziert.
 
-## 🔒 Security Status
+NO-GO wenn einer dieser Punkte auftritt:
+- Health Endpoint bleibt >5 Minuten instabil.
+- Subscription Checkout oder Public Booking reproduzierbar defekt.
+- Tenant-Datenintegritaet ist verletzt.
 
-- ✅ Alle ObjectId Inputs validiert (mongoose.isValidObjectId)
-- ✅ User Inputs nie direkt in MongoDB Query
-- ✅ Encryption Keys aus ENV (keine Fallbacks)
-- ✅ Tenant Boundaries enforcet (16 Integration Tests)
-- ✅ Rate Limiting aktiv (CEO Shell-Exec Endpoints: 10/15min)
-- ✅ CORS konfiguriert
-- ✅ Helmet Security Headers
-- ✅ Content-Type Validation Middleware
+## 6. Remaining Risks
 
----
+Offen bis nach Deploy:
+- Finale Production-Smoke-Ausfuehrung auf echten Railway/Vercel Deployments.
+- Monitoring/Budget-Alerts in der ersten Stunde nach Release aktiv beobachten.
 
-## 📊 Performance Benchmarks
+Diese Punkte blockieren keinen kontrollierten Rollout,
+aber blockieren einen ungeprueften Full Traffic Ramp-up.
 
-- **Frontend Build**: 4.71s
-- **Backend Startup**: <5s (mit allen Workers)
-- **Unit Tests**: ~10s (61 Tests)
-- **Integration Tests**: 1.6s (16 Tests)
-- **Coverage**: >80% für kritische Controller
+## 7. Launch Decision
 
----
+Entscheidung: CONDITIONAL GO
 
-## 🚦 Launch Decision
+Interpretation:
+- Code- und Build-Reife ist erreicht.
+- Deployment darf gestartet werden.
+- Produktiver Traffic-Ramp-up nur nach bestandener Smoke-Ausfuehrung gemaess PRODUCTION_TESTING.md.
 
-**Empfehlung**: ✅ **READY TO LAUNCH**
+## 8. Immediate Next Steps
 
-**Reasoning**:
-- Alle Security Bugs gefixt
-- Alle Frontend TODOs implementiert
-- Alle Tests bestanden
-- Workers laufen stabil
-- Code reviewed & syntax-checked
-
-**Next Steps**:
-1. Railway Backend deployen
-2. Vercel Frontend deployen
-3. Production Testing durchführen (1-2h)
-4. Live gehen 🚀
-
-**Estimated Time to Launch**: 2-3h (Deployment + Manual Testing)
-
----
-
-**Letzte Änderungen**:
-- Socket.IO Service erstellt
-- System Settings API implementiert
-- Waitlist Add Form vervollständigt
+1. Backend auf Railway deployen und Health pruefen.
+2. Frontend auf Vercel deployen.
+3. Kompletten Smoke-Test gemaess PRODUCTION_TESTING.md durchlaufen.
+4. Evidence dokumentieren und finale GO-Freigabe erteilen.
+5. Release-ID Checkliste in release-checklists/ anlegen und ausfuellen.
+6. GO_LIVE_SIGNOFF.md vollstaendig ausfuellen und von allen Ownern signieren lassen.

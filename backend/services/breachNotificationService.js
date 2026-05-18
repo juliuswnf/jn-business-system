@@ -303,12 +303,12 @@ async function alertAdministrators(breach, incident) {
   try {
     // Email alert
     const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: process.env.SMTP_PORT || 587,
-      secure: false,
+      host: process.env.EMAIL_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.EMAIL_PORT || process.env.SMTP_PORT || '587', 10),
+      secure: (process.env.EMAIL_SECURE || process.env.SMTP_SECURE) === 'true',
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.EMAIL_USER || process.env.SMTP_USER,
+        pass: process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD || process.env.SMTP_PASS
       }
     });
 
@@ -470,12 +470,12 @@ export async function sendBreachNotification(notificationId) {
 
     // Email notification
     const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: process.env.SMTP_PORT || 587,
-      secure: false,
+      host: process.env.EMAIL_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.EMAIL_PORT || process.env.SMTP_PORT || '587', 10),
+      secure: (process.env.EMAIL_SECURE || process.env.SMTP_SECURE) === 'true',
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.EMAIL_USER || process.env.SMTP_USER,
+        pass: process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD || process.env.SMTP_PASS
       }
     });
 

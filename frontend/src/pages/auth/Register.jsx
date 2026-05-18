@@ -12,11 +12,23 @@ export default function Register() {
 
   // Check if coming from checkout or direct signup
   const fromCheckout = location.state?.fromCheckout;
-  const selectedPlan = location.state?.plan || searchParams.get('plan') || 'starter';
-  const checkoutEmail = location.state?.email || searchParams.get('email') || '';
-
-  // Get plan info from sessionStorage
   const storedPlan = JSON.parse(sessionStorage.getItem('selectedPlan') || 'null');
+  const selectedPlanFromState = location.state?.plan;
+  const selectedPlanFromQuery = searchParams.get('plan');
+  const selectedPlanFromStorage = storedPlan?.planId;
+  const selectedPlan = selectedPlanFromState || selectedPlanFromQuery || selectedPlanFromStorage || 'starter';
+
+  const selectedBillingFromState = location.state?.billing;
+  const selectedBillingFromQuery = searchParams.get('billing');
+  const selectedBillingFromStorage = storedPlan?.billing;
+  const selectedBilling = selectedBillingFromState || selectedBillingFromQuery || selectedBillingFromStorage || 'monthly';
+  const normalizedBilling = selectedBilling === 'yearly' ? 'yearly' : 'monthly';
+
+  const hasExplicitPlanSelection = Boolean(
+    fromCheckout || selectedPlanFromState || selectedPlanFromQuery || selectedPlanFromStorage
+  );
+
+  const checkoutEmail = location.state?.email || searchParams.get('email') || storedPlan?.email || '';
 
   // Plan details
   const planDetails = {
@@ -46,10 +58,11 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [apiError, setApiError] = useState('');
 
-  const planInfo = storedPlan || {
-    planId: selectedPlan,
-    planName: planDetails[selectedPlan]?.name || 'Starter',
-    price: planDetails[selectedPlan]?.price || 129,
+  const planInfo = {
+    planId: storedPlan?.planId || selectedPlan,
+    planName: storedPlan?.planName || planDetails[selectedPlan]?.name || 'Starter',
+    price: storedPlan?.price || planDetails[selectedPlan]?.price || 129,
+    billing: storedPlan?.billing === 'yearly' ? 'yearly' : normalizedBilling,
   };
 
   const handleChange = (e) => {
@@ -119,9 +132,13 @@ export default function Register() {
         sessionStorage.removeItem('selectedPlan');
 
         success('Registrierung erfolgreich! Weiterleitung...');
-        
-        // Navigate to pending-payment so the new owner selects a plan
-        navigate('/pending-payment', { replace: true });
+
+        if (hasExplicitPlanSelection) {
+          navigate(`/checkout/${planInfo.planId}?billing=${planInfo.billing}`, { replace: true });
+        } else {
+          // Fallback for direct signups without explicit plan selection
+          navigate('/pending-payment', { replace: true });
+        }
       }
     } catch (error) {
       const errorMsg = formatError(error);
