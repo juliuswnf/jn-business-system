@@ -1,5 +1,6 @@
 ﻿import ConsentForm from '../models/ConsentForm.js';
 import Salon from '../models/Salon.js';
+import Customer from '../models/Customer.js';
 import logger from '../utils/logger.js';
 import { generateConsentPDF } from '../utils/pdfGenerator.js';
 import { validateUrl } from '../utils/securityHelpers.js';
@@ -83,21 +84,59 @@ export const createConsentForm = async (req, res) => {
       language
     } = req.body;
 
+    if (!salonId || !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+
+    if (!customerId || !mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    const safeCustomerId = new mongoose.Types.ObjectId(customerId);
+
+    let parsedRisks = [];
+    if (Array.isArray(risks)) {
+      parsedRisks = risks;
+    } else if (typeof risks === 'string' && risks.trim()) {
+      try {
+        const decodedRisks = JSON.parse(risks);
+        if (!Array.isArray(decodedRisks)) {
+          return res.status(400).json({ success: false, message: 'Invalid risks format' });
+        }
+        parsedRisks = decodedRisks;
+      } catch (_parseError) {
+        return res.status(400).json({ success: false, message: 'Invalid risks JSON' });
+      }
+    }
+
     // Verify salon
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
 
+    const customer = await Customer.findOne({
+      _id: safeCustomerId,
+      salonId: safeSalonId
+    })
+      .select('_id')
+      .lean()
+      .maxTimeMS(5000);
+
+    if (!customer) {
+      return res.status(404).json({ success: false, message: 'Customer not found for this salon' });
+    }
+
     // Create consent form
     const consentForm = await ConsentForm.create({
-      salonId,
-      customerId,
+      salonId: safeSalonId,
+      customerId: safeCustomerId,
       consentType,
       title,
       description,
       treatmentName,
-      risks: risks ? JSON.parse(risks) : [],
+      risks: parsedRisks,
       signature,
       ipAddress: req.ip,
       userAgent: req.headers['user-agent'],
@@ -187,7 +226,13 @@ export const getConsentById = async (req, res) => {
 
     const { id } = req.params;
 
-    const consent = await ConsentForm.findById(id)
+    if (!id || !mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid consent id' });
+    }
+
+    const safeConsentId = new mongoose.Types.ObjectId(id);
+
+    const consent = await ConsentForm.findById(safeConsentId)
       .populate('customerId', 'name email')
       .lean().maxTimeMS(5000);
 
@@ -223,7 +268,13 @@ export const revokeConsent = async (req, res) => {
     const { reason } = req.body;
     const userId = getRequestUserId(req);
 
-    const consent = await ConsentForm.findById(id).maxTimeMS(5000);
+    if (!id || !mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid consent id' });
+    }
+
+    const safeConsentId = new mongoose.Types.ObjectId(id);
+
+    const consent = await ConsentForm.findById(safeConsentId).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
@@ -327,6 +378,10 @@ export const getExpiringConsents = async (req, res) => {
     const { salonId: requestedSalonId } = req.params;
     const { daysAhead = 30 } = req.query;
 
+    if (requestedSalonId && !mongoose.isValidObjectId(requestedSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+
     const rawTargetId = req.user.role === 'ceo' ? requestedSalonId : req.user.salonId?.toString();
     // Ensure salonId is a plain string (prevents object-operator injection)
     const targetSalonId = typeof rawTargetId === 'string' ? rawTargetId : null;
@@ -339,6 +394,11 @@ export const getExpiringConsents = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
     }
 
+    if (!mongoose.isValidObjectId(targetSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid tenant context' });
+    }
+    const safeTargetSalonId = new mongoose.Types.ObjectId(targetSalonId);
+
     const parsedDaysAhead = Number.parseInt(daysAhead, 10);
     const normalizedDaysAhead = Number.isFinite(parsedDaysAhead)
       ? Math.min(365, Math.max(1, parsedDaysAhead))
@@ -348,7 +408,7 @@ export const getExpiringConsents = async (req, res) => {
     expirationDate.setDate(expirationDate.getDate() + normalizedDaysAhead);
 
     const expiringConsents = await ConsentForm.find({
-      salonId: targetSalonId,
+      salonId: safeTargetSalonId,
       isActive: true,
       expiresAt: {
         $lte: expirationDate,
@@ -380,7 +440,13 @@ export const downloadConsentPDF = async (req, res) => {
 
     const { id } = req.params;
 
-    const consent = await ConsentForm.findById(id)
+    if (!id || !mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid consent id' });
+    }
+
+    const safeConsentId = new mongoose.Types.ObjectId(id);
+
+    const consent = await ConsentForm.findById(safeConsentId)
       .populate('customerId', 'name email').maxTimeMS(5000);
 
     if (!consent) {
@@ -445,7 +511,13 @@ export const addWitnessSignature = async (req, res) => {
     const { id } = req.params;
     const { witnessName, witnessSignature } = req.body;
 
-    const consent = await ConsentForm.findById(id).maxTimeMS(5000);
+    if (!id || !mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid consent id' });
+    }
+
+    const safeConsentId = new mongoose.Types.ObjectId(id);
+
+    const consent = await ConsentForm.findById(safeConsentId).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
@@ -481,25 +553,31 @@ export const getSalonConsents = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Authentication required' });
     }
 
-    const { salonId } = req.params;
+    const { salonId: rawSalonId } = req.params;
     const userId = getRequestUserId(req);
     const { consentType, isActive, page = 1, limit = 50 } = req.query;
 
+    if (!rawSalonId || !mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(rawSalonId);
+
     // Verify authorization
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
 
     const isCeo = req.user.role === 'ceo';
-    const hasSalonTenantAccess = req.user.salonId?.toString() === salonId;
+    const hasSalonTenantAccess = req.user.salonId?.toString() === rawSalonId;
     const isOwner = salon.owner?.toString() === userId?.toString();
 
     if (!isCeo && !hasSalonTenantAccess && !isOwner) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
-    const query = { salonId, deletedAt: null };
+    const query = { salonId: safeSalonId, deletedAt: null };
     if (consentType) {
       const safeConsentType = ALLOWED_CONSENT_TYPES.includes(String(consentType)) ? String(consentType) : undefined;
       if (safeConsentType) query.consentType = safeConsentType;

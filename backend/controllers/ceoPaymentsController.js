@@ -7,6 +7,7 @@
 import Salon from '../models/Salon.js';
 import Payment from '../models/Payment.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_PAYMENT_STATUSES = ['pending', 'completed', 'failed', 'refunded', 'partially_refunded', 'cancelled'];
 const ALLOWED_PAYMENT_TYPES = ['subscription', 'booking', 'refund', 'connect', 'manual'];
@@ -203,7 +204,13 @@ export const getTransactionDetails = async (req, res) => {
   try {
     const { transactionId } = req.params;
 
-    const transaction = await Payment.findById(transactionId)
+    if (!mongoose.isValidObjectId(transactionId)) {
+      return res.status(400).json({ success: false, message: 'Invalid transactionId format' });
+    }
+
+    const safeTransactionId = new mongoose.Types.ObjectId(transactionId);
+
+    const transaction = await Payment.findById(safeTransactionId)
       .populate('companyId', 'name email phone').maxTimeMS(5000)
       .populate('bookingId');
 
@@ -230,7 +237,13 @@ export const processRefund = async (req, res) => {
     const { transactionId } = req.params;
     const { reason, amount } = req.body;
 
-    const transaction = await Payment.findById(transactionId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(transactionId)) {
+      return res.status(400).json({ success: false, message: 'Invalid transactionId format' });
+    }
+
+    const safeTransactionId = new mongoose.Types.ObjectId(transactionId);
+
+    const transaction = await Payment.findById(safeTransactionId).maxTimeMS(5000);
     if (!transaction) {
       return res.status(404).json({
         success: false,
@@ -245,12 +258,24 @@ export const processRefund = async (req, res) => {
       });
     }
 
+    let refundAmount = transaction.amount;
+    if (typeof amount !== 'undefined') {
+      const parsedAmount = Number(amount);
+      if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid refund amount' });
+      }
+      if (parsedAmount > Number(transaction.amount)) {
+        return res.status(400).json({ success: false, message: 'Refund amount exceeds transaction amount' });
+      }
+      refundAmount = parsedAmount;
+    }
+
     // Update transaction
     transaction.status = 'refunded';
     transaction.refundReason = reason;
     transaction.refundedAt = new Date();
     transaction.refundedBy = req.user._id;
-    transaction.refundAmount = amount || transaction.amount;
+    transaction.refundAmount = refundAmount;
     await transaction.save();
 
     // TODO: Call Stripe refund API

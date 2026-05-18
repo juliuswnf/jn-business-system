@@ -3,6 +3,7 @@ import Salon from '../models/Salon.js';
 import emailService from '../services/emailService.js';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 import { escapeHtml } from '../utils/securityHelpers.js';
 
 const ALLOWED_SUPPORT_STATUSES = ['open', 'in_progress', 'resolved', 'closed', 'pending', 'all'];
@@ -135,6 +136,9 @@ export const getMyTickets = async (req, res) => {
   try {
     const userId = req.user.id;
     const { status, page = 1, limit = 10 } = req.query;
+    const validatedPage = Math.max(1, parseInt(page, 10) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
+    const skip = (validatedPage - 1) * validatedLimit;
 
     const query = { userId };
     if (status && ALLOWED_SUPPORT_STATUSES.includes(String(status)) && status !== 'all') {
@@ -144,8 +148,8 @@ export const getMyTickets = async (req, res) => {
     const tickets = await SupportTicket.find(query)
       .select('ticketNumber subject category priority status createdAt updatedAt')
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(Math.min(parseInt(limit) || 10, 100))
+      .skip(skip)
+      .limit(validatedLimit)
       .lean();
 
     const total = await SupportTicket.countDocuments(query);
@@ -154,10 +158,10 @@ export const getMyTickets = async (req, res) => {
       success: true,
       tickets,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: validatedPage,
+        limit: validatedLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validatedLimit)
       }
     });
   } catch (error) {
@@ -178,8 +182,14 @@ export const getTicketDetails = async (req, res) => {
     const { ticketId } = req.params;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(ticketId)) {
+      return res.status(400).json({ success: false, error: 'Ungültige Ticket-ID' });
+    }
+
+    const safeTicketId = new mongoose.Types.ObjectId(ticketId);
+
     const ticket = await SupportTicket.findOne({
-      _id: ticketId,
+      _id: safeTicketId,
       userId
     }).lean();
 
@@ -213,6 +223,12 @@ export const addMessage = async (req, res) => {
     const { content } = req.body;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(ticketId)) {
+      return res.status(400).json({ success: false, error: 'Ungültige Ticket-ID' });
+    }
+
+    const safeTicketId = new mongoose.Types.ObjectId(ticketId);
+
     if (!content) {
       return res.status(400).json({
         success: false,
@@ -221,7 +237,7 @@ export const addMessage = async (req, res) => {
     }
 
     const ticket = await SupportTicket.findOne({
-      _id: ticketId,
+      _id: safeTicketId,
       userId
     });
 
@@ -293,8 +309,14 @@ export const closeTicket = async (req, res) => {
     const { ticketId } = req.params;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(ticketId)) {
+      return res.status(400).json({ success: false, error: 'Ungültige Ticket-ID' });
+    }
+
+    const safeTicketId = new mongoose.Types.ObjectId(ticketId);
+
     const ticket = await SupportTicket.findOneAndUpdate(
-      { _id: ticketId, userId },
+      { _id: safeTicketId, userId },
       {
         status: 'closed',
         closedAt: new Date(),

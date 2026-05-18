@@ -2,6 +2,7 @@
 import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 /**
  * Widget Controller - For Embeddable Booking System
@@ -15,8 +16,14 @@ export const createWidget = async (req, res) => {
     const { salonId } = req.body;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Check if salon exists and belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
+    const salon = await Salon.findOne({ _id: safeSalonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -25,7 +32,7 @@ export const createWidget = async (req, res) => {
     }
 
     // Create widget
-    const widget = await Widget.createForSalon(salonId, req.body);
+    const widget = await Widget.createForSalon(safeSalonId, req.body);
 
     logger.log(`? Widget created for salon: ${salonId}`);
 
@@ -65,8 +72,14 @@ export const getWidget = async (req, res) => {
     const { salonId } = req.params;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
+    const salon = await Salon.findOne({ _id: safeSalonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -74,7 +87,7 @@ export const getWidget = async (req, res) => {
       });
     }
 
-    const widget = await Widget.findBySalon(salonId);
+    const widget = await Widget.findBySalon(safeSalonId);
     if (!widget) {
       return res.status(404).json({
         success: false,
@@ -171,8 +184,14 @@ export const updateWidget = async (req, res) => {
     const userId = req.user.id;
     const { theme, settings, layout, allowedDomains } = req.body;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
+    const salon = await Salon.findOne({ _id: safeSalonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -180,7 +199,7 @@ export const updateWidget = async (req, res) => {
       });
     }
 
-    const widget = await Widget.findBySalon(salonId);
+    const widget = await Widget.findBySalon(safeSalonId);
     if (!widget) {
       return res.status(404).json({
         success: false,
@@ -219,8 +238,14 @@ export const regenerateApiKey = async (req, res) => {
     const { salonId } = req.params;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
+    const salon = await Salon.findOne({ _id: safeSalonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -228,7 +253,7 @@ export const regenerateApiKey = async (req, res) => {
       });
     }
 
-    const widget = await Widget.findBySalon(salonId);
+    const widget = await Widget.findBySalon(safeSalonId);
     if (!widget) {
       return res.status(404).json({
         success: false,
@@ -265,8 +290,14 @@ export const deleteWidget = async (req, res) => {
     const { salonId } = req.params;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
+    const salon = await Salon.findOne({ _id: safeSalonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -274,7 +305,7 @@ export const deleteWidget = async (req, res) => {
       });
     }
 
-    const widget = await Widget.findBySalon(salonId);
+    const widget = await Widget.findBySalon(safeSalonId);
     if (!widget) {
       return res.status(404).json({
         success: false,
@@ -307,8 +338,14 @@ export const getWidgetStats = async (req, res) => {
     const { salonId } = req.params;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Check if salon belongs to user
-    const salon = await Salon.findOne({ _id: salonId, owner: userId }).maxTimeMS(5000);
+    const salon = await Salon.findOne({ _id: safeSalonId, owner: userId }).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -316,7 +353,7 @@ export const getWidgetStats = async (req, res) => {
       });
     }
 
-    const stats = await Widget.getStats(salonId);
+    const stats = await Widget.getStats(safeSalonId);
     if (!stats) {
       return res.status(404).json({
         success: false,

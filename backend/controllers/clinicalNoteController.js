@@ -29,8 +29,26 @@ export const createClinicalNote = async (req, res) => {
 
     const userId = req.user.id;
 
+    if (!salonId || !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+    if (!customerId || !mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId format' });
+    }
+    if (bookingId && !mongoose.isValidObjectId(bookingId)) {
+      return res.status(400).json({ success: false, message: 'Invalid bookingId format' });
+    }
+    if (consentFormId && !mongoose.isValidObjectId(consentFormId)) {
+      return res.status(400).json({ success: false, message: 'Invalid consentFormId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    const safeCustomerId = new mongoose.Types.ObjectId(customerId);
+    const safeBookingId = bookingId ? new mongoose.Types.ObjectId(bookingId) : null;
+    const safeConsentFormId = consentFormId ? new mongoose.Types.ObjectId(consentFormId) : null;
+
     // Verify salon has HIPAA enabled
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -44,22 +62,22 @@ export const createClinicalNote = async (req, res) => {
 
     // Verify practitioner is authorized
     const isOwner = salon.owner.toString() === userId;
-    const isAuthorizedPractitioner = ['admin', 'ceo'].includes(req.user.role) || (req.user.role === 'employee' && req.user.salonId?.toString() === salonId);
+    const isAuthorizedPractitioner = ['admin', 'ceo'].includes(req.user.role) || (req.user.role === 'employee' && req.user.salonId?.toString() === safeSalonId.toString());
     if (!isOwner && !isAuthorizedPractitioner) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
     // Create clinical note with encrypted content
     const clinicalNote = new ClinicalNote({
-      salonId,
-      customerId,
-      bookingId,
+      salonId: safeSalonId,
+      customerId: safeCustomerId,
+      bookingId: safeBookingId,
       practitionerId: userId,
       noteType,
       subject,
       treatmentDate: treatmentDate || new Date(),
       accessLevel: accessLevel || 'restricted',
-      consentFormId,
+      consentFormId: safeConsentFormId,
       hipaaCompliant: true
     });
 
@@ -78,7 +96,7 @@ export const createClinicalNote = async (req, res) => {
       resourceId: clinicalNote._id,
       isPHIAccess: true,
       phiAccessDetails: {
-        patientId: customerId,
+        patientId: safeCustomerId,
         dataType: 'clinical-note',
         accessReason: 'create',
         justification: `Created ${noteType} note`
@@ -111,7 +129,13 @@ export const getClinicalNote = async (req, res) => {
     const userId = req.user.id;
     const { accessReason, justification } = req.query;
 
-    const clinicalNote = await ClinicalNote.findById(id)
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid clinical note id format' });
+    }
+
+    const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
+
+    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId)
       .populate('practitionerId', 'name email').maxTimeMS(5000)
       .populate('customerId', 'name email');
 
@@ -268,7 +292,13 @@ export const updateClinicalNote = async (req, res) => {
     const { subject, content, noteType, accessLevel } = req.body;
     const userId = req.user.id;
 
-    const clinicalNote = await ClinicalNote.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid clinical note id format' });
+    }
+
+    const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
+
+    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
@@ -344,7 +374,13 @@ export const deleteClinicalNote = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const clinicalNote = await ClinicalNote.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid clinical note id format' });
+    }
+
+    const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
+
+    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
@@ -399,7 +435,17 @@ export const shareClinicalNote = async (req, res) => {
     const { shareWithUserId, expiresInDays } = req.body;
     const userId = req.user.id;
 
-    const clinicalNote = await ClinicalNote.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid clinical note id format' });
+    }
+    if (!shareWithUserId || !mongoose.isValidObjectId(shareWithUserId)) {
+      return res.status(400).json({ success: false, message: 'Invalid shareWithUserId format' });
+    }
+
+    const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
+    const safeShareWithUserId = new mongoose.Types.ObjectId(shareWithUserId);
+
+    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
@@ -415,7 +461,7 @@ export const shareClinicalNote = async (req, res) => {
       : null;
 
     clinicalNote.sharedWith.push({
-      userId: shareWithUserId,
+      userId: safeShareWithUserId,
       sharedAt: new Date(),
       expiresAt
     });

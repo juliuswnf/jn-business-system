@@ -264,6 +264,15 @@ export const getAvailableSlots = async (req, res) => {
       });
     }
 
+    if (!isValidObjectId(serviceId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ungültiges Service-ID-Format'
+      });
+    }
+
+    const safeServiceId = new mongoose.Types.ObjectId(serviceId);
+
     const salon = await Salon.findBySlug(slug);
 
     if (!salon || !isPublicBookingAvailable(salon)) {
@@ -273,13 +282,39 @@ export const getAvailableSlots = async (req, res) => {
       });
     }
 
-    const service = await Service.findById(serviceId).maxTimeMS(5000);
+    const service = await Service.findOne({
+      _id: safeServiceId,
+      salonId: salon._id,
+      isActive: true
+    }).maxTimeMS(5000);
 
     if (!service) {
       return res.status(404).json({
         success: false,
-        message: 'Service nicht gefunden'
+        message: 'Service nicht gefunden oder nicht für diesen Salon verfügbar'
       });
+    }
+
+    let safeEmployeeId = null;
+    if (employeeId) {
+      if (!isValidObjectId(employeeId)) {
+        return res.status(400).json({ success: false, message: 'Invalid employeeId format' });
+      }
+
+      safeEmployeeId = new mongoose.Types.ObjectId(employeeId);
+      const employee = await User.findOne({
+        _id: safeEmployeeId,
+        salonId: salon._id,
+        role: 'employee',
+        isActive: true
+      })
+        .select('_id')
+        .lean()
+        .maxTimeMS(5000);
+
+      if (!employee) {
+        return res.status(404).json({ success: false, message: 'Mitarbeiter nicht gefunden' });
+      }
     }
 
     // Get day of week for business hours check
@@ -307,11 +342,8 @@ export const getAvailableSlots = async (req, res) => {
       status: { $nin: ['cancelled', 'no_show'] }
     };
 
-    if (employeeId) {
-      if (!isValidObjectId(employeeId)) {
-        return res.status(400).json({ success: false, message: 'Invalid employeeId format' });
-      }
-      bookingFilter.employeeId = new mongoose.Types.ObjectId(employeeId);
+    if (safeEmployeeId) {
+      bookingFilter.employeeId = safeEmployeeId;
     }
 
     const existingBookings = await Booking.find(bookingFilter)
@@ -491,6 +523,9 @@ export const createPublicBooking = async (req, res) => {
     const salon = await Salon.findBySlug(slug);
     if (!salon) return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
 
+    const safeServiceId = new mongoose.Types.ObjectId(serviceId);
+    const safeEmployeeId = employeeId ? new mongoose.Types.ObjectId(employeeId) : null;
+
     // Convert new { date, time } format to UTC using salon timezone
     stage = 'convert_booking_date_timezone';
     if (!parsedBookingDate && bookingDate.date && bookingDate.time) {
@@ -512,8 +547,28 @@ export const createPublicBooking = async (req, res) => {
 
     // Get service
     stage = 'load_service';
-    const service = await Service.findById(serviceId).maxTimeMS(5000);
+    const service = await Service.findOne({
+      _id: safeServiceId,
+      salonId: salon._id,
+      isActive: true
+    }).maxTimeMS(5000);
     if (!service) return res.status(404).json({ success: false, message: 'Service nicht gefunden' });
+
+    if (safeEmployeeId) {
+      const employee = await User.findOne({
+        _id: safeEmployeeId,
+        salonId: salon._id,
+        role: 'employee',
+        isActive: true
+      })
+        .select('_id')
+        .lean()
+        .maxTimeMS(5000);
+
+      if (!employee) {
+        return res.status(404).json({ success: false, message: 'Mitarbeiter nicht gefunden' });
+      }
+    }
 
     // No-Show-Killer payment method handling
     stage = 'handle_payment_method';
@@ -534,7 +589,7 @@ export const createPublicBooking = async (req, res) => {
     stage = 'create_booking';
     const bookingData = {
       salonId: salon._id, customerName, customerEmail: customerEmail.toLowerCase(), customerPhone,
-      serviceId, employeeId: employeeId || null, bookingDate: parsedBookingDate,
+      serviceId: safeServiceId, employeeId: safeEmployeeId || null, bookingDate: parsedBookingDate,
       duration: service.duration, notes,
       language: language || salon.defaultLanguage || 'de',
       status: 'confirmed', confirmedAt: new Date(),
@@ -549,7 +604,7 @@ export const createPublicBooking = async (req, res) => {
     const txSession = await mongoose.startSession();
     txSession.startTransaction();
     try {
-      const isAvailable = await Booking.checkAvailability(salon._id, parsedBookingDate, service.duration, employeeId || null, txSession);
+      const isAvailable = await Booking.checkAvailability(salon._id, parsedBookingDate, service.duration, safeEmployeeId || null, txSession);
       if (!isAvailable) {
         await txSession.abortTransaction();
         return res.status(409).json({ success: false, message: 'Dieser Zeitraum ist nicht mehr verfügbar' });
@@ -565,7 +620,7 @@ export const createPublicBooking = async (req, res) => {
 
     stage = 'populate_booking';
     await booking.populate('serviceId');
-    if (employeeId) await booking.populate('employeeId');
+    if (safeEmployeeId) await booking.populate('employeeId');
 
     const bookingForEmail = { ...booking.toObject(), service: booking.serviceId, employee: booking.employeeId };
 

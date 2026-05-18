@@ -96,7 +96,13 @@ export const getLogDetails = async (req, res) => {
   try {
     const { logId } = req.params;
 
-    const log = await AuditLog.findById(logId)
+    if (!mongoose.isValidObjectId(logId)) {
+      return res.status(400).json({ success: false, message: 'Invalid logId format' });
+    }
+
+    const safeLogId = new mongoose.Types.ObjectId(logId);
+
+    const log = await AuditLog.findById(safeLogId)
       .populate('userId', 'name email role').maxTimeMS(5000);
 
     if (!log) {

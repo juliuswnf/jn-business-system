@@ -32,8 +32,42 @@ export const createPackage = async (req, res) => {
 
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
+    if (trainerSpecific === 'true' && trainerId && !mongoose.isValidObjectId(trainerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid trainerId format' });
+    }
+
+    let parsedServiceIds = [];
+    if (Array.isArray(serviceIds)) {
+      parsedServiceIds = serviceIds;
+    } else if (typeof serviceIds === 'string' && serviceIds.trim()) {
+      try {
+        const decodedServiceIds = JSON.parse(serviceIds);
+        if (!Array.isArray(decodedServiceIds)) {
+          return res.status(400).json({ success: false, message: 'Invalid serviceIds format' });
+        }
+        parsedServiceIds = decodedServiceIds;
+      } catch (_parseError) {
+        return res.status(400).json({ success: false, message: 'Invalid serviceIds JSON' });
+      }
+    }
+
+    for (const serviceId of parsedServiceIds) {
+      if (!mongoose.isValidObjectId(serviceId)) {
+        return res.status(400).json({ success: false, message: 'Invalid serviceIds entry' });
+      }
+    }
+
+    const safeServiceIds = parsedServiceIds.map(serviceId => new mongoose.Types.ObjectId(serviceId));
+    const safeTrainerId = trainerSpecific === 'true' && trainerId ? new mongoose.Types.ObjectId(trainerId) : null;
+
     // Verify salon ownership
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -43,7 +77,7 @@ export const createPackage = async (req, res) => {
     }
 
     const pkg = await Package.create({
-      salonId,
+      salonId: safeSalonId,
       createdBy: userId,
       name,
       description,
@@ -52,9 +86,9 @@ export const createPackage = async (req, res) => {
       totalSessions,
       sessionDuration,
       validityPeriod,
-      serviceIds: serviceIds ? JSON.parse(serviceIds) : [],
+      serviceIds: safeServiceIds,
       trainerSpecific: trainerSpecific === 'true',
-      trainerId: trainerSpecific === 'true' ? trainerId : null,
+      trainerId: safeTrainerId,
       isActive: true
     });
 
@@ -75,16 +109,29 @@ export const getAvailablePackages = async (req, res) => {
     const { salonId } = req.params;
     const { trainerId } = req.query;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    let safeTrainerId = null;
+    if (trainerId) {
+      if (!mongoose.isValidObjectId(trainerId)) {
+        return res.status(400).json({ success: false, message: 'Invalid trainerId format' });
+      }
+      safeTrainerId = new mongoose.Types.ObjectId(trainerId);
+    }
+
     const query = {
-      salonId,
+      salonId: safeSalonId,
       isActive: true,
       deletedAt: null
     };
 
-    if (trainerId) {
+    if (safeTrainerId) {
       query.$or = [
         { trainerSpecific: false },
-        { trainerId }
+        { trainerId: safeTrainerId }
       ];
     } else {
       query.trainerSpecific = false;
@@ -378,7 +425,13 @@ export const updatePackage = async (req, res) => {
     const { name, description, price, isActive } = req.body;
     const userId = req.user.id;
 
-    const pkg = await Package.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid package ID format' });
+    }
+
+    const safePackageId = new mongoose.Types.ObjectId(id);
+
+    const pkg = await Package.findById(safePackageId).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
@@ -413,7 +466,13 @@ export const deletePackage = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const pkg = await Package.findById(id).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid package ID format' });
+    }
+
+    const safePackageId = new mongoose.Types.ObjectId(id);
+
+    const pkg = await Package.findById(safePackageId).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
@@ -445,8 +504,14 @@ export const getPackageStatistics = async (req, res) => {
     const { salonId } = req.params;
     const userId = req.user.id;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+
     // Verify authorization
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }

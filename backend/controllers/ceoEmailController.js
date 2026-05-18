@@ -7,6 +7,7 @@ import logger from '../utils/logger.js';
 import Salon from '../models/Salon.js';
 import EmailLog from '../models/EmailLog.js';
 import EmailQueue from '../models/EmailQueue.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_EMAIL_STATUSES = ['pending', 'sent', 'failed', 'cancelled', 'completed', 'draft'];
 
@@ -15,6 +16,9 @@ export const getAllCampaigns = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const status = ALLOWED_EMAIL_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
+    const validatedPage = Math.max(1, parseInt(page, 10) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+    const skip = (validatedPage - 1) * validatedLimit;
 
     const query = { type: 'campaign' };
     if (status) {
@@ -24,8 +28,8 @@ export const getAllCampaigns = async (req, res) => {
     // Get campaigns from email logs
     const campaigns = await EmailLog.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(Math.min(parseInt(limit) || 20, 100))
+      .skip(skip)
+      .limit(validatedLimit)
       .lean()
       .maxTimeMS(5000);
 
@@ -58,10 +62,10 @@ export const getAllCampaigns = async (req, res) => {
       campaigns,
       stats: statsObj,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: validatedPage,
+        limit: validatedLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validatedLimit)
       }
     });
   } catch (error) {
@@ -158,7 +162,13 @@ export const getCampaignDetails = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(campaignId)) {
+      return res.status(400).json({ success: false, message: 'Invalid campaignId format' });
+    }
+
+    const safeCampaignId = new mongoose.Types.ObjectId(campaignId);
+
+    const campaign = await EmailLog.findById(safeCampaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -206,7 +216,13 @@ export const cancelCampaign = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(campaignId)) {
+      return res.status(400).json({ success: false, message: 'Invalid campaignId format' });
+    }
+
+    const safeCampaignId = new mongoose.Types.ObjectId(campaignId);
+
+    const campaign = await EmailLog.findById(safeCampaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -246,7 +262,13 @@ export const sendCampaign = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(campaignId)) {
+      return res.status(400).json({ success: false, message: 'Invalid campaignId format' });
+    }
+
+    const safeCampaignId = new mongoose.Types.ObjectId(campaignId);
+
+    const campaign = await EmailLog.findById(safeCampaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -303,7 +325,13 @@ export const deleteCampaign = async (req, res) => {
   try {
     const { campaignId } = req.params;
 
-    const campaign = await EmailLog.findById(campaignId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(campaignId)) {
+      return res.status(400).json({ success: false, message: 'Invalid campaignId format' });
+    }
+
+    const safeCampaignId = new mongoose.Types.ObjectId(campaignId);
+
+    const campaign = await EmailLog.findById(safeCampaignId).maxTimeMS(5000);
     if (!campaign) {
       return res.status(404).json({
         success: false,

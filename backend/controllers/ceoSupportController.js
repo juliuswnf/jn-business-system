@@ -124,7 +124,13 @@ export const getTicketDetails = async (req, res) => {
   try {
     const { ticketId } = req.params;
 
-    const ticket = await SupportTicket.findById(ticketId)
+    if (!mongoose.isValidObjectId(ticketId)) {
+      return res.status(400).json({ success: false, message: 'Invalid ticketId format' });
+    }
+
+    const safeTicketId = new mongoose.Types.ObjectId(ticketId);
+
+    const ticket = await SupportTicket.findById(safeTicketId)
       .populate('salonId', 'name ownerEmail subscription').maxTimeMS(5000)
       .populate('userId', 'name email')
       .populate('assignedTo', 'name email')
@@ -167,8 +173,22 @@ export const createTicket = async (req, res) => {
       });
     }
 
+    if (category && !ALLOWED_TICKET_CATEGORIES.includes(String(category))) {
+      return res.status(400).json({ success: false, message: 'Invalid category' });
+    }
+
+    if (priority && !ALLOWED_TICKET_PRIORITIES.includes(String(priority))) {
+      return res.status(400).json({ success: false, message: 'Invalid priority' });
+    }
+
+    if (salonId && !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = salonId ? new mongoose.Types.ObjectId(salonId) : null;
+
     const ticket = await SupportTicket.create({
-      salonId,
+      salonId: safeSalonId,
       customerName: customerName || 'Unknown',
       customerEmail,
       subject,
@@ -199,7 +219,25 @@ export const updateTicket = async (req, res) => {
     const { ticketId } = req.params;
     const { status, priority, assignedTo, internalNotes, tags } = req.body;
 
-    const ticket = await SupportTicket.findById(ticketId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(ticketId)) {
+      return res.status(400).json({ success: false, message: 'Invalid ticketId format' });
+    }
+
+    const safeTicketId = new mongoose.Types.ObjectId(ticketId);
+
+    if (status && !ALLOWED_TICKET_STATUSES.includes(String(status))) {
+      return res.status(400).json({ success: false, message: 'Invalid status' });
+    }
+
+    if (priority && !ALLOWED_TICKET_PRIORITIES.includes(String(priority))) {
+      return res.status(400).json({ success: false, message: 'Invalid priority' });
+    }
+
+    if (assignedTo !== undefined && assignedTo !== null && assignedTo !== '' && !mongoose.isValidObjectId(assignedTo)) {
+      return res.status(400).json({ success: false, message: 'Invalid assignedTo format' });
+    }
+
+    const ticket = await SupportTicket.findById(safeTicketId).maxTimeMS(5000);
     if (!ticket) {
       return res.status(404).json({
         success: false,
@@ -214,7 +252,9 @@ export const updateTicket = async (req, res) => {
       if (status === 'closed') ticket.closedAt = new Date();
     }
     if (priority) ticket.priority = priority;
-    if (assignedTo !== undefined) ticket.assignedTo = assignedTo || null;
+    if (assignedTo !== undefined) {
+      ticket.assignedTo = assignedTo ? new mongoose.Types.ObjectId(assignedTo) : null;
+    }
     if (internalNotes !== undefined) ticket.internalNotes = internalNotes;
     if (tags) ticket.tags = tags;
 
@@ -237,6 +277,12 @@ export const addReply = async (req, res) => {
     const { ticketId } = req.params;
     const { content } = req.body;
 
+    if (!mongoose.isValidObjectId(ticketId)) {
+      return res.status(400).json({ success: false, message: 'Invalid ticketId format' });
+    }
+
+    const safeTicketId = new mongoose.Types.ObjectId(ticketId);
+
     if (!content) {
       return res.status(400).json({
         success: false,
@@ -244,7 +290,7 @@ export const addReply = async (req, res) => {
       });
     }
 
-    const ticket = await SupportTicket.findById(ticketId).maxTimeMS(5000);
+    const ticket = await SupportTicket.findById(safeTicketId).maxTimeMS(5000);
     if (!ticket) {
       return res.status(404).json({
         success: false,

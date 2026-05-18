@@ -12,6 +12,13 @@ import mongoose from 'mongoose';
 const ALLOWED_CAMPAIGN_STATUSES = ['draft', 'active', 'paused', 'completed', 'cancelled'];
 const ALLOWED_RECIPIENT_STATUSES = ['pending', 'sent', 'delivered', 'failed', 'unsubscribed'];
 
+const parseObjectIdOrNull = (value) => {
+  if (!mongoose.isValidObjectId(value)) {
+    return null;
+  }
+  return new mongoose.Types.ObjectId(value);
+};
+
 const getSalonForRequestUser = async (req, { populateOwner = false } = {}) => {
   const userId = req.user?._id || req.user?.id;
   const userSalonId = req.user?.salonId;
@@ -72,6 +79,11 @@ export const createCampaign = async (req, res) => {
   try {
     const { templateId, name, customRules, customMessage, customSchedule } = req.body;
 
+    const safeTemplateId = parseObjectIdOrNull(templateId);
+    if (!safeTemplateId) {
+      return res.status(400).json({ success: false, message: 'Invalid templateId format' });
+    }
+
     const salon = await getSalonForRequestUser(req);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
@@ -87,7 +99,7 @@ export const createCampaign = async (req, res) => {
     }
 
     // Get template
-    const template = await MarketingTemplate.findById(templateId);
+    const template = await MarketingTemplate.findById(safeTemplateId);
     if (!template) {
       return res.status(404).json({ success: false, message: 'Template nicht gefunden' });
     }
@@ -147,7 +159,12 @@ export const getCampaigns = async (req, res) => {
  */
 export const getCampaign = async (req, res) => {
   try {
-    const campaign = await MarketingCampaign.findById(req.params.id);
+    const safeCampaignId = parseObjectIdOrNull(req.params.id);
+    if (!safeCampaignId) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
+    }
+
+    const campaign = await MarketingCampaign.findById(safeCampaignId);
     if (!campaign) {
       return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
@@ -181,7 +198,12 @@ export const getCampaign = async (req, res) => {
  */
 export const updateCampaign = async (req, res) => {
   try {
-    const campaign = await MarketingCampaign.findById(req.params.id);
+    const safeCampaignId = parseObjectIdOrNull(req.params.id);
+    if (!safeCampaignId) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
+    }
+
+    const campaign = await MarketingCampaign.findById(safeCampaignId);
     if (!campaign) {
       return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
@@ -224,7 +246,12 @@ export const updateCampaign = async (req, res) => {
  */
 export const deleteCampaign = async (req, res) => {
   try {
-    const campaign = await MarketingCampaign.findById(req.params.id);
+    const safeCampaignId = parseObjectIdOrNull(req.params.id);
+    if (!safeCampaignId) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
+    }
+
+    const campaign = await MarketingCampaign.findById(safeCampaignId);
     if (!campaign) {
       return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
@@ -255,7 +282,12 @@ export const deleteCampaign = async (req, res) => {
  */
 export const runCampaign = async (req, res) => {
   try {
-    const campaign = await MarketingCampaign.findById(req.params.id);
+    const safeCampaignId = parseObjectIdOrNull(req.params.id);
+    if (!safeCampaignId) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
+    }
+
+    const campaign = await MarketingCampaign.findById(safeCampaignId);
     if (!campaign) {
       return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
@@ -309,7 +341,12 @@ export const runCampaign = async (req, res) => {
  */
 export const previewCampaign = async (req, res) => {
   try {
-    const campaign = await MarketingCampaign.findById(req.params.id);
+    const safeCampaignId = parseObjectIdOrNull(req.params.id);
+    if (!safeCampaignId) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
+    }
+
+    const campaign = await MarketingCampaign.findById(safeCampaignId);
     if (!campaign) {
       return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
@@ -361,7 +398,12 @@ export const previewCampaign = async (req, res) => {
  */
 export const getRecipients = async (req, res) => {
   try {
-    const campaign = await MarketingCampaign.findById(req.params.id);
+    const safeCampaignId = parseObjectIdOrNull(req.params.id);
+    if (!safeCampaignId) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
+    }
+
+    const campaign = await MarketingCampaign.findById(safeCampaignId);
     if (!campaign) {
       return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }

@@ -30,6 +30,9 @@ export const getAllBackups = async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const type = ALLOWED_BACKUP_TYPES.includes(String(req.query.type)) ? String(req.query.type) : undefined;
     const status = ALLOWED_BACKUP_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : undefined;
+    const validatedPage = Math.max(1, parseInt(page, 10) || 1);
+    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+    const skip = (validatedPage - 1) * validatedLimit;
 
     const query = {};
     if (type) query.type = type;
@@ -37,8 +40,8 @@ export const getAllBackups = async (req, res) => {
 
     const backups = await Backup.find(query)
       .sort({ createdAt: -1 })
-      .skip((parseInt(page) - 1) * parseInt(limit))
-      .limit(parseInt(limit))
+      .skip(skip)
+      .limit(validatedLimit)
       .lean().maxTimeMS(5000)
       .populate('createdBy', 'name email');
 
@@ -72,10 +75,10 @@ export const getAllBackups = async (req, res) => {
       backups,
       stats: statsObj,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: validatedPage,
+        limit: validatedLimit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / validatedLimit)
       }
     });
   } catch (error) {
@@ -89,7 +92,13 @@ export const getBackupDetails = async (req, res) => {
   try {
     const { backupId } = req.params;
 
-    const backup = await Backup.findById(backupId)
+    if (!mongoose.isValidObjectId(backupId)) {
+      return res.status(400).json({ success: false, message: 'Invalid backupId format' });
+    }
+
+    const safeBackupId = new mongoose.Types.ObjectId(backupId);
+
+    const backup = await Backup.findById(safeBackupId)
       .populate('createdBy', 'name email').maxTimeMS(5000);
 
     if (!backup) {
@@ -232,7 +241,13 @@ export const deleteBackup = async (req, res) => {
   try {
     const { backupId } = req.params;
 
-    const backup = await Backup.findById(backupId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(backupId)) {
+      return res.status(400).json({ success: false, message: 'Invalid backupId format' });
+    }
+
+    const safeBackupId = new mongoose.Types.ObjectId(backupId);
+
+    const backup = await Backup.findById(safeBackupId).maxTimeMS(5000);
     if (!backup) {
       return res.status(404).json({
         success: false,
@@ -264,6 +279,12 @@ export const restoreBackup = async (req, res) => {
     const { backupId } = req.params;
     const { confirm } = req.body;
 
+    if (!mongoose.isValidObjectId(backupId)) {
+      return res.status(400).json({ success: false, message: 'Invalid backupId format' });
+    }
+
+    const safeBackupId = new mongoose.Types.ObjectId(backupId);
+
     if (!confirm) {
       return res.status(400).json({
         success: false,
@@ -271,7 +292,7 @@ export const restoreBackup = async (req, res) => {
       });
     }
 
-    const backup = await Backup.findById(backupId).maxTimeMS(5000);
+    const backup = await Backup.findById(safeBackupId).maxTimeMS(5000);
     if (!backup) {
       return res.status(404).json({
         success: false,
@@ -355,7 +376,13 @@ export const downloadBackup = async (req, res) => {
   try {
     const { backupId } = req.params;
 
-    const backup = await Backup.findById(backupId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(backupId)) {
+      return res.status(400).json({ success: false, message: 'Invalid backupId format' });
+    }
+
+    const safeBackupId = new mongoose.Types.ObjectId(backupId);
+
+    const backup = await Backup.findById(safeBackupId).maxTimeMS(5000);
     if (!backup) {
       return res.status(404).json({
         success: false,

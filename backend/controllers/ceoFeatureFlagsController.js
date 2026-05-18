@@ -6,6 +6,7 @@
 
 import FeatureFlag from '../models/FeatureFlag.js';
 import Salon from '../models/Salon.js';
+import mongoose from 'mongoose';
 
 const ALLOWED_FLAG_CATEGORIES = ['feature', 'experiment', 'killswitch', 'plan', 'beta', 'internal'];
 
@@ -55,7 +56,13 @@ export const getFlagDetails = async (req, res) => {
   try {
     const { flagId } = req.params;
 
-    const flag = await FeatureFlag.findById(flagId)
+    if (!mongoose.isValidObjectId(flagId)) {
+      return res.status(400).json({ success: false, message: 'Invalid flagId format' });
+    }
+
+    const safeFlagId = new mongoose.Types.ObjectId(flagId);
+
+    const flag = await FeatureFlag.findById(safeFlagId)
       .populate('enabledFor', 'name ownerEmail').maxTimeMS(5000)
       .populate('disabledFor', 'name ownerEmail')
       .populate('createdBy', 'name email')
@@ -146,7 +153,13 @@ export const updateFlag = async (req, res) => {
       rolloutPercentage
     } = req.body;
 
-    const flag = await FeatureFlag.findById(flagId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(flagId)) {
+      return res.status(400).json({ success: false, message: 'Invalid flagId format' });
+    }
+
+    const safeFlagId = new mongoose.Types.ObjectId(flagId);
+
+    const flag = await FeatureFlag.findById(safeFlagId).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -181,7 +194,13 @@ export const toggleFlag = async (req, res) => {
   try {
     const { flagId } = req.params;
 
-    const flag = await FeatureFlag.findById(flagId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(flagId)) {
+      return res.status(400).json({ success: false, message: 'Invalid flagId format' });
+    }
+
+    const safeFlagId = new mongoose.Types.ObjectId(flagId);
+
+    const flag = await FeatureFlag.findById(safeFlagId).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -209,7 +228,13 @@ export const deleteFlag = async (req, res) => {
   try {
     const { flagId } = req.params;
 
-    const flag = await FeatureFlag.findById(flagId);
+    if (!mongoose.isValidObjectId(flagId)) {
+      return res.status(400).json({ success: false, message: 'Invalid flagId format' });
+    }
+
+    const safeFlagId = new mongoose.Types.ObjectId(flagId);
+
+    const flag = await FeatureFlag.findById(safeFlagId);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -236,7 +261,24 @@ export const updateCustomerFlag = async (req, res) => {
     const { flagId } = req.params;
     const { salonId, action } = req.body; // action: 'enable' or 'disable' or 'remove'
 
-    const flag = await FeatureFlag.findById(flagId).maxTimeMS(5000);
+    if (!mongoose.isValidObjectId(flagId)) {
+      return res.status(400).json({ success: false, message: 'Invalid flagId format' });
+    }
+
+    if (!salonId || !mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeActions = ['enable', 'disable', 'remove'];
+    if (!safeActions.includes(String(action))) {
+      return res.status(400).json({ success: false, message: 'Invalid action' });
+    }
+
+    const safeFlagId = new mongoose.Types.ObjectId(flagId);
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    const safeSalonIdString = safeSalonId.toString();
+
+    const flag = await FeatureFlag.findById(safeFlagId).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
         success: false,
@@ -244,7 +286,7 @@ export const updateCustomerFlag = async (req, res) => {
       });
     }
 
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -254,20 +296,20 @@ export const updateCustomerFlag = async (req, res) => {
 
     if (action === 'enable') {
       // Add to enabledFor, remove from disabledFor
-      if (!flag.enabledFor.includes(salonId)) {
-        flag.enabledFor.push(salonId);
+      if (!flag.enabledFor.some(id => id.toString() === safeSalonIdString)) {
+        flag.enabledFor.push(safeSalonId);
       }
-      flag.disabledFor = flag.disabledFor.filter(id => id.toString() !== salonId);
+      flag.disabledFor = flag.disabledFor.filter(id => id.toString() !== safeSalonIdString);
     } else if (action === 'disable') {
       // Add to disabledFor, remove from enabledFor
-      if (!flag.disabledFor.includes(salonId)) {
-        flag.disabledFor.push(salonId);
+      if (!flag.disabledFor.some(id => id.toString() === safeSalonIdString)) {
+        flag.disabledFor.push(safeSalonId);
       }
-      flag.enabledFor = flag.enabledFor.filter(id => id.toString() !== salonId);
+      flag.enabledFor = flag.enabledFor.filter(id => id.toString() !== safeSalonIdString);
     } else if (action === 'remove') {
       // Remove from both lists (use default behavior)
-      flag.enabledFor = flag.enabledFor.filter(id => id.toString() !== salonId);
-      flag.disabledFor = flag.disabledFor.filter(id => id.toString() !== salonId);
+      flag.enabledFor = flag.enabledFor.filter(id => id.toString() !== safeSalonIdString);
+      flag.disabledFor = flag.disabledFor.filter(id => id.toString() !== safeSalonIdString);
     }
 
     flag.lastModifiedBy = req.user._id;
@@ -289,6 +331,13 @@ export const checkFlagForCustomer = async (req, res) => {
   try {
     const { flagKey, salonId } = req.params;
 
+    if (!mongoose.isValidObjectId(salonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    const safeSalonIdString = safeSalonId.toString();
+
     const flag = await FeatureFlag.findOne({ key: flagKey }).maxTimeMS(5000);
     if (!flag) {
       return res.status(404).json({
@@ -297,7 +346,7 @@ export const checkFlagForCustomer = async (req, res) => {
       });
     }
 
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({
         success: false,
@@ -305,12 +354,12 @@ export const checkFlagForCustomer = async (req, res) => {
       });
     }
 
-    const isEnabled = flag.isEnabledFor(salonId, salon.subscription?.plan);
+    const isEnabled = flag.isEnabledFor(safeSalonIdString, salon.subscription?.plan);
 
     res.status(200).json({
       success: true,
       flagKey,
-      salonId,
+      salonId: safeSalonIdString,
       isEnabled
     });
   } catch (error) {
