@@ -261,13 +261,8 @@ class StripePaymentService {
         idempotencyKey: `sub-upgrade-${salon._id}-${subscription.id}-${newTier}-${billingCycle}`
       });
 
-      // Do not finalize tier/billing locally here.
-      // Source of truth is Stripe webhook confirmation to avoid frontend-triggered
-      // direct state confirmation races.
-      salon.subscription.currentPeriodEnd = new Date(
-        updatedSubscription.current_period_end * 1000
-      );
-      await salon.save();
+      // Do not mutate local subscription state here.
+      // Source of truth is Stripe webhook confirmation only.
 
       logger.info(
         `[Stripe] Upgraded salon ${salon._id} from ${currentTier} to ${newTier}`
@@ -361,11 +356,8 @@ class StripePaymentService {
           idempotencyKey: `sub-downgrade-scheduled-${salon._id}-${subscription.id}-${newTier}-${billingCycle}`
         });
 
-        // Mark for downgrade at period end (keep current tier until webhook confirms)
-        salon.subscription.cancelAtPeriodEnd = false;
+        // Keep local DB unchanged; webhook confirmation is authoritative.
       }
-
-      await salon.save();
 
       logger.info(
         `[Stripe] Downgraded salon ${salon._id} from ${currentTier} to ${newTier} (${

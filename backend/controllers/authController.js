@@ -151,8 +151,11 @@ export const register = async (req, res) => {
     const normalizedEmail = String(email).toLowerCase().trim();
 
     // Check if user exists - ensure email is string to prevent NoSQL injection
+    // ? SECURITY FIX: Timing-safe duplicate check (prevents user enumeration)
     const existingUser = await User.findOne({ email: normalizedEmail }).maxTimeMS(5000);
     if (existingUser) {
+      // Execute dummy bcrypt to equalize timing with successful registration path
+      await bcrypt.hash('dummy-password-for-timing', 12);
       return res.status(400).json({
         success: false,
         message: 'Diese E-Mail-Adresse wird bereits verwendet'
@@ -247,10 +250,20 @@ export const register = async (req, res) => {
     // ? SECURITY FIX: Generate CSRF token for state-changing operations
     generateCSRFToken(req, res, () => {});
 
+    // ? SECURITY FIX: Explicit safe user fields (never return sensitive data)
     res.status(201).json({
       success: true,
       expiresIn: 15 * 60, // 15 minutes in seconds
-      user: user.toJSON(),
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        salonId: user.salonId,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        language: user.language
+      },
       salon: salon ? {
         id: salon._id,
         name: salon.name,
@@ -365,10 +378,20 @@ export const login = async (req, res) => {
 
     await applyMinimumAuthDelay(startTime);
 
+    // ? SECURITY FIX: Explicit safe user fields
     res.status(200).json({
       success: true,
       expiresIn: 15 * 60, // 15 minutes in seconds
-      user: user.toJSON(),
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        salonId: user.salonId,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        language: user.language
+      },
       subscriptionStatus
     });
   } catch (error) {
@@ -468,7 +491,25 @@ async function handleCEOTwoFactor(user, twoFactorCode, clientIP, email, ipAttemp
         await user.resetLoginAttempts();
         const token = generateToken(user._id, '30d');
         logger.info(`[CEO-SECURITY] ? 2FA setup completed and CEO logged in: ${user.email}, IP: ${clientIP}`);
-        return { status: 200, body: { success: true, token, user: user.toJSON(), message: '2FA erfolgreich eingerichtet. Willkommen im CEO Bereich!' } };
+        // ? SECURITY FIX: Explicit safe user fields
+        return { 
+          status: 200, 
+          body: { 
+            success: true, 
+            token, 
+            user: {
+              id: user._id,
+              email: user.email,
+              name: user.name,
+              role: user.role,
+              salonId: user.salonId,
+              emailVerified: user.emailVerified,
+              avatar: user.avatar,
+              language: user.language
+            }, 
+            message: '2FA erfolgreich eingerichtet. Willkommen im CEO Bereich!' 
+          } 
+        };
       }
       logger.warn(`[CEO-SECURITY] Invalid 2FA code during setup: ${email}, IP: ${clientIP}`);
       return { status: 401, body: { success: false, message: 'Ungültiger 2FA-Code. Bitte versuchen Sie es erneut.' } };
@@ -526,7 +567,25 @@ async function handleCEOTwoFactor(user, twoFactorCode, clientIP, email, ipAttemp
   res.cookie('accessToken', accessToken, getCookieOptions({ rememberMe: Boolean(rememberMe), maxAge: 24 * 60 * 60 * 1000, path: '/' }));
   generateCSRFToken(req, res, () => {});
 
-  return { status: 200, body: { success: true, expiresIn: 24 * 60 * 60, user: user.toJSON(), message: 'Willkommen im CEO Bereich' } };
+  // ? SECURITY FIX: Explicit safe user fields
+  return { 
+    status: 200, 
+    body: { 
+      success: true, 
+      expiresIn: 24 * 60 * 60, 
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        salonId: user.salonId,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        language: user.language
+      }, 
+      message: 'Willkommen im CEO Bereich' 
+    } 
+  };
 }
 
 export const ceoLogin = async (req, res) => {
@@ -576,6 +635,7 @@ export const ceoLogin = async (req, res) => {
 
     // ==================== 2FA MANDATORY FOR CEO ====================
     const twoFactorResult = await handleCEOTwoFactor(user, twoFactorCode, clientIP, email, ipAttempts, now, rememberMe, req, res);
+    // ? SECURITY FIX: handleCEOTwoFactor already returns sanitized user fields
     return res.status(twoFactorResult.status).json(twoFactorResult.body);
   } catch (error) {
     logger.error(`[CEO-SECURITY] ERROR: ${error.message}, IP: ${clientIP}`);
@@ -677,10 +737,20 @@ export const employeeLogin = async (req, res) => {
     // ? SECURITY FIX: Generate CSRF token for state-changing operations
     generateCSRFToken(req, res, () => {});
 
+    // ? SECURITY FIX: Explicit safe user fields
     res.status(200).json({
       success: true,
       expiresIn: 15 * 60, // 15 minutes in seconds
-      user: user.toJSON()
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        salonId: user.salonId,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        language: user.language
+      }
     });
   } catch (error) {
     logger.error('❌ Employee Login Error:', error);
@@ -704,9 +774,20 @@ export const getProfile = async (req, res) => {
       });
     }
 
+    // ? SECURITY FIX: Explicit safe user fields
     res.status(200).json({
       success: true,
-      user: user.toJSON()
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        salonId: user.salonId,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        language: user.language,
+        phone: user.phone
+      }
     });
   } catch (error) {
     logger.error('? GetProfile Error:', error);
@@ -763,10 +844,21 @@ export const updateProfile = async (req, res) => {
 
     logger.info(`? Profile updated for user: ${user.email}`);
 
+    // ? SECURITY FIX: Explicit safe user fields
     res.status(200).json({
       success: true,
       message: 'Profile updated',
-      user: user.toJSON()
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        salonId: user.salonId,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        language: user.language,
+        phone: user.phone
+      }
     });
   } catch (error) {
     logger.error('? UpdateProfile Error:', error);
@@ -1377,16 +1469,30 @@ export const verifyEmail = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Token required' });
     }
 
-    // Hash token
+    // Hash incoming token
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     // Find user with valid token
     const user = await User.findOne({
-      emailVerificationToken: hashedToken,
+      emailVerificationToken: { $exists: true },
       emailVerificationExpire: { $gt: Date.now() }
-    }).maxTimeMS(5000);
+    }).select('+emailVerificationToken').maxTimeMS(5000);
 
     if (!user) {
+      await applyMinimumAuthDelay(startTime, 300);
+      return res.status(400).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    // ? SECURITY FIX: Timing-safe token comparison (prevents timing attacks)
+    const storedTokenBuffer = Buffer.from(user.emailVerificationToken, 'hex');
+    const providedTokenBuffer = Buffer.from(hashedToken, 'hex');
+    
+    let tokensMatch = false;
+    if (storedTokenBuffer.length === providedTokenBuffer.length) {
+      tokensMatch = crypto.timingSafeEqual(storedTokenBuffer, providedTokenBuffer);
+    }
+
+    if (!tokensMatch) {
       await applyMinimumAuthDelay(startTime, 300);
       return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     }
@@ -1455,6 +1561,17 @@ export const refreshToken = async (req, res) => {
       });
     }
 
+    // ? SECURITY FIX: Token Reuse Detection - if already revoked, revoke ALL user sessions
+    if (storedToken.revoked) {
+      logger.error(`[SECURITY] Token reuse detected for user: ${storedToken.userId}. Revoking all sessions.`);
+      // Revoke all refresh tokens for this user
+      await RefreshToken.deleteMany({ userId: storedToken.userId });
+      return res.status(401).json({
+        success: false,
+        message: 'Token reuse detected. All sessions have been revoked for security.'
+      });
+    }
+
     // Find user
     const user = await User.findById(storedToken.userId).maxTimeMS(5000);
     if (!user) {
@@ -1510,10 +1627,20 @@ export const refreshToken = async (req, res) => {
     // ? SECURITY FIX: Generate new CSRF token after token refresh
     generateCSRFToken(req, res, () => {});
 
+    // ? SECURITY FIX: Explicit safe user fields
     res.status(200).json({
       success: true,
       expiresIn: 15 * 60, // 15 minutes in seconds
-      user: user.toJSON()
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        salonId: user.salonId,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        language: user.language
+      }
     });
   } catch (error) {
     logger.error('❌ RefreshToken Error:', error);

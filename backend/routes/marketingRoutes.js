@@ -30,6 +30,7 @@ router.get('/track/:trackingId', trackClick);
 // ==================== PROTECTED ROUTES ====================
 
 router.use(authMiddleware.protect);
+router.use(authMiddleware.requireRole('salon_owner', 'ceo'));
 router.use(checkFeatureAccess('marketingAutomation'));
 
 /**

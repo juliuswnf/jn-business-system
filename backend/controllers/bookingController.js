@@ -18,6 +18,81 @@ import Booking from '../models/Booking.js';
 import Service from '../models/Service.js';
 import Customer from '../models/Customer.js';
 
+const ALLOWED_BOOKING_STATUSES = ['pending', 'booked', 'confirmed', 'completed', 'cancelled', 'no_show'];
+
+const ALLOWED_STATUS_TRANSITIONS = {
+  pending: ['pending', 'booked', 'confirmed', 'cancelled', 'no_show'],
+  booked: ['booked', 'confirmed', 'cancelled', 'no_show'],
+  confirmed: ['confirmed', 'completed', 'cancelled', 'no_show'],
+  completed: ['completed'],
+  cancelled: ['cancelled'],
+  no_show: ['no_show']
+};
+
+const canTransitionBookingStatus = (currentStatus, nextStatus) => {
+  const allowedNext = ALLOWED_STATUS_TRANSITIONS[currentStatus] || [];
+  return allowedNext.includes(nextStatus);
+};
+
+const getAuthenticatedCustomerReference = (req) => {
+  return req.user?.customerId || req.user?.id || req.user?._id || null;
+};
+
+const hasCustomerBookingAccess = (req, booking) => {
+  const bookingCustomerId = booking?.customerId?.toString();
+  const bookingCustomerEmail = (booking?.customerEmail || '').toLowerCase().trim();
+  const authenticatedCustomerRef = getAuthenticatedCustomerReference(req)?.toString();
+  const authenticatedCustomerEmail = (req.user?.email || '').toLowerCase().trim();
+
+  // Prefer strong ID match when booking has a linked customerId.
+  if (bookingCustomerId) {
+    return Boolean(authenticatedCustomerRef) && bookingCustomerId === authenticatedCustomerRef;
+  }
+
+  // Fallback for legacy bookings created without customerId.
+  return Boolean(authenticatedCustomerEmail) && bookingCustomerEmail === authenticatedCustomerEmail;
+};
+
+const hasSalonBookingAccess = (req, booking) => {
+  if (req.user?.role === 'ceo') {
+    return true;
+  }
+
+  const bookingSalonId = booking?.salonId?._id
+    ? booking.salonId._id.toString()
+    : booking?.salonId?.toString();
+
+  return bookingSalonId === req.user?.salonId?.toString();
+};
+
+const ensureBookingAccess = (req, res, booking) => {
+  if (!booking) {
+    return false;
+  }
+
+  if (req.user?.role === 'customer') {
+    if (!hasCustomerBookingAccess(req, booking)) {
+      res.status(403).json({
+        success: false,
+        message: 'Access denied - Booking belongs to another customer'
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  if (!hasSalonBookingAccess(req, booking)) {
+    res.status(403).json({
+      success: false,
+      message: 'Access denied - Resource belongs to another salon'
+    });
+    return false;
+  }
+
+  return true;
+};
+
 // ==================== CREATE BOOKING ====================
 
 export const createBooking = async (req, res) => {
@@ -51,6 +126,10 @@ export const createBooking = async (req, res) => {
     if (employeeId && !isValidObjectId(employeeId)) {
       return res.status(400).json({ success: false, message: 'Ungültiges Mitarbeiter-ID-Format' });
     }
+
+    const salonObjectId = new mongoose.Types.ObjectId(effectiveSalonId);
+    const serviceObjectId = new mongoose.Types.ObjectId(serviceId);
+    const employeeObjectId = employeeId ? new mongoose.Types.ObjectId(employeeId) : null;
 
     // ? SRE FIX #30: Idempotency check - prevent double bookings from double-clicks
     if (idempotencyKey) {
@@ -89,7 +168,7 @@ export const createBooking = async (req, res) => {
       }
     }
 
-    const service = await Service.findOne({ _id: serviceId, salonId: effectiveSalonId }).maxTimeMS(5000);
+    const service = await Service.findOne({ _id: serviceObjectId, salonId: salonObjectId }).maxTimeMS(5000);
     if (!service) {
       return res.status(404).json({
         success: false,
@@ -103,7 +182,7 @@ export const createBooking = async (req, res) => {
 
     try {
       // ? HIGH FIX #8: Check salon capacity (prevent overbooking)
-      const salon = await Salon.findById(effectiveSalonId).maxTimeMS(5000).session(session);
+      const salon = await Salon.findById(salonObjectId).maxTimeMS(5000).session(session);
       if (!salon) {
         await session.abortTransaction();
         return res.status(404).json({
@@ -142,20 +221,20 @@ export const createBooking = async (req, res) => {
       // ? AUDIT FIX: Use service duration as buffer (not fixed 30 min)
       const bufferMs = serviceDuration * 60 * 1000;
       const concurrentBookings = await Booking.countDocuments({
-        salonId: effectiveSalonId,
+        salonId: salonObjectId,
         bookingDate: {
           $gte: new Date(startTime.getTime() - bufferMs),
           $lt: new Date(endTime.getTime() + bufferMs)
         },
         status: { $nin: ['cancelled', 'no_show'] }
-      }).session(session);
+      }).session(session).maxTimeMS(5000);
 
       // Get salon capacity (default 5 if not set)
       const maxConcurrentBookings = salon.settings?.maxConcurrentBookings || salon.capacity || 5;
 
       if (concurrentBookings >= maxConcurrentBookings) {
         await session.abortTransaction();
-        logger.warn(`⚠️ Capacity exceeded: ${concurrentBookings}/${maxConcurrentBookings} for salon ${salonId}`);
+        logger.warn(`⚠️ Capacity exceeded: ${concurrentBookings}/${maxConcurrentBookings} for salon ${effectiveSalonId}`);
         return res.status(409).json({
           success: false,
           message: `Kapazität erreicht. Maximal ${maxConcurrentBookings} gleichzeitige Buchungen möglich.`,
@@ -169,7 +248,13 @@ export const createBooking = async (req, res) => {
       // Check slot availability inside the transaction so the read is snapshot-isolated.
       // checkAvailability uses .session(session) internally, preventing concurrent
       // requests from both seeing a free slot and double-booking.
-      const isAvailable = await Booking.checkAvailability(effectiveSalonId, parsedDate, serviceDuration, employeeId || null, session);
+      const isAvailable = await Booking.checkAvailability(
+        salonObjectId,
+        parsedDate,
+        serviceDuration,
+        employeeObjectId,
+        session
+      );
       if (!isAvailable) {
         await session.abortTransaction();
         return res.status(409).json({
@@ -180,16 +265,25 @@ export const createBooking = async (req, res) => {
 
       // Create booking within transaction
       const bookingData = {
-        salonId: effectiveSalonId,
-        serviceId,
-        employeeId: employeeId || null,
+        salonId: salonObjectId,
+        serviceId: serviceObjectId,
+        employeeId: employeeObjectId,
         bookingDate: parsedDate,
+        duration: serviceDuration,
         customerName,
-        customerEmail: customerEmail.toLowerCase(),
+        customerEmail: String(customerEmail).toLowerCase().trim(),
         customerPhone,
         notes,
         status: 'pending'
       };
+
+      // Preserve ownership for authenticated customers to prevent IDOR on cancellation/update.
+      if (req.user?.role === 'customer') {
+        const customerRef = getAuthenticatedCustomerReference(req);
+        if (customerRef && mongoose.isValidObjectId(customerRef)) {
+          bookingData.customerId = new mongoose.Types.ObjectId(customerRef);
+        }
+      }
 
       // Persist idempotency key only when it is a non-empty string.
       if (typeof idempotencyKey === 'string' && idempotencyKey.trim()) {
@@ -229,8 +323,6 @@ export const getBookings = async (req, res) => {
   try {
     const { status, startDate, endDate, salonId } = req.query;
     const { page, limit, skip } = req.pagination;
-
-    const ALLOWED_BOOKING_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show', 'booked'];
     let filter = { ...(req.tenantFilter || {}) };
 
     // Optional salon filter for CEO only
@@ -242,8 +334,9 @@ export const getBookings = async (req, res) => {
     }
 
     // .find() returns the value from the static array, breaking the taint chain
-    const safeStatus = typeof status === 'string'
-      ? ALLOWED_BOOKING_STATUSES.find(s => s === status)
+    const normalizedStatus = typeof status === 'string' ? status.replace('no-show', 'no_show') : undefined;
+    const safeStatus = typeof normalizedStatus === 'string'
+      ? ALLOWED_BOOKING_STATUSES.find(s => s === normalizedStatus)
       : undefined;
     if (safeStatus) filter.status = safeStatus;
 
@@ -273,7 +366,7 @@ export const getBookings = async (req, res) => {
       filter.bookingDate = dateRange;
     }
 
-    const total = await Booking.countDocuments(filter);
+    const total = await Booking.countDocuments(filter).maxTimeMS(5000);
     const bookings = await Booking.find(filter).maxTimeMS(5000)
       .populate('serviceId', 'name price duration')
       .populate('employeeId', 'name')
@@ -284,9 +377,11 @@ export const getBookings = async (req, res) => {
 
     // ? NO-SHOW-KILLER: Add confirmation status to each booking (performance optimized)
     const bookingIds = bookings.map(b => b._id);
-    const confirmations = await BookingConfirmation.find({
-      bookingId: { $in: bookingIds }
-    }).select('bookingId status reminderSentAt confirmedAt confirmationDeadline autoCancelledAt').lean();
+    const confirmations = bookingIds.length > 0
+      ? await BookingConfirmation.find({
+        bookingId: { $in: bookingIds }
+      }).select('bookingId status reminderSentAt confirmedAt confirmationDeadline autoCancelledAt').lean().maxTimeMS(5000)
+      : [];
 
     // Create lookup map for O(1) access
     const confirmationMap = new Map(
@@ -342,12 +437,8 @@ export const getBooking = async (req, res) => {
       });
     }
 
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
     }
 
     res.status(200).json({
@@ -387,42 +478,30 @@ export const updateBooking = async (req, res) => {
       });
     }
 
-    // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
     }
 
     // Build update data with validation
     if (status) {
-      // Whitelist: only these transitions are permitted via updateBooking
-      const UPDATABLE_STATUSES = ['pending', 'booked', 'confirmed'];
-      if (!UPDATABLE_STATUSES.includes(status)) {
+      const normalizedStatus = String(status).trim();
+      const safeStatus = ['pending', 'booked', 'confirmed'].find(s => s === normalizedStatus);
+      if (!safeStatus) {
         return res.status(400).json({
           success: false,
-          message: `Invalid status. Use the dedicated endpoints for: cancelled, completed, no_show`
+          message: 'Invalid status value',
+          allowedStatuses: ['pending', 'booked', 'confirmed']
         });
       }
-      const ALLOWED_TRANSITIONS = {
-        pending: ['pending', 'booked', 'confirmed'],
-        booked: ['booked', 'confirmed'],
-        confirmed: ['confirmed'],
-        completed: [],
-        cancelled: [],
-        no_show: []
-      };
 
-      const allowedNextStates = ALLOWED_TRANSITIONS[booking.status] || [];
-      if (!allowedNextStates.includes(status)) {
+      if (!canTransitionBookingStatus(booking.status, safeStatus)) {
         return res.status(409).json({
           success: false,
-          message: `Ungültiger Statuswechsel von '${booking.status}' zu '${status}'`
+          message: `Ungültiger Statuswechsel von '${booking.status}' zu '${safeStatus}'`
         });
       }
 
-      booking.status = status;
+      booking.status = safeStatus;
     }
     if (notes !== undefined) booking.notes = notes;
 
@@ -542,16 +621,11 @@ export const confirmBooking = async (req, res) => {
       });
     }
 
-    // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
     }
 
-    // State machine: only pending/booked bookings may be confirmed
-    if (!['pending', 'booked'].includes(booking.status)) {
+    if (!canTransitionBookingStatus(booking.status, 'confirmed')) {
       return res.status(409).json({
         success: false,
         message: `Buchung im Status '${booking.status}' kann nicht bestätigt werden`
@@ -598,16 +672,11 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
     }
 
-    // State machine: completed/cancelled bookings are terminal
-    if (['completed', 'cancelled'].includes(booking.status)) {
+    if (!canTransitionBookingStatus(booking.status, 'cancelled')) {
       return res.status(409).json({
         success: false,
         message: `Buchung im Status '${booking.status}' kann nicht storniert werden`
@@ -654,16 +723,11 @@ export const completeBooking = async (req, res) => {
       });
     }
 
-    // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
     }
 
-    // State machine: only confirmed bookings can be completed
-    if (booking.status !== 'confirmed') {
+    if (!canTransitionBookingStatus(booking.status, 'completed')) {
       return res.status(409).json({
         success: false,
         message: `Buchung im Status '${booking.status}' kann nicht abgeschlossen werden`
@@ -710,12 +774,8 @@ export const deleteBooking = async (req, res) => {
       });
     }
 
-    // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
     }
 
     // ? SOFT DELETE instead of hard delete
@@ -741,12 +801,12 @@ async function chargeNoShowFee(booking) {
   if (booking.salonId.stripe?.connectedAccountId && booking.salonId.stripe?.chargesEnabled) {
     const { chargeNoShowFeeConnect } = await import('../services/stripeConnectService.js');
     const chargeResult = await chargeNoShowFeeConnect(booking, booking.salonId);
-    await Booking.findByIdAndUpdate(booking._id, { $set: { 'noShowFee.charged': true, 'noShowFee.amount': feeAmount, 'noShowFee.chargeId': chargeResult.chargeId, 'noShowFee.transferId': chargeResult.transferId || null, 'noShowFee.chargedAt': new Date(), 'noShowFee.breakdown': chargeResult.breakdown } });
+    await Booking.findByIdAndUpdate(booking._id, { $set: { 'noShowFee.charged': true, 'noShowFee.amount': feeAmount, 'noShowFee.chargeId': chargeResult.chargeId, 'noShowFee.transferId': chargeResult.transferId || null, 'noShowFee.chargedAt': new Date(), 'noShowFee.breakdown': chargeResult.breakdown } }).maxTimeMS(5000);
   } else {
     const { chargeNoShowFee: chargeFn } = await import('../services/stripeService.js');
     const paymentIntent = await chargeFn(booking.stripeCustomerId, booking.paymentMethodId, feeAmount, `No-Show-Gebühr - ${booking.salonId.name}`, { bookingId: booking._id.toString(), salonId: booking.salonId._id.toString(), type: 'no_show_fee' });
     const stripeFee = Math.round(25 + (feeAmount * 0.014));
-    await Booking.findByIdAndUpdate(booking._id, { $set: { 'noShowFee.charged': true, 'noShowFee.amount': feeAmount, 'noShowFee.chargeId': paymentIntent.id, 'noShowFee.chargedAt': new Date(), 'noShowFee.breakdown': { totalCharged: feeAmount, stripeFee, salonReceives: feeAmount - stripeFee, platformCommission: 0 } } });
+    await Booking.findByIdAndUpdate(booking._id, { $set: { 'noShowFee.charged': true, 'noShowFee.amount': feeAmount, 'noShowFee.chargeId': paymentIntent.id, 'noShowFee.chargedAt': new Date(), 'noShowFee.breakdown': { totalCharged: feeAmount, stripeFee, salonReceives: feeAmount - stripeFee, platformCommission: 0 } } }).maxTimeMS(5000);
   }
   return feeAmount;
 }
@@ -798,11 +858,14 @@ export const markAsNoShow = async (req, res) => {
       });
     }
 
-    // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId._id.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
+    }
+
+    if (!canTransitionBookingStatus(booking.status, 'no_show')) {
+      return res.status(409).json({
         success: false,
-        message: 'Zugriff verweigert - Ressource gehört zu einem anderen Salon'
+        message: `Buchung im Status '${booking.status}' kann nicht als No-Show markiert werden`
       });
     }
 
@@ -842,7 +905,7 @@ export const markAsNoShow = async (req, res) => {
             'noShowFee.error': error.message,
             'noShowFee.attemptedAt': new Date()
           }
-        });
+        }).maxTimeMS(5000);
         logger.error(`❌ Failed to charge No-Show-Fee: ${error.message}`);
         await sendNoShowFeeFailureEmail(booking, error.message);
       }
@@ -852,7 +915,7 @@ export const markAsNoShow = async (req, res) => {
     }
 
     // Reload to reflect any noShowFee updates applied via findByIdAndUpdate
-    const updatedBooking = await Booking.findById(booking._id).populate('salonId');
+    const updatedBooking = await Booking.findById(booking._id).populate('salonId').maxTimeMS(5000);
     res.json({
       success: true,
       message: 'Als No-Show markiert',
@@ -894,12 +957,8 @@ export const undoNoShow = async (req, res) => {
       });
     }
 
-    // ? TENANT ISOLATION CHECK
-    if (req.user.role !== 'ceo' && booking.salonId._id.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Zugriff verweigert - Ressource gehört zu einem anderen Salon'
-      });
+    if (!ensureBookingAccess(req, res, booking)) {
+      return;
     }
 
     // Check if marked as no-show
@@ -986,13 +1045,13 @@ export const getBookingStats = async (req, res) => {
     }
 
     const [totalBookings, confirmedBookings, pendingBookings, cancelledBookings, completedBookings, bookedBookings] = await Promise.all([
-      Booking.countDocuments(filter),
-      Booking.countDocuments({ ...filter, status: 'confirmed' }),
-      Booking.countDocuments({ ...filter, status: 'pending' }),
-      Booking.countDocuments({ ...filter, status: 'cancelled' }),
-      Booking.countDocuments({ ...filter, status: 'completed' }),
+      Booking.countDocuments(filter).maxTimeMS(5000),
+      Booking.countDocuments({ ...filter, status: 'confirmed' }).maxTimeMS(5000),
+      Booking.countDocuments({ ...filter, status: 'pending' }).maxTimeMS(5000),
+      Booking.countDocuments({ ...filter, status: 'cancelled' }).maxTimeMS(5000),
+      Booking.countDocuments({ ...filter, status: 'completed' }).maxTimeMS(5000),
       // 'booked' is set by createAppointment (walk-in/manual entries)
-      Booking.countDocuments({ ...filter, status: 'booked' })
+      Booking.countDocuments({ ...filter, status: 'booked' }).maxTimeMS(5000)
     ]);
 
     res.status(200).json({
@@ -1046,8 +1105,8 @@ export const getDashboardStats = async (req, res) => {
     };
 
     const [todayAppointments, totalCustomers, revenueResult] = await Promise.all([
-      Booking.countDocuments(todayFilter),
-      Customer.countDocuments({ salonId: studioId, status: { $ne: 'blocked' } }),
+      Booking.countDocuments(todayFilter).maxTimeMS(5000),
+      Customer.countDocuments({ salonId: studioId, status: { $ne: 'blocked' } }).maxTimeMS(5000),
       Booking.aggregate([
         { $match: completedTodayFilter },
         {
@@ -1091,7 +1150,7 @@ export const getDashboardStats = async (req, res) => {
             totalRevenueToday: { $sum: '$revenue' }
           }
         }
-      ])
+      ]).maxTimeMS(5000)
     ]);
 
     res.status(200).json({
@@ -1119,6 +1178,9 @@ export const getDashboardStats = async (req, res) => {
 export const getTodayAppointments = async (req, res) => {
   try {
     const studioId = req.user?.salonId;
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 25));
+    const skip = (page - 1) * limit;
 
     if (!studioId) {
       return res.status(400).json({
@@ -1127,27 +1189,37 @@ export const getTodayAppointments = async (req, res) => {
       });
     }
 
-    const now = new Date();
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
     const endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
 
-    const appointments = await Booking.find({
+    const filter = {
       salonId: studioId,
       bookingDate: { $gte: startOfToday, $lte: endOfToday },
       status: { $in: ['booked', 'pending', 'confirmed'] }
-    })
+    };
+
+    const total = await Booking.countDocuments(filter).maxTimeMS(5000);
+
+    const appointments = await Booking.find(filter)
       .populate('customerId', 'firstName lastName')
       .populate('serviceId', 'name duration')
       .sort({ bookingDate: 1 })
-      .limit(100)
+      .skip(skip)
+      .limit(limit)
       .lean()
       .maxTimeMS(5000);
 
+    const totalPages = Math.ceil(total / limit);
+
     res.status(200).json({
       success: true,
+      total,
+      page,
+      limit,
+      totalPages,
       count: appointments.length,
       appointments
     });
@@ -1182,17 +1254,18 @@ export const updateAppointmentStatus = async (req, res) => {
       });
     }
 
-    const allowedStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'];
-    if (!allowedStatuses.includes(status)) {
+    const normalizedStatus = String(status || '').trim();
+    const safeStatus = ALLOWED_BOOKING_STATUSES.find(s => s === normalizedStatus);
+    if (!safeStatus) {
       return res.status(400).json({
         success: false,
         message: 'Ungültiger Statuswert',
-        allowedStatuses
+        allowedStatuses: ALLOWED_BOOKING_STATUSES
       });
     }
 
     const appointment = await Booking.findOne({
-      _id: id,
+      _id: new mongoose.Types.ObjectId(id),
       salonId: studioId
     }).maxTimeMS(5000);
 
@@ -1203,7 +1276,18 @@ export const updateAppointmentStatus = async (req, res) => {
       });
     }
 
-    appointment.status = status;
+    if (!ensureBookingAccess(req, res, appointment)) {
+      return;
+    }
+
+    if (!canTransitionBookingStatus(appointment.status, safeStatus)) {
+      return res.status(409).json({
+        success: false,
+        message: `Ungültiger Statuswechsel von '${appointment.status}' zu '${safeStatus}'`
+      });
+    }
+
+    appointment.status = safeStatus;
     await appointment.save();
 
     cacheService.invalidate('bookings', studioId?.toString());
@@ -1349,6 +1433,9 @@ export const getBookingsByDate = async (req, res) => {
   try {
     const { date } = req.query;
     const salonId = req.query.salonId;
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit, 10) || 50));
+    const skip = (page - 1) * limit;
 
     if (salonId && !isValidObjectId(salonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
@@ -1402,21 +1489,25 @@ export const getBookingsByDate = async (req, res) => {
       filter.salonId = new mongoose.Types.ObjectId(salonId);
     }
 
-    // ? PAGINATION - single day should be reasonable, but limit for safety
-    const limit = Math.min(500, parseInt(req.query.limit) || 500); // Max 500 bookings per day
+    const total = await Booking.countDocuments(filter).maxTimeMS(5000);
 
     const bookings = await Booking.find(filter).lean().maxTimeMS(5000)
       .populate('serviceId', 'name duration')
       .populate('employeeId', 'name')
       .sort({ bookingDate: 1 })
+      .skip(skip)
       .limit(limit);
+
+    const totalPages = Math.ceil(total / limit);
 
     res.status(200).json({
       success: true,
+      total,
+      page,
+      limit,
+      totalPages,
       count: bookings.length,
-      bookings,
-      // Warning if limit reached
-      ...(bookings.length === limit && { warning: 'Ergebnislimit erreicht, einige Buchungen werden möglicherweise nicht angezeigt' })
+      bookings
     });
   } catch (error) {
     logger.error('GetBookingsByDate Error:', error);

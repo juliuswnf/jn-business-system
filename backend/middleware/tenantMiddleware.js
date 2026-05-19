@@ -2,6 +2,7 @@ import Booking from '../models/Booking.js';
 import Service from '../models/Service.js';
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 /**
  * Tenant Isolation Middleware
@@ -45,6 +46,13 @@ export const checkTenantAccess = (resourceType, idParam = 'id') => {
         });
       }
 
+      if (!mongoose.isValidObjectId(resourceId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid resource ID format'
+        });
+      }
+
       const Model = MODELS[resourceType];
       if (!Model) {
         logger.error(`Invalid resource type: ${resourceType}`);
@@ -61,6 +69,28 @@ export const checkTenantAccess = (resourceType, idParam = 'id') => {
           success: false,
           message: `${resourceType.charAt(0).toUpperCase() + resourceType.slice(1)} not found`
         });
+      }
+
+      // Customers can only access their own bookings.
+      if (req.user.role === 'customer' && resourceType === 'booking') {
+        const bookingCustomerId = resource.customerId?.toString();
+        const bookingCustomerEmail = (resource.customerEmail || '').toLowerCase().trim();
+        const userCustomerId = (req.user.customerId || req.user.id || req.user._id || '').toString();
+        const userEmail = (req.user.email || '').toLowerCase().trim();
+
+        const hasCustomerIdMatch = Boolean(bookingCustomerId) && bookingCustomerId === userCustomerId;
+        const hasEmailMatch = !bookingCustomerId && Boolean(userEmail) && bookingCustomerEmail === userEmail;
+
+        if (!hasCustomerIdMatch && !hasEmailMatch) {
+          logger.warn(`🚫 Customer access denied: User ${req.user.id} tried to access booking ${resourceId} of another customer`);
+          return res.status(403).json({
+            success: false,
+            message: 'Access denied - Booking belongs to another customer'
+          });
+        }
+
+        req.resource = resource;
+        return next();
       }
 
       // Get the salonId from the resource

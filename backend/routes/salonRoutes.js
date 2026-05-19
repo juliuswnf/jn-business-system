@@ -1,6 +1,7 @@
 ﻿import express from 'express';
 import salonController from '../controllers/salonController.js';
 import salonAnalyticsController from '../controllers/salonAnalyticsController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 import { checkSalonOwnership, enforceTenantFilter } from '../middleware/tenantMiddleware.js';
 
 const router = express.Router();
@@ -40,8 +41,8 @@ router.get('/info', salonController.getSalonInfo);
 router.get('/:salonId/info', checkSalonOwnership, salonController.getSalonInfo);
 
 // Update salon (own salon only, or CEO can update any)
-router.put('/update', salonController.updateSalon);
-router.put('/:salonId/update', checkSalonOwnership, salonController.updateSalon);
+router.put('/update', authMiddleware.requireRole('salon_owner', 'ceo'), salonController.updateSalon);
+router.put('/:salonId/update', authMiddleware.requireRole('salon_owner', 'ceo'), checkSalonOwnership, salonController.updateSalon);
 
 // Get salon services (own salon only)
 router.get('/services', salonController.getSalonServices);

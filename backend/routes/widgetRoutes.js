@@ -15,6 +15,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import { tierHasFeature } from '../config/pricing.js';
 
 const router = express.Router();
+const requireWidgetConfigRole = authMiddleware.requireRole('salon_owner', 'ceo');
 
 async function resolveWidgetSalonId(req) {
   let salonId = req.user.salonId;
@@ -52,7 +53,7 @@ async function getOrCreateWidget(salonId) {
 
 // ==================== PROTECTED ROUTES (Auth Required) ====================
 // Get widget config for authenticated user's salon
-router.get('/config', authMiddleware.protect, async (req, res) => {
+router.get('/config', authMiddleware.protect, requireWidgetConfigRole, async (req, res) => {
   try {
     const salonId = await resolveWidgetSalonId(req);
 
@@ -101,7 +102,7 @@ router.get('/config', authMiddleware.protect, async (req, res) => {
 });
 
 // Update widget config for authenticated user's salon
-router.put('/config', authMiddleware.protect, async (req, res) => {
+router.put('/config', authMiddleware.protect, requireWidgetConfigRole, async (req, res) => {
   try {
     const salonId = await resolveWidgetSalonId(req);
 

@@ -67,34 +67,41 @@ export const getAnalyticsOverview = async (req, res) => {
     }
 
     // Current metrics
-    const totalCustomers = await Salon.countDocuments();
-    const paidCustomers = await Salon.countDocuments({
-      'subscription.status': 'active',
-      'subscription.plan': { $in: ['starter', 'pro'] }
-    });
-    const starterCount = await Salon.countDocuments({ 'subscription.plan': 'starter', 'subscription.status': 'active' });
-    const proCount = await Salon.countDocuments({ 'subscription.plan': 'pro', 'subscription.status': 'active' });
+    const [
+      totalCustomers,
+      paidCustomers,
+      starterCount,
+      proCount,
+      prevCustomers,
+      newCustomers,
+      churnedCustomers,
+      trialCount,
+      cancelledCount
+    ] = await Promise.all([
+      Salon.countDocuments().maxTimeMS(10000),
+      Salon.countDocuments({
+        'subscription.status': 'active',
+        'subscription.plan': { $in: ['starter', 'pro'] }
+      }).maxTimeMS(10000),
+      Salon.countDocuments({ 'subscription.plan': 'starter', 'subscription.status': 'active' }).maxTimeMS(10000),
+      Salon.countDocuments({ 'subscription.plan': 'pro', 'subscription.status': 'active' }).maxTimeMS(10000),
+      Salon.countDocuments({ createdAt: { $lt: startDate } }).maxTimeMS(10000),
+      Salon.countDocuments({ createdAt: { $gte: startDate } }).maxTimeMS(10000),
+      Salon.countDocuments({
+        'subscription.status': 'cancelled',
+        'subscription.cancelledAt': { $gte: startDate }
+      }).maxTimeMS(10000),
+      Salon.countDocuments({ 'subscription.status': 'trial' }).maxTimeMS(10000),
+      Salon.countDocuments({ 'subscription.status': 'cancelled' }).maxTimeMS(10000)
+    ]);
 
     // Calculate MRR
     const mrr = (starterCount * PRICING.starter) + (proCount * PRICING.pro);
     const arr = mrr * 12;
 
-    // Previous period for comparison
-    const prevCustomers = await Salon.countDocuments({ createdAt: { $lt: startDate } });
     const customerGrowth = prevCustomers > 0
       ? Math.round(((totalCustomers - prevCustomers) / prevCustomers) * 100)
       : 100;
-
-    // New customers in period
-    const newCustomers = await Salon.countDocuments({
-      createdAt: { $gte: startDate }
-    });
-
-    // Churned customers (cancelled in period)
-    const churnedCustomers = await Salon.countDocuments({
-      'subscription.status': 'cancelled',
-      'subscription.cancelledAt': { $gte: startDate }
-    });
 
     // Churn rate
     const churnRate = paidCustomers > 0
@@ -126,8 +133,8 @@ export const getAnalyticsOverview = async (req, res) => {
         subscriptions: {
           starter: starterCount,
           pro: proCount,
-          trial: await Salon.countDocuments({ 'subscription.status': 'trial' }),
-          cancelled: await Salon.countDocuments({ 'subscription.status': 'cancelled' })
+          trial: trialCount,
+          cancelled: cancelledCount
         },
         churn: {
           rate: parseFloat(churnRate),
@@ -154,8 +161,8 @@ export const getRevenueChart = async (req, res) => {
 
     // Fetch all active salons once — avoids N×2 sequential queries in the loop
     const [allStarters, allPros] = await Promise.all([
-      Salon.find({ 'subscription.plan': 'starter', 'subscription.status': 'active' }, { createdAt: 1 }).lean().maxTimeMS(5000),
-      Salon.find({ 'subscription.plan': 'pro', 'subscription.status': 'active' }, { createdAt: 1 }).lean().maxTimeMS(5000)
+      Salon.find({ 'subscription.plan': 'starter', 'subscription.status': 'active' }, { createdAt: 1 }).lean().maxTimeMS(10000),
+      Salon.find({ 'subscription.plan': 'pro', 'subscription.status': 'active' }, { createdAt: 1 }).lean().maxTimeMS(10000)
     ]);
 
     for (let i = months - 1; i >= 0; i--) {
@@ -194,8 +201,8 @@ export const getCustomerGrowthChart = async (req, res) => {
 
     // Fetch all salons once — avoids N×2 sequential queries in the loop
     const [allSalons, allPaidSalons] = await Promise.all([
-      Salon.find({}, { createdAt: 1 }).lean().maxTimeMS(5000),
-      Salon.find({ 'subscription.status': 'active', 'subscription.plan': { $in: ['starter', 'pro'] } }, { createdAt: 1 }).lean().maxTimeMS(5000)
+      Salon.find({}, { createdAt: 1 }).lean().maxTimeMS(10000),
+      Salon.find({ 'subscription.status': 'active', 'subscription.plan': { $in: ['starter', 'pro'] } }, { createdAt: 1 }).lean().maxTimeMS(10000)
     ]);
 
     for (let i = months - 1; i >= 0; i--) {
@@ -238,7 +245,7 @@ export const getCohortAnalysis = async (req, res) => {
       // Customers who signed up in this month
       const cohortCustomers = await Salon.find({
         createdAt: { $gte: monthStart, $lte: monthEnd }
-      }).lean().maxTimeMS(5000);
+      }).lean().maxTimeMS(10000);
 
       const cohortSize = cohortCustomers.length;
 
@@ -287,7 +294,7 @@ export const getChurnAnalysis = async (req, res) => {
       ...(salonFilter ? { _id: salonFilter } : {})
     };
 
-    const totalChurned = await Salon.countDocuments(churnFilter);
+    const totalChurned = await Salon.countDocuments(churnFilter).maxTimeMS(10000);
 
     const reasonBreakdown = await Salon.aggregate([
       { $match: { ...churnFilter } },
@@ -300,7 +307,7 @@ export const getChurnAnalysis = async (req, res) => {
         }
       },
       { $sort: { count: -1 } }
-    ]).maxTimeMS(5000);
+    ]).maxTimeMS(10000);
 
     // Monthly churn trend
     const churnTrend = [];
@@ -314,13 +321,13 @@ export const getChurnAnalysis = async (req, res) => {
         ...churnFilter,
         'subscription.status': 'cancelled',
         'subscription.cancelledAt': { $gte: monthStart, $lte: monthEnd }
-      });
+      }).maxTimeMS(10000);
 
       const totalAtStart = await Salon.countDocuments({
         ...(salonFilter ? { _id: salonFilter } : {}),
         'subscription.status': { $in: ['active', 'cancelled'] },
         createdAt: { $lt: monthStart }
-      });
+      }).maxTimeMS(10000);
 
       const churnRate = totalAtStart > 0 ? ((churnedInMonth / totalAtStart) * 100).toFixed(1) : 0;
 
@@ -337,7 +344,7 @@ export const getChurnAnalysis = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .lean()
-      .maxTimeMS(5000);
+      .maxTimeMS(10000);
 
     res.status(200).json({
       success: true,
@@ -456,7 +463,7 @@ export const getAtRiskStudios = async (req, res) => {
     const studios = await Salon.find(studioFilter)
       .populate('owner', 'name email lastLogin')
       .lean()
-      .maxTimeMS(5000);
+      .maxTimeMS(10000);
 
     const now = new Date();
     const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
@@ -467,11 +474,11 @@ export const getAtRiskStudios = async (req, res) => {
       Booking.aggregate([
         { $match: { salonId: { $in: studioIds }, createdAt: { $gte: sevenDaysAgo } } },
         { $group: { _id: '$salonId', count: { $sum: 1 } } }
-      ]).maxTimeMS(5000),
+      ]).maxTimeMS(10000),
       Booking.aggregate([
         { $match: { salonId: { $in: studioIds } } },
         { $group: { _id: '$salonId', count: { $sum: 1 } } }
-      ]).maxTimeMS(5000)
+      ]).maxTimeMS(10000)
     ]);
     const recentCountMap = new Map(recentCountDocs.map(r => [r._id.toString(), r.count]));
     const totalCountMap = new Map(totalCountDocs.map(r => [r._id.toString(), r.count]));
@@ -518,11 +525,11 @@ export const getLifecycleEmailStats = async (req, res) => {
     const baseFilter = salonFilter ? { salonId: salonFilter } : {};
 
     // Get overall stats
-    const totalScheduled = await LifecycleEmail.countDocuments(baseFilter);
-    const sent = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'sent' });
-    const pending = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'pending' });
-    const failed = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'failed' });
-    const skipped = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'skipped' });
+    const totalScheduled = await LifecycleEmail.countDocuments(baseFilter).maxTimeMS(10000);
+    const sent = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'sent' }).maxTimeMS(10000);
+    const pending = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'pending' }).maxTimeMS(10000);
+    const failed = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'failed' }).maxTimeMS(10000);
+    const skipped = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'skipped' }).maxTimeMS(10000);
 
     // Get stats by email type
     const emailTypes = [
@@ -531,14 +538,14 @@ export const getLifecycleEmailStats = async (req, res) => {
     ];
 
     const byType = await Promise.all(emailTypes.map(async (type) => {
-      const typeSent = await LifecycleEmail.countDocuments({ ...baseFilter, emailType: type, status: 'sent' });
-      const typeTotal = await LifecycleEmail.countDocuments({ ...baseFilter, emailType: type });
+      const typeSent = await LifecycleEmail.countDocuments({ ...baseFilter, emailType: type, status: 'sent' }).maxTimeMS(10000);
+      const typeTotal = await LifecycleEmail.countDocuments({ ...baseFilter, emailType: type }).maxTimeMS(10000);
       const conversions = await LifecycleEmail.countDocuments({
         ...baseFilter,
         emailType: type,
         status: 'sent',
         convertedAfter: true
-      });
+      }).maxTimeMS(10000);
 
       return {
         type,
@@ -552,7 +559,7 @@ export const getLifecycleEmailStats = async (req, res) => {
 
     // Get recently sent emails
     const recentlySentFilter = { ...baseFilter, status: 'sent' };
-    const recentlySentTotal = await LifecycleEmail.countDocuments(recentlySentFilter);
+    const recentlySentTotal = await LifecycleEmail.countDocuments(recentlySentFilter).maxTimeMS(10000);
     const recentlySent = await LifecycleEmail.find(recentlySentFilter)
       .populate('salonId', 'name')
       .populate('userId', 'name email')
@@ -560,7 +567,7 @@ export const getLifecycleEmailStats = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .lean()
-      .maxTimeMS(5000);
+      .maxTimeMS(10000);
 
     // Get upcoming emails
     const upcomingFilter = {
@@ -568,7 +575,7 @@ export const getLifecycleEmailStats = async (req, res) => {
       status: 'pending',
       scheduledFor: { $gte: new Date() }
     };
-    const upcomingTotal = await LifecycleEmail.countDocuments(upcomingFilter);
+    const upcomingTotal = await LifecycleEmail.countDocuments(upcomingFilter).maxTimeMS(10000);
     const upcoming = await LifecycleEmail.find(upcomingFilter)
       .populate('salonId', 'name')
       .populate('userId', 'name email')
@@ -576,7 +583,7 @@ export const getLifecycleEmailStats = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .lean()
-      .maxTimeMS(5000);
+      .maxTimeMS(10000);
 
     res.status(200).json({
       success: true,

@@ -10,6 +10,8 @@
 import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
 import { escapeRegExp } from '../utils/securityHelpers.js';
+import mongoose from 'mongoose';
+import { isValidObjectId } from '../utils/validation.js';
 
 // Helper to build MongoDB $switch branches without a 'then' object literal (SonarCloud S5958)
 const makeBranch = (caseExpr, thenExpr) => {
@@ -18,27 +20,47 @@ const makeBranch = (caseExpr, thenExpr) => {
   return branch;
 };
 
+const resolveSalonObjectId = (req, res) => {
+  const salonId = req.user?.salonId;
+
+  if (!salonId) {
+    res.status(400).json({
+      success: false,
+      error: 'Kein Salon zugeordnet'
+    });
+    return null;
+  }
+
+  if (!isValidObjectId(salonId)) {
+    res.status(400).json({
+      success: false,
+      error: 'Ungültige Salon-ID'
+    });
+    return null;
+  }
+
+  return new mongoose.Types.ObjectId(salonId);
+};
+
 /**
  * Get all customers for a salon (aggregated from bookings)
  * GET /api/crm/customers
  */
 export const getCustomers = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
-
-    if (!salonId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Kein Salon zugeordnet'
-      });
-    }
+    const salonObjectId = resolveSalonObjectId(req, res);
+    if (!salonObjectId) return;
 
     const { search, sortBy = 'lastBooking', sortOrder = 'desc' } = req.query;
-    const { page, limit, skip } = req.pagination;
+    const rawPage = Number(req.pagination?.page || 1);
+    const rawLimit = Number(req.pagination?.limit || 20);
+    const page = Math.max(1, Number.isFinite(rawPage) ? rawPage : 1);
+    const limit = Math.min(1000, Math.max(1, Number.isFinite(rawLimit) ? rawLimit : 20));
+    const skip = (page - 1) * limit;
 
     // Aggregate customers from bookings
     const aggregation = [
-      { $match: { salonId } },
+      { $match: { salonId: salonObjectId } },
       {
         $group: {
           _id: { $toLower: '$customerEmail' },
@@ -56,7 +78,7 @@ export const getCustomers = async (req, res) => {
             $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
           },
           noShows: {
-            $sum: { $cond: [{ $eq: ['$status', 'no-show'] }, 1, 0] }
+            $sum: { $cond: [{ $in: ['$status', ['no_show', 'no-show']] }, 1, 0] }
           }
         }
       }
@@ -107,10 +129,24 @@ export const getCustomers = async (req, res) => {
 
     // Get total count
     const countAggregation = [
-      { $match: { salonId } },
+      { $match: { salonId: salonObjectId } },
       { $group: { _id: '$customerEmail' } },
       { $count: 'total' }
     ];
+
+    if (search && typeof search === 'string' && search.length > 0 && search.length <= 100) {
+      const escapedSearch = escapeRegExp(search);
+      countAggregation.splice(2, 0, {
+        $match: {
+          $or: [
+            { customerName: { $regex: escapedSearch, $options: 'i' } },
+            { customerEmail: { $regex: escapedSearch, $options: 'i' } },
+            { customerPhone: { $regex: escapedSearch, $options: 'i' } }
+          ]
+        }
+      });
+    }
+
     const countResult = await Booking.aggregate(countAggregation).maxTimeMS(5000);
     const totalCount = countResult[0]?.total || 0;
 
@@ -150,21 +186,20 @@ export const getCustomers = async (req, res) => {
  */
 export const getCustomerDetails = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
-    const { email } = req.params;
-    const { page, limit, skip } = req.pagination || { page: 1, limit: 20, skip: 0 };
+    const salonObjectId = resolveSalonObjectId(req, res);
+    if (!salonObjectId) return;
 
-    if (!salonId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Kein Salon zugeordnet'
-      });
-    }
+    const { email } = req.params;
+    const rawPage = Number(req.pagination?.page || 1);
+    const rawLimit = Number(req.pagination?.limit || 20);
+    const page = Math.max(1, Number.isFinite(rawPage) ? rawPage : 1);
+    const limit = Math.min(1000, Math.max(1, Number.isFinite(rawLimit) ? rawLimit : 20));
+    const skip = (page - 1) * limit;
 
     // Get all bookings for this customer
     const safeEmail = String(email || '').slice(0, 254);
     const customerFilter = {
-      salonId,
+      salonId: salonObjectId,
       customerEmail: { $regex: new RegExp(`^${escapeRegExp(safeEmail)}$`, 'i') }
     };
 
@@ -189,7 +224,8 @@ export const getCustomerDetails = async (req, res) => {
 
     const [statsResult, latestBooking, favoriteServices] = await Promise.all([
       Booking.aggregate([
-        { $match: { ...customerFilter } },
+        { $match: { salonId: salonObjectId } },
+        { $match: { customerEmail: customerFilter.customerEmail } },
         {
           $group: {
             _id: null,
@@ -201,7 +237,7 @@ export const getCustomerDetails = async (req, res) => {
               $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
             },
             noShows: {
-              $sum: { $cond: [{ $eq: ['$status', 'no-show'] }, 1, 0] }
+              $sum: { $cond: [{ $in: ['$status', ['no_show', 'no-show']] }, 1, 0] }
             },
             totalSpent: { $sum: { $ifNull: ['$totalPrice', 0] } },
             firstBooking: { $min: '$bookingDate' },
@@ -213,7 +249,8 @@ export const getCustomerDetails = async (req, res) => {
         .sort({ bookingDate: -1 })
         .maxTimeMS(5000),
       Booking.aggregate([
-        { $match: { ...customerFilter } },
+        { $match: { salonId: salonObjectId } },
+        { $match: { customerEmail: customerFilter.customerEmail } },
         {
           $lookup: {
             from: 'services',
@@ -314,14 +351,8 @@ export const getCustomerDetails = async (req, res) => {
  */
 export const getCRMStats = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
-
-    if (!salonId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Kein Salon zugeordnet'
-      });
-    }
+    const salonObjectId = resolveSalonObjectId(req, res);
+    if (!salonObjectId) return;
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -329,11 +360,11 @@ export const getCRMStats = async (req, res) => {
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     // Total unique customers
-    const totalCustomers = await Booking.distinct('customerEmail', { salonId });
+    const totalCustomers = await Booking.distinct('customerEmail', { salonId: salonObjectId }).maxTimeMS(5000);
 
     // New customers this month
     const newThisMonth = await Booking.aggregate([
-      { $match: { salonId } },
+      { $match: { salonId: salonObjectId } },
       { $group: { _id: '$customerEmail', firstBooking: { $min: '$bookingDate' } } },
       { $match: { firstBooking: { $gte: startOfMonth } } },
       { $count: 'count' }
@@ -341,7 +372,7 @@ export const getCRMStats = async (req, res) => {
 
     // New customers last month
     const newLastMonth = await Booking.aggregate([
-      { $match: { salonId } },
+      { $match: { salonId: salonObjectId } },
       { $group: { _id: '$customerEmail', firstBooking: { $min: '$bookingDate' } } },
       { $match: { firstBooking: { $gte: startOfLastMonth, $lte: endOfLastMonth } } },
       { $count: 'count' }
@@ -349,7 +380,7 @@ export const getCRMStats = async (req, res) => {
 
     // Customer tiers breakdown
     const tierBreakdown = await Booking.aggregate([
-      { $match: { salonId } },
+      { $match: { salonId: salonObjectId } },
       {
         $group: {
           _id: '$customerEmail',
@@ -379,14 +410,16 @@ export const getCRMStats = async (req, res) => {
 
     // Average customer lifetime value
     const avgLTV = await Booking.aggregate([
-      { $match: { salonId, status: 'completed' } },
+      { $match: { salonId: salonObjectId } },
+      { $match: { status: 'completed' } },
       { $group: { _id: '$customerEmail', totalSpent: { $sum: '$totalPrice' } } },
       { $group: { _id: null, avgLTV: { $avg: '$totalSpent' } } }
     ]).maxTimeMS(5000);
 
     // Top 5 customers by revenue
     const topCustomers = await Booking.aggregate([
-      { $match: { salonId, status: 'completed' } },
+      { $match: { salonId: salonObjectId } },
+      { $match: { status: 'completed' } },
       {
         $group: {
           _id: '$customerEmail',
@@ -433,7 +466,9 @@ export const getCRMStats = async (req, res) => {
  */
 export const addCustomerNote = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonObjectId = resolveSalonObjectId(req, res);
+    if (!salonObjectId) return;
+
     const { email } = req.params;
     const { note } = req.body;
 
@@ -448,7 +483,7 @@ export const addCustomerNote = async (req, res) => {
     const safeEmailNote = String(email || '').slice(0, 254);
     const booking = await Booking.findOneAndUpdate(
       {
-        salonId,
+        salonId: salonObjectId,
         customerEmail: { $regex: new RegExp(`^${escapeRegExp(safeEmailNote)}$`, 'i') }
       },
       {
@@ -461,7 +496,7 @@ export const addCustomerNote = async (req, res) => {
         }
       },
       { new: true, sort: { bookingDate: -1 } }
-    );
+    ).maxTimeMS(5000);
 
     if (!booking) {
       return res.status(404).json({

@@ -1,6 +1,7 @@
 ﻿import stripePaymentService from '../services/stripePaymentService.js';
 import { PRICING_TIERS, compareTiers } from '../config/pricing.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 /**
  * Subscription Management Controller
@@ -15,11 +16,73 @@ import logger from '../utils/logger.js';
  * - Trial conversion
  */
 
+const activeSubscriptionMutations = new Set();
+
+const validateSubscriptionMutationContext = (req, res, salon) => {
+  if (!salon?._id) {
+    res.status(400).json({
+      success: false,
+      error: 'Missing salon context',
+      message: 'Authenticated salon context is required'
+    });
+    return false;
+  }
+
+  // Tenant ID must never be client-controlled for these endpoints.
+  if (req.body?.salonId !== undefined) {
+    res.status(400).json({
+      success: false,
+      error: 'Invalid payload',
+      message: 'salonId must not be provided in request body'
+    });
+    return false;
+  }
+
+  const forbiddenStripePayloadFields = ['stripeCustomerId', 'stripeSubscriptionId', 'customerId', 'subscriptionId'];
+  const forbiddenField = forbiddenStripePayloadFields.find(field => req.body?.[field] !== undefined);
+  if (forbiddenField) {
+    res.status(400).json({
+      success: false,
+      error: 'Invalid payload',
+      message: `${forbiddenField} must not be provided in request body`
+    });
+    return false;
+  }
+
+  const contextSalonId = salon._id.toString();
+  if (!mongoose.isValidObjectId(contextSalonId)) {
+    res.status(400).json({
+      success: false,
+      error: 'Invalid salon context',
+      message: 'Authenticated salon context is invalid'
+    });
+    return false;
+  }
+
+  return true;
+};
+
+const acquireSubscriptionMutationLock = (salonId) => {
+  if (activeSubscriptionMutations.has(salonId)) {
+    return false;
+  }
+  activeSubscriptionMutations.add(salonId);
+  return true;
+};
+
+const releaseSubscriptionMutationLock = (salonId) => {
+  activeSubscriptionMutations.delete(salonId);
+};
+
 // Create new subscription
 export const createSubscription = async (req, res) => {
   try {
     const { salon } = req;
     const { tier, billingCycle, paymentMethodId, email, trial } = req.body;
+
+    if (!validateSubscriptionMutationContext(req, res, salon)) {
+      return;
+    }
 
     // Validate inputs
     if (!tier || !billingCycle) {
@@ -83,52 +146,77 @@ export const upgradeSubscription = async (req, res) => {
     const { salon } = req;
     const { newTier, billingCycle } = req.body;
 
-    await stripePaymentService.verifySubscriptionOwnership(salon);
+    if (!validateSubscriptionMutationContext(req, res, salon)) {
+      return;
+    }
 
-    // Validate inputs
-    if (!newTier) {
-      return res.status(400).json({
+    const lockKey = salon._id.toString();
+    if (!acquireSubscriptionMutationLock(lockKey)) {
+      return res.status(409).json({
         success: false,
-        error: 'Missing required field',
-        message: 'New tier is required'
+        error: 'Concurrent request',
+        message: 'A subscription change is already in progress for this salon. Please retry shortly.'
       });
     }
 
-    if (!PRICING_TIERS[newTier]) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid tier',
-        message: `Tier must be one of: starter, professional, enterprise`
+    try {
+      await stripePaymentService.verifySubscriptionOwnership(salon);
+
+      // Validate inputs
+      if (!newTier) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required field',
+          message: 'New tier is required'
+        });
+      }
+
+      if (!PRICING_TIERS[newTier]) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid tier',
+          message: `Tier must be one of: starter, professional, enterprise`
+        });
+      }
+
+      // Check if it's actually an upgrade
+      const currentTier = salon.subscription.tier;
+      const comparison = compareTiers(currentTier, newTier);
+
+      if (comparison >= 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid upgrade',
+          message: 'New tier must be higher than current tier',
+          currentTier,
+          newTier
+        });
+      }
+
+      const targetBillingCycle = billingCycle || salon.subscription.billingCycle;
+
+      // Upgrade request is sent to Stripe, final state is applied by webhook only.
+      const result = await stripePaymentService.upgradeSubscription({
+        salon,
+        newTier,
+        billingCycle: targetBillingCycle
       });
-    }
 
-    // Check if it's actually an upgrade
-    const currentTier = salon.subscription.tier;
-    const comparison = compareTiers(currentTier, newTier);
-
-    if (comparison >= 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid upgrade',
-        message: 'New tier must be higher than current tier',
-        currentTier,
-        newTier
+      return res.status(202).json({
+        success: true,
+        pendingWebhookConfirmation: true,
+        subscription: result,
+        requestedChange: {
+          fromTier: currentTier,
+          toTier: newTier,
+          billingCycle: targetBillingCycle
+        },
+        message: 'Upgrade initiated. Final plan activation occurs after Stripe webhook confirmation.',
+        proratedAmount: result.proratedAmount / 100 // Convert to euros
       });
+    } finally {
+      releaseSubscriptionMutationLock(lockKey);
     }
-
-    // Upgrade subscription
-    const result = await stripePaymentService.upgradeSubscription({
-      salon,
-      newTier,
-      billingCycle: billingCycle || salon.subscription.billingCycle
-    });
-
-    res.json({
-      success: true,
-      subscription: result,
-      message: `Successfully upgraded from ${currentTier} to ${newTier}`,
-      proratedAmount: result.proratedAmount / 100 // Convert to euros
-    });
   } catch (error) {
     logger.error('[Subscription Controller] Error upgrading subscription:', error);
     res.status(500).json({
@@ -145,65 +233,91 @@ export const downgradeSubscription = async (req, res) => {
     const { salon } = req;
     const { newTier, billingCycle, immediate } = req.body;
 
-    await stripePaymentService.verifySubscriptionOwnership(salon);
+    if (!validateSubscriptionMutationContext(req, res, salon)) {
+      return;
+    }
 
-    // Validate inputs
-    if (!newTier) {
-      return res.status(400).json({
+    const lockKey = salon._id.toString();
+    if (!acquireSubscriptionMutationLock(lockKey)) {
+      return res.status(409).json({
         success: false,
-        error: 'Missing required field',
-        message: 'New tier is required'
+        error: 'Concurrent request',
+        message: 'A subscription change is already in progress for this salon. Please retry shortly.'
       });
     }
 
-    if (!PRICING_TIERS[newTier]) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid tier',
-        message: `Tier must be one of: starter, professional, enterprise`
+    try {
+      await stripePaymentService.verifySubscriptionOwnership(salon);
+
+      // Validate inputs
+      if (!newTier) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required field',
+          message: 'New tier is required'
+        });
+      }
+
+      if (!PRICING_TIERS[newTier]) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid tier',
+          message: `Tier must be one of: starter, professional, enterprise`
+        });
+      }
+
+      // Check if it's actually a downgrade
+      const currentTier = salon.subscription.tier;
+      const comparison = compareTiers(currentTier, newTier);
+
+      if (comparison <= 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid downgrade',
+          message: 'New tier must be lower than current tier',
+          currentTier,
+          newTier
+        });
+      }
+
+      // Get features that will be lost
+      const currentFeatures = PRICING_TIERS[currentTier].features;
+      const newFeatures = PRICING_TIERS[newTier].features;
+      const lostFeatures = Object.keys(currentFeatures).filter(
+        (feature) => currentFeatures[feature] && !newFeatures[feature]
+      );
+
+      const targetBillingCycle = billingCycle || salon.subscription.billingCycle;
+
+      // Downgrade request is sent to Stripe, final state is applied by webhook only.
+      const result = await stripePaymentService.downgradeSubscription({
+        salon,
+        newTier,
+        billingCycle: targetBillingCycle,
+        immediate: immediate || false
       });
-    }
 
-    // Check if it's actually a downgrade
-    const currentTier = salon.subscription.tier;
-    const comparison = compareTiers(currentTier, newTier);
-
-    if (comparison <= 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid downgrade',
-        message: 'New tier must be lower than current tier',
-        currentTier,
-        newTier
+      return res.status(202).json({
+        success: true,
+        pendingWebhookConfirmation: true,
+        subscription: result,
+        requestedChange: {
+          fromTier: currentTier,
+          toTier: newTier,
+          billingCycle: targetBillingCycle,
+          immediate: Boolean(immediate)
+        },
+        message: immediate
+          ? `Downgrade initiated. Final activation of ${newTier} follows Stripe webhook confirmation.`
+          : `Downgrade scheduling initiated. Webhook confirmation will finalize ${newTier} at period end.`,
+        lostFeatures,
+        warning: lostFeatures.length > 0
+          ? `You will lose access to: ${lostFeatures.join(', ')}`
+          : null
       });
+    } finally {
+      releaseSubscriptionMutationLock(lockKey);
     }
-
-    // Get features that will be lost
-    const currentFeatures = PRICING_TIERS[currentTier].features;
-    const newFeatures = PRICING_TIERS[newTier].features;
-    const lostFeatures = Object.keys(currentFeatures).filter(
-      (feature) => currentFeatures[feature] && !newFeatures[feature]
-    );
-
-    // Downgrade subscription
-    const result = await stripePaymentService.downgradeSubscription({
-      salon,
-      newTier,
-      billingCycle: billingCycle || salon.subscription.billingCycle,
-      immediate: immediate || false
-    });
-
-    res.json({
-      success: true,
-      subscription: result,
-      message: immediate
-        ? `Successfully downgraded from ${currentTier} to ${newTier}`
-        : `Downgrade to ${newTier} scheduled for end of billing period`,
-      lostFeatures,
-      warning: lostFeatures.length > 0
-        ? `You will lose access to: ${lostFeatures.join(', ')}`
-        : null
-    });
   } catch (error) {
     logger.error('[Subscription Controller] Error downgrading subscription:', error);
     res.status(500).json({
@@ -219,6 +333,10 @@ export const cancelSubscription = async (req, res) => {
   try {
     const { salon } = req;
     const { immediately } = req.body;
+
+    if (!validateSubscriptionMutationContext(req, res, salon)) {
+      return;
+    }
 
     await stripePaymentService.verifySubscriptionOwnership(salon);
 
@@ -250,6 +368,10 @@ export const setupSEPA = async (req, res) => {
   try {
     const { salon } = req;
     const { email, name, iban } = req.body;
+
+    if (!validateSubscriptionMutationContext(req, res, salon)) {
+      return;
+    }
 
     // Validate Enterprise tier
     if (salon.subscription.tier !== 'enterprise') {
@@ -311,6 +433,10 @@ export const createInvoice = async (req, res) => {
     const { salon } = req;
     const { amount, description, dueDate } = req.body;
 
+    if (!validateSubscriptionMutationContext(req, res, salon)) {
+      return;
+    }
+
     // Validate Enterprise tier
     if (salon.subscription.tier !== 'enterprise') {
       return res.status(403).json({
@@ -360,6 +486,10 @@ export const convertTrialToPaid = async (req, res) => {
   try {
     const { salon } = req;
     const { selectedTier } = req.body;
+
+    if (!validateSubscriptionMutationContext(req, res, salon)) {
+      return;
+    }
 
     await stripePaymentService.verifySubscriptionOwnership(salon);
 

@@ -27,7 +27,73 @@ const resolveScopedSalonId = (req, res) => {
     return null;
   }
 
-  return req.user.salonId;
+  if (!mongoose.isValidObjectId(req.user.salonId)) {
+    res.status(400).json({ success: false, message: 'Invalid authenticated salonId' });
+    return null;
+  }
+
+  return new mongoose.Types.ObjectId(req.user.salonId);
+};
+
+const resolveTrendRange = (req, res, period) => {
+  const rawStartDate = req.query?.startDate;
+  const rawEndDate = req.query?.endDate;
+
+  if (rawStartDate || rawEndDate) {
+    if (typeof rawStartDate !== 'string' || typeof rawEndDate !== 'string') {
+      res.status(400).json({ success: false, message: 'startDate and endDate must be strings in YYYY-MM-DD format' });
+      return null;
+    }
+
+    const startDate = new Date(rawStartDate);
+    const endDate = new Date(rawEndDate);
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+      res.status(400).json({ success: false, message: 'Invalid startDate or endDate format' });
+      return null;
+    }
+
+    if (endDate < startDate) {
+      res.status(400).json({ success: false, message: 'endDate must be greater than or equal to startDate' });
+      return null;
+    }
+
+    const maxRangeMs = 365 * 24 * 60 * 60 * 1000;
+    if (endDate.getTime() - startDate.getTime() > maxRangeMs) {
+      res.status(400).json({ success: false, message: 'Date range cannot exceed 1 year' });
+      return null;
+    }
+
+    return { startDate, groupBy: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, normalizedPeriod: 'custom' };
+  }
+
+  const now = new Date();
+  switch (period) {
+  case '7d':
+    return {
+      startDate: new Date(now - 7 * 24 * 60 * 60 * 1000),
+      groupBy: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+      normalizedPeriod: period
+    };
+  case '30d':
+    return {
+      startDate: new Date(now - 30 * 24 * 60 * 60 * 1000),
+      groupBy: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+      normalizedPeriod: period
+    };
+  case '90d':
+    return {
+      startDate: new Date(now - 90 * 24 * 60 * 60 * 1000),
+      groupBy: { $dateToString: { format: '%Y-%W', date: '$createdAt' } },
+      normalizedPeriod: period
+    };
+  case '1y':
+  default:
+    return {
+      startDate: new Date(now - 365 * 24 * 60 * 60 * 1000),
+      groupBy: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+      normalizedPeriod: '1y'
+    };
+  }
 };
 
 // ==================== GET SALON METRICS OVERVIEW ====================
@@ -55,21 +121,22 @@ export const getMetricsOverview = async (req, res) => {
       completedBookings,
       noShowBookings
     ] = await Promise.all([
-      Booking.countDocuments({ salonId, createdAt: { $gte: startOfMonth } }),
-      Booking.countDocuments({ salonId, createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth } }),
-      Booking.countDocuments({ salonId, createdAt: { $gte: startOfWeek } }),
-      Booking.countDocuments({ salonId }),
-      Booking.countDocuments({ salonId, status: 'confirmed' }),
-      Booking.countDocuments({ salonId, status: 'cancelled' }),
-      Booking.countDocuments({ salonId, status: 'completed' }),
-      Booking.countDocuments({ salonId, status: 'no_show' })
+      Booking.countDocuments({ salonId, createdAt: { $gte: startOfMonth } }).maxTimeMS(10000),
+      Booking.countDocuments({ salonId, createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth } }).maxTimeMS(10000),
+      Booking.countDocuments({ salonId, createdAt: { $gte: startOfWeek } }).maxTimeMS(10000),
+      Booking.countDocuments({ salonId }).maxTimeMS(10000),
+      Booking.countDocuments({ salonId, status: 'confirmed' }).maxTimeMS(10000),
+      Booking.countDocuments({ salonId, status: 'cancelled' }).maxTimeMS(10000),
+      Booking.countDocuments({ salonId, status: 'completed' }).maxTimeMS(10000),
+      Booking.countDocuments({ salonId, status: 'no_show' }).maxTimeMS(10000)
     ]);
 
     // Revenue calculation
     const revenueAggregation = await Booking.aggregate([
       { $match: { salonId: salonId, status: { $in: ['confirmed', 'completed'] } } },
-      { $group: { _id: null, total: { $sum: '$totalPrice' } } }
-    ]).maxTimeMS(5000);
+      { $group: { _id: null, total: { $sum: '$totalPrice' } } },
+      { $limit: 1 }
+    ]).maxTimeMS(10000);
     const totalRevenue = revenueAggregation[0]?.total || 0;
 
     // This month revenue
@@ -81,19 +148,20 @@ export const getMetricsOverview = async (req, res) => {
           createdAt: { $gte: startOfMonth }
         }
       },
-      { $group: { _id: null, total: { $sum: '$totalPrice' } } }
-    ]).maxTimeMS(5000);
+      { $group: { _id: null, total: { $sum: '$totalPrice' } } },
+      { $limit: 1 }
+    ]).maxTimeMS(10000);
     const thisMonthRevenue = thisMonthRevenueAgg[0]?.total || 0;
 
     // Unique customers
-    const uniqueCustomers = await Booking.distinct('customerEmail', { salonId });
+    const uniqueCustomers = await Booking.distinct('customerEmail', { salonId }).maxTimeMS(10000);
     const totalCustomers = uniqueCustomers.length;
 
     // New customers this month
     const newCustomersThisMonth = await Booking.distinct('customerEmail', {
       salonId,
       createdAt: { $gte: startOfMonth }
-    });
+    }).maxTimeMS(10000);
 
     // Calculate averages
     const avgBookingValue = totalBookings > 0 ? totalRevenue / totalBookings : 0;
@@ -154,32 +222,9 @@ export const getBookingTrends = async (req, res) => {
 
     if (!salonId) return;
 
-    // Calculate date range
-    const now = new Date();
-    let startDate;
-    let groupBy;
-
-    switch (period) {
-      case '7d':
-        startDate = new Date(now - 7 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
-        break;
-      case '30d':
-        startDate = new Date(now - 30 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
-        break;
-      case '90d':
-        startDate = new Date(now - 90 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: '%Y-%W', date: '$createdAt' } };
-        break;
-      case '1y':
-        startDate = new Date(now - 365 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: '%Y-%m', date: '$createdAt' } };
-        break;
-      default:
-        startDate = new Date(now - 30 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
-    }
+    const trendRange = resolveTrendRange(req, res, period);
+    if (!trendRange) return;
+    const { startDate, groupBy, normalizedPeriod } = trendRange;
 
     const trendLimitByPeriod = {
       '7d': 8,
@@ -196,12 +241,12 @@ export const getBookingTrends = async (req, res) => {
         revenue: { $sum: '$totalPrice' }
       }},
       { $sort: { _id: 1 } },
-      { $limit: trendLimitByPeriod[period] || 31 }
-    ]).maxTimeMS(5000);
+      { $limit: Math.min(trendLimitByPeriod[normalizedPeriod] || 31, 10000) }
+    ]).maxTimeMS(10000);
 
     res.status(200).json({
       success: true,
-      period,
+      period: normalizedPeriod,
       data: bookingTrend.map(item => ({
         date: item._id,
         bookings: item.bookings,
@@ -258,7 +303,7 @@ export const getTopServices = async (req, res) => {
         as: 'service'
       }},
       { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } }
-    ]).maxTimeMS(5000);
+    ]).maxTimeMS(10000);
 
     res.status(200).json({
       success: true,
@@ -289,8 +334,9 @@ export const getPeakHours = async (req, res) => {
         _id: { $hour: '$bookingDate' },
         count: { $sum: 1 }
       }},
-      { $sort: { _id: 1 } }
-    ]).maxTimeMS(5000);
+      { $sort: { _id: 1 } },
+      { $limit: 24 }
+    ]).maxTimeMS(10000);
 
     // Get booking distribution by day of week
     const dailyDistribution = await Booking.aggregate([
@@ -299,8 +345,9 @@ export const getPeakHours = async (req, res) => {
         _id: { $dayOfWeek: '$bookingDate' },
         count: { $sum: 1 }
       }},
-      { $sort: { _id: 1 } }
-    ]).maxTimeMS(5000);
+      { $sort: { _id: 1 } },
+      { $limit: 7 }
+    ]).maxTimeMS(10000);
 
     const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 
@@ -350,8 +397,9 @@ export const getCustomerInsights = async (req, res) => {
             },
             totalSpentAll: { $sum: '$totalSpent' }
           }
-        }
-      ]).maxTimeMS(5000),
+        },
+        { $limit: 1 }
+      ]).maxTimeMS(10000),
       Booking.aggregate([
         { $match: { salonId: salonId, status: { $in: ['confirmed', 'completed'] } } },
         {
@@ -365,7 +413,7 @@ export const getCustomerInsights = async (req, res) => {
         },
         { $sort: { bookingCount: -1 } },
         { $limit: 5 }
-      ]).maxTimeMS(5000)
+      ]).maxTimeMS(10000)
     ]);
 
     const summary = summaryResult[0] || {

@@ -298,7 +298,12 @@ describe('Tenant boundary integration: CRM', () => {
 
     expect(response.status).toBe(200);
     const firstPipeline = mockBookingAggregate.mock.calls[0][0];
-    expect(firstPipeline[0]).toEqual({ $match: { salonId: SALON_A_ID } });
+    expect(firstPipeline[0]).toEqual({
+      $match: {
+        salonId: expect.objectContaining({ _bsontype: 'ObjectId' })
+      }
+    });
+    expect(firstPipeline[0].$match.salonId.toString()).toBe(SALON_A_ID);
   });
 
   it('returns 400 when authenticated user has no salon context', async () => {

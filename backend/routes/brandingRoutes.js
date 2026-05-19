@@ -12,12 +12,14 @@ import {
   deleteLogo,
   resetBranding
 } from '../controllers/brandingController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 // ? SECURITY FIX: Use centralized file upload middleware
 import { upload, validateImageDimensions, handleUploadError } from '../middleware/fileUploadMiddleware.js';
 
 const router = express.Router();
 
 // All routes require authentication (applied in server.js)
+router.use(authMiddleware.requireRole('salon_owner', 'ceo'));
 
 /**
  * @route   GET /api/branding

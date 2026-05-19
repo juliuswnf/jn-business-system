@@ -14,6 +14,7 @@ const router = express.Router();
 
 // All routes require authentication
 router.use(authMiddleware.protect);
+router.use(authMiddleware.requireRole('salon_owner', 'ceo'));
 
 /**
  * POST /api/v1/stripe-connect/create-account

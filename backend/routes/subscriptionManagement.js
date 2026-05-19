@@ -16,6 +16,11 @@ const router = express.Router();
 
 // Use protect middleware for authentication
 const authenticateSalon = [authMiddleware.protect, checkSubscriptionStatus];
+const authenticateSubscriptionMutation = [
+  authMiddleware.protect,
+  authMiddleware.requireRole('salon_owner', 'ceo'),
+  checkSubscriptionStatus
+];
 
 /**
  * Subscription Management Routes
@@ -27,24 +32,24 @@ const authenticateSalon = [authMiddleware.protect, checkSubscriptionStatus];
 router.get('/status', authenticateSalon, getSubscriptionStatus);
 
 // Create new subscription
-router.post('/create', authenticateSalon, createSubscription);
+router.post('/create', authenticateSubscriptionMutation, createSubscription);
 
 // Upgrade subscription
-router.post('/upgrade', authenticateSalon, upgradeSubscription);
+router.post('/upgrade', authenticateSubscriptionMutation, upgradeSubscription);
 
 // Downgrade subscription
-router.post('/downgrade', authenticateSalon, downgradeSubscription);
+router.post('/downgrade', authenticateSubscriptionMutation, downgradeSubscription);
 
 // Cancel subscription
-router.post('/cancel', authenticateSalon, cancelSubscription);
+router.post('/cancel', authenticateSubscriptionMutation, cancelSubscription);
 
 // Setup SEPA Direct Debit (Enterprise only)
-router.post('/sepa/setup', authenticateSalon, setupSEPA);
+router.post('/sepa/setup', authenticateSubscriptionMutation, setupSEPA);
 
 // Create invoice (Enterprise only)
-router.post('/invoice/create', authenticateSalon, createInvoice);
+router.post('/invoice/create', authenticateSubscriptionMutation, createInvoice);
 
 // Convert trial to paid
-router.post('/trial/convert', authenticateSalon, convertTrialToPaid);
+router.post('/trial/convert', authenticateSubscriptionMutation, convertTrialToPaid);
 
 export default router;

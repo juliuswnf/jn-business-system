@@ -57,7 +57,7 @@ const router = express.Router();
 
 // Apply auth middleware
 router.use(authMiddleware.protect);
-router.use(authMiddleware.authorize('ceo'));
+router.use(requireCEO);
 
 // ==================== NEW CEO DASHBOARD ENDPOINTS ====================
 

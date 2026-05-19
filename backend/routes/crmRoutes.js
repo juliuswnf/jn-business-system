@@ -8,6 +8,7 @@ import express from 'express';
 import { body } from 'express-validator';
 import { validateBody } from '../middleware/validationMiddleware.js';
 import paginationMiddleware from '../middleware/paginationMiddleware.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 import {
   getCustomers,
   getCustomerDetails,
@@ -18,6 +19,7 @@ import {
 const router = express.Router();
 
 // All routes require authentication (applied in server.js)
+router.use(authMiddleware.requireRole('salon_owner', 'employee', 'ceo'));
 
 /**
  * @route   GET /api/crm/customers
@@ -38,7 +40,7 @@ router.get('/customers/:email', paginationMiddleware, getCustomerDetails);
  * @desc    Get CRM statistics overview
  * @access  Protected (salon_owner)
  */
-router.get('/stats', getCRMStats);
+router.get('/stats', authMiddleware.requireRole('salon_owner', 'ceo'), getCRMStats);
 
 /**
  * @route   POST /api/crm/customers/:email/notes

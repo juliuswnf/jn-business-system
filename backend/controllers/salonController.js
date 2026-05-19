@@ -1,7 +1,7 @@
 ﻿import logger from '../utils/logger.js';
 import mongoose from 'mongoose';
 
-const ALLOWED_BOOKING_STATUSES_SALON = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show', 'booked'];
+const ALLOWED_BOOKING_STATUSES_SALON = ['pending', 'confirmed', 'cancelled', 'completed', 'no_show', 'booked'];
 /**
  * Salon Controller - MVP
  * Salon owner operations for their salon
@@ -15,18 +15,26 @@ const sanitizeSalonResponse = (salonDoc, role) => {
   const salon = salonDoc?.toObject ? salonDoc.toObject() : salonDoc;
   if (!salon) return salon;
 
+  // Never expose Stripe customer/subscription identifiers to frontend clients.
+  if (salon.subscription) {
+    delete salon.subscription.stripeCustomerId;
+    delete salon.subscription.stripeSubscriptionId;
+  }
+
   if (role !== 'ceo') {
     if (salon.stripe) {
       delete salon.stripe.connectedAccountId;
       delete salon.stripe.onboardingCompletedAt;
     }
     if (salon.subscription) {
-      delete salon.subscription.stripeCustomerId;
-      delete salon.subscription.stripeSubscriptionId;
       delete salon.subscription.oldPlanId;
       delete salon.subscription.grandfathered;
+      delete salon.subscription.smsUsedThisMonth;
+      delete salon.subscription.smsResetDate;
     }
 
+    delete salon.compliance;
+    delete salon.isPremium;
     delete salon.deletedAt;
     delete salon.deletedBy;
   }
@@ -87,12 +95,19 @@ const ALLOWED_SALON_FIELDS = [
 
 export const updateSalon = async (req, res) => {
   try {
-        if (!['ceo', 'salon_owner'].includes(req.user.role)) {
-          return res.status(403).json({
-            success: false,
-            message: 'Access denied - Only salon owners or CEO can change salon settings'
-          });
-        }
+    if (!['ceo', 'salon_owner'].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - Only salon owners or CEO can change salon settings'
+      });
+    }
+
+    if (req.body?.salonId !== undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'salonId in request body is not allowed'
+      });
+    }
 
     if (req.params.salonId && !mongoose.isValidObjectId(req.params.salonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId' });
@@ -160,13 +175,17 @@ export const getSalonServices = async (req, res) => {
     }
     const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
 
+    if (req.user.role !== 'ceo' && salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+    }
+
     // ? PAGINATION - prevent unbounded queries (DoS protection)
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50)); // Default 50, max 100
     const skip = (page - 1) * limit;
 
     // Get total count for pagination metadata
-    const total = await Service.countDocuments({ salonId });
+    const total = await Service.countDocuments({ salonId }).maxTimeMS(5000);
 
     const services = await Service.find({ salonId })
       .sort({ createdAt: -1 })
@@ -204,14 +223,20 @@ export const getSalonBookings = async (req, res) => {
     }
     const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
     const { status, startDate, endDate } = req.query;
+
+    if (req.user.role !== 'ceo' && salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+    }
+
     // ? SECURITY FIX: Validate and limit pagination to prevent DoS
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20)); // Max 100 items
 
     let filter = { salonId };
 
-    if (status && ALLOWED_BOOKING_STATUSES_SALON.includes(String(status))) {
-      filter.status = String(status);
+    const normalizedStatus = typeof status === 'string' ? status.replace('no-show', 'no_show') : null;
+    if (normalizedStatus && ALLOWED_BOOKING_STATUSES_SALON.includes(normalizedStatus)) {
+      filter.status = normalizedStatus;
     }
 
     if (startDate || endDate) {
@@ -224,7 +249,7 @@ export const getSalonBookings = async (req, res) => {
       }
     }
 
-    const total = await Booking.countDocuments(filter);
+    const total = await Booking.countDocuments(filter).maxTimeMS(5000);
     const skip = (page - 1) * limit;
 
     const bookings = await Booking.find(filter)
@@ -262,6 +287,10 @@ export const getSalonStats = async (req, res) => {
     }
     const salonId = req.params.salonId ? new mongoose.Types.ObjectId(req.params.salonId) : req.user.salonId;
 
+    if (req.user.role !== 'ceo' && salonId?.toString() !== req.user.salonId?.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied - Resource belongs to another salon' });
+    }
+
     const [
       totalBookings,
       confirmedBookings,
@@ -270,12 +299,12 @@ export const getSalonStats = async (req, res) => {
       completedBookings,
       totalServices
     ] = await Promise.all([
-      Booking.countDocuments({ salonId }),
-      Booking.countDocuments({ salonId, status: 'confirmed' }),
-      Booking.countDocuments({ salonId, status: 'pending' }),
-      Booking.countDocuments({ salonId, status: 'cancelled' }),
-      Booking.countDocuments({ salonId, status: 'completed' }),
-      Service.countDocuments({ salonId })
+      Booking.countDocuments({ salonId }).maxTimeMS(5000),
+      Booking.countDocuments({ salonId, status: 'confirmed' }).maxTimeMS(5000),
+      Booking.countDocuments({ salonId, status: 'pending' }).maxTimeMS(5000),
+      Booking.countDocuments({ salonId, status: 'cancelled' }).maxTimeMS(5000),
+      Booking.countDocuments({ salonId, status: 'completed' }).maxTimeMS(5000),
+      Service.countDocuments({ salonId }).maxTimeMS(5000)
     ]);
 
     res.status(200).json({
@@ -341,16 +370,16 @@ export const getSalonDashboard = async (req, res) => {
       Booking.countDocuments({
         salonId,
         bookingDate: { $gte: today, $lt: tomorrow }
-      }),
+      }).maxTimeMS(5000),
       Booking.countDocuments({
         salonId,
         bookingDate: { $gte: today, $lt: nextWeek },
         status: { $in: ['confirmed', 'pending'] }
-      }),
-      Booking.countDocuments({ salonId }),
-      Service.countDocuments({ salonId }),
-      Booking.countDocuments({ salonId, status: 'completed' }),
-      Booking.countDocuments({ salonId, status: 'cancelled' })
+      }).maxTimeMS(5000),
+      Booking.countDocuments({ salonId }).maxTimeMS(5000),
+      Service.countDocuments({ salonId }).maxTimeMS(5000),
+      Booking.countDocuments({ salonId, status: 'completed' }).maxTimeMS(5000),
+      Booking.countDocuments({ salonId, status: 'cancelled' }).maxTimeMS(5000)
     ]);
 
     // Get revenue (sum of completed bookings)
@@ -366,7 +395,7 @@ export const getSalonDashboard = async (req, res) => {
       },
       { $unwind: '$service' },
       { $group: { _id: null, totalRevenue: { $sum: '$service.price' } } }
-    ]);
+    ]).maxTimeMS(5000);
 
     const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
 
@@ -379,7 +408,7 @@ export const getSalonDashboard = async (req, res) => {
       salonId,
       createdAt: { $gte: startOfMonth },
       status: { $ne: 'cancelled' }
-    });
+    }).maxTimeMS(5000);
 
     const planId = (salon.subscription?.planId || '').toLowerCase();
     const isPro = planId.includes('pro');

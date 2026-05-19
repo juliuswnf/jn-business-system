@@ -9,6 +9,9 @@ const router = express.Router();
 // All routes require authentication
 router.use(authMiddleware.protect);
 
+// Service management is restricted to salon staff
+router.use(authMiddleware.requireRole('salon_owner', 'employee', 'ceo'));
+
 // Apply tenant filter
 router.use(enforceTenantFilter);
 

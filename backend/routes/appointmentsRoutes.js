@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.use(authMiddleware.protect);
 router.use(enforceTenantFilter);
+router.use(authMiddleware.requireRole('salon_owner', 'employee', 'ceo'));
 
 // Core dashboard KPI endpoint for booking flow
 router.get('/dashboard-stats', bookingController.getDashboardStats);
