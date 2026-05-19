@@ -152,6 +152,7 @@ export const getCustomerDetails = async (req, res) => {
   try {
     const salonId = req.user.salonId;
     const { email } = req.params;
+    const { page, limit, skip } = req.pagination || { page: 1, limit: 20, skip: 0 };
 
     if (!salonId) {
       return res.status(400).json({
@@ -162,33 +163,104 @@ export const getCustomerDetails = async (req, res) => {
 
     // Get all bookings for this customer
     const safeEmail = String(email || '').slice(0, 254);
-    const bookings = await Booking.find({
+    const customerFilter = {
       salonId,
       customerEmail: { $regex: new RegExp(`^${escapeRegExp(safeEmail)}$`, 'i') }
-    })
-      .populate('serviceId', 'name price duration')
-      .populate('employeeId', 'name')
-      .sort({ bookingDate: -1 })
-      .maxTimeMS(5000);
+    };
 
-    if (bookings.length === 0) {
+    const totalCount = await Booking.countDocuments(customerFilter).maxTimeMS(5000);
+
+    if (totalCount === 0) {
       return res.status(404).json({
         success: false,
         error: 'Kunde nicht gefunden'
       });
     }
 
-    // Calculate customer stats
-    const stats = {
-      totalBookings: bookings.length,
-      completedBookings: bookings.filter(b => b.status === 'completed').length,
-      cancelledBookings: bookings.filter(b => b.status === 'cancelled').length,
-      noShows: bookings.filter(b => b.status === 'no-show').length,
-      totalSpent: bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0),
-      averageSpent: 0,
-      firstBooking: bookings[bookings.length - 1]?.bookingDate,
-      lastBooking: bookings[0]?.bookingDate
+    const bookings = await Booking.find({
+      ...customerFilter
+    })
+      .populate('serviceId', 'name price duration')
+      .populate('employeeId', 'name')
+      .sort({ bookingDate: -1 })
+      .skip(skip)
+      .limit(limit)
+      .maxTimeMS(5000);
+
+    const [statsResult, latestBooking, favoriteServices] = await Promise.all([
+      Booking.aggregate([
+        { $match: { ...customerFilter } },
+        {
+          $group: {
+            _id: null,
+            totalBookings: { $sum: 1 },
+            completedBookings: {
+              $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+            },
+            cancelledBookings: {
+              $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
+            },
+            noShows: {
+              $sum: { $cond: [{ $eq: ['$status', 'no-show'] }, 1, 0] }
+            },
+            totalSpent: { $sum: { $ifNull: ['$totalPrice', 0] } },
+            firstBooking: { $min: '$bookingDate' },
+            lastBooking: { $max: '$bookingDate' }
+          }
+        }
+      ]).maxTimeMS(5000),
+      Booking.findOne({ ...customerFilter })
+        .sort({ bookingDate: -1 })
+        .maxTimeMS(5000),
+      Booking.aggregate([
+        { $match: { ...customerFilter } },
+        {
+          $lookup: {
+            from: 'services',
+            let: {
+              serviceId: '$serviceId',
+              bookingSalonId: '$salonId'
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$_id', '$$serviceId'] },
+                      { $eq: ['$salonId', '$$bookingSalonId'] }
+                    ]
+                  }
+                }
+              },
+              {
+                $project: { name: 1 }
+              }
+            ],
+            as: 'service'
+          }
+        },
+        { $unwind: '$service' },
+        {
+          $group: {
+            _id: '$service.name',
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1 } },
+        { $limit: 3 }
+      ]).maxTimeMS(5000)
+    ]);
+
+    const stats = statsResult[0] || {
+      totalBookings: 0,
+      completedBookings: 0,
+      cancelledBookings: 0,
+      noShows: 0,
+      totalSpent: 0,
+      firstBooking: null,
+      lastBooking: null
     };
+
     stats.averageSpent = stats.completedBookings > 0
       ? Math.round(stats.totalSpent / stats.completedBookings)
       : 0;
@@ -199,20 +271,10 @@ export const getCustomerDetails = async (req, res) => {
     else if (stats.totalSpent >= 500) tier = 'gold';
     else if (stats.totalBookings >= 5) tier = 'regular';
 
-    // Most booked services
-    const serviceCount = {};
-    bookings.forEach(b => {
-      if (b.serviceId?.name) {
-        serviceCount[b.serviceId.name] = (serviceCount[b.serviceId.name] || 0) + 1;
-      }
-    });
-    const favoriteServices = Object.entries(serviceCount)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 3);
-
-    // Get customer info from latest booking
-    const latestBooking = bookings[0];
+    const formattedFavoriteServices = favoriteServices.map(s => ({
+      name: s._id,
+      count: s.count
+    }));
 
     res.status(200).json({
       success: true,
@@ -222,7 +284,10 @@ export const getCustomerDetails = async (req, res) => {
         phone: latestBooking.customerPhone || null,
         tier,
         stats,
-        favoriteServices,
+        favoriteServices: formattedFavoriteServices,
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: page,
         bookings: bookings.map(b => ({
           id: b._id,
           date: b.bookingDate,
@@ -272,7 +337,7 @@ export const getCRMStats = async (req, res) => {
       { $group: { _id: '$customerEmail', firstBooking: { $min: '$bookingDate' } } },
       { $match: { firstBooking: { $gte: startOfMonth } } },
       { $count: 'count' }
-    ]).option({ maxTimeMS: 5000 });
+    ]).maxTimeMS(5000);
 
     // New customers last month
     const newLastMonth = await Booking.aggregate([
@@ -280,7 +345,7 @@ export const getCRMStats = async (req, res) => {
       { $group: { _id: '$customerEmail', firstBooking: { $min: '$bookingDate' } } },
       { $match: { firstBooking: { $gte: startOfLastMonth, $lte: endOfLastMonth } } },
       { $count: 'count' }
-    ]).option({ maxTimeMS: 5000 });
+    ]).maxTimeMS(5000);
 
     // Customer tiers breakdown
     const tierBreakdown = await Booking.aggregate([
@@ -307,7 +372,7 @@ export const getCRMStats = async (req, res) => {
         }
       },
       { $group: { _id: '$tier', count: { $sum: 1 } } }
-    ]).option({ maxTimeMS: 5000 });
+    ]).maxTimeMS(5000);
 
     const tiers = { vip: 0, gold: 0, regular: 0, new: 0 };
     tierBreakdown.forEach(t => { tiers[t._id] = t.count; });
@@ -317,7 +382,7 @@ export const getCRMStats = async (req, res) => {
       { $match: { salonId, status: 'completed' } },
       { $group: { _id: '$customerEmail', totalSpent: { $sum: '$totalPrice' } } },
       { $group: { _id: null, avgLTV: { $avg: '$totalSpent' } } }
-    ]).option({ maxTimeMS: 5000 });
+    ]).maxTimeMS(5000);
 
     // Top 5 customers by revenue
     const topCustomers = await Booking.aggregate([
@@ -332,7 +397,7 @@ export const getCRMStats = async (req, res) => {
       },
       { $sort: { totalSpent: -1 } },
       { $limit: 5 }
-    ]).option({ maxTimeMS: 5000 });
+    ]).maxTimeMS(5000);
 
     res.status(200).json({
       success: true,

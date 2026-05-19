@@ -14,12 +14,35 @@ export default function ConsentFormFlow({ customerId, businessType }) {
   const [showSignModal, setShowSignModal] = useState(false);
   const [showRevokeModal, setShowRevokeModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [signing, setSigning] = useState(false);
+  const [revoking, setRevoking] = useState(false);
+  const [revocationReason, setRevocationReason] = useState('');
+  const [signatureCanvasWidth, setSignatureCanvasWidth] = useState(700);
   
   const signatureRef = useRef(null);
 
   useEffect(() => {
     fetchForms();
   }, [customerId]);
+
+  useEffect(() => {
+    if (!showSignModal) {
+      return;
+    }
+
+    const updateSignatureCanvasWidth = () => {
+      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
+      const nextWidth = Math.min(700, Math.max(280, viewportWidth - 64));
+      setSignatureCanvasWidth(nextWidth);
+    };
+
+    updateSignatureCanvasWidth();
+    window.addEventListener('resize', updateSignatureCanvasWidth);
+
+    return () => {
+      window.removeEventListener('resize', updateSignatureCanvasWidth);
+    };
+  }, [showSignModal]);
 
   const fetchForms = async () => {
     try {
@@ -37,13 +60,18 @@ export default function ConsentFormFlow({ customerId, businessType }) {
   const handleSignForm = async (e) => {
     e.preventDefault();
 
-    if (signatureRef.current.isEmpty()) {
+    if (signing) {
+      return;
+    }
+
+    if (!signatureRef.current || signatureRef.current.isEmpty()) {
       alert('Please provide a signature');
       return;
     }
 
     const formData = new FormData(e.target);
     const signatureData = signatureRef.current.toDataURL();
+    setSigning(true);
 
     try {
       const response = await api.post('/consent-forms', {
@@ -59,6 +87,7 @@ export default function ConsentFormFlow({ customerId, businessType }) {
 
       if (response.data.success) {
         setShowSignModal(false);
+        clearSignature();
         fetchForms();
         alert('Consent form signed successfully');
       } else {
@@ -67,16 +96,24 @@ export default function ConsentFormFlow({ customerId, businessType }) {
     } catch (error) {
       captureError(error, { context: 'signConsentForm' });
       alert('Failed to sign form');
+    } finally {
+      setSigning(false);
     }
   };
 
   const handleRevokeConsent = async () => {
-    const reason = document.getElementById('revocationReason').value;
+    if (revoking || !selectedForm) {
+      return;
+    }
+
+    const reason = revocationReason.trim();
 
     if (!reason || reason.length < 10) {
       alert('Please provide a detailed reason for revocation (min 10 characters)');
       return;
     }
+
+    setRevoking(true);
 
     try {
       const response = await api.post(`/consent-forms/${selectedForm._id}/revoke`, { reason });
@@ -84,17 +121,22 @@ export default function ConsentFormFlow({ customerId, businessType }) {
       if (response.data.success) {
         setShowRevokeModal(false);
         setSelectedForm(null);
+        setRevocationReason('');
         fetchForms();
         alert('Consent revoked successfully');
       }
     } catch (error) {
       captureError(error, { context: 'revokeConsent' });
       alert('Failed to revoke consent');
+    } finally {
+      setRevoking(false);
     }
   };
 
   const clearSignature = () => {
-    signatureRef.current.clear();
+    if (signatureRef.current) {
+      signatureRef.current.clear();
+    }
   };
 
   const getStatusColor = (status) => {
@@ -294,7 +336,10 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
           <p className="text-gray-600 mt-2">Digital consent management with e-signatures</p>
         </div>
         <button
-          onClick={() => setShowSignModal(true)}
+          onClick={() => {
+            setShowSignModal(true);
+            setSigning(false);
+          }}
           className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
         >
           <FileSignature className="w-5 h-5" />
@@ -492,7 +537,7 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                   <SignatureCanvas
                     ref={signatureRef}
                     canvasProps={{
-                      width: 700,
+                      width: signatureCanvasWidth,
                       height: 200,
                       className: 'signature-canvas'
                     }}
@@ -527,15 +572,17 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                     setShowSignModal(false);
                     clearSignature();
                   }}
+                  disabled={signing}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
+                  disabled={signing}
+                  className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Sign & Submit
+                  {signing ? 'Signing...' : 'Sign & Submit'}
                 </button>
               </div>
             </form>
@@ -562,6 +609,8 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                 </label>
                 <textarea
                   id="revocationReason"
+                  value={revocationReason}
+                  onChange={(e) => setRevocationReason(e.target.value)}
                   rows={4}
                   required
                   placeholder="Please provide a detailed reason for revoking this consent..."
@@ -576,16 +625,19 @@ PHOTO/TESTIMONIAL CONSENT: ☐ Yes ☐ No - I consent to photos/testimonials for
                   onClick={() => {
                     setShowRevokeModal(false);
                     setSelectedForm(null);
+                    setRevocationReason('');
                   }}
+                  disabled={revoking}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRevokeConsent}
-                  className="flex-1 px-4 py-2 bg-red-600 text-gray-900 rounded-xl hover:bg-red-700 transition-colors"
+                  disabled={revoking}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Revoke Consent
+                  {revoking ? 'Revoking...' : 'Revoke Consent'}
                 </button>
               </div>
             </div>

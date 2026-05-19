@@ -69,10 +69,15 @@ const SubscriptionManagement = () => {
     try {
       const response = await api.get('/subscriptions/manage/status');
 
-      if (response.data.success) {
+      if (response.data.success && response.data.subscription) {
         setSubscription(response.data.subscription);
+        setError('');
+      } else {
+        setSubscription(null);
+        setError(response.data.message || 'Keine Subscription-Daten verfügbar');
       }
     } catch (err) {
+      setSubscription(null);
       setError('Fehler beim Laden der Subscription-Informationen');
     } finally {
       setLoading(false);
@@ -116,6 +121,10 @@ const SubscriptionManagement = () => {
   if (loading) return <LoadingView />;
 
   if (error) return <ErrorView error={error} onBack={() => navigate('/')} />;
+
+  if (!subscription) {
+    return <ErrorView error="Keine Subscription-Daten verfügbar" onBack={() => navigate('/')} />;
+  }
 
   if (showUpgrade) {
     return (

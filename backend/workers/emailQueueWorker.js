@@ -14,6 +14,8 @@ import emailService from '../services/emailService.js';
 import emailTemplateService from '../services/emailTemplateService.js';
 import alertingService from '../services/alertingService.js';
 
+let isProcessingQueue = false;
+
 /**
  * ? SECURITY FIX: Determine if error is transient (retryable) or permanent
  * Transient errors: Timeout, Connection Reset, Network issues
@@ -75,6 +77,13 @@ const isTransientError = (error) => {
  * Process all pending emails in the queue
  */
 const processEmailQueue = async () => {
+  if (isProcessingQueue) {
+    logger.log('[INFO] Email queue worker already running, skipping...');
+    return;
+  }
+
+  isProcessingQueue = true;
+
   try {
     const now = new Date();
     // ? SECURITY FIX: Get emails ready to send (scheduled and retry time passed)
@@ -137,6 +146,8 @@ const processEmailQueue = async () => {
       source: 'worker',
       stackTrace: error.stack
     }).catch(e => logger.error('[EmailQueue] ErrorLog write failed:', e.message));
+  } finally {
+    isProcessingQueue = false;
   }
 };
 

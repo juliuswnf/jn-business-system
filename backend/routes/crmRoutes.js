@@ -31,7 +31,7 @@ router.get('/customers', paginationMiddleware, getCustomers);
  * @desc    Get customer details with booking history
  * @access  Protected (salon_owner, employee)
  */
-router.get('/customers/:email', getCustomerDetails);
+router.get('/customers/:email', paginationMiddleware, getCustomerDetails);
 
 /**
  * @route   GET /api/crm/stats

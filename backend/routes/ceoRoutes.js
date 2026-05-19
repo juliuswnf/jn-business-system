@@ -1,6 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import securityMiddleware from '../middleware/securityMiddleware.js';
+import { validateBody } from '../middleware/validationMiddleware.js';
 import ceoMiddleware from '../middleware/ceoMiddleware.js';
 import ceoController from '../controllers/ceoController.js';
 import ceoSubscriptionController from '../controllers/ceoSubscriptionController.js';
@@ -13,11 +14,44 @@ import * as ceoSupportController from '../controllers/ceoSupportController.js';
 import * as ceoAuditController from '../controllers/ceoAuditController.js';
 import * as ceoFeatureFlagsController from '../controllers/ceoFeatureFlagsController.js';
 import * as ceoBackupsController from '../controllers/ceoBackupsController.js';
+import Joi from 'joi';
 
 import { createRateLimiter } from '../middleware/rateLimiterMiddleware.js';
 
 // Strict rate limit for shell-exec endpoints: max 10 calls per 15 min per CEO session
 const serviceActionLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10, message: 'Service action rate limit exceeded' });
+const requireCEO = authMiddleware.requireRole('ceo');
+
+const systemSettingsUpdateSchema = Joi.object({
+  email: Joi.object({
+    smtpHost: Joi.string().trim().max(255),
+    smtpPort: Joi.number().integer().min(1).max(65535),
+    smtpUser: Joi.string().trim().max(255),
+    smtpPassword: Joi.string().trim().max(255),
+    smtpSecure: Joi.boolean(),
+    fromEmail: Joi.string().trim().email().max(255),
+    fromName: Joi.string().trim().max(120)
+  }).optional(),
+  sms: Joi.object({
+    provider: Joi.string().trim().valid('twilio', 'messagebird', 'test'),
+    accountSid: Joi.string().trim().max(255),
+    authToken: Joi.string().trim().max(255),
+    phoneNumber: Joi.string().trim().max(40)
+  }).optional(),
+  payment: Joi.object({
+    stripePublicKey: Joi.string().trim().max(255),
+    stripeSecretKey: Joi.string().trim().max(255),
+    webhookSecret: Joi.string().trim().max(255)
+  }).optional()
+}).or('email', 'sms', 'payment');
+
+const testEmailSchema = Joi.object({
+  testEmail: Joi.string().trim().email().required()
+});
+
+const testSmsSchema = Joi.object({
+  testPhone: Joi.string().trim().pattern(/^\+?[0-9\s().-]{7,20}$/).required()
+});
 
 const router = express.Router();
 
@@ -89,8 +123,8 @@ router.get('/subscription-info', ceoMiddleware.verifyCEOAuth, ceoController.getS
 router.get('/revenue', ceoMiddleware.verifyCEOAuth, ceoController.getRevenueReport);
 
 // System Settings (Email Templates, etc)
-router.get('/settings', ceoMiddleware.verifyCEOAuth, ceoController.getSystemSettings);
-router.put('/settings', securityMiddleware.validateContentType, ceoController.updateSystemSettings);
+router.get('/settings', requireCEO, ceoMiddleware.verifyCEOAuth, ceoController.getSystemSettings);
+router.put('/settings', securityMiddleware.validateContentType, requireCEO, ceoController.updateSystemSettings);
 
 // ==================== CEO HIDDEN LOGIN ROUTE ====================
 // Nur über spezielle URL erreichbar
@@ -117,22 +151,22 @@ router.get('/status', ceoMiddleware.verifyCEOAuth, (req, res) => {
 // Für das System Control Tab im CEO Dashboard
 
 // Get status of all services
-router.get('/system/status', ceoMiddleware.verifyCEOAuth, systemController.getAllServicesStatus);
+router.get('/system/status', requireCEO, ceoMiddleware.verifyCEOAuth, systemController.getAllServicesStatus);
 
 // Get status of a specific service
-router.get('/system/status/:serviceId', ceoMiddleware.verifyCEOAuth, systemController.getServiceStatus);
+router.get('/system/status/:serviceId', requireCEO, ceoMiddleware.verifyCEOAuth, systemController.getServiceStatus);
 
 // Start a specific service
-router.post('/system/start/:serviceId', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.startService);
+router.post('/system/start/:serviceId', requireCEO, ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.startService);
 
 // Stop a specific service
-router.post('/system/stop/:serviceId', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.stopService);
+router.post('/system/stop/:serviceId', requireCEO, ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.stopService);
 
 // Start all services
-router.post('/system/start-all', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.startAllServices);
+router.post('/system/start-all', requireCEO, ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.startAllServices);
 
 // Stop all services
-router.post('/system/stop-all', ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.stopAllServices);
+router.post('/system/stop-all', requireCEO, ceoMiddleware.verifyCEOAuth, serviceActionLimiter, systemController.stopAllServices);
 
 // ==================== ANALYTICS ROUTES ====================
 router.get('/analytics/overview', ceoMiddleware.verifyCEOAuth, ceoAnalyticsController.getAnalyticsOverview);
@@ -197,9 +231,9 @@ router.post('/backups/:backupId/restore', securityMiddleware.validateContentType
 router.get('/backups/:backupId/download', ceoMiddleware.verifyCEOAuth, ceoBackupsController.downloadBackup);
 
 // ==================== SYSTEM SETTINGS ROUTES ====================
-router.get('/system-settings', ceoMiddleware.verifyCEOAuth, systemSettingsController.getSystemSettings);
-router.put('/system-settings', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, systemSettingsController.updateSystemSettings);
-router.post('/system-settings/test-email', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, systemSettingsController.testEmailSettings);
-router.post('/system-settings/test-sms', securityMiddleware.validateContentType, ceoMiddleware.verifyCEOAuth, systemSettingsController.testSMSSettings);
+router.get('/system-settings', requireCEO, ceoMiddleware.verifyCEOAuth, systemSettingsController.getSystemSettings);
+router.put('/system-settings', securityMiddleware.validateContentType, requireCEO, ceoMiddleware.verifyCEOAuth, validateBody(systemSettingsUpdateSchema), systemSettingsController.updateSystemSettings);
+router.post('/system-settings/test-email', securityMiddleware.validateContentType, requireCEO, ceoMiddleware.verifyCEOAuth, validateBody(testEmailSchema), systemSettingsController.testEmailSettings);
+router.post('/system-settings/test-sms', securityMiddleware.validateContentType, requireCEO, ceoMiddleware.verifyCEOAuth, validateBody(testSmsSchema), systemSettingsController.testSMSSettings);
 
 export default router;

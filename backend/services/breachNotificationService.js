@@ -1,6 +1,7 @@
 import AuditLog from '../models/AuditLog.js';
 import logger from '../utils/logger.js';
 import nodemailer from 'nodemailer';
+import mongoose from 'mongoose';
 
 /**
  * Breach Notification Service
@@ -71,7 +72,7 @@ async function detectExcessiveAccess(now, timeWindows) {
     {
       $match: {
         isPHIAccess: true,
-        timestamp: { $gte: new Date(now - timeWindows.fiveMinutes) }
+        createdAt: { $gte: new Date(now - timeWindows.fiveMinutes) }
       }
     },
     {
@@ -118,7 +119,7 @@ async function detectBruteForce(now, timeWindows) {
     {
       $match: {
         action: 'login_failed',
-        timestamp: { $gte: new Date(now - timeWindows.fiveMinutes) }
+        createdAt: { $gte: new Date(now - timeWindows.fiveMinutes) }
       }
     },
     {
@@ -161,20 +162,20 @@ async function detectUnusualAccess(now, timeWindows) {
   // Find access from unusual locations/times
   const users = await AuditLog.distinct('userId', {
     isPHIAccess: true,
-    timestamp: { $gte: new Date(now - timeWindows.oneHour) }
+    createdAt: { $gte: new Date(now - timeWindows.oneHour) }
   });
 
   for (const userId of users) {
     // Get user's historical IP addresses
     const historicalIPs = await AuditLog.distinct('ipAddress', {
       userId,
-      timestamp: { $lt: new Date(now - 24 * 60 * 60 * 1000) } // Before last 24 hours
+      createdAt: { $lt: new Date(now - 24 * 60 * 60 * 1000) } // Before last 24 hours
     });
 
     // Get recent IP addresses
     const recentIPs = await AuditLog.distinct('ipAddress', {
       userId,
-      timestamp: { $gte: new Date(now - timeWindows.oneHour) }
+      createdAt: { $gte: new Date(now - timeWindows.oneHour) }
     });
 
     // Check for new IPs
@@ -185,7 +186,7 @@ async function detectUnusualAccess(now, timeWindows) {
         userId,
         isPHIAccess: true,
         ipAddress: { $in: newIPs },
-        timestamp: { $gte: new Date(now - timeWindows.oneHour) }
+        createdAt: { $gte: new Date(now - timeWindows.oneHour) }
       });
 
       if (accessCount > 5) {
@@ -216,7 +217,7 @@ async function detectUnauthorizedAccess(now, timeWindows) {
   // Find access denied events
   const deniedAccess = await AuditLog.find({
     action: 'access_denied',
-    timestamp: { $gte: new Date(now - timeWindows.fiveMinutes) }
+    createdAt: { $gte: new Date(now - timeWindows.fiveMinutes) }
   })
     .limit(100)
     .lean();
@@ -302,7 +303,7 @@ async function handleBreach(breach) {
 async function alertAdministrators(breach, incident) {
   try {
     // Email alert
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.EMAIL_PORT || process.env.SMTP_PORT || '587', 10),
       secure: (process.env.EMAIL_SECURE || process.env.SMTP_SECURE) === 'true',
@@ -469,7 +470,7 @@ export async function sendBreachNotification(notificationId) {
     const incident = notification.incidentId;
 
     // Email notification
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.EMAIL_PORT || process.env.SMTP_PORT || '587', 10),
       secure: (process.env.EMAIL_SECURE || process.env.SMTP_SECURE) === 'true',
@@ -513,12 +514,34 @@ export async function sendBreachNotification(notificationId) {
       JN Business System
     `;
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: process.env.NOTIFICATION_EMAIL || 'notifications@jnbusiness.com',
       to: patient.email,
       subject: 'Important Notice: Data Security Incident',
       text: emailContent
     });
+
+    const rejectedRecipients = Array.isArray(info.rejected) ? info.rejected : [];
+    if (rejectedRecipients.length > 0) {
+      await BreachNotification.findByIdAndUpdate(notificationId, {
+        status: 'bounced',
+        failureReason: `Rejected recipients: ${rejectedRecipients.join(', ')}`,
+        failureDetails: {
+          response: info.response,
+          rejected: rejectedRecipients
+        },
+        lastRetryAt: new Date(),
+        $inc: { retryCount: 1 }
+      });
+
+      logger.warn('Breach notification bounced', {
+        notificationId,
+        patientId: patient._id,
+        rejectedRecipients
+      });
+
+      return { success: false, status: 'bounced' };
+    }
 
     // Update notification status
     await BreachNotification.findByIdAndUpdate(notificationId, {
@@ -532,6 +555,19 @@ export async function sendBreachNotification(notificationId) {
     });
 
   } catch (error) {
+    await (await import('../models/BreachNotification.js')).default.findByIdAndUpdate(notificationId, {
+      status: 'failed',
+      failureReason: error.message,
+      failureDetails: {
+        name: error.name,
+        code: error.code,
+        command: error.command,
+        responseCode: error.responseCode
+      },
+      lastRetryAt: new Date(),
+      $inc: { retryCount: 1 }
+    }).catch(() => null);
+
     logger.error('Failed to send breach notification:', error);
     throw error;
   }
@@ -542,15 +578,47 @@ export async function sendBreachNotification(notificationId) {
  */
 export async function getBreachIncidents(req, res) {
   try {
-    const { status, severity, startDate, endDate } = req.query;
+    const { status, severity, startDate, endDate, salonId: rawSalonId } = req.query;
 
     const query = {};
     if (status) query.status = status;
     if (severity) query.severity = severity;
+
+    if (req.user?.role === 'ceo') {
+      if (rawSalonId) {
+        if (!mongoose.isValidObjectId(rawSalonId)) {
+          return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+        }
+        query.salonId = new mongoose.Types.ObjectId(rawSalonId);
+      }
+    } else {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Salon context required' });
+      }
+
+      if (rawSalonId && String(rawSalonId) !== String(req.user.salonId)) {
+        return res.status(403).json({ success: false, message: 'Cross-tenant access denied' });
+      }
+
+      query.salonId = req.user.salonId;
+    }
+
     if (startDate || endDate) {
       query.detectedAt = {};
-      if (startDate) query.detectedAt.$gte = new Date(startDate);
-      if (endDate) query.detectedAt.$lte = new Date(endDate);
+      if (startDate) {
+        const start = new Date(startDate);
+        if (Number.isNaN(start.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid startDate' });
+        }
+        query.detectedAt.$gte = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        if (Number.isNaN(end.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid endDate' });
+        }
+        query.detectedAt.$lte = end;
+      }
     }
 
     const BreachIncident = (await import('../models/BreachIncident.js')).default;
@@ -558,7 +626,8 @@ export async function getBreachIncidents(req, res) {
     const incidents = await BreachIncident.find(query)
       .sort({ detectedAt: -1 })
       .limit(100)
-      .lean();
+      .lean()
+      .maxTimeMS(5000);
 
     res.json({
       success: true,

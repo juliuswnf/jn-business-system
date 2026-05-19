@@ -6,14 +6,35 @@
 
 import Booking from '../models/Booking.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
+
+const resolveScopedSalonId = (req, res) => {
+  if (req.user?.role === 'ceo') {
+    const rawSalonId = req.query?.salonId || req.params?.salonId;
+    if (!rawSalonId) {
+      res.status(400).json({ success: false, message: 'salonId query parameter is required for CEO analytics' });
+      return null;
+    }
+    if (!mongoose.isValidObjectId(rawSalonId)) {
+      res.status(400).json({ success: false, message: 'Invalid salonId format' });
+      return null;
+    }
+    return new mongoose.Types.ObjectId(rawSalonId);
+  }
+
+  if (!req.user?.salonId) {
+    res.status(400).json({ success: false, message: 'No salon associated with user' });
+    return null;
+  }
+
+  return req.user.salonId;
+};
 
 // ==================== GET SALON METRICS OVERVIEW ====================
 export const getMetricsOverview = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
-    if (!salonId) {
-      return res.status(400).json({ success: false, message: 'No salon associated with user' });
-    }
+    const salonId = resolveScopedSalonId(req, res);
+    if (!salonId) return;
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -48,7 +69,7 @@ export const getMetricsOverview = async (req, res) => {
     const revenueAggregation = await Booking.aggregate([
       { $match: { salonId: salonId, status: { $in: ['confirmed', 'completed'] } } },
       { $group: { _id: null, total: { $sum: '$totalPrice' } } }
-    ]);
+    ]).maxTimeMS(5000);
     const totalRevenue = revenueAggregation[0]?.total || 0;
 
     // This month revenue
@@ -61,7 +82,7 @@ export const getMetricsOverview = async (req, res) => {
         }
       },
       { $group: { _id: null, total: { $sum: '$totalPrice' } } }
-    ]);
+    ]).maxTimeMS(5000);
     const thisMonthRevenue = thisMonthRevenueAgg[0]?.total || 0;
 
     // Unique customers
@@ -128,12 +149,10 @@ export const getMetricsOverview = async (req, res) => {
 // ==================== GET BOOKING TRENDS ====================
 export const getBookingTrends = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonId = resolveScopedSalonId(req, res);
     const { period = '30d' } = req.query;
 
-    if (!salonId) {
-      return res.status(400).json({ success: false, message: 'No salon associated with user' });
-    }
+    if (!salonId) return;
 
     // Calculate date range
     const now = new Date();
@@ -162,6 +181,13 @@ export const getBookingTrends = async (req, res) => {
         groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
     }
 
+    const trendLimitByPeriod = {
+      '7d': 8,
+      '30d': 31,
+      '90d': 14,
+      '1y': 13
+    };
+
     const bookingTrend = await Booking.aggregate([
       { $match: { salonId: salonId, createdAt: { $gte: startDate } } },
       { $group: {
@@ -169,8 +195,9 @@ export const getBookingTrends = async (req, res) => {
         bookings: { $sum: 1 },
         revenue: { $sum: '$totalPrice' }
       }},
-      { $sort: { _id: 1 } }
-    ]);
+      { $sort: { _id: 1 } },
+      { $limit: trendLimitByPeriod[period] || 31 }
+    ]).maxTimeMS(5000);
 
     res.status(200).json({
       success: true,
@@ -190,12 +217,15 @@ export const getBookingTrends = async (req, res) => {
 // ==================== GET TOP SERVICES ====================
 export const getTopServices = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonId = resolveScopedSalonId(req, res);
     const { limit = 5 } = req.query;
 
-    if (!salonId) {
-      return res.status(400).json({ success: false, message: 'No salon associated with user' });
-    }
+    if (!salonId) return;
+
+    const parsedLimit = Number.parseInt(String(limit), 10);
+    const safeLimit = Number.isFinite(parsedLimit)
+      ? Math.min(Math.max(parsedLimit, 1), 50)
+      : 5;
 
     const topServices = await Booking.aggregate([
       { $match: { salonId: salonId, status: { $in: ['confirmed', 'completed'] } } },
@@ -205,15 +235,30 @@ export const getTopServices = async (req, res) => {
         revenue: { $sum: '$totalPrice' }
       }},
       { $sort: { bookings: -1 } },
-      { $limit: Math.min(parseInt(limit) || 5, 50) },
+      { $limit: safeLimit },
       { $lookup: {
         from: 'services',
-        localField: '_id',
-        foreignField: '_id',
+        let: {
+          serviceId: '$_id',
+          bookingSalonId: salonId
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$_id', '$$serviceId'] },
+                  { $eq: ['$salonId', '$$bookingSalonId'] }
+                ]
+              }
+            }
+          },
+          { $project: { name: 1 } }
+        ],
         as: 'service'
       }},
       { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } }
-    ]);
+    ]).maxTimeMS(5000);
 
     res.status(200).json({
       success: true,
@@ -234,11 +279,8 @@ export const getTopServices = async (req, res) => {
 // ==================== GET PEAK HOURS ====================
 export const getPeakHours = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
-
-    if (!salonId) {
-      return res.status(400).json({ success: false, message: 'No salon associated with user' });
-    }
+    const salonId = resolveScopedSalonId(req, res);
+    if (!salonId) return;
 
     // Get booking distribution by hour
     const hourlyDistribution = await Booking.aggregate([
@@ -248,7 +290,7 @@ export const getPeakHours = async (req, res) => {
         count: { $sum: 1 }
       }},
       { $sort: { _id: 1 } }
-    ]);
+    ]).maxTimeMS(5000);
 
     // Get booking distribution by day of week
     const dailyDistribution = await Booking.aggregate([
@@ -258,7 +300,7 @@ export const getPeakHours = async (req, res) => {
         count: { $sum: 1 }
       }},
       { $sort: { _id: 1 } }
-    ]);
+    ]).maxTimeMS(5000);
 
     const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 
@@ -284,31 +326,59 @@ export const getPeakHours = async (req, res) => {
 // ==================== GET CUSTOMER INSIGHTS ====================
 export const getCustomerInsights = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonId = resolveScopedSalonId(req, res);
+    if (!salonId) return;
 
-    if (!salonId) {
-      return res.status(400).json({ success: false, message: 'No salon associated with user' });
-    }
-
-    // Repeat customers (more than 1 booking)
-    const customerBookings = await Booking.aggregate([
-      { $match: { salonId: salonId, status: { $in: ['confirmed', 'completed'] } } },
-      { $group: {
-        _id: '$customerEmail',
-        bookingCount: { $sum: 1 },
-        totalSpent: { $sum: '$totalPrice' },
-        lastBooking: { $max: '$bookingDate' },
-        firstName: { $first: '$customerName' }
-      }},
-      { $sort: { bookingCount: -1 } }
+    const [summaryResult, topCustomersRaw] = await Promise.all([
+      Booking.aggregate([
+        { $match: { salonId: salonId, status: { $in: ['confirmed', 'completed'] } } },
+        {
+          $group: {
+            _id: '$customerEmail',
+            bookingCount: { $sum: 1 },
+            totalSpent: { $sum: '$totalPrice' }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalCustomers: { $sum: 1 },
+            repeatCustomers: {
+              $sum: {
+                $cond: [{ $gt: ['$bookingCount', 1] }, 1, 0]
+              }
+            },
+            totalSpentAll: { $sum: '$totalSpent' }
+          }
+        }
+      ]).maxTimeMS(5000),
+      Booking.aggregate([
+        { $match: { salonId: salonId, status: { $in: ['confirmed', 'completed'] } } },
+        {
+          $group: {
+            _id: '$customerEmail',
+            bookingCount: { $sum: 1 },
+            totalSpent: { $sum: '$totalPrice' },
+            lastBooking: { $max: '$bookingDate' },
+            firstName: { $first: '$customerName' }
+          }
+        },
+        { $sort: { bookingCount: -1 } },
+        { $limit: 5 }
+      ]).maxTimeMS(5000)
     ]);
 
-    const totalCustomers = customerBookings.length;
-    const repeatCustomers = customerBookings.filter(c => c.bookingCount > 1).length;
+    const summary = summaryResult[0] || {
+      totalCustomers: 0,
+      repeatCustomers: 0,
+      totalSpentAll: 0
+    };
+
+    const totalCustomers = summary.totalCustomers;
+    const repeatCustomers = summary.repeatCustomers;
     const repeatRate = totalCustomers > 0 ? Math.round((repeatCustomers / totalCustomers) * 100) : 0;
 
-    // Top customers
-    const topCustomers = customerBookings.slice(0, 5).map(c => ({
+    const topCustomers = topCustomersRaw.map(c => ({
       name: c.firstName || c._id?.split('@')[0] || 'Anonym',
       email: c._id,
       bookings: c.bookingCount,
@@ -317,8 +387,9 @@ export const getCustomerInsights = async (req, res) => {
     }));
 
     // Average customer lifetime value
-    const totalSpentAll = customerBookings.reduce((sum, c) => sum + (c.totalSpent || 0), 0);
-    const avgLifetimeValue = totalCustomers > 0 ? Math.round(totalSpentAll / totalCustomers) : 0;
+    const avgLifetimeValue = totalCustomers > 0
+      ? Math.round(summary.totalSpentAll / totalCustomers)
+      : 0;
 
     res.status(200).json({
       success: true,

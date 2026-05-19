@@ -374,14 +374,16 @@ const sendCampaignMessages = async (campaign, customers, salon) => {
     });
 
     try {
-      const smsResult = await sendSMS({
-        phoneNumber: customer.phoneNumber,
+      const smsResult = await sendSMS(
+        customer.phoneNumber,
         message,
-        salonId: salon._id,
-        customerId: customer._id
-      });
+        salon._id,
+        'custom',
+        null,
+        customer._id
+      );
 
-      if (smsResult.success) {
+      if (smsResult?.success === true) {
         results.sent++;
         return {
           recipientId: recipient._id,
@@ -394,12 +396,12 @@ const sendCampaignMessages = async (campaign, customers, salon) => {
       results.failed++;
       results.errors.push({
         customer: customer.name,
-        error: smsResult.error
+        error: smsResult?.error || smsResult?.reason || 'SMS send failed'
       });
       return {
         recipientId: recipient._id,
         success: false,
-        error: smsResult.error || 'SMS send failed',
+        error: smsResult?.error || smsResult?.reason || 'SMS send failed',
         customerName: customer.name
       };
     } catch (error) {

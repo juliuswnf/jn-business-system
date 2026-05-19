@@ -257,11 +257,13 @@ class StripePaymentService {
           previousTier: currentTier,
           upgradeDate: new Date().toISOString()
         }
+      }, {
+        idempotencyKey: `sub-upgrade-${salon._id}-${subscription.id}-${newTier}-${billingCycle}`
       });
 
-      // Update salon
-      salon.subscription.tier = newTier;
-      salon.subscription.billingCycle = billingCycle;
+      // Do not finalize tier/billing locally here.
+      // Source of truth is Stripe webhook confirmation to avoid frontend-triggered
+      // direct state confirmation races.
       salon.subscription.currentPeriodEnd = new Date(
         updatedSubscription.current_period_end * 1000
       );
@@ -332,11 +334,11 @@ class StripePaymentService {
             previousTier: currentTier,
             downgradeDate: new Date().toISOString()
           }
+        }, {
+          idempotencyKey: `sub-downgrade-immediate-${salon._id}-${subscription.id}-${newTier}-${billingCycle}`
         });
 
-        // Update salon immediately
-        salon.subscription.tier = newTier;
-        salon.subscription.billingCycle = billingCycle;
+        // Do not finalize tier/billing locally; wait for webhook confirmation.
       } else {
         // Schedule downgrade for end of period
         updatedSubscription = await this.stripe.subscriptions.update(subscription.id, {
@@ -355,16 +357,12 @@ class StripePaymentService {
             previousTier: currentTier,
             downgradeScheduledDate: new Date().toISOString()
           }
+        }, {
+          idempotencyKey: `sub-downgrade-scheduled-${salon._id}-${subscription.id}-${newTier}-${billingCycle}`
         });
 
-        // Mark for downgrade at period end (keep current tier until then)
+        // Mark for downgrade at period end (keep current tier until webhook confirms)
         salon.subscription.cancelAtPeriodEnd = false;
-        // Store scheduled tier change
-        salon.subscription.scheduledTierChange = {
-          newTier,
-          billingCycle,
-          effectiveDate: new Date(subscription.current_period_end * 1000)
-        };
       }
 
       await salon.save();
@@ -546,6 +544,8 @@ class StripePaymentService {
           trialConversionDate: new Date().toISOString(),
           tier
         }
+      }, {
+        idempotencyKey: `sub-trial-convert-${salon._id}-${subscription.id}-${tier}`
       });
 
       // Update salon
@@ -584,12 +584,16 @@ class StripePaymentService {
 
       if (immediately) {
         // Cancel immediately
-        canceledSubscription = await this.stripe.subscriptions.cancel(subscription.id);
+        canceledSubscription = await this.stripe.subscriptions.cancel(subscription.id, {
+          idempotencyKey: `sub-cancel-now-${salon._id}-${subscription.id}`
+        });
         salon.subscription.status = 'expired';
       } else {
         // Cancel at period end
         canceledSubscription = await this.stripe.subscriptions.update(subscription.id, {
           cancel_at_period_end: true
+        }, {
+          idempotencyKey: `sub-cancel-period-end-${salon._id}-${subscription.id}`
         });
         salon.subscription.cancelAtPeriodEnd = true;
       }
@@ -622,6 +626,31 @@ class StripePaymentService {
    */
   getPriceId(tier, billingCycle) {
     return this.priceIds[tier]?.[billingCycle];
+  }
+
+  async verifySubscriptionOwnership(salon) {
+    if (!salon?.subscription?.stripeSubscriptionId) {
+      return true;
+    }
+
+    const stripeSubscription = await this.stripe.subscriptions.retrieve(
+      salon.subscription.stripeSubscriptionId
+    );
+
+    const subscriptionSalonId = stripeSubscription?.metadata?.salonId;
+    const stripeCustomerId = typeof stripeSubscription.customer === 'string'
+      ? stripeSubscription.customer
+      : stripeSubscription.customer?.id;
+
+    if (subscriptionSalonId && subscriptionSalonId !== salon._id.toString()) {
+      throw new Error('Stripe subscription does not belong to authenticated salon');
+    }
+
+    if (salon.subscription?.stripeCustomerId && stripeCustomerId && salon.subscription.stripeCustomerId !== stripeCustomerId) {
+      throw new Error('Stripe customer mismatch for authenticated salon');
+    }
+
+    return true;
   }
 }
 

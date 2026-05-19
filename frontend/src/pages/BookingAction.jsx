@@ -14,6 +14,7 @@ const BookingAction = () => {
 
   useEffect(() => {
     if (!token) {
+      setResult({ success: false, message: 'Ungültiger Aktionslink. Bitte prüfe die URL.' });
       setLoading(false);
       return;
     }
@@ -37,6 +38,10 @@ const BookingAction = () => {
   }, [token]);
 
   const handleAction = async () => {
+    if (actionLoading || !booking || !token) {
+      return;
+    }
+
     setActionLoading(true);
     try {
       const endpoint = action === 'cancel' ? `/bookings/cancel/${token}` : `/bookings/confirm/${token}`;

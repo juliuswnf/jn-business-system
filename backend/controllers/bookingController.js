@@ -24,16 +24,25 @@ export const createBooking = async (req, res) => {
   try {
     const { salonId, serviceId, employeeId, bookingDate, customerName, customerEmail, customerPhone, notes, idempotencyKey } = req.body;
 
-    if (!salonId || !serviceId || !bookingDate || !customerEmail) {
+    const effectiveSalonId = req.user?.role === 'ceo' ? salonId : req.user?.salonId;
+
+    if (!effectiveSalonId || !serviceId || !bookingDate || !customerEmail) {
       return res.status(400).json({
         success: false,
-        message: 'Bitte geben Sie alle erforderlichen Felder an: salonId, serviceId, bookingDate, customerEmail'
+        message: 'Bitte geben Sie alle erforderlichen Felder an: serviceId, bookingDate, customerEmail'
+      });
+    }
+
+    if (req.user?.role !== 'ceo' && salonId && salonId.toString() !== req.user?.salonId?.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - salonId must match authenticated tenant'
       });
     }
 
     // Validate ObjectIds BEFORE any DB queries (including idempotency check) to
     // avoid unnecessary DB load from malformed / adversarial requests.
-    if (!isValidObjectId(salonId)) {
+    if (!isValidObjectId(effectiveSalonId)) {
       return res.status(400).json({ success: false, message: 'Ungültiges Salon-ID-Format' });
     }
     if (!isValidObjectId(serviceId)) {
@@ -80,7 +89,7 @@ export const createBooking = async (req, res) => {
       }
     }
 
-    const service = await Service.findById(serviceId).maxTimeMS(5000);
+    const service = await Service.findOne({ _id: serviceId, salonId: effectiveSalonId }).maxTimeMS(5000);
     if (!service) {
       return res.status(404).json({
         success: false,
@@ -94,7 +103,7 @@ export const createBooking = async (req, res) => {
 
     try {
       // ? HIGH FIX #8: Check salon capacity (prevent overbooking)
-      const salon = await Salon.findById(salonId).maxTimeMS(5000).session(session);
+      const salon = await Salon.findById(effectiveSalonId).maxTimeMS(5000).session(session);
       if (!salon) {
         await session.abortTransaction();
         return res.status(404).json({
@@ -133,7 +142,7 @@ export const createBooking = async (req, res) => {
       // ? AUDIT FIX: Use service duration as buffer (not fixed 30 min)
       const bufferMs = serviceDuration * 60 * 1000;
       const concurrentBookings = await Booking.countDocuments({
-        salonId,
+        salonId: effectiveSalonId,
         bookingDate: {
           $gte: new Date(startTime.getTime() - bufferMs),
           $lt: new Date(endTime.getTime() + bufferMs)
@@ -160,7 +169,7 @@ export const createBooking = async (req, res) => {
       // Check slot availability inside the transaction so the read is snapshot-isolated.
       // checkAvailability uses .session(session) internally, preventing concurrent
       // requests from both seeing a free slot and double-booking.
-      const isAvailable = await Booking.checkAvailability(salonId, parsedDate, serviceDuration, employeeId || null, session);
+      const isAvailable = await Booking.checkAvailability(effectiveSalonId, parsedDate, serviceDuration, employeeId || null, session);
       if (!isAvailable) {
         await session.abortTransaction();
         return res.status(409).json({
@@ -171,7 +180,7 @@ export const createBooking = async (req, res) => {
 
       // Create booking within transaction
       const bookingData = {
-        salonId,
+        salonId: effectiveSalonId,
         serviceId,
         employeeId: employeeId || null,
         bookingDate: parsedDate,
@@ -396,6 +405,23 @@ export const updateBooking = async (req, res) => {
           message: `Invalid status. Use the dedicated endpoints for: cancelled, completed, no_show`
         });
       }
+      const ALLOWED_TRANSITIONS = {
+        pending: ['pending', 'booked', 'confirmed'],
+        booked: ['booked', 'confirmed'],
+        confirmed: ['confirmed'],
+        completed: [],
+        cancelled: [],
+        no_show: []
+      };
+
+      const allowedNextStates = ALLOWED_TRANSITIONS[booking.status] || [];
+      if (!allowedNextStates.includes(status)) {
+        return res.status(409).json({
+          success: false,
+          message: `Ungültiger Statuswechsel von '${booking.status}' zu '${status}'`
+        });
+      }
+
       booking.status = status;
     }
     if (notes !== undefined) booking.notes = notes;

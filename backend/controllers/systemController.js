@@ -125,7 +125,8 @@ const startDockerContainer = async (service) => {
       if (error.message.includes('port is already allocated')) {
         return { success: true, message: `${service.name} is already running locally` };
       }
-      return { success: false, message: error.message };
+      logger.error(`Failed to create/start container ${service.containerName}: ${error.message}`);
+      return { success: false, message: 'Container start failed' };
     }
   }
 };
@@ -136,7 +137,8 @@ const stopDockerContainer = async (containerName) => {
     await execAsync(`docker stop ${containerName}`, { timeout: 30000 });
     return { success: true };
   } catch (error) {
-    return { success: false, message: error.message };
+    logger.error(`Failed to stop container ${containerName}: ${error.message}`);
+    return { success: false, message: 'Container stop failed' };
   }
 };
 
@@ -171,7 +173,7 @@ const startNodeService = async (service, serviceId) => {
     }
   } catch (error) {
     logger.error(`startNodeService error: ${error.message}`);
-    return { success: false, message: error.message };
+    return { success: false, message: 'Process start failed' };
   }
 };
 
@@ -233,13 +235,13 @@ async function doStartService(service, serviceId) {
     const result = await startDockerContainer(service);
     return result.success
       ? { status: 200, body: { success: true, message: `${service.name} started successfully`, status: 'running' } }
-      : { status: 500, body: { success: false, message: `Failed to start ${service.name}: ${result.message}` } };
+      : { status: 500, body: { success: false, message: `Failed to start ${service.name}` } };
   }
   // Node.js service
   if (await checkPortInUse(service.port)) return { status: 200, body: { success: true, message: `${service.name} is already running`, status: 'running' } };
   if (serviceId === 'backend') return { status: 200, body: { success: true, message: 'Backend is the current process', status: 'running' } };
   const result = await startNodeService(service, serviceId);
-  if (!result.success) return { status: 500, body: { success: false, message: `Failed to start ${service.name}: ${result.message}` } };
+  if (!result.success) return { status: 500, body: { success: false, message: `Failed to start ${service.name}` } };
   logger.log(`? Started ${service.name}`);
   await new Promise(resolve => setTimeout(resolve, 4000));
   const nowRunning = await checkPortInUse(service.port);
@@ -254,7 +256,7 @@ async function doStopService(service, serviceId) {
     const result = await stopDockerContainer(service.containerName);
     return result.success
       ? { status: 200, body: { success: true, message: `${service.name} stopped successfully`, status: 'stopped' } }
-      : { status: 500, body: { success: false, message: `Failed to stop ${service.name}: ${result.message}` } };
+      : { status: 500, body: { success: false, message: `Failed to stop ${service.name}` } };
   }
   await stopNodeService(service.port);
   delete runningProcesses[serviceId];
@@ -332,7 +334,7 @@ export const startAllServices = async (req, res) => {
         await new Promise(resolve => setTimeout(resolve, 2000));
       } catch (error) {
         logger.error(`Failed to start ${serviceId}:`, error);
-        results.push({ service: serviceId, success: false, message: error.message, status: 'error' });
+        results.push({ service: serviceId, success: false, message: 'Service start failed', status: 'error' });
       }
     }
 

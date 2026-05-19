@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import RefreshToken from '../models/RefreshToken.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import logger from '../utils/logger.js';
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
@@ -30,6 +31,17 @@ const generateToken = (id, expiresIn = process.env.JWT_EXPIRE || '7d') => {
  */
 const generateRefreshToken = () => {
   return crypto.randomBytes(64).toString('hex');
+};
+
+// Constant hash used to equalize login timing when email does not exist.
+const DUMMY_BCRYPT_HASH = '$2b$12$C6UzMDM.H6dfI/f/IKcEeO8y5FQ8S8E7M7Q4Jrped1IovnHgwlHG2';
+
+const applyMinimumAuthDelay = async (startTimeMs, minimumMs = 350) => {
+  const elapsed = Date.now() - startTimeMs;
+  const delay = Math.max(0, minimumMs - elapsed);
+  if (delay > 0) {
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
 };
 
 const getCookieOptions = ({ rememberMe = true, maxAge, httpOnly = true, path = '/', sameSite = 'strict' } = {}) => {
@@ -136,9 +148,10 @@ export const register = async (req, res) => {
       return res.status(400).json({ success: false, message: validation.error });
     }
     const { fullName, userRole } = validation;
+    const normalizedEmail = String(email).toLowerCase().trim();
 
     // Check if user exists - ensure email is string to prevent NoSQL injection
-    const existingUser = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000);
+    const existingUser = await User.findOne({ email: normalizedEmail }).maxTimeMS(5000);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -148,7 +161,7 @@ export const register = async (req, res) => {
 
     // Build user data
     const userData = {
-      email,
+      email: normalizedEmail,
       password,
       name: fullName,
       role: userRole
@@ -258,6 +271,7 @@ export const register = async (req, res) => {
 // ==================== LOGIN ====================
 
 export const login = async (req, res) => {
+  const startTime = Date.now();
   try {
     const { email, password, rememberMe = false } = req.body;
 
@@ -273,6 +287,8 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email: String(email).toLowerCase() }).maxTimeMS(5000).select('+password');
 
     if (!user) {
+      await bcrypt.compare(password, DUMMY_BCRYPT_HASH);
+      await applyMinimumAuthDelay(startTime);
       logger.warn(`🚨 Login attempt with non-existent email: ${email}`);
       return res.status(401).json({
         success: false,
@@ -282,6 +298,7 @@ export const login = async (req, res) => {
 
     // Check if account is locked
     if (user.isLocked) {
+      await applyMinimumAuthDelay(startTime);
       return res.status(403).json({
         success: false,
         message: 'Konto gesperrt. Zu viele fehlgeschlagene Anmeldeversuche. Bitte versuchen Sie es später erneut.'
@@ -294,6 +311,7 @@ export const login = async (req, res) => {
     if (!isPasswordCorrect) {
       logger.warn(`⚠️ Invalid password for: ${email}`);
       await user.incLoginAttempts();
+      await applyMinimumAuthDelay(startTime);
       return res.status(401).json({
         success: false,
         message: 'Falsche E-Mail oder falsches Passwort.'
@@ -344,6 +362,8 @@ export const login = async (req, res) => {
         // Non-critical – frontend will fallback via the 403 API interceptor
       }
     }
+
+    await applyMinimumAuthDelay(startTime);
 
     res.status(200).json({
       success: true,
@@ -1348,10 +1368,12 @@ export const sendVerificationEmail = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
+  const startTime = Date.now();
   try {
     const { token } = req.body;
 
     if (!token) {
+      await applyMinimumAuthDelay(startTime, 300);
       return res.status(400).json({ success: false, message: 'Token required' });
     }
 
@@ -1365,11 +1387,14 @@ export const verifyEmail = async (req, res) => {
     }).maxTimeMS(5000);
 
     if (!user) {
+      await applyMinimumAuthDelay(startTime, 300);
       return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     }
 
     // Verify email
     await user.verifyEmail();
+
+    await applyMinimumAuthDelay(startTime, 300);
 
     logger.info(`? Email verified for: ${user.email}`);
 

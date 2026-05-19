@@ -1,4 +1,5 @@
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 /**
  * Subscription Middleware
  * Ensures salon has active subscription before allowing access
@@ -21,6 +22,33 @@ const PLAN_LIMITS = {
     monthlyBookings: 50, // Limited during trial
     employees: 3
   }
+};
+
+const resolveSalonIdFromTrustedContext = async (req) => {
+  if (req.user?.role === 'ceo') {
+    const ceoSalonId = req.query?.salonId || req.params?.salonId || req.salon?._id;
+    if (!ceoSalonId) {
+      return null;
+    }
+    if (!mongoose.isValidObjectId(ceoSalonId)) {
+      return 'INVALID_OBJECT_ID';
+    }
+    return ceoSalonId;
+  }
+
+  if (req.user?.salonId) {
+    if (!mongoose.isValidObjectId(req.user.salonId)) {
+      return 'INVALID_OBJECT_ID';
+    }
+    return req.user.salonId;
+  }
+
+  if (req.user?.role === 'salon_owner') {
+    const salon = await Salon.findOne({ owner: req.user._id }).select('_id').maxTimeMS(5000);
+    return salon?._id || null;
+  }
+
+  return null;
 };
 
 /**
@@ -112,15 +140,13 @@ export const checkBookingLimits = async (req, res, next) => {
  */
 export const requireActiveSubscription = async (req, res, next) => {
   try {
-    // Get salon ID from various sources
-    let salonId = req.salon?._id || req.body.salonId || req.params.salonId;
+    const salonId = await resolveSalonIdFromTrustedContext(req);
 
-    // For salon owners, get their salon
-    if (!salonId && req.user && req.user.role === 'salon_owner') {
-      const salon = await Salon.findOne({ owner: req.user._id });
-      if (salon) {
-        salonId = salon._id;
-      }
+    if (salonId === 'INVALID_OBJECT_ID') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid salon ID format'
+      });
     }
 
     if (!salonId) {
@@ -172,13 +198,13 @@ export const requireActiveSubscription = async (req, res, next) => {
  */
 export const checkSubscriptionStatus = async (req, res, next) => {
   try {
-    let salonId = req.salon?._id || req.body.salonId || req.params.salonId;
+    const salonId = await resolveSalonIdFromTrustedContext(req);
 
-    if (!salonId && req.user && req.user.role === 'salon_owner') {
-      const salon = await Salon.findOne({ owner: req.user._id });
-      if (salon) {
-        salonId = salon._id;
-      }
+    if (salonId === 'INVALID_OBJECT_ID') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid salon ID format'
+      });
     }
 
     if (salonId) {
@@ -209,13 +235,13 @@ export const checkSubscriptionStatus = async (req, res, next) => {
  */
 export const requireTrialOrActive = async (req, res, next) => {
   try {
-    let salonId = req.salon?._id || req.body.salonId || req.params.salonId;
+    const salonId = await resolveSalonIdFromTrustedContext(req);
 
-    if (!salonId && req.user && req.user.role === 'salon_owner') {
-      const salon = await Salon.findOne({ owner: req.user._id });
-      if (salon) {
-        salonId = salon._id;
-      }
+    if (salonId === 'INVALID_OBJECT_ID') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid salon ID format'
+      });
     }
 
     if (!salonId) {

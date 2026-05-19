@@ -11,6 +11,29 @@ import Salon from '../models/Salon.js';
 import Service from '../models/Service.js';
 import Booking from '../models/Booking.js';
 
+const sanitizeSalonResponse = (salonDoc, role) => {
+  const salon = salonDoc?.toObject ? salonDoc.toObject() : salonDoc;
+  if (!salon) return salon;
+
+  if (role !== 'ceo') {
+    if (salon.stripe) {
+      delete salon.stripe.connectedAccountId;
+      delete salon.stripe.onboardingCompletedAt;
+    }
+    if (salon.subscription) {
+      delete salon.subscription.stripeCustomerId;
+      delete salon.subscription.stripeSubscriptionId;
+      delete salon.subscription.oldPlanId;
+      delete salon.subscription.grandfathered;
+    }
+
+    delete salon.deletedAt;
+    delete salon.deletedBy;
+  }
+
+  return salon;
+};
+
 // ==================== GET SALON INFO ====================
 
 export const getSalonInfo = async (req, res) => {
@@ -40,7 +63,7 @@ export const getSalonInfo = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      salon
+      salon: sanitizeSalonResponse(salon, req.user.role)
     });
   } catch (error) {
     logger.error('GetSalonInfo Error:', error);
@@ -64,6 +87,13 @@ const ALLOWED_SALON_FIELDS = [
 
 export const updateSalon = async (req, res) => {
   try {
+        if (!['ceo', 'salon_owner'].includes(req.user.role)) {
+          return res.status(403).json({
+            success: false,
+            message: 'Access denied - Only salon owners or CEO can change salon settings'
+          });
+        }
+
     if (req.params.salonId && !mongoose.isValidObjectId(req.params.salonId)) {
       return res.status(400).json({ success: false, message: 'Invalid salonId' });
     }
@@ -110,7 +140,7 @@ export const updateSalon = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Salon updated successfully',
-      salon
+      salon: sanitizeSalonResponse(salon, req.user.role)
     });
   } catch (error) {
     logger.error('UpdateSalon Error:', error);
@@ -377,7 +407,7 @@ export const getSalonDashboard = async (req, res) => {
     res.status(200).json({
       success: true,
       dashboard: {
-        salon,
+        salon: sanitizeSalonResponse(salon, req.user.role),
         stats: {
           todayBookings,
           upcomingBookings,

@@ -46,6 +46,10 @@ export const createSubscription = async (req, res) => {
       });
     }
 
+    if (salon?.subscription?.stripeSubscriptionId) {
+      await stripePaymentService.verifySubscriptionOwnership(salon);
+    }
+
     // Create subscription
     const result = await stripePaymentService.createSubscription({
       salon,
@@ -78,6 +82,8 @@ export const upgradeSubscription = async (req, res) => {
   try {
     const { salon } = req;
     const { newTier, billingCycle } = req.body;
+
+    await stripePaymentService.verifySubscriptionOwnership(salon);
 
     // Validate inputs
     if (!newTier) {
@@ -138,6 +144,8 @@ export const downgradeSubscription = async (req, res) => {
   try {
     const { salon } = req;
     const { newTier, billingCycle, immediate } = req.body;
+
+    await stripePaymentService.verifySubscriptionOwnership(salon);
 
     // Validate inputs
     if (!newTier) {
@@ -211,6 +219,8 @@ export const cancelSubscription = async (req, res) => {
   try {
     const { salon } = req;
     const { immediately } = req.body;
+
+    await stripePaymentService.verifySubscriptionOwnership(salon);
 
     // Cancel subscription
     const result = await stripePaymentService.cancelSubscription(
@@ -351,6 +361,8 @@ export const convertTrialToPaid = async (req, res) => {
     const { salon } = req;
     const { selectedTier } = req.body;
 
+    await stripePaymentService.verifySubscriptionOwnership(salon);
+
     // Check if on trial
     if (salon.subscription.status !== 'trial') {
       return res.status(400).json({
@@ -383,6 +395,8 @@ export const convertTrialToPaid = async (req, res) => {
 export const getSubscriptionStatus = async (req, res) => {
   try {
     const { salon } = req;
+
+    await stripePaymentService.verifySubscriptionOwnership(salon);
 
     const tierConfig = PRICING_TIERS[salon.subscription.tier];
 

@@ -2,6 +2,32 @@ import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 import mongoose from 'mongoose';
 
+const ALLOWED_SMS_PROVIDERS = ['twilio', 'messagebird', 'test'];
+const MASKED_SECRET = '••••••••';
+const MASKED_STRIPE_LIVE = 'sk_live_••••••••';
+const MASKED_STRIPE_TEST = 'sk_test_••••••••';
+const MASKED_WEBHOOK = 'whsec_••••••••';
+
+const sanitizeSettingString = (value, maxLength = 255) => {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  const cleaned = value
+    .replace(/[\u0000-\u001F\u007F]/g, '')
+    .trim();
+
+  return cleaned.slice(0, maxLength);
+};
+
+const parseSafePort = (value) => {
+  const parsed = Number.parseInt(String(value), 10);
+  if (Number.isNaN(parsed) || parsed < 1 || parsed > 65535) {
+    return null;
+  }
+  return parsed;
+};
+
 /**
  * System Settings Controller (CEO Only)
  * Manages platform-wide configuration for email, SMS, and payment providers
@@ -10,6 +36,13 @@ import mongoose from 'mongoose';
 // GET /api/ceo/system-settings - Get all system settings for current salon
 export const getSystemSettings = async (req, res) => {
   try {
+    if (req.user?.role !== 'ceo') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - CEO only'
+      });
+    }
+
     const salonId = req.user.salonId;
 
     if (!salonId) {
@@ -21,7 +54,8 @@ export const getSystemSettings = async (req, res) => {
 
     const salon = await Salon.findById(salonId)
       .select('emailSettings smsSettings paymentSettings')
-      .lean();
+      .lean()
+      .maxTimeMS(5000);
 
     if (!salon) {
       return res.status(404).json({
@@ -73,6 +107,13 @@ export const getSystemSettings = async (req, res) => {
 // PUT /api/ceo/system-settings - Update system settings
 export const updateSystemSettings = async (req, res) => {
   try {
+    if (req.user?.role !== 'ceo') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - CEO only'
+      });
+    }
+
     const salonId = req.user.salonId;
     const { email, sms, payment } = req.body;
 
@@ -90,7 +131,7 @@ export const updateSystemSettings = async (req, res) => {
       });
     }
 
-    const salon = await Salon.findById(salonId);
+    const salon = await Salon.findById(salonId).maxTimeMS(5000);
 
     if (!salon) {
       return res.status(404).json({
@@ -102,42 +143,66 @@ export const updateSystemSettings = async (req, res) => {
     // Update email settings (if provided)
     if (email) {
       salon.emailSettings = salon.emailSettings || {};
-      
-      if (email.smtpHost) salon.emailSettings.smtpHost = email.smtpHost;
-      if (email.smtpPort) salon.emailSettings.smtpPort = Number(email.smtpPort);
-      if (email.smtpUser) salon.emailSettings.smtpUser = email.smtpUser;
-      if (email.smtpPassword && email.smtpPassword !== '••••••••') {
-        salon.emailSettings.smtpPassword = email.smtpPassword;
+
+      const smtpHost = sanitizeSettingString(email.smtpHost, 255);
+      const smtpUser = sanitizeSettingString(email.smtpUser, 255);
+      const smtpPassword = sanitizeSettingString(email.smtpPassword, 255);
+      const fromEmail = sanitizeSettingString(email.fromEmail, 255).toLowerCase();
+      const fromName = sanitizeSettingString(email.fromName, 120);
+      const smtpPort = parseSafePort(email.smtpPort);
+
+      if (smtpHost) salon.emailSettings.smtpHost = smtpHost;
+      if (smtpPort) salon.emailSettings.smtpPort = smtpPort;
+      if (smtpUser) salon.emailSettings.smtpUser = smtpUser;
+      if (smtpPassword && smtpPassword !== MASKED_SECRET) {
+        salon.emailSettings.smtpPassword = smtpPassword;
       }
       if (typeof email.smtpSecure === 'boolean') {
         salon.emailSettings.smtpSecure = email.smtpSecure;
       }
-      if (email.fromEmail) salon.emailSettings.fromEmail = email.fromEmail;
-      if (email.fromName) salon.emailSettings.fromName = email.fromName;
+      if (fromEmail) salon.emailSettings.fromEmail = fromEmail;
+      if (fromName) salon.emailSettings.fromName = fromName;
     }
 
     // Update SMS settings (if provided)
     if (sms) {
       salon.smsSettings = salon.smsSettings || {};
-      
-      if (sms.provider) salon.smsSettings.provider = sms.provider;
-      if (sms.accountSid) salon.smsSettings.accountSid = sms.accountSid;
-      if (sms.authToken && sms.authToken !== '••••••••') {
-        salon.smsSettings.authToken = sms.authToken;
+
+      const provider = sanitizeSettingString(sms.provider, 32).toLowerCase();
+      const accountSid = sanitizeSettingString(sms.accountSid, 255);
+      const authToken = sanitizeSettingString(sms.authToken, 255);
+      const phoneNumber = sanitizeSettingString(sms.phoneNumber, 40);
+
+      if (provider && ALLOWED_SMS_PROVIDERS.includes(provider)) {
+        salon.smsSettings.provider = provider;
       }
-      if (sms.phoneNumber) salon.smsSettings.phoneNumber = sms.phoneNumber;
+      if (accountSid) salon.smsSettings.accountSid = accountSid;
+      if (authToken && authToken !== MASKED_SECRET) {
+        salon.smsSettings.authToken = authToken;
+      }
+      if (phoneNumber) salon.smsSettings.phoneNumber = phoneNumber;
     }
 
     // Update payment settings (if provided)
     if (payment) {
       salon.paymentSettings = salon.paymentSettings || {};
-      
-      if (payment.stripePublicKey) salon.paymentSettings.stripePublicKey = payment.stripePublicKey;
-      if (payment.stripeSecretKey && !payment.stripeSecretKey.startsWith('sk_live_••')) {
-        salon.paymentSettings.stripeSecretKey = payment.stripeSecretKey;
+
+      const stripePublicKey = sanitizeSettingString(payment.stripePublicKey, 255);
+      const stripeSecretKey = sanitizeSettingString(payment.stripeSecretKey, 255);
+      const webhookSecret = sanitizeSettingString(payment.webhookSecret, 255);
+
+      if (stripePublicKey) salon.paymentSettings.stripePublicKey = stripePublicKey;
+      if (
+        stripeSecretKey &&
+        stripeSecretKey !== MASKED_STRIPE_LIVE &&
+        stripeSecretKey !== MASKED_STRIPE_TEST &&
+        !stripeSecretKey.startsWith('sk_live_••') &&
+        !stripeSecretKey.startsWith('sk_test_••')
+      ) {
+        salon.paymentSettings.stripeSecretKey = stripeSecretKey;
       }
-      if (payment.webhookSecret && !payment.webhookSecret.startsWith('whsec_••')) {
-        salon.paymentSettings.webhookSecret = payment.webhookSecret;
+      if (webhookSecret && webhookSecret !== MASKED_WEBHOOK && !webhookSecret.startsWith('whsec_••')) {
+        salon.paymentSettings.webhookSecret = webhookSecret;
       }
     }
 
@@ -161,12 +226,27 @@ export const updateSystemSettings = async (req, res) => {
 // POST /api/ceo/system-settings/test-email - Test email configuration
 export const testEmailSettings = async (req, res) => {
   try {
-    const { testEmail } = req.body;
+    if (req.user?.role !== 'ceo') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - CEO only'
+      });
+    }
+
+    const testEmail = sanitizeSettingString(req.body?.testEmail, 255).toLowerCase();
 
     if (!testEmail) {
       return res.status(400).json({
         success: false,
         message: 'Test email address required'
+      });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(testEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid test email format'
       });
     }
 
@@ -180,7 +260,7 @@ export const testEmailSettings = async (req, res) => {
 
     res.json({
       success: true,
-      message: `Test email sent to ${testEmail}`
+      message: 'Test email sent successfully'
     });
   } catch (error) {
     logger.error('Error testing email settings:', error);
@@ -194,12 +274,27 @@ export const testEmailSettings = async (req, res) => {
 // POST /api/ceo/system-settings/test-sms - Test SMS configuration
 export const testSMSSettings = async (req, res) => {
   try {
-    const { testPhone } = req.body;
+    if (req.user?.role !== 'ceo') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - CEO only'
+      });
+    }
+
+    const testPhone = sanitizeSettingString(req.body?.testPhone, 40);
 
     if (!testPhone) {
       return res.status(400).json({
         success: false,
         message: 'Test phone number required'
+      });
+    }
+
+    const phoneRegex = /^\+?[0-9\s().-]{7,20}$/;
+    if (!phoneRegex.test(testPhone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid test phone number format'
       });
     }
 
@@ -213,7 +308,7 @@ export const testSMSSettings = async (req, res) => {
 
     res.json({
       success: true,
-      message: `Test SMS sent to ${testPhone}`
+      message: 'Test SMS sent successfully'
     });
   } catch (error) {
     logger.error('Error testing SMS settings:', error);

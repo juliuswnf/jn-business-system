@@ -1,4 +1,6 @@
 import BAA from '../models/BAA.js';
+import BreachIncident from '../models/BreachIncident.js';
+import AuditLog from '../models/AuditLog.js';
 import cloudinary from '../utils/cloudinaryHelper.js';
 import logger from '../utils/logger.js';
 import mongoose from 'mongoose';
@@ -8,12 +10,55 @@ import mongoose from 'mongoose';
  * BAA Management, HIPAA Compliance Status
  */
 
+const ALLOWED_BREACH_TYPES = [
+  'excessive_phi_access',
+  'brute_force_attack',
+  'unusual_access_location',
+  'unauthorized_access_attempt',
+  'data_theft',
+  'malware',
+  'phishing',
+  'lost_device',
+  'improper_disposal',
+  'other'
+];
+
+const ALLOWED_BREACH_SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+
+const resolveScopedSalonId = (req, res, inputSalonId = null) => {
+  if (req.user?.role === 'ceo') {
+    const candidateSalonId = inputSalonId || req.query?.salonId || req.user?.salonId;
+    if (!candidateSalonId) {
+      res.status(400).json({ success: false, message: 'salonId is required for CEO context' });
+      return null;
+    }
+    if (!mongoose.isValidObjectId(candidateSalonId)) {
+      res.status(400).json({ success: false, message: 'Invalid salonId format' });
+      return null;
+    }
+    return new mongoose.Types.ObjectId(candidateSalonId);
+  }
+
+  if (!req.user?.salonId) {
+    res.status(403).json({ success: false, message: 'Salon context required' });
+    return null;
+  }
+
+  if (inputSalonId && String(inputSalonId) !== String(req.user.salonId)) {
+    res.status(403).json({ success: false, message: 'Cross-tenant access denied' });
+    return null;
+  }
+
+  return req.user.salonId;
+};
+
 /**
  * Get all BAAs for a salon
  */
 export const getBaas = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonId = resolveScopedSalonId(req, res, req.query?.salonId);
+    if (!salonId) return;
 
     const baas = await BAA.find({ salonId })
       .sort({ expirationDate: 1 })
@@ -49,7 +94,23 @@ export const getBaas = async (req, res) => {
 export const createBaa = async (req, res) => {
   try {
     const { associateName, associateType, contactEmail, contactPhone, signedDate, expirationDate, servicesCovered, phiAccessLevel } = req.body;
-    const salonId = req.user.salonId;
+    const salonId = resolveScopedSalonId(req, res, req.body?.salonId);
+    if (!salonId) return;
+
+    let parsedServicesCovered = [];
+    if (Array.isArray(servicesCovered)) {
+      parsedServicesCovered = servicesCovered;
+    } else if (typeof servicesCovered === 'string' && servicesCovered.trim().length > 0) {
+      try {
+        const parsed = JSON.parse(servicesCovered);
+        if (!Array.isArray(parsed)) {
+          return res.status(400).json({ success: false, message: 'servicesCovered must be an array' });
+        }
+        parsedServicesCovered = parsed;
+      } catch {
+        return res.status(400).json({ success: false, message: 'Invalid servicesCovered JSON' });
+      }
+    }
 
     // Upload document to Cloudinary
     let documentUrl = null;
@@ -68,7 +129,7 @@ export const createBaa = async (req, res) => {
       contactPhone,
       signedDate,
       expirationDate,
-      servicesCovered: servicesCovered ? JSON.parse(servicesCovered) : [],
+      servicesCovered: parsedServicesCovered,
       phiAccessLevel,
       documentUrl,
       salonId,
@@ -266,7 +327,8 @@ export const terminateBaa = async (req, res) => {
  */
 export const getComplianceStatus = async (req, res) => {
   try {
-    const salonId = req.user.salonId;
+    const salonId = resolveScopedSalonId(req, res, req.query?.salonId);
+    if (!salonId) return;
 
     // Count active/expiring BAAs
     const [activeBAAs, expiringSoon, totalStaff, trainedStaff] = await Promise.all([
@@ -313,13 +375,105 @@ export const getComplianceStatus = async (req, res) => {
   }
 };
 
+/**
+ * Manually create a breach report
+ */
+export const createBreachReport = async (req, res) => {
+  try {
+    const {
+      type,
+      severity,
+      description,
+      details = {},
+      affectedRecords = 0,
+      affectedDataTypes = [],
+      affectedPatients = [],
+      occurredAt,
+      userId,
+      ipAddress,
+      salonId: rawSalonId
+    } = req.body;
+
+    if (!ALLOWED_BREACH_TYPES.includes(type)) {
+      return res.status(400).json({ success: false, message: 'Invalid breach type' });
+    }
+
+    if (!ALLOWED_BREACH_SEVERITIES.includes(severity)) {
+      return res.status(400).json({ success: false, message: 'Invalid breach severity' });
+    }
+
+    const salonId = resolveScopedSalonId(req, res, rawSalonId);
+    if (!salonId) return;
+
+    if (userId && !mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid userId format' });
+    }
+
+    const safeAffectedPatients = Array.isArray(affectedPatients) ? affectedPatients : [];
+    for (const patientId of safeAffectedPatients) {
+      if (!mongoose.isValidObjectId(patientId)) {
+        return res.status(400).json({ success: false, message: 'Invalid affected patient id' });
+      }
+    }
+
+    const incident = await BreachIncident.create({
+      type,
+      severity,
+      description,
+      details,
+      affectedRecords,
+      affectedDataTypes: Array.isArray(affectedDataTypes) ? affectedDataTypes : [],
+      affectedPatients: safeAffectedPatients.map((id) => new mongoose.Types.ObjectId(id)),
+      occurredAt: occurredAt ? new Date(occurredAt) : undefined,
+      detectedAt: new Date(),
+      userId: userId ? new mongoose.Types.ObjectId(userId) : req.user.id,
+      ipAddress: ipAddress || req.ip,
+      salonId,
+      notificationRequired: severity === 'HIGH' || severity === 'CRITICAL',
+      status: 'detected'
+    });
+
+    await AuditLog.logAction({
+      userId: req.user.id,
+      userEmail: req.user.email,
+      userRole: req.user.role,
+      action: 'BREACH_REPORT_CREATED',
+      category: 'security',
+      description: `Manual breach report created (${type})`,
+      resourceType: 'system',
+      status: 'warning',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      metadata: {
+        incidentId: incident._id,
+        salonId,
+        severity,
+        type
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Breach report created',
+      incident
+    });
+  } catch (error) {
+    logger.error('Failed to create breach report:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create breach report'
+    });
+  }
+};
+
 export default {
   getBaas,
   createBaa,
   updateBaa,
   renewBaa,
   terminateBaa,
-  getComplianceStatus
+  getComplianceStatus,
+  createBreachReport
 };
 
 

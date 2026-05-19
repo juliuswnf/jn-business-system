@@ -6,6 +6,7 @@
 
 import Salon from '../models/Salon.js';
 import LifecycleEmail from '../models/LifecycleEmail.js';
+import mongoose from 'mongoose';
 
 // ==================== PRICING CONSTANTS ====================
 const PRICING = {
@@ -14,10 +15,36 @@ const PRICING = {
   enterprise: 599
 };
 
+const parsePagination = (req, defaultLimit = 20, maxLimit = 100) => {
+  const parsedPage = Number.parseInt(String(req.query.page || '1'), 10);
+  const parsedLimit = Number.parseInt(String(req.query.limit || String(defaultLimit)), 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const limit = Number.isFinite(parsedLimit)
+    ? Math.min(Math.max(parsedLimit, 1), maxLimit)
+    : defaultLimit;
+  const skip = (page - 1) * limit;
+  return { page, limit, skip };
+};
+
+const parseOptionalSalonFilter = (req, res) => {
+  const rawSalonId = req.query?.salonId;
+  if (!rawSalonId) {
+    return null;
+  }
+
+  if (!mongoose.isValidObjectId(rawSalonId)) {
+    res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    return 'INVALID';
+  }
+
+  return new mongoose.Types.ObjectId(rawSalonId);
+};
+
 // ==================== GET ANALYTICS OVERVIEW ====================
 export const getAnalyticsOverview = async (req, res) => {
   try {
-    const { period = '30d' } = req.query;
+    const rawPeriod = typeof req.query.period === 'string' ? req.query.period : '30d';
+    const period = ['7d', '30d', '90d', '1y'].includes(rawPeriod) ? rawPeriod : '30d';
 
     // Calculate date range
     const now = new Date();
@@ -118,7 +145,8 @@ export const getAnalyticsOverview = async (req, res) => {
 // ==================== GET REVENUE CHART DATA ====================
 export const getRevenueChart = async (req, res) => {
   try {
-    const { period = '12m' } = req.query;
+    const rawPeriod = typeof req.query.period === 'string' ? req.query.period : '12m';
+    const period = ['6m', '12m'].includes(rawPeriod) ? rawPeriod : '12m';
 
     // Generate monthly revenue data
     const months = period === '6m' ? 6 : 12;
@@ -159,7 +187,8 @@ export const getRevenueChart = async (req, res) => {
 // ==================== GET CUSTOMER GROWTH CHART ====================
 export const getCustomerGrowthChart = async (req, res) => {
   try {
-    const { period = '12m' } = req.query;
+    const rawPeriod = typeof req.query.period === 'string' ? req.query.period : '12m';
+    const period = ['6m', '12m'].includes(rawPeriod) ? rawPeriod : '12m';
     const months = period === '6m' ? 6 : 12;
     const chartData = [];
 
@@ -247,17 +276,31 @@ export const getCohortAnalysis = async (req, res) => {
 // ==================== GET CHURN ANALYSIS ====================
 export const getChurnAnalysis = async (req, res) => {
   try {
-    // Churned customers with reasons
-    const churned = await Salon.find({
-      'subscription.status': 'cancelled'
-    }).lean().maxTimeMS(5000).select('name subscription.cancelledAt subscription.cancelReason createdAt');
+    const { page, limit, skip } = parsePagination(req, 20, 100);
+    const salonFilter = parseOptionalSalonFilter(req, res);
+    if (salonFilter === 'INVALID') {
+      return;
+    }
 
-    // Group by reason
-    const reasonCounts = {};
-    churned.forEach(c => {
-      const reason = c.subscription?.cancelReason || 'Unbekannt';
-      reasonCounts[reason] = (reasonCounts[reason] || 0) + 1;
-    });
+    const churnFilter = {
+      'subscription.status': 'cancelled',
+      ...(salonFilter ? { _id: salonFilter } : {})
+    };
+
+    const totalChurned = await Salon.countDocuments(churnFilter);
+
+    const reasonBreakdown = await Salon.aggregate([
+      { $match: { ...churnFilter } },
+      {
+        $group: {
+          _id: {
+            $ifNull: ['$subscription.cancelReason', 'Unbekannt']
+          },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]).maxTimeMS(5000);
 
     // Monthly churn trend
     const churnTrend = [];
@@ -268,11 +311,13 @@ export const getChurnAnalysis = async (req, res) => {
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
       const churnedInMonth = await Salon.countDocuments({
+        ...churnFilter,
         'subscription.status': 'cancelled',
         'subscription.cancelledAt': { $gte: monthStart, $lte: monthEnd }
       });
 
       const totalAtStart = await Salon.countDocuments({
+        ...(salonFilter ? { _id: salonFilter } : {}),
         'subscription.status': { $in: ['active', 'cancelled'] },
         createdAt: { $lt: monthStart }
       });
@@ -286,22 +331,36 @@ export const getChurnAnalysis = async (req, res) => {
       });
     }
 
+    const recentChurns = await Salon.find(churnFilter)
+      .select('name subscription.cancelledAt subscription.cancelReason createdAt')
+      .sort({ 'subscription.cancelledAt': -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .maxTimeMS(5000);
+
     res.status(200).json({
       success: true,
       analysis: {
-        total: churned.length,
-        reasons: Object.entries(reasonCounts).map(([reason, count]) => ({
-          reason,
+        total: totalChurned,
+        reasons: reasonBreakdown.map(({ _id, count }) => ({
+          reason: _id,
           count,
-          percentage: Math.round((count / churned.length) * 100)
+          percentage: totalChurned > 0 ? Math.round((count / totalChurned) * 100) : 0
         })),
         trend: churnTrend,
-        recentChurns: churned.slice(-10).map(c => ({
+        recentChurns: recentChurns.map(c => ({
           name: c.name,
           cancelledAt: c.subscription?.cancelledAt,
           reason: c.subscription?.cancelReason || 'Unbekannt',
           customerSince: c.createdAt
-        }))
+        })),
+        pagination: {
+          page,
+          limit,
+          total: totalChurned,
+          totalPages: Math.ceil(totalChurned / limit)
+        }
       }
     });
   } catch (error) {
@@ -382,11 +441,22 @@ function buildAtRiskEntry(studio, recentCountMap, totalCountMap, now) {
 export const getAtRiskStudios = async (req, res) => {
   try {
     const Booking = (await import('../models/Booking.js')).default;
+    const { page, limit, skip } = parsePagination(req, 25, 100);
+    const salonFilter = parseOptionalSalonFilter(req, res);
+    if (salonFilter === 'INVALID') {
+      return;
+    }
+
+    const studioFilter = {
+      'subscription.status': { $in: ['active', 'trial'] },
+      ...(salonFilter ? { _id: salonFilter } : {})
+    };
 
     // Get all active/trial studios
-    const studios = await Salon.find({
-      'subscription.status': { $in: ['active', 'trial'] }
-    }).populate('owner', 'name email lastLogin').lean().maxTimeMS(5000);
+    const studios = await Salon.find(studioFilter)
+      .populate('owner', 'name email lastLogin')
+      .lean()
+      .maxTimeMS(5000);
 
     const now = new Date();
     const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
@@ -397,11 +467,11 @@ export const getAtRiskStudios = async (req, res) => {
       Booking.aggregate([
         { $match: { salonId: { $in: studioIds }, createdAt: { $gte: sevenDaysAgo } } },
         { $group: { _id: '$salonId', count: { $sum: 1 } } }
-      ]),
+      ]).maxTimeMS(5000),
       Booking.aggregate([
         { $match: { salonId: { $in: studioIds } } },
         { $group: { _id: '$salonId', count: { $sum: 1 } } }
-      ])
+      ]).maxTimeMS(5000)
     ]);
     const recentCountMap = new Map(recentCountDocs.map(r => [r._id.toString(), r.count]));
     const totalCountMap = new Map(totalCountDocs.map(r => [r._id.toString(), r.count]));
@@ -412,15 +482,22 @@ export const getAtRiskStudios = async (req, res) => {
 
     // Sort by risk score descending
     atRiskStudios.sort((a, b) => b.riskScore - a.riskScore);
+    const pagedStudios = atRiskStudios.slice(skip, skip + limit);
 
     res.status(200).json({
       success: true,
-      studios: atRiskStudios,
+      studios: pagedStudios,
       summary: {
         total: atRiskStudios.length,
         highRisk: atRiskStudios.filter(s => s.riskLevel === 'high').length,
         mediumRisk: atRiskStudios.filter(s => s.riskLevel === 'medium').length,
         lowRisk: atRiskStudios.filter(s => s.riskLevel === 'low').length
+      },
+      pagination: {
+        page,
+        limit,
+        total: atRiskStudios.length,
+        totalPages: Math.ceil(atRiskStudios.length / limit)
       }
     });
   } catch (error) {
@@ -432,12 +509,20 @@ export const getAtRiskStudios = async (req, res) => {
 // ==================== GET LIFECYCLE EMAIL STATS ====================
 export const getLifecycleEmailStats = async (req, res) => {
   try {
+    const { page, limit, skip } = parsePagination(req, 20, 100);
+    const salonFilter = parseOptionalSalonFilter(req, res);
+    if (salonFilter === 'INVALID') {
+      return;
+    }
+
+    const baseFilter = salonFilter ? { salonId: salonFilter } : {};
+
     // Get overall stats
-    const totalScheduled = await LifecycleEmail.countDocuments();
-    const sent = await LifecycleEmail.countDocuments({ status: 'sent' });
-    const pending = await LifecycleEmail.countDocuments({ status: 'pending' });
-    const failed = await LifecycleEmail.countDocuments({ status: 'failed' });
-    const skipped = await LifecycleEmail.countDocuments({ status: 'skipped' });
+    const totalScheduled = await LifecycleEmail.countDocuments(baseFilter);
+    const sent = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'sent' });
+    const pending = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'pending' });
+    const failed = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'failed' });
+    const skipped = await LifecycleEmail.countDocuments({ ...baseFilter, status: 'skipped' });
 
     // Get stats by email type
     const emailTypes = [
@@ -446,9 +531,10 @@ export const getLifecycleEmailStats = async (req, res) => {
     ];
 
     const byType = await Promise.all(emailTypes.map(async (type) => {
-      const typeSent = await LifecycleEmail.countDocuments({ emailType: type, status: 'sent' });
-      const typeTotal = await LifecycleEmail.countDocuments({ emailType: type });
+      const typeSent = await LifecycleEmail.countDocuments({ ...baseFilter, emailType: type, status: 'sent' });
+      const typeTotal = await LifecycleEmail.countDocuments({ ...baseFilter, emailType: type });
       const conversions = await LifecycleEmail.countDocuments({
+        ...baseFilter,
         emailType: type,
         status: 'sent',
         convertedAfter: true
@@ -465,23 +551,30 @@ export const getLifecycleEmailStats = async (req, res) => {
     }));
 
     // Get recently sent emails
-    const recentlySent = await LifecycleEmail.find({ status: 'sent' })
+    const recentlySentFilter = { ...baseFilter, status: 'sent' };
+    const recentlySentTotal = await LifecycleEmail.countDocuments(recentlySentFilter);
+    const recentlySent = await LifecycleEmail.find(recentlySentFilter)
       .populate('salonId', 'name')
       .populate('userId', 'name email')
       .sort({ sentAt: -1 })
-      .limit(20)
+      .skip(skip)
+      .limit(limit)
       .lean()
       .maxTimeMS(5000);
 
     // Get upcoming emails
-    const upcoming = await LifecycleEmail.find({
+    const upcomingFilter = {
+      ...baseFilter,
       status: 'pending',
       scheduledFor: { $gte: new Date() }
-    })
+    };
+    const upcomingTotal = await LifecycleEmail.countDocuments(upcomingFilter);
+    const upcoming = await LifecycleEmail.find(upcomingFilter)
       .populate('salonId', 'name')
       .populate('userId', 'name email')
       .sort({ scheduledFor: 1 })
-      .limit(20)
+      .skip(skip)
+      .limit(limit)
       .lean()
       .maxTimeMS(5000);
 
@@ -510,7 +603,15 @@ export const getLifecycleEmailStats = async (req, res) => {
         salon: e.salonId?.name || 'Unknown',
         user: e.userId?.email || 'Unknown',
         scheduledFor: e.scheduledFor
-      }))
+      })),
+      pagination: {
+        page,
+        limit,
+        recentlySentTotal,
+        recentlySentPages: Math.ceil(recentlySentTotal / limit),
+        upcomingTotal,
+        upcomingPages: Math.ceil(upcomingTotal / limit)
+      }
     });
   } catch (error) {
     logger.error('GetLifecycleEmailStats Error:', error);

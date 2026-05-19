@@ -75,7 +75,7 @@ export const createConnectedAccount = async (salon, salonOwner) => {
 export const createAccountLink = async (accountId) => {
   try {
     const stripe = getStripe();
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://app.jn-business-system.de';
 
     const accountLink = await stripe.accountLinks.create({
       account: accountId,

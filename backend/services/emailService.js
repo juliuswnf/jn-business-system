@@ -29,21 +29,42 @@ const createTransporter = () => {
   });
 };
 
+const toSafeString = (value) => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  return String(value);
+};
+
+const escapeHtml = (value) => {
+  return toSafeString(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
 // ==================== SEND EMAIL ====================
 
 export const sendEmail = async (emailData) => {
   try {
     const transporter = createTransporter();
+    const plainBody = toSafeString(emailData.body);
+    const renderedHtml = emailData.html || escapeHtml(plainBody).replace(/\n/g, '<br>');
 
     const mailOptions = {
       from: process.env.EMAIL_FROM || process.env.SMTP_FROM || 'JN Business System <noreply@jn-business-system.com>',
       to: emailData.to,
       subject: emailData.subject,
-      text: emailData.body,
-      html: emailData.html || emailData.body.replace(/\n/g, '<br>')
+      text: plainBody,
+      html: renderedHtml
     };
 
     const info = await transporter.sendMail(mailOptions);
+    const acceptedRecipients = Array.isArray(info.accepted) ? info.accepted : [];
+    const rejectedRecipients = Array.isArray(info.rejected) ? info.rejected : [];
+    const hasRejectedRecipients = rejectedRecipients.length > 0;
 
     // Log email (only if companyId provided)
     if (emailData.companyId || emailData.salonId) {
@@ -53,7 +74,8 @@ export const sendEmail = async (emailData) => {
           recipientEmail: emailData.to,
           subject: emailData.subject,
           emailType: emailData.type || 'general',
-          status: 'sent',
+          status: hasRejectedRecipients ? 'bounced' : 'sent',
+          error: hasRejectedRecipients ? `Rejected recipients: ${rejectedRecipients.join(', ')}` : null,
           sentAt: new Date(),
           attempts: 1
         });
@@ -63,16 +85,23 @@ export const sendEmail = async (emailData) => {
       }
     }
 
+    if (hasRejectedRecipients && acceptedRecipients.length === 0) {
+      const rejectionError = new Error('SMTP rejected all recipients');
+      rejectionError.code = 'SMTP_ALL_RECIPIENTS_REJECTED';
+      throw rejectionError;
+    }
+
     logger.log(`✅ Email sent to: ${emailData.to}`);
 
     return { success: true, messageId: info.messageId };
   } catch (error) {
+    const safeErrorMessage = toSafeString(error.message || 'Unknown email error').slice(0, 900);
     logger.error('❌ Email send error:', error);
 
     // Log to ErrorLog so failures appear in the CEO dashboard
     ErrorLog.logError({
       type: 'email_failure',
-      message: `sendEmail failed to ${emailData.to}: ${error.message}`,
+      message: `sendEmail failed to ${emailData.to}: ${safeErrorMessage}`,
       source: 'service',
       ...(emailData.salonId || emailData.companyId
         ? { salonId: emailData.salonId || emailData.companyId }
@@ -88,7 +117,7 @@ export const sendEmail = async (emailData) => {
           subject: emailData.subject,
           emailType: emailData.type || 'general',
           status: 'failed',
-          error: error.message,
+          error: safeErrorMessage,
           attempts: 1
         });
       } catch (logError) {
@@ -165,8 +194,22 @@ export const sendBookingConfirmation = async (booking) => {
         })
       : `Hallo ${firstName},\n\nIhre Buchung wurde bestätigt.\n\nService: ${service.name}\nDatum: ${dateStr}\nUhrzeit: ${timeStr}\n\nWir freuen uns auf Sie!\n\n${salon.name}`;
 
+    const htmlFirstName = escapeHtml(firstName);
+    const htmlSalonName = escapeHtml(salon.name || '');
+    const htmlServiceName = escapeHtml(service.name || '');
+    const htmlDateStr = escapeHtml(dateStr);
+    const htmlTimeStr = escapeHtml(timeStr);
+    const htmlAddressStr = escapeHtml(addressStr);
+    const htmlSalonPhone = escapeHtml(salon.phone || '');
+    const htmlSalonEmail = escapeHtml(salon.email || '');
+    const supportEmailCandidate = salon.email || 'info@salon.de';
+    const supportEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supportEmailCandidate)
+      ? supportEmailCandidate
+      : 'info@salon.de';
+    const supportContactText = escapeHtml(salon.email || salon.phone || supportEmail);
+
     // Create HTML email template
-    const dashboardUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const dashboardUrl = process.env.FRONTEND_URL || 'https://app.jn-business-system.de';
     const html = `
 <!DOCTYPE html>
 <html>
@@ -186,11 +229,11 @@ export const sendBookingConfirmation = async (booking) => {
   <div style="background: white; padding: 40px 30px;">
 
     <p style="font-size: 16px; color: #1f2937; margin: 0 0 20px 0;">
-      Hallo ${firstName},
+      Hallo ${htmlFirstName},
     </p>
 
     <p style="color: #4b5563; margin: 0 0 30px 0;">
-      Ihre Buchung bei <strong>${salon.name}</strong> wurde erfolgreich bestätigt.
+      Ihre Buchung bei <strong>${htmlSalonName}</strong> wurde erfolgreich bestätigt.
     </p>
 
     <!-- Booking Details Card -->
@@ -201,19 +244,19 @@ export const sendBookingConfirmation = async (booking) => {
 
       <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #d1fae5;">
         <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Service</div>
-        <div style="color: #1f2937; font-size: 16px; font-weight: 600;">${service.name}</div>
+        <div style="color: #1f2937; font-size: 16px; font-weight: 600;">${htmlServiceName}</div>
       </div>
 
       <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #d1fae5;">
         <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Datum & Uhrzeit</div>
-        <div style="color: #1f2937; font-size: 16px; font-weight: 600;">${dateStr}</div>
-        <div style="color: #10b981; font-size: 18px; font-weight: 700; margin-top: 4px;">🕐 ${timeStr} Uhr</div>
+        <div style="color: #1f2937; font-size: 16px; font-weight: 600;">${htmlDateStr}</div>
+        <div style="color: #10b981; font-size: 18px; font-weight: 700; margin-top: 4px;">🕐 ${htmlTimeStr} Uhr</div>
       </div>
 
       ${addressStr ? `
       <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #d1fae5;">
         <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Adresse</div>
-        <div style="color: #1f2937; font-size: 14px;">${addressStr}</div>
+        <div style="color: #1f2937; font-size: 14px;">${htmlAddressStr}</div>
       </div>
       ` : ''}
 
@@ -221,8 +264,8 @@ export const sendBookingConfirmation = async (booking) => {
       <div style="margin-bottom: 0;">
         <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Kontakt</div>
         <div style="color: #1f2937; font-size: 14px;">
-          📞 ${salon.phone}
-          ${salon.email ? `<br>📧 ${salon.email}` : ''}
+          📞 ${htmlSalonPhone}
+          ${salon.email ? `<br>📧 ${htmlSalonEmail}` : ''}
         </div>
       </div>
       ` : ''}
@@ -248,7 +291,7 @@ export const sendBookingConfirmation = async (booking) => {
     <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
       <p style="color: #6b7280; margin: 0; font-size: 13px;">
         Termin absagen oder verschieben?<br>
-        Kontaktieren Sie uns: <a href="mailto:${salon.email || 'info@salon.de'}" style="color: #10b981; text-decoration: none;">${salon.email || salon.phone}</a>
+        Kontaktieren Sie uns: <a href="mailto:${supportEmail}" style="color: #10b981; text-decoration: none;">${supportContactText}</a>
       </p>
     </div>
 
@@ -260,7 +303,7 @@ export const sendBookingConfirmation = async (booking) => {
       Wir freuen uns auf Ihren Besuch! 🎉
     </p>
     <p style="color: #6b7280; margin: 0; font-size: 12px;">
-      ${salon.name}<br>
+      ${htmlSalonName}<br>
       Powered by JN Business System
     </p>
   </div>
@@ -473,11 +516,11 @@ export const processEmailQueue = async () => {
 // ==================== HELPER: REPLACE PLACEHOLDERS ====================
 
 const replacePlaceholders = (text, data) => {
-  let result = text;
+  let result = toSafeString(text);
 
   Object.keys(data).forEach(key => {
     const regex = new RegExp(`{{${escapeRegExp(key)}}}`, 'g');
-    result = result.replace(regex, data[key] || '');
+    result = result.replace(regex, toSafeString(data[key]));
   });
 
   return result;
@@ -489,6 +532,7 @@ export const sendWelcomeEmail = async (user, _salon) => {
   try {
     const dashboardUrl = process.env.FRONTEND_URL || 'https://app.jn-business-system.de';
     const firstName = user.name?.split(' ')[0] || user.name || 'dort';
+    const safeFirstName = escapeHtml(firstName);
 
     const emailData = {
       to: user.email,
@@ -514,7 +558,7 @@ export const sendWelcomeEmail = async (user, _salon) => {
   <div style="background: white; padding: 40px 30px;">
 
     <p style="font-size: 18px; color: #1f2937; margin: 0 0 20px 0;">
-      Hallo ${firstName},
+      Hallo ${safeFirstName},
     </p>
 
     <p style="color: #4b5563; margin: 0 0 30px 0;">

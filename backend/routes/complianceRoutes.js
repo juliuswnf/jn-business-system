@@ -9,11 +9,13 @@ import {
   updateBaa,
   renewBaa,
   terminateBaa,
-  getComplianceStatus
+  getComplianceStatus,
+  createBreachReport
 } from '../controllers/complianceController.js';
 import {
   getPatientAuditTrail,
-  generateComplianceReport
+  generateComplianceReport,
+  requireJustification
 } from '../middleware/hipaaAuditMiddleware.js';
 import {
   manualKeyRotation,
@@ -42,7 +44,7 @@ router.get(
   '/baas',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
   getBaas
 );
 
@@ -52,7 +54,7 @@ router.post(
   '/baas',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
   upload.single('document'),
   handleUploadError,
   async (req, res, next) => {
@@ -86,7 +88,7 @@ router.patch(
   '/baas/:id',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
   updateBaa
 );
 
@@ -95,7 +97,7 @@ router.post(
   '/baas/:id/renew',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
   renewBaa
 );
 
@@ -104,7 +106,7 @@ router.delete(
   '/baas/:id',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
   terminateBaa
 );
 
@@ -115,7 +117,7 @@ router.get(
   '/status',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin', 'manager'),
+  authMiddleware.authorize('ceo', 'salon_owner', 'employee'),
   getComplianceStatus
 );
 
@@ -126,7 +128,8 @@ router.get(
   '/audit/patient/:customerId',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin', 'provider'),
+  authMiddleware.authorize('ceo', 'salon_owner', 'employee'),
+  requireJustification,
   getPatientAuditTrail
 );
 
@@ -135,7 +138,8 @@ router.get(
   '/audit/report/:salonId',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
+  requireJustification,
   generateComplianceReport
 );
 
@@ -165,6 +169,7 @@ router.get(
 router.get(
   '/data-export/:customerId',
   authMiddleware.protect,
+  authMiddleware.authorize('ceo'),
   exportCustomerData
 );
 
@@ -172,6 +177,7 @@ router.get(
 router.post(
   '/data-deletion/:customerId',
   authMiddleware.protect,
+  authMiddleware.authorize('ceo'),
   requestDataDeletion
 );
 
@@ -179,6 +185,7 @@ router.post(
 router.get(
   '/data-export-history/:customerId',
   authMiddleware.protect,
+  authMiddleware.authorize('ceo'),
   getExportHistory
 );
 
@@ -189,8 +196,16 @@ router.get(
   '/breaches',
   authMiddleware.protect,
   checkFeatureAccess('hipaaCompliance'),
-  authMiddleware.authorize('ceo', 'admin'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
   getBreachIncidents
+);
+
+router.post(
+  '/breaches/report',
+  authMiddleware.protect,
+  checkFeatureAccess('hipaaCompliance'),
+  authMiddleware.authorize('ceo', 'salon_owner'),
+  createBreachReport
 );
 
 export default router;

@@ -1,4 +1,7 @@
 ﻿import AuditLog from '../models/AuditLog.js';
+import Customer from '../models/Customer.js';
+import User from '../models/User.js';
+import mongoose from 'mongoose';
 import logger from '../utils/logger.js';
 
 /**
@@ -179,7 +182,7 @@ async function detectAnomalousAccess(userId, dataType, ipAddress) {
     const recentCount = await AuditLog.countDocuments({
       userId,
       isPHIAccess: true,
-      timestamp: { $gte: new Date(Date.now() - timeWindow) }
+      createdAt: { $gte: new Date(Date.now() - timeWindow) }
     });
 
     if (recentCount > recentAccessThreshold) {
@@ -219,7 +222,7 @@ async function detectAnomalousAccess(userId, dataType, ipAddress) {
     const userIPs = await AuditLog.distinct('ipAddress', {
       userId,
       isPHIAccess: true,
-      timestamp: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Last 30 days
+      createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Last 30 days
     });
 
     if (!userIPs.includes(ipAddress)) {
@@ -261,24 +264,97 @@ export const requireJustification = (req, res, next) => {
 export const getPatientAuditTrail = async (req, res) => {
   try {
     const { customerId } = req.params;
-    const { startDate, endDate, limit = 100 } = req.query;
+    const { startDate, endDate, limit = 100, justification, salonId: rawSalonId } = req.query;
+
+    if (!mongoose.isValidObjectId(customerId)) {
+      return res.status(400).json({ success: false, message: 'Invalid customerId format' });
+    }
+
+    const safeJustification = typeof justification === 'string' ? justification.trim() : '';
+    if (safeJustification.length < 10) {
+      return res.status(400).json({
+        success: false,
+        message: 'Access justification required for HIPAA compliance',
+        requiredField: 'justification',
+        minLength: 10
+      });
+    }
+
+    const parsedLimit = Number.parseInt(String(limit), 10);
+    const safeLimit = Number.isNaN(parsedLimit) ? 100 : Math.min(Math.max(parsedLimit, 1), 500);
+
+    let scopedSalonId = req.user?.salonId || null;
+    if (req.user?.role === 'ceo' && rawSalonId) {
+      if (!mongoose.isValidObjectId(rawSalonId)) {
+        return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+      }
+      scopedSalonId = new mongoose.Types.ObjectId(rawSalonId);
+    }
+
+    if (req.user?.role !== 'ceo' && !scopedSalonId) {
+      return res.status(403).json({ success: false, message: 'Salon context required' });
+    }
+
+    const customerFilter = { _id: new mongoose.Types.ObjectId(customerId) };
+    if (scopedSalonId) {
+      customerFilter.salonId = scopedSalonId;
+    }
+
+    const scopedCustomer = await Customer.findOne(customerFilter)
+      .select('_id salonId')
+      .lean()
+      .maxTimeMS(5000);
+
+    if (!scopedCustomer) {
+      return res.status(404).json({
+        success: false,
+        message: 'Customer not found in allowed salon scope'
+      });
+    }
+
+    const userScopeFilter = {
+      $or: [
+        { salonId: scopedCustomer.salonId },
+        { additionalSalonIds: scopedCustomer.salonId }
+      ]
+    };
+
+    const scopedUsers = await User.find(userScopeFilter)
+      .select('_id')
+      .lean()
+      .maxTimeMS(5000);
+    const scopedUserIds = scopedUsers.map((u) => u._id);
 
     const query = {
       isPHIAccess: true,
-      'phiAccessDetails.patientId': customerId
+      'phiAccessDetails.patientId': scopedCustomer._id,
+      ...(scopedUserIds.length > 0 ? { userId: { $in: scopedUserIds } } : {})
     };
 
     if (startDate || endDate) {
-      query.timestamp = {};
-      if (startDate) query.timestamp.$gte = new Date(startDate);
-      if (endDate) query.timestamp.$lte = new Date(endDate);
+      query.createdAt = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        if (Number.isNaN(start.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid startDate' });
+        }
+        query.createdAt.$gte = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        if (Number.isNaN(end.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid endDate' });
+        }
+        query.createdAt.$lte = end;
+      }
     }
 
     const auditTrail = await AuditLog.find(query)
-      .sort({ timestamp: -1 })
-      .limit(parseInt(limit))
+      .sort({ createdAt: -1 })
+      .limit(safeLimit)
       .select('-__v')
-      .lean();
+      .lean()
+      .maxTimeMS(5000);
 
     res.json({
       success: true,
@@ -301,18 +377,62 @@ export const getPatientAuditTrail = async (req, res) => {
  */
 export const generateComplianceReport = async (req, res) => {
   try {
-    const { salonId } = req.params;
+    const { salonId: rawSalonId } = req.params;
     const { startDate, endDate } = req.query;
 
+    if (!mongoose.isValidObjectId(rawSalonId)) {
+      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    }
+
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId || String(req.user.salonId) !== String(rawSalonId)) {
+        return res.status(403).json({
+          success: false,
+          message: 'You are not allowed to generate reports for this salon'
+        });
+      }
+    }
+
+    const scopedSalonId = new mongoose.Types.ObjectId(rawSalonId);
+
+    const scopedUsers = await User.find({
+      $or: [
+        { salonId: scopedSalonId },
+        { additionalSalonIds: scopedSalonId }
+      ]
+    })
+      .select('_id')
+      .lean()
+      .maxTimeMS(5000);
+    const scopedUserIds = scopedUsers.map((u) => u._id);
+
+    const scopedOrFilters = [];
+    if (scopedUserIds.length > 0) {
+      scopedOrFilters.push({ userId: { $in: scopedUserIds } });
+    }
+    scopedOrFilters.push({ 'metadata.salonId': scopedSalonId });
+
     const query = {
-      salonId,
-      isPHIAccess: true
+      isPHIAccess: true,
+      $or: scopedOrFilters
     };
 
     if (startDate || endDate) {
-      query.timestamp = {};
-      if (startDate) query.timestamp.$gte = new Date(startDate);
-      if (endDate) query.timestamp.$lte = new Date(endDate);
+      query.createdAt = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        if (Number.isNaN(start.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid startDate' });
+        }
+        query.createdAt.$gte = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        if (Number.isNaN(end.getTime())) {
+          return res.status(400).json({ success: false, message: 'Invalid endDate' });
+        }
+        query.createdAt.$lte = end;
+      }
     }
 
     // Aggregate statistics
@@ -325,7 +445,7 @@ export const generateComplianceReport = async (req, res) => {
         { $match: query },
         { $group: { _id: '$phiAccessDetails.dataType', count: { $sum: 1 } } },
         { $sort: { count: -1 } }
-      ])
+      ]).maxTimeMS(5000)
     ]);
 
     const report = {

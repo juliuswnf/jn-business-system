@@ -110,6 +110,10 @@ import stripeWebhookController from './controllers/stripeWebhookController.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ENVIRONMENT = process.env.NODE_ENV || 'development';
+const TRUST_PROXY = process.env.TRUST_PROXY || (ENVIRONMENT === 'production' ? '1' : 'loopback');
+
+app.disable('x-powered-by');
+app.set('trust proxy', TRUST_PROXY);
 
 /**
  * JN Business System Backend
@@ -133,7 +137,7 @@ server.on('connection', (connection) => {
 // Socket.IO Configuration
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'https://app.jn-business-system.de',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
   },
@@ -229,7 +233,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
       imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-      connectSrc: ["'self'", process.env.FRONTEND_URL || 'http://localhost:5173'],
+      connectSrc: ["'self'", process.env.FRONTEND_URL || 'https://app.jn-business-system.de'],
       frameSrc: ["'self'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null

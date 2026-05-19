@@ -185,6 +185,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showHIPAAWarning, setShowHIPAAWarning] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     chiefComplaint: '',
     diagnosis: '',
@@ -211,6 +212,11 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
   };
 
   const handleSave = async () => {
+    if (saving) {
+      return;
+    }
+
+    setSaving(true);
     try {
       if (selectedNote) {
         // Update existing note
@@ -230,6 +236,8 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
     } catch (error) {
       captureError(error, { context: 'saveClinicalNote' });
       alert('Failed to save clinical note');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -329,6 +337,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
             resetForm();
             setIsEditing(true);
           }}
+          disabled={saving}
           className="flex items-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
         >
           <FileText className="w-5 h-5" />
@@ -377,6 +386,7 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
               {selectedNote && !isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
+                  disabled={saving}
                   className="text-gray-600 hover:text-gray-700 text-sm font-medium"
                 >
                   Edit Note
@@ -393,14 +403,16 @@ export default function ClinicalNotesEditor({ customerId, salonId }) {
                   <div className="flex space-x-4 pt-6 border-t">
                     <button
                       onClick={handleSave}
-                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors"
+                      disabled={saving}
+                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <Save className="w-5 h-5" />
-                      <span>Save Note (Encrypted)</span>
+                      <span>{saving ? 'Saving...' : 'Save Note (Encrypted)'}</span>
                     </button>
                     <button
                       onClick={resetForm}
-                      className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                      disabled={saving}
+                      className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       Cancel
                     </button>
