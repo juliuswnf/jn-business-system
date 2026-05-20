@@ -25,11 +25,12 @@ import { sanitizeInput } from './middleware/sanitizationMiddleware.js';
 import { initSentry, sentryErrorHandler } from './config/sentry.js';
 
 // NO-SHOW-KILLER Workers
-import { startConfirmationSender, stopConfirmationSender } from './workers/confirmationSenderWorker.js';
-import { startAutoCancelWorker, stopAutoCancelWorker } from './workers/autoCancelWorker.js';
+import { stopConfirmationSender } from './workers/confirmationSenderWorker.js';
+import { stopAutoCancelWorker } from './workers/autoCancelWorker.js';
 import { startWaitlistMatcher, stopWaitlistMatcher } from './workers/waitlistMatcherWorker.js';
-import { startReminderWorker, stopReminderWorker } from './workers/reminderWorker.js';
+import { stopReminderWorker } from './workers/reminderWorker.js';
 import { startNoShowChargeWorker, stopNoShowChargeWorker } from './workers/noShowChargeWorker.js';
+import { startNoShowWorker, stopNoShowWorker } from './workers/noShowWorker.js';
 import { startSubscriptionExpiryWorker, stopSubscriptionExpiryWorker } from './workers/subscriptionExpiryWorker.js';
 
 // Marketing Automation Workers
@@ -91,6 +92,7 @@ import confirmationRoutes from './routes/confirmationRoutes.js';
 import waitlistRoutes from './routes/waitlistRoutes.js';
 import slotSuggestionRoutes from './routes/slotSuggestionRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js'; // MessageBird webhooks
+import noShowRoutes from './routes/noShowRoutes.js';
 
 // Marketing Automation Routes
 import marketingRoutes from './routes/marketingRoutes.js';
@@ -102,6 +104,7 @@ import tattooRoutes from './routes/tattooRoutes.js';
 import authMiddleware from './middleware/authMiddleware.js';
 import webhookMiddleware from './middleware/webhookMiddleware.js';
 import { apiVersioningMiddleware } from './middleware/apiVersioningMiddleware.js';
+import normalizeErrorResponses from './middleware/responseNormalizationMiddleware.js';
 
 // Import Controllers
 import stripeWebhookController from './controllers/stripeWebhookController.js';
@@ -265,6 +268,7 @@ app.use(apiVersioningMiddleware);
 // 6️⃣ LOGGING & MONITORING
 // ✅ AUDIT FIX: Add request context middleware for structured logging
 app.use(addRequestContext);
+app.use(normalizeErrorResponses);
 
 if (ENVIRONMENT === 'development') {
   app.use(morgan('dev'));
@@ -390,6 +394,7 @@ app.use('/api/v1/locations', authMiddleware.protect, multiLocationRoutes); // Mu
 // NO-SHOW-KILLER Routes - Phase 2
 app.use('/api/v1/sms-consent', smsConsentRoutes); // SMS GDPR Consent (Public + Protected)
 app.use('/api/v1/confirmations', confirmationRoutes); // Booking Confirmations (Mixed: public confirm link)
+app.use('/api/v1/no-show', noShowRoutes); // No-Show prevention + confirmation flow (Mixed public/protected)
 app.use('/api/v1/waitlist', waitlistRoutes); // Waitlist Management (Public join + Protected admin)
 app.use('/api/v1/marketing', marketingRoutes); // Marketing Automation (Protected)
 app.use('/api/v1/slot-suggestions', slotSuggestionRoutes); // Slot Suggestions (Public accept/reject)
@@ -646,11 +651,11 @@ const startNoShowKillerWorkers = () => {
   try {
     logger.info('? Starting NO-SHOW-KILLER workers...');
 
-    // Start all 4 workers
-    startConfirmationSender(); // Every 5 min
-    startAutoCancelWorker(); // Every 15 min
+    // Core no-show automation
+    startNoShowWorker(); // Every 15 min (reminders + no-show detection + deposit policy)
+
+    // Supporting workers
     startWaitlistMatcher(); // Every 15 min
-    startReminderWorker(); // Every 30 min
     startNoShowChargeWorker(); // Every hour at :10
     startSubscriptionExpiryWorker(); // Every hour at :30
 
@@ -750,6 +755,7 @@ const gracefulShutdown = async (signal) => {
   stopConfirmationSender();
   stopAutoCancelWorker();
   stopReminderWorker();
+  stopNoShowWorker();
   stopWaitlistMatcher();
   stopNoShowChargeWorker();
   stopSubscriptionExpiryWorker();

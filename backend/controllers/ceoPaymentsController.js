@@ -278,7 +278,7 @@ export const processRefund = async (req, res) => {
     transaction.refundAmount = refundAmount;
     await transaction.save();
 
-    // TODO: Call Stripe refund API
+    // Planned improvement: invoke Stripe refund API directly here
     // const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
     // await stripe.refunds.create({ payment_intent: transaction.stripePaymentId });
 

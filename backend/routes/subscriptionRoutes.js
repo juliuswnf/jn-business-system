@@ -4,6 +4,7 @@ import securityMiddleware from '../middleware/securityMiddleware.js';
 import subscriptionController from '../controllers/subscriptionController.js';
 
 const router = express.Router();
+const requireSubscriptionRole = authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo');
 
 // ==================== PUBLIC ====================
 
@@ -16,6 +17,7 @@ router.get('/plans', subscriptionController.getPlans);
 router.post(
   '/checkout',
   authMiddleware.protect,
+  requireSubscriptionRole,
   securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for subscriptions
   subscriptionController.createCheckout
 );
@@ -24,6 +26,7 @@ router.post(
 router.post(
   '/portal',
   authMiddleware.protect,
+  requireSubscriptionRole,
   securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for subscriptions
   subscriptionController.createPortal
 );
@@ -32,6 +35,7 @@ router.post(
 router.get(
   '/status',
   authMiddleware.protect,
+  requireSubscriptionRole,
   subscriptionController.getSubscriptionStatus
 );
 

@@ -1,6 +1,36 @@
 import calculateTierRecommendation, { getTierDetails } from '../utils/tierRecommendationEngine.js';
 import PricingWizardResponse from '../models/PricingWizardResponse.js';
 import logger from '../utils/logger.js';
+import crypto from 'crypto';
+import mongoose from 'mongoose';
+
+const SESSION_ID_PATTERN = /^[a-zA-Z0-9_-]{8,256}$/;
+const WRITE_TOKEN_PATTERN = /^[a-f0-9]{64}$/;
+const ALLOWED_TIERS = ['starter', 'professional', 'enterprise'];
+
+const createOwnerFingerprint = (req) => {
+  const userAgent = String(req.headers['user-agent'] || 'unknown');
+  const ipAddress = String(req.ip || 'unknown');
+  return crypto.createHash('sha256').update(`${ipAddress}|${userAgent}`).digest('hex');
+};
+
+const createWriteToken = () => crypto.randomBytes(32).toString('hex');
+
+const toTokenHash = (token) => crypto.createHash('sha256').update(token).digest('hex');
+
+const resolveOptionalSalonId = (req, res) => {
+  if (!req.user?.salonId) {
+    return null;
+  }
+
+  const trustedSalonId = String(req.user.salonId);
+  if (!mongoose.isValidObjectId(trustedSalonId)) {
+    res.status(400).json({ success: false, message: 'Invalid authenticated salonId format' });
+    return 'INVALID';
+  }
+
+  return new mongoose.Types.ObjectId(trustedSalonId);
+};
 
 /**
  * GET /api/pricing-wizard/questions
@@ -127,6 +157,13 @@ export const getRecommendation = async (req, res) => {
       });
     }
 
+    if (!sessionId || typeof sessionId !== 'string' || !SESSION_ID_PATTERN.test(sessionId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid sessionId is required'
+      });
+    }
+
     // Calculate recommendation
     const recommendation = calculateTierRecommendation(answers);
 
@@ -138,33 +175,47 @@ export const getRecommendation = async (req, res) => {
       enterprise: getTierDetails('enterprise')
     };
 
-    // Save response to database (optional - for analytics)
-    if (sessionId) {
-      try {
-        await PricingWizardResponse.create({
-          userId: req.user?._id || null,
-          sessionId,
-          answers,
-          recommendedTier: recommendation.recommendedTier,
-          score: recommendation.score,
-          scoreBreakdown: recommendation.scoreBreakdown,
-          confidence: recommendation.confidence,
-          timeToComplete: timeToComplete || null,
-          userAgent: req.headers['user-agent'],
-          ipAddress: req.ip,
-          questionSetVersion: 'v1'
-        });
-      } catch (saveError) {
-        // Non-critical error, just log it
-        logger.warn('Failed to save wizard response:', saveError);
-      }
+    const ownerFingerprint = createOwnerFingerprint(req);
+    const writeToken = createWriteToken();
+    const writeTokenHash = toTokenHash(writeToken);
+
+    const salonId = resolveOptionalSalonId(req, res);
+    if (salonId === 'INVALID') {
+      return;
+    }
+
+    // Save response to database for analytics and secure state management.
+    try {
+      await PricingWizardResponse.create({
+        salonId,
+        userId: req.user?._id || null,
+        sessionId,
+        ownerFingerprint,
+        writeTokenHash,
+        answers,
+        recommendedTier: recommendation.recommendedTier,
+        score: recommendation.score,
+        scoreBreakdown: recommendation.scoreBreakdown,
+        confidence: recommendation.confidence,
+        timeToComplete: timeToComplete || null,
+        userAgent: req.headers['user-agent'],
+        ipAddress: req.ip,
+        questionSetVersion: 'v1'
+      });
+    } catch (saveError) {
+      // Non-critical error, just log it
+      logger.warn('Failed to save wizard response:', saveError);
     }
 
     logger.info(`Recommendation generated: ${recommendation.recommendedTier} (score: ${recommendation.score})`);
 
     res.json({
       success: true,
-      data: recommendation
+      data: {
+        ...recommendation,
+        sessionId,
+        writeToken
+      }
     });
   } catch (error) {
     logger.error('Error generating recommendation:', error);
@@ -182,7 +233,7 @@ export const getRecommendation = async (req, res) => {
  */
 export const saveResponse = async (req, res) => {
   try {
-    const { sessionId, selectedTier } = req.body;
+    const { sessionId, selectedTier, writeToken } = req.body;
 
     if (!sessionId) {
       return res.status(400).json({
@@ -191,12 +242,40 @@ export const saveResponse = async (req, res) => {
       });
     }
 
-    if (typeof sessionId !== 'string' || sessionId.length > 256 || !/^[a-zA-Z0-9_-]+$/.test(sessionId)) {
+    if (typeof sessionId !== 'string' || !SESSION_ID_PATTERN.test(sessionId)) {
       return res.status(400).json({ success: false, message: 'Invalid session ID format' });
     }
 
-    // Find most recent response for this session
-    const response = await PricingWizardResponse.findOne({ sessionId: String(sessionId) })
+    if (selectedTier && !ALLOWED_TIERS.includes(selectedTier)) {
+      return res.status(400).json({ success: false, message: 'Invalid selected tier' });
+    }
+
+    const ownerFingerprint = createOwnerFingerprint(req);
+    const query = { sessionId: String(sessionId) };
+
+    const salonId = resolveOptionalSalonId(req, res);
+    if (salonId === 'INVALID') {
+      return;
+    }
+
+    if (req.user?._id) {
+      query.userId = req.user._id;
+      query.ownerFingerprint = ownerFingerprint;
+      query.salonId = salonId;
+    } else {
+      if (!writeToken || typeof writeToken !== 'string' || !WRITE_TOKEN_PATTERN.test(writeToken)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Valid writeToken is required for anonymous session save'
+        });
+      }
+
+      query.ownerFingerprint = ownerFingerprint;
+      query.writeTokenHash = toTokenHash(writeToken);
+    }
+
+    // Find most recent response in the current owner scope only.
+    const response = await PricingWizardResponse.findOne(query)
       .sort({ createdAt: -1 });
 
     if (!response) {

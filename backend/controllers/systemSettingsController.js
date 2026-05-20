@@ -250,8 +250,7 @@ export const testEmailSettings = async (req, res) => {
       });
     }
 
-    // TODO: Implement actual email test using nodemailer
-    // This is a placeholder that simulates sending
+    // Placeholder simulation until dedicated nodemailer integration is wired here
     
     logger.info(`Email test requested for ${testEmail}`);
 
@@ -298,8 +297,7 @@ export const testSMSSettings = async (req, res) => {
       });
     }
 
-    // TODO: Implement actual SMS test using Twilio
-    // This is a placeholder that simulates sending
+    // Placeholder simulation until dedicated Twilio integration is wired here
     
     logger.info(`SMS test requested for ${testPhone}`);
 

@@ -4,6 +4,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import { validateContentType } from '../middleware/securityMiddleware.js';
 
 const router = express.Router();
+const requireSupportRole = authMiddleware.requireRole('customer', 'employee', 'salon_owner', 'admin', 'ceo', 'business');
 
 /**
  * Customer Support Routes
@@ -14,6 +15,7 @@ const router = express.Router();
 router.post(
   '/tickets',
   authMiddleware.protect,
+  requireSupportRole,
   validateContentType,
   supportController.createTicket
 );
@@ -22,6 +24,7 @@ router.post(
 router.get(
   '/tickets',
   authMiddleware.protect,
+  requireSupportRole,
   supportController.getMyTickets
 );
 
@@ -29,6 +32,7 @@ router.get(
 router.get(
   '/tickets/:ticketId',
   authMiddleware.protect,
+  requireSupportRole,
   supportController.getTicketDetails
 );
 
@@ -36,6 +40,7 @@ router.get(
 router.post(
   '/tickets/:ticketId/messages',
   authMiddleware.protect,
+  requireSupportRole,
   validateContentType,
   supportController.addMessage
 );
@@ -44,6 +49,7 @@ router.post(
 router.patch(
   '/tickets/:ticketId/close',
   authMiddleware.protect,
+  requireSupportRole,
   supportController.closeTicket
 );
 

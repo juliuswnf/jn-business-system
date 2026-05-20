@@ -60,7 +60,9 @@ const makeAuthMiddleware = () => {
     return next();
   };
 
-  return { protect, authorize };
+  const requireRole = (...allowedRoles) => authorize(...allowedRoles);
+
+  return { protect, authorize, requireRole };
 };
 
 jest.unstable_mockModule('../../models/ConsentForm.js', () => ({

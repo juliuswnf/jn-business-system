@@ -264,6 +264,41 @@ const salonSchema = new mongoose.Schema({
     }
   },
 
+  noShowSettings: {
+    reminders: {
+      enabled72h: {
+        type: Boolean,
+        default: true
+      },
+      enabled24h: {
+        type: Boolean,
+        default: true
+      },
+      enabled2h: {
+        type: Boolean,
+        default: true
+      }
+    },
+    autoMarkNoShowAfterMinutes: {
+      type: Number,
+      default: 30,
+      min: 5,
+      max: 240
+    },
+    highRiskThreshold: {
+      type: Number,
+      default: 3,
+      min: 1,
+      max: 20
+    },
+    depositPercentage: {
+      type: Number,
+      default: 30,
+      min: 0,
+      max: 100
+    }
+  },
+
   // ==================== STRIPE CONNECT ====================
   stripe: {
     // Existing subscription fields

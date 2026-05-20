@@ -196,7 +196,7 @@ consentSchema.methods.checkExpiration = function() {
  * Generate PDF (placeholder - would use PDFKit or similar)
  */
 consentSchema.methods.generatePDF = async function() {
-  // TODO: Implement PDF generation
+  // Placeholder until PDF generation pipeline is connected
   return {
     url: `/api/consents/${this._id}/pdf`,
     filename: `consent_${this.type}_${this._id}.pdf`

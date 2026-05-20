@@ -5,6 +5,7 @@
  */
 
 import express from 'express';
+import path from 'path';
 import {
   getBranding,
   updateBranding,
@@ -17,6 +18,8 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import { upload, validateImageDimensions, handleUploadError } from '../middleware/fileUploadMiddleware.js';
 
 const router = express.Router();
+const MAX_LOGO_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_LOGO_MIME_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
 
 // All routes require authentication (applied in server.js)
 router.use(authMiddleware.requireRole('salon_owner', 'ceo'));
@@ -43,6 +46,51 @@ router.put('/', updateBranding);
  */
 router.post('/logo', upload.single('logo'), handleUploadError, async (req, res, next) => {
   try {
+    if (req.file) {
+      if (!ALLOWED_LOGO_MIME_TYPES.has(req.file.mimetype)) {
+        const fs = await import('fs');
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (_unlinkError) {
+          // Ignore cleanup errors
+        }
+
+        return res.status(400).json({
+          success: false,
+          message: 'Nur JPEG, PNG oder WEBP sind erlaubt'
+        });
+      }
+
+      if (req.file.size > MAX_LOGO_SIZE_BYTES) {
+        const fs = await import('fs');
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (_unlinkError) {
+          // Ignore cleanup errors
+        }
+
+        return res.status(400).json({
+          success: false,
+          message: 'Datei zu groß. Maximal 5MB erlaubt'
+        });
+      }
+
+      const baseFilename = path.basename(req.file.filename);
+      if (baseFilename !== req.file.filename || req.file.filename.includes('..')) {
+        const fs = await import('fs');
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (_unlinkError) {
+          // Ignore cleanup errors
+        }
+
+        return res.status(400).json({
+          success: false,
+          message: 'Ungültiger Dateiname'
+        });
+      }
+    }
+
     // ? SECURITY FIX: Validate image dimensions with Sharp
     if (req.file) {
       await validateImageDimensions(req.file.path);

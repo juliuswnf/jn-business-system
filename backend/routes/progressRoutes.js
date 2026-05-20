@@ -14,18 +14,19 @@ import authMiddleware from '../middleware/authMiddleware.js';
 // ? SECURITY FIX: Use centralized file upload middleware
 import { upload, validateImageDimensions, handleUploadError } from '../middleware/fileUploadMiddleware.js';
 
-const { protect } = authMiddleware;
+const { protect, requireRole } = authMiddleware;
+const requireProgressRole = requireRole('salon_owner', 'employee', 'admin', 'ceo');
 
 const router = express.Router();
 
 // ==================== ROUTES ====================
 
 // Create progress entry (Protected - Trainer only)
-router.post('/', protect, createProgressEntry);
+router.post('/', protect, requireProgressRole, createProgressEntry);
 
 // Upload progress photos (Protected - Trainer only)
 // ? SECURITY FIX: Uses centralized file upload validation with Sharp dimension check
-router.post('/:id/photos', protect, upload.single('photo'), handleUploadError, async (req, res, next) => {
+router.post('/:id/photos', protect, requireProgressRole, upload.single('photo'), handleUploadError, async (req, res, next) => {
   try {
     // ? SECURITY FIX: Validate image dimensions with Sharp
     if (req.file) {
@@ -50,25 +51,25 @@ router.post('/:id/photos', protect, upload.single('photo'), handleUploadError, a
 }, uploadProgressPhotos);
 
 // Get client progress history (Protected)
-router.get('/client/:customerId', protect, getClientProgressHistory);
+router.get('/client/:customerId', protect, requireProgressRole, getClientProgressHistory);
 
 // Get progress summary (Protected)
-router.get('/client/:customerId/summary', protect, getProgressSummary);
+router.get('/client/:customerId/summary', protect, requireProgressRole, getProgressSummary);
 
 // Update progress entry (Protected - Trainer only)
-router.patch('/:id', protect, updateProgressEntry);
+router.patch('/:id', protect, requireProgressRole, updateProgressEntry);
 
 // Delete progress entry (Protected - Trainer only)
-router.delete('/:id', protect, deleteProgressEntry);
+router.delete('/:id', protect, requireProgressRole, deleteProgressEntry);
 
 // Get weight trend (Protected)
-router.get('/client/:customerId/weight-trend', protect, getWeightTrend);
+router.get('/client/:customerId/weight-trend', protect, requireProgressRole, getWeightTrend);
 
 // Get performance trend (Protected)
-router.get('/client/:customerId/performance-trend', protect, getPerformanceTrend);
+router.get('/client/:customerId/performance-trend', protect, requireProgressRole, getPerformanceTrend);
 
 // Get trainer statistics (Protected - Trainer only)
-router.get('/trainer/:trainerId/statistics', protect, getTrainerStatistics);
+router.get('/trainer/:trainerId/statistics', protect, requireProgressRole, getTrainerStatistics);
 
 export default router;
 

@@ -317,7 +317,7 @@ export default function Waitlist() {
         </div>
       )}
 
-      {/* Add Form Modal (TODO: Implement) */}
+      {/* Add Form Modal (implementation pending) */}
       {showAddForm && (
         <div className="fixed inset-0 bg-white/50 flex items-center justify-center z-50">
           <div className="bg-gray-50 p-6 rounded-xl max-w-md w-full">

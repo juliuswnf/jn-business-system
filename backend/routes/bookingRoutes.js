@@ -10,6 +10,7 @@ const router = express.Router();
 
 // All routes require authentication
 router.use(authMiddleware.protect);
+router.use(authMiddleware.requireRole('salon_owner', 'employee', 'ceo'));
 
 // Apply tenant filter to all list/query operations
 router.use(enforceTenantFilter);

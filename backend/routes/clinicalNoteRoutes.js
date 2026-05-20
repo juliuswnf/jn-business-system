@@ -9,7 +9,8 @@ import {
 } from '../controllers/clinicalNoteController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
-const { protect } = authMiddleware;
+const { protect, requireRole } = authMiddleware;
+const requireClinicalNoteRole = requireRole('salon_owner', 'employee', 'admin', 'ceo');
 
 const router = express.Router();
 
@@ -19,22 +20,22 @@ const router = express.Router();
 // ==================== ROUTES ====================
 
 // Create clinical note (Protected - Practitioner only)
-router.post('/', protect, createClinicalNote);
+router.post('/', protect, requireClinicalNoteRole, createClinicalNote);
 
 // Get clinical note by ID (Protected - Decrypts content + Audit Log)
-router.get('/:id', protect, getClinicalNote);
+router.get('/:id', protect, requireClinicalNoteRole, getClinicalNote);
 
 // Get all clinical notes for a patient (Protected - Batch access logged)
-router.get('/patient/:customerId', protect, getPatientClinicalNotes);
+router.get('/patient/:customerId', protect, requireClinicalNoteRole, getPatientClinicalNotes);
 
 // Update clinical note (Protected - Re-encrypts content)
-router.patch('/:id', protect, updateClinicalNote);
+router.patch('/:id', protect, requireClinicalNoteRole, updateClinicalNote);
 
 // Delete clinical note (Protected - Soft delete)
-router.delete('/:id', protect, deleteClinicalNote);
+router.delete('/:id', protect, requireClinicalNoteRole, deleteClinicalNote);
 
 // Share clinical note with another practitioner (Protected)
-router.post('/:id/share', protect, shareClinicalNote);
+router.post('/:id/share', protect, requireClinicalNoteRole, shareClinicalNote);
 
 export default router;
 

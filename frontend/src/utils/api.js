@@ -318,6 +318,17 @@ export const bookingAPI = {
   bulkImport: (data) => api.post('/bookings/bulk/import', data)
 };
 
+export const noShowAPI = {
+  getDashboard: (params) => api.get('/no-show/dashboard', { params }),
+  getRisk: (params) => api.get('/no-show/risk', { params }),
+  sendReminder: (bookingId, data = {}) => api.post(`/no-show/remind/${bookingId}`, data),
+  markNoShow: (bookingId) => api.patch(`/no-show/mark/${bookingId}`),
+  confirmToken: (token) => api.get(`/no-show/confirm/${token}`),
+  getSettings: (params) => api.get('/no-show/settings', { params }),
+  updateSettings: (data, params) => api.put('/no-show/settings', data, { params }),
+  getAnalytics: (params) => api.get('/no-show/analytics', { params })
+};
+
 export const serviceAPI = {
   getAll: async (params, forceRefresh = false) => {
     // Return cached data if available and not expired

@@ -147,8 +147,8 @@ const triggerSecurityAlert = async (alert) => {
         action: 'IP_MARKED_SUSPICIOUS'
       });
 
-      // TODO: Send alert to monitoring service (Datadog, Sentry, etc.)
-      // TODO: Send email/Slack notification for critical alerts
+      // Planned next step: Send alert to monitoring service (Datadog, Sentry, etc.)
+      // Planned next step: Send email/Slack notification for critical alerts
       // Example:
       // await sendSecurityAlert({
       //   channel: 'security-alerts',

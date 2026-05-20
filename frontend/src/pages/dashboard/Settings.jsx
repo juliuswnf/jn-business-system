@@ -4,8 +4,9 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
 import { salonAPI, api } from '../../utils/api';
 import { Link } from 'react-router-dom';
-import NoShowKillerSettings from './Settings/NoShowKiller';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import NoShowSettings from '../../components/settings/NoShowSettings';
+import NoShowAnalytics from '../../components/dashboard/NoShowAnalytics';
 
 const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 
@@ -113,7 +114,7 @@ export default function Settings() {
     { id: 'hours', label: 'Öffnungszeiten', icon: Clock },
     { id: 'integrations', label: 'Integrationen', icon: Star },
     { id: 'notifications', label: 'Benachrichtigungen', icon: Bell },
-    { id: 'noShowKiller', label: 'AUSFALL-SCHUTZ', icon: CreditCard }
+    { id: 'noShowKiller', label: 'NO-SHOW SYSTEM', icon: CreditCard }
   ];
 
   if (loading) return <LoadingSpinner />;
@@ -447,8 +448,13 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Ausfall-Schutz Tab */}
-        {activeTab === 'noShowKiller' && <NoShowKillerSettings />}
+        {/* No-Show System Tab */}
+        {activeTab === 'noShowKiller' && (
+          <div className="space-y-6">
+            <NoShowSettings />
+            <NoShowAnalytics />
+          </div>
+        )}
         </div>
       </div>
 

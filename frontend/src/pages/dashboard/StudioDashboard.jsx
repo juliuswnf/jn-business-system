@@ -9,6 +9,7 @@ import { useDashboardIndustry } from '../../hooks/useDashboardIndustry';
 import { salonAPI, bookingAPI } from '../../utils/api';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 import MobileBookingCard from '../../components/Dashboard/MobileBookingCard';
+import NoShowWidget from '../../components/dashboard/NoShowWidget';
 
 // Import branch-specific dashboards
 import TattooStudioDashboard from './dashboards/TattooStudioDashboard';
@@ -144,6 +145,8 @@ function DefaultSalonDashboard() {
           </div>
         ))}
       </div>
+
+      <NoShowWidget />
 
       <section className="bg-white rounded-xl border border-gray-200">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">

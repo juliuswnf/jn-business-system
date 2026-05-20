@@ -67,15 +67,7 @@ router.get('/live', (req, res) => {
 
 // Protect admin routes
 router.use(authMiddleware.protect);
-router.use((req, res, next) => {
-  if (req.user.role !== 'ceo' && req.user.role !== 'admin') {
-    return res.status(403).json({
-      success: false,
-      message: 'Admin access required'
-    });
-  }
-  next();
-});
+router.use(authMiddleware.requireRole('ceo', 'admin'));
 
 // Get detailed health status
 router.get('/health/detailed', async (req, res) => {

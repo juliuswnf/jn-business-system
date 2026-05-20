@@ -119,6 +119,35 @@ const customerSchema = new mongoose.Schema(
       default: 0
     },
 
+    noShowScore: {
+      type: Number,
+      default: 0,
+      min: 0,
+      index: true
+    },
+
+    noShowHistory: [{
+      bookingId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Booking',
+        required: true
+      },
+      date: {
+        type: Date,
+        default: Date.now
+      }
+    }],
+
+    totalCompletedBookings: {
+      type: Number,
+      default: 0
+    },
+
+    totalNoShows: {
+      type: Number,
+      default: 0
+    },
+
     // ==================== Financial ====================
     totalSpent: {
       type: Number,
@@ -241,6 +270,7 @@ customerSchema.index({ salonId: 1, lastName: 1, firstName: 1 });
 customerSchema.index({ salonId: 1, status: 1 });
 customerSchema.index({ salonId: 1, vipStatus: 1 });
 customerSchema.index({ salonId: 1, createdAt: -1 });
+customerSchema.index({ salonId: 1, noShowScore: -1 });
 
 // ==================== VIRTUALS ====================
 
@@ -263,12 +293,13 @@ customerSchema.virtual('noShowRate').get(function () {
 /**
  * Update booking statistics
  */
-customerSchema.methods.updateBookingStats = async function (type) {
+customerSchema.methods.updateBookingStats = async function (type, bookingId = null) {
   this.totalBookings += 1;
 
   switch (type) {
     case 'completed':
       this.completedBookings += 1;
+      this.totalCompletedBookings += 1;
       this.lastVisit = new Date();
       break;
     case 'canceled':
@@ -276,6 +307,14 @@ customerSchema.methods.updateBookingStats = async function (type) {
       break;
     case 'no-show':
       this.noShowCount += 1;
+      this.totalNoShows += 1;
+      this.noShowScore += 1;
+      if (bookingId && mongoose.isValidObjectId(bookingId)) {
+        this.noShowHistory.push({
+          bookingId: new mongoose.Types.ObjectId(bookingId),
+          date: new Date()
+        });
+      }
       break;
   }
 
@@ -324,33 +363,17 @@ customerSchema.statics.getVIPCustomers = function (salonId) {
 /**
  * Get high-risk no-show customers
  */
-customerSchema.statics.getHighRiskCustomers = function (salonId, threshold = 30) {
+customerSchema.statics.getHighRiskCustomers = function (salonId, threshold = 3) {
   return this.aggregate([
     {
       $match: {
         salonId: new mongoose.Types.ObjectId(salonId),
-        totalBookings: { $gte: 3 },
+        noShowScore: { $gte: threshold },
         status: 'active'
       }
     },
     {
-      $addFields: {
-        noShowRate: {
-          $cond: [
-            { $eq: ['$totalBookings', 0] },
-            0,
-            { $multiply: [{ $divide: ['$noShowCount', '$totalBookings'] }, 100] }
-          ]
-        }
-      }
-    },
-    {
-      $match: {
-        noShowRate: { $gte: threshold }
-      }
-    },
-    {
-      $sort: { noShowRate: -1 }
+      $sort: { noShowScore: -1, totalNoShows: -1 }
     }
   ]);
 };

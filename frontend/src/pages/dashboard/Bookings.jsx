@@ -69,8 +69,6 @@ export default function Bookings() {
     socketService.on('booking:cancelled', handleBookingUpdate);
     socketService.on('booking:noshow', handleBookingUpdate);
 
-    console.log('📡 Subscribed to real-time booking updates');
-
     // Cleanup on unmount
     return () => {
       socketService.off('booking:created');
@@ -86,8 +84,6 @@ export default function Bookings() {
    * Handle real-time booking updates from Socket.IO
    */
   const handleBookingUpdate = (data) => {
-    console.log('📡 Received booking update:', data);
-    
     // Show toast notification
     if (data.message) {
       toast.success(data.message);

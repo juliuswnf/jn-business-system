@@ -12,7 +12,7 @@ import logger from '../utils/logger.js';
  * Finds bookings marked as no_show where:
  *   - noShowFee.charged is NOT true
  *   - noShowFee.attemptedAt is null (never attempted) — prevents infinite retries
- *   - startTime is within the last 7 days (process only recent no-shows)
+ *   - bookingDate is within the last 7 days (process only recent no-shows)
  *   - stripeCustomerId and paymentMethodId are present (payment method stored)
  *   - noShowFeeAcceptance.accepted is true (customer accepted the policy)
  *
@@ -45,7 +45,7 @@ async function processNoShowCharges() {
       'noShowFeeAcceptance.accepted': true,
       stripeCustomerId: { $exists: true, $ne: null },
       paymentMethodId: { $exists: true, $ne: null },
-      startTime: { $gte: sevenDaysAgo, $lte: now }
+      bookingDate: { $gte: sevenDaysAgo, $lte: now }
     })
       .limit(100) // Process at most 100 per run to prevent overload
       .maxTimeMS(5000);

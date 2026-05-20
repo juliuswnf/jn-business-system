@@ -13,6 +13,7 @@ const router = express.Router();
 
 // Use protect middleware for authentication
 const authenticateSalon = authMiddleware.protect;
+const requirePricingRole = authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo');
 
 /**
  * Pricing Routes
@@ -42,12 +43,12 @@ router.get('/compare', compareTiersEndpoint);
 // ==================== AUTHENTICATED ROUTES ====================
 
 // Get current salon tier and subscription (authenticated)
-router.get('/current', authenticateSalon, getCurrentTier);
+router.get('/current', authenticateSalon, requirePricingRole, getCurrentTier);
 
 // Get SMS usage stats (authenticated, Enterprise only)
-router.get('/sms-usage', authenticateSalon, getSMSUsage);
+router.get('/sms-usage', authenticateSalon, requirePricingRole, getSMSUsage);
 
 // Check if salon has access to feature (authenticated)
-router.post('/check-feature', authenticateSalon, checkFeatureAccess);
+router.post('/check-feature', authenticateSalon, requirePricingRole, checkFeatureAccess);
 
 export default router;

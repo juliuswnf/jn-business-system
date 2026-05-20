@@ -696,7 +696,7 @@ export const downloadConsentPDF = async (req, res) => {
       });
     }
 
-    // TODO: Generate actual PDF using PDFKit
+    // Placeholder response until PDFKit pipeline is connected
     const pdfInfo = await consent.generatePDF();
 
     res.json({

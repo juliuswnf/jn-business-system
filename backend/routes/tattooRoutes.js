@@ -39,7 +39,7 @@ router.post('/sessions/:id/photos', authMiddleware.protect, authMiddleware.autho
 // ==================== CONSENTS ====================
 router.post('/consents', authMiddleware.protect, authMiddleware.authorize('salon_owner', 'ceo'), createConsent);
 router.get('/consents/:customerId', authMiddleware.protect, authMiddleware.authorize('salon_owner', 'ceo'), getCustomerConsents);
-router.post('/consents/:id/sign', authMiddleware.protect, signConsent); // Customers can also sign
+router.post('/consents/:id/sign', authMiddleware.protect, authMiddleware.authorize('customer', 'salon_owner', 'employee', 'admin', 'ceo'), signConsent); // Customers can also sign
 router.get('/consents/:id/pdf', authMiddleware.protect, authMiddleware.authorize('salon_owner', 'ceo'), downloadConsentPDF);
 
 // ==================== PORTFOLIO (Public) ====================

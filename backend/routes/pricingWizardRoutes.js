@@ -19,13 +19,13 @@ router.get('/questions', getQuestions);
  * POST /api/pricing-wizard/recommend
  * Get tier recommendation (public - works without auth)
  */
-router.post('/recommend', getRecommendation);
+router.post('/recommend', authMiddleware.optionalAuth, getRecommendation);
 
 /**
  * POST /api/pricing-wizard/save
  * Save user selection (optional auth)
  */
-router.post('/save', saveResponse);
+router.post('/save', authMiddleware.optionalAuth, saveResponse);
 
 /**
  * GET /api/pricing-wizard/analytics

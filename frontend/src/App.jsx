@@ -104,7 +104,8 @@ const PricingWizard = lazy(() => import('./pages/onboarding/PricingWizard'));
 
 // Public Booking (no auth required)
 const PublicBooking = lazy(() => import('./pages/booking/PublicBooking'));
-const BookingConfirmation = lazy(() => import('./pages/booking/BookingConfirmation'));
+const BookingSuccessPage = lazy(() => import('./pages/booking/BookingConfirmation'));
+const BookingConfirmationPage = lazy(() => import('./pages/BookingConfirmation'));
 const Salons = lazy(() => import('./pages/public/Salons'));
 
 // Error Pages
@@ -171,6 +172,11 @@ const CEODeviceRoute = ({ children }) => {
 const LegacyBookingRouteRedirect = () => {
   const { studioSlug } = useParams();
   return <Navigate to={`/s/${studioSlug}`} replace />;
+};
+
+const BookingRescheduleRedirect = () => {
+  const { token } = useParams();
+  return <Navigate to={`/booking/action/${token}?action=cancel`} replace />;
 };
 
 /**
@@ -254,7 +260,7 @@ const TierRoute = ({ children, requiredTier = 'starter', bypassRoles = ['ceo', '
  * Version: 2.0.0 MVP Professional
  */
 function App() {
-  // Removed console.log statements for production (Lighthouse Best Practices)
+  // Runtime debug statements removed for production (Lighthouse Best Practices)
 
   return (
     <HelmetProvider>
@@ -869,7 +875,15 @@ function App() {
         />
         <Route
           path="/booking/confirmation"
-          element={<LazyPage><BookingConfirmation /></LazyPage>}
+          element={<LazyPage><BookingSuccessPage /></LazyPage>}
+        />
+        <Route
+          path="/booking/confirm/:token"
+          element={<LazyPage><BookingConfirmationPage /></LazyPage>}
+        />
+        <Route
+          path="/booking/reschedule/:token"
+          element={<BookingRescheduleRedirect />}
         />
         <Route
           path="/booking/action/:token"

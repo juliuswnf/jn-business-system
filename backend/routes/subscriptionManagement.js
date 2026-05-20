@@ -16,11 +16,6 @@ const router = express.Router();
 
 // Use protect middleware for authentication
 const authenticateSalon = [authMiddleware.protect, checkSubscriptionStatus];
-const authenticateSubscriptionMutation = [
-  authMiddleware.protect,
-  authMiddleware.requireRole('salon_owner', 'ceo'),
-  checkSubscriptionStatus
-];
 
 /**
  * Subscription Management Routes
@@ -32,24 +27,24 @@ const authenticateSubscriptionMutation = [
 router.get('/status', authenticateSalon, getSubscriptionStatus);
 
 // Create new subscription
-router.post('/create', authenticateSubscriptionMutation, createSubscription);
+router.post('/create', authenticateSalon, authMiddleware.requireRole('salon_owner', 'ceo'), createSubscription);
 
 // Upgrade subscription
-router.post('/upgrade', authenticateSubscriptionMutation, upgradeSubscription);
+router.post('/upgrade', authenticateSalon, authMiddleware.requireRole('salon_owner', 'ceo'), upgradeSubscription);
 
 // Downgrade subscription
-router.post('/downgrade', authenticateSubscriptionMutation, downgradeSubscription);
+router.post('/downgrade', authenticateSalon, authMiddleware.requireRole('salon_owner', 'ceo'), downgradeSubscription);
 
 // Cancel subscription
-router.post('/cancel', authenticateSubscriptionMutation, cancelSubscription);
+router.post('/cancel', authenticateSalon, authMiddleware.requireRole('salon_owner', 'ceo'), cancelSubscription);
 
 // Setup SEPA Direct Debit (Enterprise only)
-router.post('/sepa/setup', authenticateSubscriptionMutation, setupSEPA);
+router.post('/sepa/setup', authenticateSalon, authMiddleware.requireRole('salon_owner', 'ceo'), setupSEPA);
 
 // Create invoice (Enterprise only)
-router.post('/invoice/create', authenticateSubscriptionMutation, createInvoice);
+router.post('/invoice/create', authenticateSalon, authMiddleware.requireRole('salon_owner', 'ceo'), createInvoice);
 
 // Convert trial to paid
-router.post('/trial/convert', authenticateSubscriptionMutation, convertTrialToPaid);
+router.post('/trial/convert', authenticateSalon, authMiddleware.requireRole('salon_owner', 'ceo'), convertTrialToPaid);
 
 export default router;

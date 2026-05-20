@@ -42,7 +42,7 @@ router.get('/export', protect, exportUserData);
 // @route   POST /api/gdpr/delete
 // @desc    Delete/Anonymize user data (Right to be Forgotten)
 // @access  Private
-router.post('/delete', protect, securityMiddleware.validateCSRFToken, validateBody(deleteAccountSchema), deleteUserData);
+router.post('/delete', protect, authorize('customer', 'employee', 'salon_owner', 'admin', 'ceo', 'business'), securityMiddleware.validateCSRFToken, validateBody(deleteAccountSchema), deleteUserData);
 
 // @route   GET /api/gdpr/retention-info
 // @desc    Get data retention policy information

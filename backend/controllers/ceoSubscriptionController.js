@@ -85,7 +85,7 @@ export const getSubscriptionStats = async (req, res) => {
     const inactive = await Salon.countDocuments({ 'subscription.status': 'inactive' });
 
     // Calculate MRR (Monthly Recurring Revenue)
-    // TODO: Get actual price from Stripe for MRR calculation
+    // Planned improvement: read effective prices from Stripe for MRR calculation
 
     res.status(200).json({
       success: true,

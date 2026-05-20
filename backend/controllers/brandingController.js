@@ -9,6 +9,9 @@
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
 
+const ALLOWED_FONT_FAMILIES = ['inter', 'roboto', 'open-sans', 'lato', 'montserrat', 'poppins'];
+const ALLOWED_BUTTON_STYLES = ['rounded', 'square', 'pill'];
+
 /**
  * Get current branding settings
  * GET /api/branding
@@ -74,6 +77,17 @@ export const getBranding = async (req, res) => {
 
 const COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
 
+const hasBodySalonId = (body) => Object.prototype.hasOwnProperty.call(body || {}, 'salonId');
+
+const sanitizeEnumValue = (rawValue, allowedValues) => {
+  if (typeof rawValue !== 'string') {
+    return null;
+  }
+
+  const normalizedValue = rawValue.trim().toLowerCase();
+  return allowedValues.find((allowedValue) => allowedValue === normalizedValue) || null;
+};
+
 function validateBrandingColors({ primaryColor, secondaryColor, accentColor }) {
   if (primaryColor && !COLOR_REGEX.test(primaryColor)) {
     return 'Ungültiges Farbformat für Primärfarbe. Verwenden Sie #RRGGBB.';
@@ -99,6 +113,13 @@ function checkBrandingPermissions(tier, showPoweredBy) {
 
 export const updateBranding = async (req, res) => {
   try {
+    if (hasBodySalonId(req.body)) {
+      return res.status(400).json({
+        success: false,
+        error: 'salonId must not be provided in request body'
+      });
+    }
+
     const salonId = req.user.salonId;
     const {
       primaryColor,
@@ -137,13 +158,35 @@ export const updateBranding = async (req, res) => {
       return res.status(400).json({ success: false, error: colorError });
     }
 
+    const safeFontFamily = typeof fontFamily === 'undefined'
+      ? undefined
+      : sanitizeEnumValue(fontFamily, ALLOWED_FONT_FAMILIES);
+
+    if (typeof fontFamily !== 'undefined' && !safeFontFamily) {
+      return res.status(400).json({
+        success: false,
+        error: 'Ungültige Schriftart'
+      });
+    }
+
+    const safeButtonStyle = typeof buttonStyle === 'undefined'
+      ? undefined
+      : sanitizeEnumValue(buttonStyle, ALLOWED_BUTTON_STYLES);
+
+    if (typeof buttonStyle !== 'undefined' && !safeButtonStyle) {
+      return res.status(400).json({
+        success: false,
+        error: 'Ungültiger Button-Stil'
+      });
+    }
+
     // Update branding
     const updates = {};
     if (primaryColor) updates['branding.primaryColor'] = primaryColor;
     if (secondaryColor) updates['branding.secondaryColor'] = secondaryColor;
     if (accentColor) updates['branding.accentColor'] = accentColor;
-    if (fontFamily) updates['branding.fontFamily'] = fontFamily;
-    if (buttonStyle) updates['branding.buttonStyle'] = buttonStyle;
+    if (safeFontFamily) updates['branding.fontFamily'] = safeFontFamily;
+    if (safeButtonStyle) updates['branding.buttonStyle'] = safeButtonStyle;
     if (typeof showPoweredBy === 'boolean') updates['branding.showPoweredBy'] = showPoweredBy;
 
     const updatedSalon = await Salon.findByIdAndUpdate(
@@ -174,6 +217,13 @@ export const updateBranding = async (req, res) => {
  */
 export const uploadLogo = async (req, res) => {
   try {
+    if (hasBodySalonId(req.body)) {
+      return res.status(400).json({
+        success: false,
+        error: 'salonId must not be provided in request body'
+      });
+    }
+
     const salonId = req.user.salonId;
 
     if (!salonId) {
@@ -191,7 +241,14 @@ export const uploadLogo = async (req, res) => {
     }
 
     const salon = await Salon.findById(salonId).maxTimeMS(5000);
-    const tier = salon?.subscription?.tier || 'starter';
+    if (!salon) {
+      return res.status(404).json({
+        success: false,
+        error: 'Salon nicht gefunden'
+      });
+    }
+
+    const tier = salon.subscription?.tier || 'starter';
 
     if (tier === 'starter') {
       return res.status(403).json({
@@ -229,6 +286,13 @@ export const uploadLogo = async (req, res) => {
  */
 export const deleteLogo = async (req, res) => {
   try {
+    if (hasBodySalonId(req.body)) {
+      return res.status(400).json({
+        success: false,
+        error: 'salonId must not be provided in request body'
+      });
+    }
+
     const salonId = req.user.salonId;
 
     if (!salonId) {
@@ -263,6 +327,13 @@ export const deleteLogo = async (req, res) => {
  */
 export const resetBranding = async (req, res) => {
   try {
+    if (hasBodySalonId(req.body)) {
+      return res.status(400).json({
+        success: false,
+        error: 'salonId must not be provided in request body'
+      });
+    }
+
     const salonId = req.user.salonId;
 
     if (!salonId) {

@@ -1,6 +1,60 @@
 ﻿import { PRICING_TIERS, FEATURE_NAMES, compareTiers } from '../config/pricing.js';
 import smsService from '../services/smsService.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
+import Salon from '../models/Salon.js';
+
+const ALLOWED_TIERS = Object.keys(PRICING_TIERS);
+const ALLOWED_FEATURES = Object.keys(FEATURE_NAMES);
+
+const resolveScopedSalon = async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ success: false, message: 'Nicht authentifiziert' });
+    return null;
+  }
+
+  let targetSalonId;
+
+  if (req.user.role === 'ceo') {
+    const rawSalonId = req.query?.salonId;
+
+    if (!rawSalonId) {
+      res.status(400).json({
+        success: false,
+        message: 'salonId query parameter is required for CEO requests'
+      });
+      return null;
+    }
+
+    if (!mongoose.isValidObjectId(rawSalonId)) {
+      res.status(400).json({ success: false, message: 'Invalid salonId format' });
+      return null;
+    }
+
+    targetSalonId = new mongoose.Types.ObjectId(rawSalonId);
+  } else {
+    const trustedSalonId = req.user.salonId;
+
+    if (!trustedSalonId) {
+      res.status(403).json({
+        success: false,
+        message: 'Access denied - No salon assigned to your account'
+      });
+      return null;
+    }
+
+    targetSalonId = new mongoose.Types.ObjectId(trustedSalonId);
+  }
+
+  const salon = await Salon.findById(targetSalonId).maxTimeMS(5000);
+
+  if (!salon) {
+    res.status(404).json({ success: false, message: 'Salon not found' });
+    return null;
+  }
+
+  return salon;
+};
 
 /**
  * Pricing Controller - Handle pricing tier and feature access
@@ -51,15 +105,8 @@ export const getPricingTiers = async (req, res) => {
 // Get current salon tier and features (authenticated)
 export const getCurrentTier = async (req, res) => {
   try {
-    const { salon } = req;
-
-    if (!salon) {
-      return res.status(401).json({
-        success: false,
-        error: 'Not authenticated',
-        message: 'Please log in to view your subscription'
-      });
-    }
+    const salon = await resolveScopedSalon(req, res);
+    if (!salon) return;
 
     // Get tier configuration
     const tierConfig = PRICING_TIERS[salon.subscription.tier || 'starter'];
@@ -140,15 +187,8 @@ export const getFeatureComparison = async (req, res) => {
 // Get SMS usage stats (authenticated, Enterprise only)
 export const getSMSUsage = async (req, res) => {
   try {
-    const { salon } = req;
-
-    if (!salon) {
-      return res.status(401).json({
-        success: false,
-        error: 'Not authenticated',
-        message: 'Please log in to view SMS usage'
-      });
-    }
+    const salon = await resolveScopedSalon(req, res);
+    if (!salon) return;
 
     // Check if salon has SMS feature
     if (!salon.hasFeature('smsNotifications')) {
@@ -182,22 +222,26 @@ export const getSMSUsage = async (req, res) => {
 // Check if salon has access to feature (authenticated)
 export const checkFeatureAccess = async (req, res) => {
   try {
-    const { salon } = req;
-    const { feature } = req.body;
+    const salon = await resolveScopedSalon(req, res);
+    if (!salon) return;
 
-    if (!salon) {
-      return res.status(401).json({
-        success: false,
-        error: 'Not authenticated',
-        message: 'Please log in to check feature access'
-      });
-    }
+    const rawFeature = req.body?.feature;
 
-    if (!feature) {
+    if (!rawFeature || typeof rawFeature !== 'string' || rawFeature.length > 64) {
       return res.status(400).json({
         success: false,
         error: 'Missing parameter',
         message: 'Feature name is required'
+      });
+    }
+
+    // Resolve from static allow-list to avoid tainted dynamic lookups.
+    const feature = ALLOWED_FEATURES.find((allowedFeature) => allowedFeature === rawFeature);
+
+    if (!feature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid feature key'
       });
     }
 
@@ -238,14 +282,21 @@ export const checkFeatureAccess = async (req, res) => {
 // Get tier comparison (which tier is higher)
 export const compareTiersEndpoint = async (req, res) => {
   try {
-    const { tier1, tier2 } = req.query;
+    const { tier1: rawTier1, tier2: rawTier2 } = req.query;
 
-    if (!tier1 || !tier2) {
+    if (!rawTier1 || !rawTier2 || typeof rawTier1 !== 'string' || typeof rawTier2 !== 'string') {
       return res.status(400).json({
         success: false,
         error: 'Missing parameters',
         message: 'Both tier1 and tier2 are required'
       });
+    }
+
+    const tier1 = ALLOWED_TIERS.find((tier) => tier === rawTier1);
+    const tier2 = ALLOWED_TIERS.find((tier) => tier === rawTier2);
+
+    if (!tier1 || !tier2) {
+      return res.status(400).json({ success: false, message: 'Invalid tier value' });
     }
 
     const comparison = compareTiers(tier1, tier2);

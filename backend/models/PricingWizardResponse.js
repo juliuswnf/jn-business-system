@@ -1,6 +1,14 @@
 import mongoose from 'mongoose';
 
 const pricingWizardResponseSchema = new mongoose.Schema({
+  // Tenant binding (set for authenticated salon users)
+  salonId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Salon',
+    default: null,
+    index: true
+  },
+
   // User Reference (optional - can be anonymous)
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -14,6 +22,20 @@ const pricingWizardResponseSchema = new mongoose.Schema({
     type: String,
     required: true,
     index: true
+  },
+
+  // Ownership binding for anonymous sessions
+  ownerFingerprint: {
+    type: String,
+    required: true,
+    index: true
+  },
+
+  // Secret write token hash to prevent foreign session overwrite
+  writeTokenHash: {
+    type: String,
+    required: true,
+    select: false
   },
 
   // User Answers
@@ -105,6 +127,8 @@ pricingWizardResponseSchema.index({ createdAt: -1 });
 pricingWizardResponseSchema.index({ recommendedTier: 1, converted: 1 });
 pricingWizardResponseSchema.index({ selectedTier: 1, converted: 1 });
 pricingWizardResponseSchema.index({ sessionId: 1, createdAt: -1 });
+pricingWizardResponseSchema.index({ sessionId: 1, ownerFingerprint: 1, createdAt: -1 });
+pricingWizardResponseSchema.index({ sessionId: 1, userId: 1, createdAt: -1 });
 
 // Methods
 pricingWizardResponseSchema.methods.markConverted = async function(selectedTier) {

@@ -26,6 +26,7 @@ const PricingWizard = () => {
     budget: null
   });
   const [recommendation, setRecommendation] = useState(null);
+  const [writeToken, setWriteToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [sessionId] = useState(() => {
@@ -114,6 +115,7 @@ const PricingWizard = () => {
 
       if (data.success) {
         setRecommendation(data.data);
+        setWriteToken(data.data?.writeToken || null);
         setCurrentStep(totalSteps + 1); // Move to recommendation view
       } else {
         throw new Error(data.message || 'Failed to get recommendation');
@@ -139,6 +141,7 @@ const PricingWizard = () => {
         body: JSON.stringify({
           sessionId,
           selectedTier: tier,
+          writeToken,
           converted: true
         })
       });

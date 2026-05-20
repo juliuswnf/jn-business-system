@@ -15,7 +15,8 @@ import {
 import authMiddleware from '../middleware/authMiddleware.js';
 import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
 
-const { protect } = authMiddleware;
+const { protect, requireRole } = authMiddleware;
+const requirePortfolioRole = requireRole('salon_owner', 'employee', 'admin', 'ceo');
 
 const router = express.Router();
 
@@ -67,7 +68,7 @@ const upload = multer({
 
 // Create/Upload portfolio item (Protected - Artist only)
 // ? SECURITY FIX: Uses centralized file upload validation with Sharp dimension check
-router.post('/upload', protect, checkFeatureAccess('portfolioManagement'), upload.single('image'), async (req, res, next) => {
+router.post('/upload', protect, requirePortfolioRole, checkFeatureAccess('portfolioManagement'), upload.single('image'), async (req, res, next) => {
   try {
     // ? SECURITY FIX: Validate image dimensions with Sharp
     if (req.file) {
@@ -99,13 +100,13 @@ router.get('/salon/:salonId', getPublicPortfolio);
 router.get('/artist/:artistId', getArtistPortfolio);
 
 // Update portfolio item (Protected - Artist only)
-router.patch('/:id', protect, checkFeatureAccess('portfolioManagement'), updatePortfolioItem);
+router.patch('/:id', protect, requirePortfolioRole, checkFeatureAccess('portfolioManagement'), updatePortfolioItem);
 
 // Delete portfolio item (Protected - Artist only)
-router.delete('/:id', protect, checkFeatureAccess('portfolioManagement'), deletePortfolioItem);
+router.delete('/:id', protect, requirePortfolioRole, checkFeatureAccess('portfolioManagement'), deletePortfolioItem);
 
 // Toggle featured status (Protected - Artist only)
-router.patch('/:id/feature', protect, checkFeatureAccess('portfolioManagement'), toggleFeatured);
+router.patch('/:id/feature', protect, requirePortfolioRole, checkFeatureAccess('portfolioManagement'), toggleFeatured);
 
 // Increment view count (Public)
 router.post('/:id/view', incrementViews);

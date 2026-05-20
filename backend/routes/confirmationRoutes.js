@@ -6,13 +6,14 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
+const requireConfirmationRole = authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo');
 
 /**
  * @route   POST /api/confirmations/:bookingId
  * @desc    Create a booking confirmation (48h requirement)
  * @access  Private (called by confirmationSenderWorker)
  */
-router.post('/:bookingId', authMiddleware.protect, async (req, res) => {
+router.post('/:bookingId', authMiddleware.protect, requireConfirmationRole, async (req, res) => {
   try {
     const { bookingId } = req.params;
 
@@ -183,7 +184,7 @@ router.get('/confirm/:token', async (req, res) => {
  * @desc    Get confirmation status for a booking
  * @access  Private (authenticated)
  */
-router.get('/:bookingId', authMiddleware.protect, async (req, res) => {
+router.get('/:bookingId', authMiddleware.protect, requireConfirmationRole, async (req, res) => {
   try {
     const { bookingId } = req.params;
 

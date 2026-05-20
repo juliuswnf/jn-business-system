@@ -1,6 +1,21 @@
 import * as Sentry from '@sentry/node';
-import { nodeProfilingIntegration } from '@sentry/profiling-node';
+import { createRequire } from 'module';
 import logger from '../utils/logger.js';
+
+const require = createRequire(import.meta.url);
+
+const getOptionalProfilingIntegration = () => {
+  try {
+    const profilingModule = require('@sentry/profiling-node');
+    if (typeof profilingModule.nodeProfilingIntegration === 'function') {
+      return profilingModule.nodeProfilingIntegration();
+    }
+  } catch (error) {
+    logger.warn('Sentry profiling integration unavailable, continuing without CPU profiler:', error.message);
+  }
+
+  return null;
+};
 
 /**
  * Sentry Configuration
@@ -13,6 +28,19 @@ export const initSentry = (app) => {
 
   if (sentryEnabled) {
     try {
+      const integrations = [
+        new Sentry.Integrations.Http({ tracing: true }),
+        new Sentry.Integrations.Express({ app }),
+        new Sentry.Integrations.Mongo({
+          useMongoose: true
+        })
+      ];
+
+      const profilingIntegration = getOptionalProfilingIntegration();
+      if (profilingIntegration) {
+        integrations.push(profilingIntegration);
+      }
+
       Sentry.init({
         dsn: process.env.SENTRY_DSN,
         environment: process.env.NODE_ENV || 'development',
@@ -27,14 +55,7 @@ export const initSentry = (app) => {
         autoSessionTracking: true,
 
         // Integrations
-        integrations: [
-          new Sentry.Integrations.Http({ tracing: true }),
-          new Sentry.Integrations.Express({ app }),
-          new Sentry.Integrations.Mongo({
-            useMongoose: true
-          }),
-          nodeProfilingIntegration()
-        ],
+        integrations,
 
         // Don't send sensitive data
         beforeSend(event, _hint) {

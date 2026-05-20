@@ -13,7 +13,6 @@ class SocketService {
    */
     connect(token = null) {
     if (this.socket && this.connected) {
-      console.log('Socket already connected');
       return;
     }
 
@@ -36,23 +35,24 @@ class SocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket.IO connected:', this.socket.id);
       this.connected = true;
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('❌ Socket.IO disconnected:', reason);
       this.connected = false;
+
+      // Reconnect is handled by socket.io itself. Ignore expected client-side disconnects.
+      if (reason === 'io client disconnect') {
+        return;
+      }
     });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('Socket.IO connection error:', error.message);
+    this.socket.on('connect_error', () => {
       this.connected = false;
     });
 
     // Re-attach all existing listeners when reconnecting
     this.socket.on('reconnect', () => {
-      console.log('🔄 Socket.IO reconnected, re-attaching listeners');
       this.listeners.forEach((callback, event) => {
         this.socket.on(event, callback);
       });
@@ -68,7 +68,6 @@ class SocketService {
       this.socket = null;
       this.connected = false;
       this.listeners.clear();
-      console.log('Socket.IO disconnected manually');
     }
   }
 
@@ -79,7 +78,6 @@ class SocketService {
    */
   on(event, callback) {
     if (!this.socket) {
-      console.warn(`Cannot subscribe to ${event}: Socket not connected`);
       return;
     }
 
@@ -110,7 +108,6 @@ class SocketService {
    */
   emit(event, data) {
     if (!this.socket || !this.connected) {
-      console.warn(`Cannot emit ${event}: Socket not connected`);
       return;
     }
 

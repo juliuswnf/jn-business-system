@@ -40,9 +40,9 @@ router.get('/:id/pdf', protect, downloadConsentPDF);
 router.post('/:id/witness', protect, authorize('salon_owner', 'employee', 'admin', 'ceo'), addWitnessSignature);
 
 // Revoke consent (Protected)
-router.patch('/:id/revoke', protect, revokeConsent);
+router.patch('/:id/revoke', protect, authorize('salon_owner', 'employee', 'admin', 'ceo', 'customer'), revokeConsent);
 // Backward compatibility for existing clients using POST
-router.post('/:id/revoke', protect, revokeConsent);
+router.post('/:id/revoke', protect, authorize('salon_owner', 'employee', 'admin', 'ceo', 'customer'), revokeConsent);
 
 // Get consent by ID (Protected)
 router.get('/:id', protect, getConsentById);

@@ -265,6 +265,65 @@ const bookingSchema = new mongoose.Schema(
       index: true // ? Performance optimization
     },
 
+    confirmationStatus: {
+      type: String,
+      enum: ['pending', 'confirmed', 'cancelled', 'no_response'],
+      default: 'pending',
+      index: true
+    },
+
+    confirmationToken: {
+      type: String,
+      default: null,
+      select: false
+    },
+
+    confirmationTokenExpiry: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    remindersSent: [{
+      type: {
+        type: String,
+        enum: ['72h', '24h', '2h', 'manual'],
+        required: true
+      },
+      sentAt: {
+        type: Date,
+        default: Date.now
+      },
+      channel: {
+        type: String,
+        enum: ['email', 'sms'],
+        default: 'email'
+      }
+    }],
+
+    depositRequired: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+
+    depositAmount: {
+      type: Number,
+      min: 0,
+      default: null,
+      comment: 'Deposit amount in cents'
+    },
+
+    depositPaymentIntentId: {
+      type: String,
+      default: null
+    },
+
+    depositRefunded: {
+      type: Boolean,
+      default: false
+    },
+
     notes: {
       type: String,
       trim: true,
@@ -541,6 +600,7 @@ bookingSchema.index({ customerId: 1, bookingDate: -1 }); // ? Customer booking h
 bookingSchema.index({ salonId: 1, createdAt: -1 }); // ? Recent bookings per salon
 bookingSchema.index({ paymentStatus: 1, bookingDate: 1 }); // ? Payment tracking
 bookingSchema.index({ salonId: 1, customerId: 1, bookingDate: -1 });
+bookingSchema.index({ confirmationToken: 1 }, { sparse: true });
 
 // Keep sparse unique idempotency index safe by unsetting empty/null values.
 bookingSchema.pre('validate', function(next) {
@@ -614,6 +674,9 @@ bookingSchema.virtual('canCancel').get(function() {
 
 bookingSchema.methods.confirm = async function() {
   this.status = 'confirmed';
+  this.confirmationStatus = 'confirmed';
+  this.confirmationToken = null;
+  this.confirmationTokenExpiry = null;
   this.confirmedAt = new Date();
   return await this.save();
 };
@@ -626,6 +689,8 @@ bookingSchema.methods.cancel = async function() {
 
 bookingSchema.methods.markNoShow = async function() {
   this.status = 'no_show';
+  this.confirmationStatus = 'no_response';
+  this.noShowMarkedAt = new Date();
   return await this.save();
 };
 

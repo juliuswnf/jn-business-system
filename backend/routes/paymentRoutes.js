@@ -5,7 +5,6 @@ import paymentController from '../controllers/paymentController.js';
 import { paymentLimiter } from '../middleware/rateLimiterMiddleware.js';
 
 const router = express.Router();
-const requirePaymentRole = authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo');
 
 // ==================== PAYMENT INTENT (Booking Payments) ====================
 
@@ -13,7 +12,7 @@ const requirePaymentRole = authMiddleware.requireRole('salon_owner', 'employee',
 router.post(
   '/intent',
   authMiddleware.protect,
-  requirePaymentRole,
+  authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo'),
   securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for payments
   paymentLimiter,
   securityMiddleware.validateContentType,
@@ -24,7 +23,7 @@ router.post(
 router.post(
   '/process',
   authMiddleware.protect,
-  requirePaymentRole,
+  authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo'),
   securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for payments
   paymentLimiter,
   securityMiddleware.validateContentType,
@@ -37,7 +36,7 @@ router.post(
 router.get(
   '/history',
   authMiddleware.protect,
-  requirePaymentRole,
+  authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo'),
   paymentController.getPaymentHistory
 );
 
@@ -45,7 +44,7 @@ router.get(
 router.get(
   '/:paymentId',
   authMiddleware.protect,
-  requirePaymentRole,
+  authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo'),
   paymentController.getPaymentDetails
 );
 
@@ -55,7 +54,7 @@ router.get(
 router.post(
   '/refund',
   authMiddleware.protect,
-  requirePaymentRole,
+  authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo'),
   securityMiddleware.validateCSRFToken, // ? SECURITY FIX: CSRF protection for refunds
   paymentLimiter,
   securityMiddleware.validateContentType,
@@ -68,7 +67,7 @@ router.post(
 router.get(
   '/analytics/revenue',
   authMiddleware.protect,
-  requirePaymentRole,
+  authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo'),
   paymentController.getRevenueAnalytics
 );
 

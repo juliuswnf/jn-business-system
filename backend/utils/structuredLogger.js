@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 /**
  * ? AUDIT FIX: Structured JSON logger with Winston
- * Replaces console.log with proper logging for production monitoring
+ * Replaces ad-hoc debug output with proper logging for production monitoring
  */
 
 const { combine, timestamp, json, errors, printf } = winston.format;

@@ -8,6 +8,8 @@ import logger from '../utils/logger.js';
 import mongoose from 'mongoose';
 
 const router = express.Router();
+const requireWaitlistManagerRole = authMiddleware.requireRole('salon_owner', 'employee', 'admin', 'ceo');
+const requireWaitlistActorRole = authMiddleware.requireRole('customer', 'salon_owner', 'employee', 'admin', 'ceo');
 
 const isPrivilegedRole = (role) => ['ceo', 'admin'].includes(role);
 
@@ -257,7 +259,7 @@ router.post('/', requirePublicWaitlistFeature, async (req, res) => {
  * @desc    Get all active waitlist entries for a salon (sorted by priority)
  * @access  Private (salon owner only)
  */
-router.get('/:salonId', authMiddleware.protect, requireWaitlistFeature, async (req, res) => {
+router.get('/:salonId', authMiddleware.protect, requireWaitlistManagerRole, requireWaitlistFeature, async (req, res) => {
   try {
     const { salonId } = req.params;
 
@@ -366,7 +368,7 @@ router.get('/customer/:customerId/:salonId', async (req, res) => {
  * @desc    Update waitlist entry (e.g., change preferred time)
  * @access  Private (customer or salon owner)
  */
-router.put('/:id', authMiddleware.protect, requireWaitlistFeature, async (req, res) => {
+router.put('/:id', authMiddleware.protect, requireWaitlistActorRole, requireWaitlistFeature, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -425,7 +427,7 @@ router.put('/:id', authMiddleware.protect, requireWaitlistFeature, async (req, r
  * @desc    Remove customer from waitlist
  * @access  Private (customer or salon owner)
  */
-router.delete('/:id', authMiddleware.protect, requireWaitlistFeature, async (req, res) => {
+router.delete('/:id', authMiddleware.protect, requireWaitlistActorRole, requireWaitlistFeature, async (req, res) => {
   try {
     const { id } = req.params;
 
