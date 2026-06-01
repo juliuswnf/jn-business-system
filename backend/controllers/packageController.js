@@ -178,16 +178,17 @@ export const purchasePackage = async (req, res) => {
     const safePackageId = new mongoose.Types.ObjectId(id);
     const safeCustomerId = new mongoose.Types.ObjectId(customerId);
 
-    const pkg = await Package.findById(safePackageId).maxTimeMS(5000);
-    if (!pkg) {
-      return res.status(404).json({ success: false, message: 'Package not found' });
+    const pkgFilter = { _id: safePackageId };
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      pkgFilter.salonId = req.user.salonId;
     }
 
-    if (req.user?.role !== 'ceo' && pkg.salonId?.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    const pkg = await Package.findOne(pkgFilter).maxTimeMS(5000);
+    if (!pkg) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
     if (!pkg.isActive) {
@@ -324,16 +325,17 @@ export const usePackageSession = async (req, res) => {
     }
     const safeBookingId = bookingId ? new mongoose.Types.ObjectId(bookingId) : null;
 
-    const customerPackage = await CustomerPackage.findById(safeCustomerPackageId).maxTimeMS(5000);
-    if (!customerPackage) {
-      return res.status(404).json({ success: false, message: 'Package not found' });
+    const cpUseFilter = { _id: safeCustomerPackageId };
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      cpUseFilter.salonId = req.user.salonId;
     }
 
-    if (req.user?.role !== 'ceo' && customerPackage.salonId?.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    const customerPackage = await CustomerPackage.findOne(cpUseFilter).maxTimeMS(5000);
+    if (!customerPackage) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
     if (safeBookingId) {
@@ -384,16 +386,17 @@ export const cancelPackage = async (req, res) => {
     }
     const safeCustomerPackageId = new mongoose.Types.ObjectId(id);
 
-    const customerPackage = await CustomerPackage.findById(safeCustomerPackageId).maxTimeMS(5000);
-    if (!customerPackage) {
-      return res.status(404).json({ success: false, message: 'Package not found' });
+    const cpCancelFilter = { _id: safeCustomerPackageId };
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      cpCancelFilter.salonId = req.user.salonId;
     }
 
-    if (req.user?.role !== 'ceo' && customerPackage.salonId?.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    const customerPackage = await CustomerPackage.findOne(cpCancelFilter).maxTimeMS(5000);
+    if (!customerPackage) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
     if (customerPackage.status !== 'active') {
@@ -431,14 +434,22 @@ export const updatePackage = async (req, res) => {
 
     const safePackageId = new mongoose.Types.ObjectId(id);
 
-    const pkg = await Package.findById(safePackageId).maxTimeMS(5000);
+    const pkgUpdateFilter = { _id: safePackageId };
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      pkgUpdateFilter.salonId = req.user.salonId;
+    }
+
+    const pkg = await Package.findOne(pkgUpdateFilter).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
-    // Verify authorization
+    // Verify ownership
     const salon = await Salon.findById(pkg.salonId).maxTimeMS(5000);
-    if (salon.owner.toString() !== userId) {
+    if (!salon || salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -472,14 +483,22 @@ export const deletePackage = async (req, res) => {
 
     const safePackageId = new mongoose.Types.ObjectId(id);
 
-    const pkg = await Package.findById(safePackageId).maxTimeMS(5000);
+    const pkgDeleteFilter = { _id: safePackageId };
+    if (req.user?.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      pkgDeleteFilter.salonId = req.user.salonId;
+    }
+
+    const pkg = await Package.findOne(pkgDeleteFilter).maxTimeMS(5000);
     if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
-    // Verify authorization
+    // Verify ownership
     const salon = await Salon.findById(pkg.salonId).maxTimeMS(5000);
-    if (salon.owner.toString() !== userId) {
+    if (!salon || salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -508,7 +527,19 @@ export const getPackageStatistics = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
 
-    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    let safeSalonId;
+    if (['ceo', 'admin'].includes(req.user?.role)) {
+      safeSalonId = new mongoose.Types.ObjectId(salonId);
+    } else {
+      const trustedSalonId = req.user?.salonId;
+      if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      if (String(salonId) !== String(trustedSalonId)) {
+        return res.status(403).json({ success: false, message: 'Access denied - salonId must match authenticated tenant' });
+      }
+      safeSalonId = new mongoose.Types.ObjectId(String(trustedSalonId));
+    }
 
     // Verify authorization
     const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);

@@ -63,19 +63,19 @@ export const createPaymentIntent = async (req, res) => {
     }
     const safeBookingId = new mongoose.Types.ObjectId(bookingId);
 
-    const booking = await Booking.findById(safeBookingId).maxTimeMS(5000);
+    const bookingFilter = { _id: safeBookingId };
+    if (req.user.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      bookingFilter.salonId = req.user.salonId;
+    }
+
+    const booking = await Booking.findOne(bookingFilter).maxTimeMS(5000);
     if (!booking) {
       return res.status(404).json({
         success: false,
         message: 'Booking not found'
-      });
-    }
-
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (req.user.role !== 'ceo' && booking.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -164,21 +164,21 @@ export const processPayment = async (req, res) => {
     }
 
     // First check booking ownership before processing payment
-    const bookingCheck = await Booking.findById(safeBookingId).maxTimeMS(5000).session(session);
+    const bookingFilter = { _id: safeBookingId };
+    if (req.user.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        await session.abortTransaction();
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      bookingFilter.salonId = req.user.salonId;
+    }
+
+    const bookingCheck = await Booking.findOne(bookingFilter).maxTimeMS(5000).session(session);
     if (!bookingCheck) {
       await session.abortTransaction();
       return res.status(404).json({
         success: false,
         message: 'Booking not found'
-      });
-    }
-
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (req.user.role !== 'ceo' && bookingCheck.salonId.toString() !== req.user.salonId?.toString()) {
-      await session.abortTransaction();
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
       });
     }
 
@@ -347,24 +347,13 @@ export const refundPayment = async (req, res) => {
         message: 'Payment not found'
       });
     }
-
-    // ? SECURITY FIX: Authorization check - prevent cross-tenant refund IDOR
-    const booking = await Booking.findById(payment.bookingId)
-      .select('salonId')
-      .maxTimeMS(5000);
-
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: 'Booking not found for payment'
-      });
-    }
-
-    if (req.user.role !== 'ceo' && booking.salonId?.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (req.user.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      if (payment.salonId?.toString() !== req.user.salonId?.toString()) {
+        return res.status(403).json({ success: false, message: 'Access denied - Payment belongs to another salon' });
+      }
     }
 
     if (payment.status === 'refunded') {
@@ -661,8 +650,7 @@ export const getPaymentDetails = async (req, res) => {
     }
     const safePaymentId = new mongoose.Types.ObjectId(paymentId);
 
-    const payment = await Payment.findById(safePaymentId)
-      .populate('bookingId', 'salonId').maxTimeMS(5000);
+    const payment = await Payment.findById(safePaymentId).maxTimeMS(5000);
 
     if (!payment) {
       return res.status(404).json({
@@ -670,13 +658,13 @@ export const getPaymentDetails = async (req, res) => {
         message: 'Payment not found'
       });
     }
-
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (req.user.role !== 'ceo' && payment.bookingId?.salonId?.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    if (req.user.role !== 'ceo') {
+      if (!req.user?.salonId) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      if (payment.salonId?.toString() !== req.user.salonId?.toString()) {
+        return res.status(403).json({ success: false, message: 'Access denied - Payment belongs to another salon' });
+      }
     }
 
     res.status(200).json({

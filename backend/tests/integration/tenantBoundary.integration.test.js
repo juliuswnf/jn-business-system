@@ -371,11 +371,9 @@ describe('Tenant boundary integration: Payments', () => {
   it('returns 403 for cross-tenant payment details access', async () => {
     const app = createAppWithPaymentRoutes();
     mockPaymentFindById.mockReturnValue({
-      populate: jest.fn().mockReturnValue({
-        maxTimeMS: jest.fn().mockResolvedValue({
-          _id: PAYMENT_1_ID,
-          bookingId: { salonId: SALON_B_ID }
-        })
+      maxTimeMS: jest.fn().mockResolvedValue({
+        _id: PAYMENT_1_ID,
+        salonId: SALON_B_ID
       })
     });
 
@@ -395,14 +393,8 @@ describe('Tenant boundary integration: Payments', () => {
           amount: 120,
           status: 'completed',
           refundedAmount: 0,
-          stripePaymentIntentId: 'pi_123'
-        })
-      });
-      mockBookingFindById.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          maxTimeMS: jest.fn().mockResolvedValue({
-            salonId: SALON_B_ID
-          })
+          stripePaymentIntentId: 'pi_123',
+          salonId: SALON_B_ID
         })
       });
 
