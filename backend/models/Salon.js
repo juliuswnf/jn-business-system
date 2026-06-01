@@ -25,7 +25,8 @@ const salonSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    maxlength: 120
   },
   slug: {
     type: String,
@@ -33,6 +34,7 @@ const salonSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
+    maxlength: 160,
     match: /^[a-z0-9-]+$/
   },
   owner: {
@@ -70,6 +72,7 @@ const salonSchema = new mongoose.Schema({
   customBusinessTypeName: {
     type: String,
     trim: true,
+    maxlength: 80,
     default: null,
     comment: 'Custom business type name for "other" category'
   },
@@ -78,16 +81,19 @@ const salonSchema = new mongoose.Schema({
     service: {
       type: String,
       default: 'Service',
+      maxlength: 40,
       comment: 'e.g., "Treatment", "Session", "Tattoo"'
     },
     staff: {
       type: String,
       default: 'Stylist',
+      maxlength: 40,
       comment: 'e.g., "Artist", "Practitioner", "Trainer"'
     },
     appointment: {
       type: String,
       default: 'Appointment',
+      maxlength: 40,
       comment: 'e.g., "Session", "Consultation", "Visit"'
     }
   },
@@ -122,11 +128,13 @@ const salonSchema = new mongoose.Schema({
     required: true,
     lowercase: true,
     trim: true,
+    maxlength: 255,
     match: [EMAIL_REGEX, 'Valid email required']
   },
   phone: {
     type: String,
     trim: true,
+    maxlength: 32,
     match: [PHONE_REGEX, 'Valid phone number required']
   },
   address: {
@@ -177,6 +185,7 @@ const salonSchema = new mongoose.Schema({
   },
   timezone: {
     type: String,
+    maxlength: 64,
     default: 'Europe/Berlin'
   },
   bookingBuffer: {
@@ -265,6 +274,22 @@ const salonSchema = new mongoose.Schema({
   },
 
   noShowSettings: {
+    remindersEnabled: {
+      type: Boolean,
+      default: true
+    },
+    reminder72h: {
+      type: Boolean,
+      default: true
+    },
+    reminder24h: {
+      type: Boolean,
+      default: true
+    },
+    reminder2h: {
+      type: Boolean,
+      default: true
+    },
     reminders: {
       enabled72h: {
         type: Boolean,
@@ -285,11 +310,23 @@ const salonSchema = new mongoose.Schema({
       min: 5,
       max: 240
     },
+    autoDepositThreshold: {
+      type: Number,
+      default: 3,
+      min: 1,
+      max: 20
+    },
     highRiskThreshold: {
       type: Number,
       default: 3,
       min: 1,
       max: 20
+    },
+    blockBookingThreshold: {
+      type: Number,
+      default: 5,
+      min: 1,
+      max: 50
     },
     depositPercentage: {
       type: Number,

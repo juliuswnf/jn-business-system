@@ -5,6 +5,35 @@ import logger from '../utils/logger.js';
 import fs from 'fs';
 import mongoose from 'mongoose';
 
+const resolveScopedProgressSalonId = (req, requestedSalonId) => {
+  if (['ceo', 'admin'].includes(req.user?.role)) {
+    if (!requestedSalonId || !mongoose.isValidObjectId(String(requestedSalonId))) {
+      return { error: { status: 400, message: 'Invalid salonId format' } };
+    }
+
+    return { salonId: new mongoose.Types.ObjectId(String(requestedSalonId)) };
+  }
+
+  const trustedSalonId = req.user?.salonId;
+  if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+    return { error: { status: 403, message: 'Access denied - No salon assigned to your account' } };
+  }
+
+  if (requestedSalonId && String(requestedSalonId) !== String(trustedSalonId)) {
+    return { error: { status: 403, message: 'Access denied - salonId must match authenticated tenant' } };
+  }
+
+  return { salonId: new mongoose.Types.ObjectId(String(trustedSalonId)) };
+};
+
+const parseObjectIdOrError = (value, fieldName) => {
+  if (!mongoose.isValidObjectId(value)) {
+    return { error: { status: 400, message: `Invalid ${fieldName} format` } };
+  }
+
+  return { value: new mongoose.Types.ObjectId(value) };
+};
+
 /**
  * Progress Entry Controller
  * For Personal Trainers - Track client progress
@@ -33,8 +62,28 @@ export const createProgressEntry = async (req, res) => {
 
     const userId = req.user.id;
 
+    const salonScope = resolveScopedProgressSalonId(req, salonId);
+    if (salonScope.error) {
+      return res.status(salonScope.error.status).json({ success: false, message: salonScope.error.message });
+    }
+    const safeSalonId = salonScope.salonId;
+
+    const customerIdResult = parseObjectIdOrError(customerId, 'customerId');
+    if (customerIdResult.error) {
+      return res.status(customerIdResult.error.status).json({ success: false, message: customerIdResult.error.message });
+    }
+
+    let safeBookingId = null;
+    if (bookingId) {
+      const bookingIdResult = parseObjectIdOrError(bookingId, 'bookingId');
+      if (bookingIdResult.error) {
+        return res.status(bookingIdResult.error.status).json({ success: false, message: bookingIdResult.error.message });
+      }
+      safeBookingId = bookingIdResult.value;
+    }
+
     // Verify salon authorization
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
@@ -46,10 +95,10 @@ export const createProgressEntry = async (req, res) => {
     }
 
     const progressEntry = await ProgressEntry.create({
-      salonId,
-      customerId,
+      salonId: safeSalonId,
+      customerId: customerIdResult.value,
       trainerId: userId,
-      bookingId,
+      bookingId: safeBookingId,
       recordedAt: new Date(),
       weight: weight ? JSON.parse(weight) : undefined,
       bodyFatPercentage,
@@ -84,14 +133,27 @@ export const uploadProgressPhotos = async (req, res) => {
     const { type } = req.body; // front, back, side, other
     const userId = req.user.id;
 
-    const progressEntry = await ProgressEntry.findById(id).maxTimeMS(5000);
-    if (!progressEntry) {
-      return res.status(404).json({ success: false, message: 'Progress entry not found' });
+    const idResult = parseObjectIdOrError(id, 'progress entry id');
+    if (idResult.error) {
+      return res.status(idResult.error.status).json({ success: false, message: idResult.error.message });
     }
 
-    // Verify authorization
-    if (progressEntry.trainerId.toString() !== userId) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const query = {
+      _id: idResult.value,
+      trainerId: userId,
+      deletedAt: null
+    };
+
+    if (!['ceo', 'admin'].includes(req.user?.role)) {
+      if (!req.user?.salonId || !mongoose.isValidObjectId(String(req.user.salonId))) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      query.salonId = new mongoose.Types.ObjectId(String(req.user.salonId));
+    }
+
+    const progressEntry = await ProgressEntry.findOne(query).maxTimeMS(5000);
+    if (!progressEntry) {
+      return res.status(404).json({ success: false, message: 'Progress entry not found' });
     }
 
     if (!req.file) {
@@ -293,14 +355,27 @@ export const updateProgressEntry = async (req, res) => {
     const updateData = req.body;
     const userId = req.user.id;
 
-    const progressEntry = await ProgressEntry.findById(id).maxTimeMS(5000);
-    if (!progressEntry) {
-      return res.status(404).json({ success: false, message: 'Progress entry not found' });
+    const idResult = parseObjectIdOrError(id, 'progress entry id');
+    if (idResult.error) {
+      return res.status(idResult.error.status).json({ success: false, message: idResult.error.message });
     }
 
-    // Verify authorization
-    if (progressEntry.trainerId.toString() !== userId) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const query = {
+      _id: idResult.value,
+      trainerId: userId,
+      deletedAt: null
+    };
+
+    if (!['ceo', 'admin'].includes(req.user?.role)) {
+      if (!req.user?.salonId || !mongoose.isValidObjectId(String(req.user.salonId))) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      query.salonId = new mongoose.Types.ObjectId(String(req.user.salonId));
+    }
+
+    const progressEntry = await ProgressEntry.findOne(query).maxTimeMS(5000);
+    if (!progressEntry) {
+      return res.status(404).json({ success: false, message: 'Progress entry not found' });
     }
 
     // Update fields
@@ -333,14 +408,27 @@ export const deleteProgressEntry = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const progressEntry = await ProgressEntry.findById(id).maxTimeMS(5000);
-    if (!progressEntry) {
-      return res.status(404).json({ success: false, message: 'Progress entry not found' });
+    const idResult = parseObjectIdOrError(id, 'progress entry id');
+    if (idResult.error) {
+      return res.status(idResult.error.status).json({ success: false, message: idResult.error.message });
     }
 
-    // Verify authorization
-    if (progressEntry.trainerId.toString() !== userId) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const query = {
+      _id: idResult.value,
+      trainerId: userId,
+      deletedAt: null
+    };
+
+    if (!['ceo', 'admin'].includes(req.user?.role)) {
+      if (!req.user?.salonId || !mongoose.isValidObjectId(String(req.user.salonId))) {
+        return res.status(403).json({ success: false, message: 'Access denied - No salon assigned to your account' });
+      }
+      query.salonId = new mongoose.Types.ObjectId(String(req.user.salonId));
+    }
+
+    const progressEntry = await ProgressEntry.findOne(query).maxTimeMS(5000);
+    if (!progressEntry) {
+      return res.status(404).json({ success: false, message: 'Progress entry not found' });
     }
 
     // Soft delete

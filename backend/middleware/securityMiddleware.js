@@ -187,12 +187,13 @@ setInterval(() => {
 export const generateCSRFToken = (req, res, next) => {
   const token = crypto.randomBytes(32).toString('hex');
   const expiry = Date.now() + CSRF_TOKEN_EXPIRY;
+  const csrfSameSite = process.env.NODE_ENV === 'production' ? 'none' : 'lax';
   csrfTokens.set(token, expiry);
   res.locals.csrfToken = token;
   res.cookie('XSRF-TOKEN', token, {
     httpOnly: false, // Must be readable by JavaScript
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: csrfSameSite,
     maxAge: CSRF_TOKEN_EXPIRY
   });
   next();

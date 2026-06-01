@@ -15,6 +15,31 @@ const hasSalonAccess = (req, salonId) => {
   return req.user?.role === 'ceo' || salonId?.toString() === req.user?.salonId?.toString();
 };
 
+const getTrustedSalonObjectId = (req) => {
+  const trustedSalonId = req.user?.salonId;
+  if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+    return null;
+  }
+
+  return new mongoose.Types.ObjectId(String(trustedSalonId));
+};
+
+const buildTenantScopedByIdFilter = (req, docId) => {
+  const filter = { _id: docId };
+
+  if (req.user?.role === 'ceo') {
+    return filter;
+  }
+
+  const trustedSalonObjectId = getTrustedSalonObjectId(req);
+  if (!trustedSalonObjectId) {
+    return null;
+  }
+
+  filter.salonId = trustedSalonObjectId;
+  return filter;
+};
+
 /**
  * ==================== WORKFLOW MANAGEMENT ====================
  */
@@ -42,7 +67,10 @@ export const getAvailableIndustries = async (req, res) => {
 export const enableWorkflow = async (req, res) => {
   try {
     const { industry, features } = req.body;
-    const salonId = req.user.salonId || req.body.salonId;
+    const requestedSalonId = req.body?.salonId;
+    const salonId = req.user?.role === 'ceo'
+      ? (requestedSalonId || req.user?.salonId)
+      : req.user?.salonId;
 
     if (!industry) {
       return res.status(400).json({
@@ -62,14 +90,22 @@ export const enableWorkflow = async (req, res) => {
       });
     }
 
-    if (typeof salonId !== 'string') {
-      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    if (
+      req.user?.role !== 'ceo' &&
+      requestedSalonId &&
+      String(requestedSalonId) !== String(req.user?.salonId)
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied - salonId must match authenticated tenant'
+      });
     }
-    if (!mongoose.isValidObjectId(salonId)) {
+
+    if (!mongoose.isValidObjectId(String(salonId))) {
       return res.status(400).json({ success: false, message: 'Invalid salonId format' });
     }
     // Cast to ObjectId — breaks taint chain from req.user/req.body into queries
-    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    const safeSalonId = new mongoose.Types.ObjectId(String(salonId));
     // .find() returns value from static array, breaking taint chain
     const safeIndustry = ALLOWED_INDUSTRIES.find(i => i === String(industry));
 
@@ -324,7 +360,17 @@ export const getProject = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const project = await WorkflowProject.findById(id)
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid project ID format' });
+    }
+    const safeProjectId = new mongoose.Types.ObjectId(id);
+
+    const projectFilter = buildTenantScopedByIdFilter(req, safeProjectId);
+    if (!projectFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const project = await WorkflowProject.findOne(projectFilter)
       .populate('customerId', 'firstName lastName email phone')
       .populate('artistId', 'firstName lastName')
       .populate('sessions');
@@ -336,13 +382,8 @@ export const getProject = async (req, res) => {
       });
     }
 
-    // Enforce tenant isolation: only the owning salon or CEO may access
-    if (req.user?.role !== 'ceo' && project.salonId?.toString() !== req.user?.salonId?.toString()) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
-    }
-
     // Get consents for this project
-    const consents = await Consent.find({ projectId: id });
+    const consents = await Consent.find({ projectId: safeProjectId });
 
     res.json({
       success: true,
@@ -381,7 +422,12 @@ export const updateProject = async (req, res) => {
     delete updates.progress;
     delete updates.completedSessions;
 
-    const project = await WorkflowProject.findById(safeProjectId).maxTimeMS(5000);
+    const projectFilter = buildTenantScopedByIdFilter(req, safeProjectId);
+    if (!projectFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const project = await WorkflowProject.findOne(projectFilter).maxTimeMS(5000);
 
     if (!project) {
       return res.status(404).json({
@@ -425,7 +471,12 @@ export const deleteProject = async (req, res) => {
     }
     const safeProjectId = new mongoose.Types.ObjectId(id);
 
-    const project = await WorkflowProject.findById(safeProjectId).maxTimeMS(5000);
+    const projectFilter = buildTenantScopedByIdFilter(req, safeProjectId);
+    if (!projectFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const project = await WorkflowProject.findOne(projectFilter).maxTimeMS(5000);
 
     if (!project) {
       return res.status(404).json({
@@ -515,7 +566,12 @@ export const createSession = async (req, res) => {
     const safeProjectId = new mongoose.Types.ObjectId(projectId);
 
     // Get project
-    const project = await WorkflowProject.findById(safeProjectId).maxTimeMS(5000);
+    const projectFilter = buildTenantScopedByIdFilter(req, safeProjectId);
+    if (!projectFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const project = await WorkflowProject.findOne(projectFilter).maxTimeMS(5000);
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -607,7 +663,12 @@ export const getProjectSessions = async (req, res) => {
     }
     const safeProjectId = new mongoose.Types.ObjectId(projectId);
 
-    const project = await WorkflowProject.findById(safeProjectId)
+    const projectFilter = buildTenantScopedByIdFilter(req, safeProjectId);
+    if (!projectFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const project = await WorkflowProject.findOne(projectFilter)
       .select('salonId')
       .maxTimeMS(5000);
 
@@ -656,7 +717,12 @@ export const updateSession = async (req, res) => {
     delete updates.status;
     delete updates.completedAt;
 
-    const session = await WorkflowSession.findById(safeSessionId)
+    const sessionFilter = buildTenantScopedByIdFilter(req, safeSessionId);
+    if (!sessionFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const session = await WorkflowSession.findOne(sessionFilter)
       .populate('projectId', 'salonId')
       .maxTimeMS(5000);
 
@@ -705,7 +771,12 @@ export const completeSession = async (req, res) => {
     }
     const safeSessionId = new mongoose.Types.ObjectId(id);
 
-    const session = await WorkflowSession.findById(safeSessionId)
+    const sessionFilter = buildTenantScopedByIdFilter(req, safeSessionId);
+    if (!sessionFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const session = await WorkflowSession.findOne(sessionFilter)
       .populate('projectId', 'salonId')
       .maxTimeMS(5000);
 
@@ -753,7 +824,12 @@ export const uploadSessionPhotos = async (req, res) => {
     }
     const safeSessionId = new mongoose.Types.ObjectId(id);
 
-    const session = await WorkflowSession.findById(safeSessionId)
+    const sessionFilter = buildTenantScopedByIdFilter(req, safeSessionId);
+    if (!sessionFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const session = await WorkflowSession.findOne(sessionFilter)
       .populate('projectId', 'salonId')
       .maxTimeMS(5000);
 
@@ -800,7 +876,12 @@ export const deleteSessionPhoto = async (req, res) => {
     }
     const safeSessionId = new mongoose.Types.ObjectId(id);
 
-    const session = await WorkflowSession.findById(safeSessionId)
+    const sessionFilter = buildTenantScopedByIdFilter(req, safeSessionId);
+    if (!sessionFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const session = await WorkflowSession.findOne(sessionFilter)
       .populate('projectId', 'salonId')
       .maxTimeMS(5000);
 
@@ -1018,7 +1099,12 @@ export const usePackageCredit = async (req, res) => {
     }
     const safeBookingId = bookingId ? new mongoose.Types.ObjectId(bookingId) : null;
 
-    const packageData = await Package.findById(safePackageId).maxTimeMS(5000);
+    const packageFilter = buildTenantScopedByIdFilter(req, safePackageId);
+    if (!packageFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const packageData = await Package.findOne(packageFilter).maxTimeMS(5000);
 
     if (!packageData) {
       return res.status(404).json({
@@ -1036,7 +1122,16 @@ export const usePackageCredit = async (req, res) => {
 
     let booking = null;
     if (safeBookingId) {
-      booking = await Booking.findById(safeBookingId)
+      const trustedSalonObjectId = getTrustedSalonObjectId(req);
+      if (req.user?.role !== 'ceo' && !trustedSalonObjectId) {
+        return res.status(403).json({ success: false, message: 'Tenant context required' });
+      }
+
+      const bookingFilter = req.user?.role === 'ceo'
+        ? { _id: safeBookingId }
+        : { _id: safeBookingId, salonId: trustedSalonObjectId };
+
+      booking = await Booking.findOne(bookingFilter)
         .select('salonId')
         .maxTimeMS(5000);
 
@@ -1102,7 +1197,12 @@ export const updatePackage = async (req, res) => {
     delete updates.salonId;
     delete updates.createdBy;
 
-    const packageData = await Package.findById(safePackageId).maxTimeMS(5000);
+    const packageFilter = buildTenantScopedByIdFilter(req, safePackageId);
+    if (!packageFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const packageData = await Package.findOne(packageFilter).maxTimeMS(5000);
 
     if (!packageData) {
       return res.status(404).json({
@@ -1255,7 +1355,12 @@ export const cancelMembership = async (req, res) => {
     }
     const safeMembershipId = new mongoose.Types.ObjectId(id);
 
-    const membership = await Membership.findById(safeMembershipId).maxTimeMS(5000);
+    const membershipFilter = buildTenantScopedByIdFilter(req, safeMembershipId);
+    if (!membershipFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const membership = await Membership.findOne(membershipFilter).maxTimeMS(5000);
 
     if (!membership) {
       return res.status(404).json({
@@ -1300,7 +1405,12 @@ export const pauseMembership = async (req, res) => {
     }
     const safeMembershipId = new mongoose.Types.ObjectId(id);
 
-    const membership = await Membership.findById(safeMembershipId).maxTimeMS(5000);
+    const membershipFilter = buildTenantScopedByIdFilter(req, safeMembershipId);
+    if (!membershipFilter) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const membership = await Membership.findOne(membershipFilter).maxTimeMS(5000);
 
     if (!membership) {
       return res.status(404).json({

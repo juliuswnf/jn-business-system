@@ -16,8 +16,9 @@ class SocketService {
       return;
     }
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    const SOCKET_URL = API_URL.replace('/api', ''); // Remove /api suffix
+    const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
+    const API_URL = configuredApiUrl || `${window.location.origin}/api`;
+    const SOCKET_URL = API_URL.replace(/\/api\/?$/, '');
 
     const authPayload = {};
     if (token) {

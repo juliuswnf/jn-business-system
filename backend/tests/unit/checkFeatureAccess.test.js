@@ -39,7 +39,7 @@ describe('checkFeatureAccess middleware', () => {
     });
 
     const req = createMockRequest({
-      user: { id: 'u1', salonId: 's1', role: 'salon_owner' },
+      user: { id: 'u1', salonId: '507f191e810c19729de860e1', role: 'salon_owner' },
       body: {},
       params: {}
     });
@@ -60,7 +60,7 @@ describe('checkFeatureAccess middleware', () => {
     });
 
     const req = createMockRequest({
-      user: { id: 'u2', salonId: 's2', role: 'salon_owner' },
+      user: { id: 'u2', salonId: '507f191e810c19729de860e2', role: 'salon_owner' },
       body: {},
       params: {}
     });
@@ -83,7 +83,7 @@ describe('checkFeatureAccess middleware', () => {
     });
 
     const req = createMockRequest({
-      user: { id: 'u3', salonId: 's3', role: 'salon_owner' },
+      user: { id: 'u3', salonId: '507f191e810c19729de860e3', role: 'salon_owner' },
       body: {},
       params: {}
     });
@@ -104,7 +104,7 @@ describe('checkFeatureAccess middleware', () => {
     });
 
     const req = createMockRequest({
-      user: { id: 'u4', salonId: 's4', role: 'salon_owner' },
+      user: { id: 'u4', salonId: '507f191e810c19729de860e4', role: 'salon_owner' },
       body: {},
       params: {}
     });
@@ -145,7 +145,7 @@ describe('requireActiveSubscription middleware', () => {
     mockSalonQuery({ subscription: { tier: 'starter', status: 'trial' } });
 
     const req = createMockRequest({
-      user: { id: 'u5', salonId: 's5', role: 'salon_owner' }
+      user: { id: 'u5', salonId: '507f191e810c19729de860e5', role: 'salon_owner' }
     });
     const res = createMockResponse();
     const next = createMockNext();
@@ -160,7 +160,7 @@ describe('requireActiveSubscription middleware', () => {
     mockSalonQuery({ subscription: { tier: 'starter', status: 'canceled' } });
 
     const req = createMockRequest({
-      user: { id: 'u6', salonId: 's6', role: 'salon_owner' }
+      user: { id: 'u6', salonId: '507f191e810c19729de860e6', role: 'salon_owner' }
     });
     const res = createMockResponse();
     const next = createMockNext();

@@ -1,6 +1,7 @@
 ﻿import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
+export const API_URL = configuredApiUrl || `${window.location.origin}/api`;
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -321,8 +322,8 @@ export const bookingAPI = {
 export const noShowAPI = {
   getDashboard: (params) => api.get('/no-show/dashboard', { params }),
   getRisk: (params) => api.get('/no-show/risk', { params }),
-  sendReminder: (bookingId, data = {}) => api.post(`/no-show/remind/${bookingId}`, data),
-  markNoShow: (bookingId) => api.patch(`/no-show/mark/${bookingId}`),
+  sendReminder: (bookingId, data = {}) => api.patch(`/no-show/manual-reminder/${bookingId}`, data),
+  markNoShow: (bookingId) => api.patch(`/no-show/mark-no-show/${bookingId}`),
   confirmToken: (token) => api.get(`/no-show/confirm/${token}`),
   getSettings: (params) => api.get('/no-show/settings', { params }),
   updateSettings: (data, params) => api.put('/no-show/settings', data, { params }),

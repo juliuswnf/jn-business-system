@@ -11,6 +11,45 @@ const hasSalonAccess = (req, salonId) => {
   return req.user?.role === 'ceo' || salonId?.toString() === req.user?.salonId?.toString();
 };
 
+const resolveScopedSalonId = (req, requestedSalonId) => {
+  if (req.user?.role === 'ceo') {
+    if (!requestedSalonId || !mongoose.isValidObjectId(String(requestedSalonId))) {
+      return { error: { status: 400, message: 'Invalid salon ID format' } };
+    }
+
+    return { salonId: new mongoose.Types.ObjectId(String(requestedSalonId)) };
+  }
+
+  const trustedSalonId = req.user?.salonId;
+  if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+    return { error: { status: 403, message: 'Missing tenant context' } };
+  }
+
+  if (requestedSalonId && String(requestedSalonId) !== String(trustedSalonId)) {
+    return { error: { status: 403, message: 'Access denied - salonId must match authenticated tenant' } };
+  }
+
+  return { salonId: new mongoose.Types.ObjectId(String(trustedSalonId)) };
+};
+
+const buildScopedResourceFilter = (req, resourceId) => {
+  const filter = {
+    _id: resourceId,
+    deletedAt: null
+  };
+
+  if (req.user?.role !== 'ceo') {
+    const trustedSalonId = req.user?.salonId;
+    if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+      return null;
+    }
+
+    filter.salonId = new mongoose.Types.ObjectId(String(trustedSalonId));
+  }
+
+  return filter;
+};
+
 /**
  * Resource Controller
  * For Spa/Wellness - Room/Equipment management
@@ -35,10 +74,11 @@ export const createResource = async (req, res) => {
 
     const userId = req.user.id;
 
-    if (!salonId || !mongoose.isValidObjectId(salonId)) {
-      return res.status(400).json({ success: false, message: 'Invalid salon ID format' });
+    const scope = resolveScopedSalonId(req, salonId);
+    if (scope.error) {
+      return res.status(scope.error.status).json({ success: false, message: scope.error.message });
     }
-    const safeSalonId = new mongoose.Types.ObjectId(salonId);
+    const safeSalonId = scope.salonId;
 
     // Verify salon ownership
     const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
@@ -46,7 +86,7 @@ export const createResource = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
 
-    if (salon.owner.toString() !== userId) {
+    if (req.user?.role !== 'ceo' && salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -125,7 +165,6 @@ export const getSalonResources = async (req, res) => {
 export const getResourceById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userRole = req.user?.role;
 
     // Validate ObjectId
     if (!mongoose.isValidObjectId(id)) {
@@ -133,21 +172,18 @@ export const getResourceById = async (req, res) => {
     }
     const safeResourceId = new mongoose.Types.ObjectId(id);
 
-    const resource = await Resource.findById(safeResourceId)
+    const scopedFilter = buildScopedResourceFilter(req, safeResourceId);
+    if (!scopedFilter) {
+      return res.status(403).json({ success: false, message: 'Missing tenant context' });
+    }
+
+    const resource = await Resource.findOne(scopedFilter)
       .populate('compatibleServices', 'name duration price')
       .maxTimeMS(5000)
       .lean();
 
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
-    }
-
-    // ? SECURITY FIX: Authorization check - prevent IDOR
-    if (userRole !== 'ceo' && resource.salonId.toString() !== req.user.salonId?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
     }
 
     return res.json({
@@ -178,7 +214,11 @@ export const checkResourceAvailability = async (req, res) => {
       });
     }
 
-    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
+    const resource = await Resource.findOne({
+      _id: safeResourceId,
+      status: 'active',
+      deletedAt: null
+    }).maxTimeMS(5000);
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
@@ -238,16 +278,14 @@ export const updateResource = async (req, res) => {
     }
     const safeResourceId = new mongoose.Types.ObjectId(id);
 
-    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
-    if (!resource) {
-      return res.status(404).json({ success: false, message: 'Resource not found' });
+    const scopedFilter = buildScopedResourceFilter(req, safeResourceId);
+    if (!scopedFilter) {
+      return res.status(403).json({ success: false, message: 'Missing tenant context' });
     }
 
-    if (!hasSalonAccess(req, resource.salonId)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    const resource = await Resource.findOne(scopedFilter).maxTimeMS(5000);
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     // Verify authorization
@@ -255,7 +293,7 @@ export const updateResource = async (req, res) => {
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
-    if (salon.owner.toString() !== userId) {
+    if (req.user?.role !== 'ceo' && salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -295,16 +333,14 @@ export const scheduleMaintenance = async (req, res) => {
     }
     const safeResourceId = new mongoose.Types.ObjectId(id);
 
-    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
-    if (!resource) {
-      return res.status(404).json({ success: false, message: 'Resource not found' });
+    const scopedFilter = buildScopedResourceFilter(req, safeResourceId);
+    if (!scopedFilter) {
+      return res.status(403).json({ success: false, message: 'Missing tenant context' });
     }
 
-    if (!hasSalonAccess(req, resource.salonId)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    const resource = await Resource.findOne(scopedFilter).maxTimeMS(5000);
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     // Verify authorization
@@ -312,7 +348,7 @@ export const scheduleMaintenance = async (req, res) => {
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
-    if (salon.owner.toString() !== userId) {
+    if (req.user?.role !== 'ceo' && salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -344,16 +380,14 @@ export const deleteResource = async (req, res) => {
     }
     const safeResourceId = new mongoose.Types.ObjectId(id);
 
-    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
-    if (!resource) {
-      return res.status(404).json({ success: false, message: 'Resource not found' });
+    const scopedFilter = buildScopedResourceFilter(req, safeResourceId);
+    if (!scopedFilter) {
+      return res.status(403).json({ success: false, message: 'Missing tenant context' });
     }
 
-    if (!hasSalonAccess(req, resource.salonId)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    const resource = await Resource.findOne(scopedFilter).maxTimeMS(5000);
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     // Verify authorization
@@ -361,7 +395,7 @@ export const deleteResource = async (req, res) => {
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
-    if (salon.owner.toString() !== userId) {
+    if (req.user?.role !== 'ceo' && salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
@@ -414,23 +448,21 @@ export const getResourceUtilization = async (req, res) => {
       });
     }
 
-    const resource = await Resource.findById(safeResourceId).maxTimeMS(5000);
-    if (!resource) {
-      return res.status(404).json({ success: false, message: 'Resource not found' });
+    const scopedFilter = buildScopedResourceFilter(req, safeResourceId);
+    if (!scopedFilter) {
+      return res.status(403).json({ success: false, message: 'Missing tenant context' });
     }
 
-    if (!hasSalonAccess(req, resource.salonId)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied - Resource belongs to another salon'
-      });
+    const resource = await Resource.findOne(scopedFilter).maxTimeMS(5000);
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
     const salon = await Salon.findById(resource.salonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
-    if (salon.owner.toString() !== userId) {
+    if (req.user?.role !== 'ceo' && salon.owner.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 

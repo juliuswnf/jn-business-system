@@ -251,7 +251,7 @@ describe('Tenant boundary integration: Consent', () => {
 
   it('returns 403 for cross-tenant consent detail access', async () => {
     const app = createAppWithConsentRoutes();
-    mockConsentFindById.mockReturnValue(
+    mockConsentFindOne.mockReturnValue(
       createChainedQuery({
         result: { _id: CONSENT_1_ID, salonId: SALON_B_ID },
         terminal: 'maxTimeAfterLean'

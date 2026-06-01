@@ -138,9 +138,29 @@ server.on('connection', (connection) => {
 });
 
 // Socket.IO Configuration
+const normalizeRuntimeOrigin = (value) => (value || '').trim().replace(/\/$/, '');
+const socketAllowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://app.jn-business-system.de',
+  ...(process.env.CORS_ORIGIN || '').split(',')
+]
+  .map(normalizeRuntimeOrigin)
+  .filter((origin) => Boolean(origin) && origin !== '*');
+
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'https://app.jn-business-system.de',
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const normalizedOrigin = normalizeRuntimeOrigin(origin);
+      if (socketAllowedOrigins.includes(normalizedOrigin) || process.env.NODE_ENV === 'development') {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`Not allowed by Socket.IO CORS: ${origin}`));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
   },
@@ -160,18 +180,22 @@ let lifecycleWorkerIntervalId = null;
 const normalizeOrigin = (value) => (value || '').trim().replace(/\/$/, '');
 
 const defaultAllowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://app.jn-business-system.de',
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5174'
-];
+]
+  .map(normalizeOrigin)
+  .filter((origin) => Boolean(origin) && origin !== '*');
 
 const envAllowedOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
   .map(normalizeOrigin)
-  .filter(Boolean);
+  .filter((origin) => Boolean(origin) && origin !== '*');
 
 const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])]
   .map(normalizeOrigin);

@@ -6,6 +6,11 @@ import logger from '../utils/logger.js';
 
 const router = express.Router();
 
+const getServiceModel = async () => {
+  const modelsModule = await import('../models/index.js');
+  return modelsModule.default.Service;
+};
+
 // All routes require authentication
 router.use(authMiddleware.protect);
 
@@ -53,7 +58,7 @@ router.get('/:id', checkTenantAccess('service'), async (req, res) => {
 // ? HIGH FIX #10: Create service with rate limiter
 router.post('/', mutationLimiter, async (req, res) => {
   try {
-    const { Service } = await import('../models/index.js').then(m => m.default);
+    const Service = await getServiceModel();
 
     const salonId = req.user?.studioId || req.user?.salonId;
 
@@ -78,7 +83,7 @@ router.post('/', mutationLimiter, async (req, res) => {
 router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, res) => {
   let updateData = {};
   try {
-    const { Service } = await import('../models/index.js').then(m => m.default);
+    const Service = await getServiceModel();
     const salonId = req.user?.studioId || req.user?.salonId;
 
     if (!salonId) {
@@ -143,7 +148,7 @@ router.put('/:id', mutationLimiter, checkTenantAccess('service'), async (req, re
 // ? HIGH FIX #10: Delete service with rate limiter
 router.delete('/:id', mutationLimiter, checkTenantAccess('service'), async (req, res) => {
   try {
-    const { Service } = await import('../models/index.js').then(m => m.default);
+    const Service = await getServiceModel();
 
     // ? SOFT DELETE - load first, then soft delete with audit trail
     const service = await Service.findById(req.params.id);

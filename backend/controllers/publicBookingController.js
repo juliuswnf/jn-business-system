@@ -468,7 +468,11 @@ async function handleNoShowKillerPayment(salon, body, customerEmail, customerNam
     }
   }
 
-  const stripe = stripeService.getStripe ? stripeService.getStripe() : await import('stripe').then(m => new m.default(process.env.STRIPE_SECRET_KEY));
+  let stripe = stripeService.getStripe ? stripeService.getStripe() : null;
+  if (!stripe) {
+    const stripeModule = await import('stripe');
+    stripe = new stripeModule.default(process.env.STRIPE_SECRET_KEY);
+  }
   const paymentMethod = await stripe.paymentMethods.retrieve(reqPaymentMethodId);
   const scheduledDeletionAt = new Date();
   scheduledDeletionAt.setDate(scheduledDeletionAt.getDate() + 90);
@@ -625,12 +629,21 @@ export const createPublicBooking = async (req, res) => {
     const bookingForEmail = { ...booking.toObject(), service: booking.serviceId, employee: booking.employeeId };
 
     stage = 'trigger_emails';
-    Promise.resolve()
-      .then(() => emailTemplateService.renderConfirmationEmail(salon, bookingForEmail, booking.language))
-      .then((emailData) => emailService.sendEmail({ to: customerEmail, subject: emailData.subject, text: emailData.body, html: emailData.body.replace(/\n/g, '<br>') }))
-      .then(() => booking.markEmailSent('confirmation'))
-      .then(() => logger.log(`✉️  Sent confirmation email to ${customerEmail}`))
-      .catch((emailError) => logger.error('Error sending confirmation email:', emailError));
+    void (async () => {
+      try {
+        const emailData = await emailTemplateService.renderConfirmationEmail(salon, bookingForEmail, booking.language);
+        await emailService.sendEmail({
+          to: customerEmail,
+          subject: emailData.subject,
+          text: emailData.body,
+          html: emailData.body.replace(/\n/g, '<br>')
+        });
+        await booking.markEmailSent('confirmation');
+        logger.log(`✉️  Sent confirmation email to ${customerEmail}`);
+      } catch (emailError) {
+        logger.error('Error sending confirmation email:', emailError);
+      }
+    })();
 
     emailQueueWorker.scheduleReminderEmail(booking, salon).catch(error => logger.error('Error scheduling reminder email:', error));
     emailQueueWorker.scheduleReviewEmail(booking, salon).catch(error => logger.error('Error scheduling review email:', error));

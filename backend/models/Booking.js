@@ -168,7 +168,8 @@ const bookingSchema = new mongoose.Schema(
     customerName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: 120
     },
 
     customerEmail: {
@@ -176,6 +177,7 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
+      maxlength: 255,
       match: [/^\S+@\S+\.\S+$/, 'Valid email required']
     },
 
@@ -183,6 +185,7 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: null,
+      maxlength: 32,
       match: [PHONE_REGEX, 'Valid phone number required']
     },
 
@@ -248,6 +251,7 @@ const bookingSchema = new mongoose.Schema(
       default: undefined,
       sparse: true, // Only index documents where idempotencyKey is present
       index: true,
+      maxlength: 512,
       comment: 'Prevents duplicate bookings from double-clicks'
     },
 
@@ -350,12 +354,14 @@ const bookingSchema = new mongoose.Schema(
       default: null,
       sparse: true,
       index: true,
+      maxlength: 255,
       comment: 'Stripe Customer ID for No-Show-Fee charging'
     },
     paymentMethodId: {
       type: String,
       default: null,
       sparse: true,
+      maxlength: 255,
       comment: 'Stripe Payment Method ID (saved card)'
     },
 

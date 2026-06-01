@@ -7,6 +7,20 @@ import { UIProvider } from './context/UIContext';
 import { NotificationProvider } from './context/NotificationContext';
 import './index.css';
 
+const getTracePropagationOrigin = () => {
+  const rawApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
+  if (!rawApiUrl) {
+    return window.location.origin;
+  }
+  try {
+    return new URL(rawApiUrl).origin;
+  } catch {
+    return window.location.origin;
+  }
+};
+
+const tracePropagationOrigin = getTracePropagationOrigin();
+
 // Initialize Sentry FIRST (before React)
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -20,7 +34,7 @@ if (import.meta.env.VITE_SENTRY_DSN) {
       }),
     ],
     tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0, // 100% in dev, 10% in prod
-    tracePropagationTargets: ['localhost', /^https:\/\/.*\.vercel\.app/, /^https:\/\/.*\.netlify\.app/],
+    tracePropagationTargets: [tracePropagationOrigin, /^https:\/\/.*\.vercel\.app/, /^https:\/\/.*\.netlify\.app/],
     replaysSessionSampleRate: 0.1, // 10% of sessions
     replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
     enabled: import.meta.env.PROD || import.meta.env.VITE_SENTRY_ENABLED === 'true',

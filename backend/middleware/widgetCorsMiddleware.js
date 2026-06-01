@@ -27,7 +27,7 @@ const widgetCorsMiddleware = async (req, res, next) => {
     }
 
     // Load widget config to get allowedDomains
-    const { Salon } = await import('./Salon.js').then(m => ({ Salon: m.default }));
+    const Salon = (await import('../models/Salon.js')).default;
     const salon = await Salon.findOne({ slug }).select('_id');
 
     if (!salon) {

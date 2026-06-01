@@ -8,6 +8,7 @@ export default function BookingConfirmation() {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState({
     success: false,
+    code: null,
     message: '',
     booking: null
   });
@@ -15,7 +16,7 @@ export default function BookingConfirmation() {
   useEffect(() => {
     const confirmBooking = async () => {
       if (!token) {
-        setResult({ success: false, message: 'Ungueltiger Bestaetigungslink.', booking: null });
+        setResult({ success: false, code: null, message: 'Ungueltiger Bestaetigungslink.', booking: null });
         setLoading(false);
         return;
       }
@@ -24,12 +25,14 @@ export default function BookingConfirmation() {
         const response = await noShowAPI.confirmToken(token);
         setResult({
           success: response.data?.success === true,
+          code: response.data?.code || null,
           message: response.data?.message || 'Termin bestaetigt.',
           booking: response.data?.booking || null
         });
       } catch (error) {
         setResult({
           success: false,
+          code: error.response?.data?.code || null,
           message: error.response?.data?.message || 'Bestaetigung fehlgeschlagen.',
           booking: null
         });
@@ -53,22 +56,25 @@ export default function BookingConfirmation() {
   }
 
   const bookingDate = result.booking?.bookingDate ? new Date(result.booking.bookingDate) : null;
+  const isAlreadyConfirmed = result.success && result.code === 'ALREADY_CONFIRMED';
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 px-4 py-10">
       <div className="max-w-xl mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm p-6 md:p-8 space-y-6">
         <div className="text-center space-y-3">
-          <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center ${result.success ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100'}`}>
+          <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center ${result.success ? (isAlreadyConfirmed ? 'bg-blue-50 border border-blue-100' : 'bg-green-50 border border-green-100') : 'bg-red-50 border border-red-100'}`}>
             {result.success ? (
-              <CheckCircle className="w-7 h-7 text-green-600" />
+              <CheckCircle className={`w-7 h-7 ${isAlreadyConfirmed ? 'text-blue-600' : 'text-green-600'}`} />
             ) : (
               <AlertTriangle className="w-7 h-7 text-red-600" />
             )}
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {result.success ? 'Termin bestaetigt' : 'Bestaetigung nicht moeglich'}
+            {result.success
+              ? (isAlreadyConfirmed ? 'Bereits bestaetigt' : 'Termin bestaetigt')
+              : 'Bestaetigung nicht moeglich'}
           </h1>
-          <p className={`text-sm ${result.success ? 'text-green-700' : 'text-red-700'}`}>{result.message}</p>
+          <p className={`text-sm ${result.success ? (isAlreadyConfirmed ? 'text-blue-700' : 'text-green-700') : 'text-red-700'}`}>{result.message}</p>
         </div>
 
         {result.booking && (

@@ -23,7 +23,13 @@ const generateToken = (id, expiresIn = process.env.JWT_EXPIRE || '7d') => {
   if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET not configured');
   }
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
+
+  const tokenSubjectId = id?.toString?.() || '';
+  if (!mongoose.isValidObjectId(tokenSubjectId)) {
+    throw new Error('Invalid token subject id');
+  }
+
+  return jwt.sign({ id: tokenSubjectId }, process.env.JWT_SECRET, { expiresIn });
 };
 
 /**
@@ -44,7 +50,11 @@ const applyMinimumAuthDelay = async (startTimeMs, minimumMs = 350) => {
   }
 };
 
-const getCookieOptions = ({ rememberMe = true, maxAge, httpOnly = true, path = '/', sameSite = 'strict' } = {}) => {
+const getCookieSameSite = () => {
+  return process.env.NODE_ENV === 'production' ? 'none' : 'lax';
+};
+
+const getCookieOptions = ({ rememberMe = true, maxAge, httpOnly = true, path = '/', sameSite = getCookieSameSite() } = {}) => {
   const options = {
     httpOnly,
     secure: process.env.NODE_ENV === 'production',
@@ -231,21 +241,17 @@ export const register = async (req, res) => {
     logger.info(`✅ User registered: ${user.email} (${user.role})`);
 
     // Set secure HTTP-only cookies for both tokens
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    res.cookie('refreshToken', refreshToken, getCookieOptions({
+      rememberMe: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/api/auth'
-    });
+    }));
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+    res.cookie('accessToken', accessToken, getCookieOptions({
+      rememberMe: true,
+      maxAge: 15 * 60 * 1000,
       path: '/'
-    });
+    }));
 
     // ? SECURITY FIX: Generate CSRF token for state-changing operations
     generateCSRFToken(req, res, () => {});
@@ -969,7 +975,7 @@ export const logout = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: getCookieSameSite(),
       domain: undefined // Don't set domain for localhost
     };
 
@@ -989,7 +995,7 @@ export const logout = async (req, res) => {
     res.clearCookie('XSRF-TOKEN', {
       httpOnly: false, // XSRF token is not httpOnly
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: getCookieSameSite(),
       path: '/'
     });
 
@@ -1006,7 +1012,7 @@ export const logout = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: getCookieSameSite(),
       domain: undefined
     };
 
@@ -1023,7 +1029,7 @@ export const logout = async (req, res) => {
     res.clearCookie('XSRF-TOKEN', {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: getCookieSameSite(),
       path: '/'
     });
 

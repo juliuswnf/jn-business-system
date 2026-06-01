@@ -7,6 +7,35 @@ import mongoose from 'mongoose';
 
 const ALLOWED_PORTFOLIO_CATEGORIES = ['hair', 'nails', 'makeup', 'tattoo', 'beauty', 'wellness', 'barbershop', 'medical', 'other'];
 
+const resolvePortfolioSalonId = (req, requestedSalonId) => {
+  if (['ceo', 'admin'].includes(req.user?.role)) {
+    if (!requestedSalonId || !mongoose.isValidObjectId(String(requestedSalonId))) {
+      return { error: { status: 400, message: 'Invalid salonId format' } };
+    }
+
+    return { salonId: new mongoose.Types.ObjectId(String(requestedSalonId)) };
+  }
+
+  const trustedSalonId = req.user?.salonId;
+  if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+    return { error: { status: 403, message: 'Access denied - No salon assigned to your account' } };
+  }
+
+  if (requestedSalonId && String(requestedSalonId) !== String(trustedSalonId)) {
+    return { error: { status: 403, message: 'Access denied - salonId must match authenticated tenant' } };
+  }
+
+  return { salonId: new mongoose.Types.ObjectId(String(trustedSalonId)) };
+};
+
+const parsePortfolioObjectId = (value, fieldName) => {
+  if (!mongoose.isValidObjectId(value)) {
+    return { error: { status: 400, message: `Invalid ${fieldName} format` } };
+  }
+
+  return { value: new mongoose.Types.ObjectId(value) };
+};
+
 /**
  * Artist Portfolio Controller
  * For Tattoo/Piercing Studios - Portfolio Management
@@ -18,15 +47,22 @@ export const uploadPortfolioItem = async (req, res) => {
     const { salonId, title, description, category, style, tags, consentGiven } = req.body;
     const userId = req.user.id;
 
+    const scope = resolvePortfolioSalonId(req, salonId);
+    if (scope.error) {
+      return res.status(scope.error.status).json({ success: false, message: scope.error.message });
+    }
+
+    const safeSalonId = scope.salonId;
+
     // Verify salon ownership or artist employment
-    const salon = await Salon.findById(salonId).maxTimeMS(5000);
+    const salon = await Salon.findById(safeSalonId).maxTimeMS(5000);
     if (!salon) {
       return res.status(404).json({ success: false, message: 'Salon not found' });
     }
 
     // Check if user is owner or employee
     const isOwner = salon.owner.toString() === userId;
-    const isEmployee = req.user.role === 'employee' && req.user.salonId?.toString() === salonId;
+    const isEmployee = req.user.role === 'employee' && req.user.salonId?.toString() === safeSalonId.toString();
     if (!isOwner && !isEmployee && req.user.role !== 'admin' && req.user.role !== 'ceo') {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -40,14 +76,14 @@ export const uploadPortfolioItem = async (req, res) => {
     let imageUrl, thumbnailUrl;
     if (process.env.CLOUDINARY_ENABLED === 'true') {
       const uploadResult = await uploadToCloudinary(req.file.path, {
-        folder: `portfolios/${salonId}`,
+        folder: `portfolios/${safeSalonId.toString()}`,
         transformation: [{ width: 1200, height: 1200, crop: 'limit' }]
       });
       imageUrl = uploadResult.secure_url;
 
       // Generate thumbnail
       const thumbResult = await uploadToCloudinary(req.file.path, {
-        folder: `portfolios/${salonId}/thumbs`,
+        folder: `portfolios/${safeSalonId.toString()}/thumbs`,
         transformation: [{ width: 400, height: 400, crop: 'fill' }]
       });
       thumbnailUrl = thumbResult.secure_url;
@@ -62,7 +98,7 @@ export const uploadPortfolioItem = async (req, res) => {
 
     // Create portfolio item
     const portfolioItem = await ArtistPortfolio.create({
-      salonId,
+      salonId: safeSalonId,
       artistId: userId,
       title,
       description,
@@ -166,14 +202,18 @@ export const updatePortfolioItem = async (req, res) => {
     const { title, description, category, style, tags, isPublic, featured } = req.body;
     const userId = req.user.id;
 
-    const portfolioItem = await ArtistPortfolio.findById(id).maxTimeMS(5000);
-    if (!portfolioItem) {
-      return res.status(404).json({ success: false, message: 'Portfolio item not found' });
+    const parsedId = parsePortfolioObjectId(id, 'portfolio id');
+    if (parsedId.error) {
+      return res.status(parsedId.error.status).json({ success: false, message: parsedId.error.message });
     }
 
-    // Verify ownership
-    if (portfolioItem.artistId.toString() !== userId) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const portfolioItem = await ArtistPortfolio.findOne({
+      _id: parsedId.value,
+      artistId: userId,
+      deletedAt: null
+    }).maxTimeMS(5000);
+    if (!portfolioItem) {
+      return res.status(404).json({ success: false, message: 'Portfolio item not found' });
     }
 
     // Update fields
@@ -204,14 +244,18 @@ export const deletePortfolioItem = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const portfolioItem = await ArtistPortfolio.findById(id).maxTimeMS(5000);
-    if (!portfolioItem) {
-      return res.status(404).json({ success: false, message: 'Portfolio item not found' });
+    const parsedId = parsePortfolioObjectId(id, 'portfolio id');
+    if (parsedId.error) {
+      return res.status(parsedId.error.status).json({ success: false, message: parsedId.error.message });
     }
 
-    // Verify ownership
-    if (portfolioItem.artistId.toString() !== userId) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const portfolioItem = await ArtistPortfolio.findOne({
+      _id: parsedId.value,
+      artistId: userId,
+      deletedAt: null
+    }).maxTimeMS(5000);
+    if (!portfolioItem) {
+      return res.status(404).json({ success: false, message: 'Portfolio item not found' });
     }
 
     // Soft delete
@@ -245,14 +289,18 @@ export const toggleFeatured = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const portfolioItem = await ArtistPortfolio.findById(id).maxTimeMS(5000);
-    if (!portfolioItem) {
-      return res.status(404).json({ success: false, message: 'Portfolio item not found' });
+    const parsedId = parsePortfolioObjectId(id, 'portfolio id');
+    if (parsedId.error) {
+      return res.status(parsedId.error.status).json({ success: false, message: parsedId.error.message });
     }
 
-    // Verify ownership
-    if (portfolioItem.artistId.toString() !== userId) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const portfolioItem = await ArtistPortfolio.findOne({
+      _id: parsedId.value,
+      artistId: userId,
+      deletedAt: null
+    }).maxTimeMS(5000);
+    if (!portfolioItem) {
+      return res.status(404).json({ success: false, message: 'Portfolio item not found' });
     }
 
     portfolioItem.featured = !portfolioItem.featured;

@@ -63,18 +63,21 @@ if (isProduction) {
 // Sentry integration (optional - requires SENTRY_DSN env var)
 let Sentry = null;
 if (process.env.SENTRY_DSN) {
-  import('@sentry/node').then((SentryModule) => {
-    Sentry = SentryModule;
-    Sentry.init({
-      dsn: process.env.SENTRY_DSN,
-      environment: process.env.NODE_ENV || 'development',
-      tracesSampleRate: isProduction ? 0.1 : 1.0,
-      integrations: []
-    });
-    winstonLogger.info('Sentry initialized for error tracking');
-  }).catch(() => {
-    winstonLogger.warn('Sentry SDK not installed - error tracking disabled');
-  });
+  void (async () => {
+    try {
+      const sentryModule = await import('@sentry/node');
+      Sentry = sentryModule;
+      Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        environment: process.env.NODE_ENV || 'development',
+        tracesSampleRate: isProduction ? 0.1 : 1.0,
+        integrations: []
+      });
+      winstonLogger.info('Sentry initialized for error tracking');
+    } catch {
+      winstonLogger.warn('Sentry SDK not installed - error tracking disabled');
+    }
+  })();
 }
 
 // Enhanced logger with context support

@@ -11,6 +11,7 @@ import mongoose from 'mongoose';
 
 const ALLOWED_CAMPAIGN_STATUSES = ['draft', 'active', 'paused', 'completed', 'cancelled'];
 const ALLOWED_RECIPIENT_STATUSES = ['pending', 'sent', 'delivered', 'failed', 'unsubscribed'];
+const TIER_ORDER = ['starter', 'professional', 'enterprise'];
 
 const parseObjectIdOrNull = (value) => {
   if (!mongoose.isValidObjectId(value)) {
@@ -42,6 +43,20 @@ const getSalonForRequestUser = async (req, { populateOwner = false } = {}) => {
   }
 
   return salon;
+};
+
+const hasTemplateTierAccess = (salonTier, templateTier) => {
+  const salonTierIndex = TIER_ORDER.indexOf(salonTier || 'starter');
+  const templateTierIndex = TIER_ORDER.indexOf(templateTier || 'starter');
+  return salonTierIndex >= 0 && templateTierIndex >= 0 && salonTierIndex >= templateTierIndex;
+};
+
+const findCampaignForSalon = async (campaignId, salonId) => {
+  return MarketingCampaign.findOne({
+    _id: campaignId,
+    salonId,
+    deletedAt: null
+  }).maxTimeMS(5000);
 };
 
 /**
@@ -99,9 +114,20 @@ export const createCampaign = async (req, res) => {
     }
 
     // Get template
-    const template = await MarketingTemplate.findById(safeTemplateId);
+    const template = await MarketingTemplate.findOne({
+      _id: safeTemplateId,
+      active: true,
+      $or: [
+        { salonId: null },
+        { salonId: salon._id }
+      ]
+    }).maxTimeMS(5000);
     if (!template) {
       return res.status(404).json({ success: false, message: 'Template nicht gefunden' });
+    }
+
+    if (!hasTemplateTierAccess(salon.subscription?.tier || 'starter', template.tier)) {
+      return res.status(403).json({ success: false, message: 'Template ist im aktuellen Tarif nicht verfuegbar' });
     }
 
     // Create campaign from template
@@ -164,15 +190,14 @@ export const getCampaign = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
     }
 
-    const campaign = await MarketingCampaign.findById(safeCampaignId);
-    if (!campaign) {
-      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
+    const salon = await getSalonForRequestUser(req);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
 
-    // Verify ownership
-    const salon = await getSalonForRequestUser(req);
-    if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
+    const campaign = await findCampaignForSalon(safeCampaignId, salon._id);
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
 
     // Get recipient stats
@@ -203,15 +228,14 @@ export const updateCampaign = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
     }
 
-    const campaign = await MarketingCampaign.findById(safeCampaignId);
-    if (!campaign) {
-      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
+    const salon = await getSalonForRequestUser(req);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
 
-    // Verify ownership
-    const salon = await getSalonForRequestUser(req);
-    if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
+    const campaign = await findCampaignForSalon(safeCampaignId, salon._id);
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
 
     const { name, status, rules, message, schedule } = req.body;
@@ -251,15 +275,14 @@ export const deleteCampaign = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
     }
 
-    const campaign = await MarketingCampaign.findById(safeCampaignId);
-    if (!campaign) {
-      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
+    const salon = await getSalonForRequestUser(req);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
 
-    // Verify ownership
-    const salon = await getSalonForRequestUser(req);
-    if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
+    const campaign = await findCampaignForSalon(safeCampaignId, salon._id);
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
 
     // ? SECURITY FIX: Soft delete instead of hard delete
@@ -287,15 +310,14 @@ export const runCampaign = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
     }
 
-    const campaign = await MarketingCampaign.findById(safeCampaignId);
-    if (!campaign) {
-      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
+    const salon = await getSalonForRequestUser(req, { populateOwner: true });
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
 
-    // Verify ownership
-    const salon = await getSalonForRequestUser(req, { populateOwner: true });
-    if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
+    const campaign = await findCampaignForSalon(safeCampaignId, salon._id);
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
 
     if (campaign.status !== 'active') {
@@ -346,15 +368,14 @@ export const previewCampaign = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
     }
 
-    const campaign = await MarketingCampaign.findById(safeCampaignId);
-    if (!campaign) {
-      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
+    const salon = await getSalonForRequestUser(req);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
 
-    // Verify ownership
-    const salon = await getSalonForRequestUser(req);
-    if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
+    const campaign = await findCampaignForSalon(safeCampaignId, salon._id);
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
 
     // Find target customers
@@ -403,15 +424,14 @@ export const getRecipients = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid campaign id format' });
     }
 
-    const campaign = await MarketingCampaign.findById(safeCampaignId);
-    if (!campaign) {
-      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
+    const salon = await getSalonForRequestUser(req);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: 'Salon nicht gefunden' });
     }
 
-    // Verify ownership
-    const salon = await getSalonForRequestUser(req);
-    if (!salon || campaign.salonId.toString() !== salon._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Keine Berechtigung' });
+    const campaign = await findCampaignForSalon(safeCampaignId, salon._id);
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: 'Campaign nicht gefunden' });
     }
 
     const recipientStatus = typeof req.query.status === 'string'

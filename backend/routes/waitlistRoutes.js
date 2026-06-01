@@ -136,7 +136,15 @@ const requireWaitlistFeature = async (req, res, next) => {
     let salonId = req.params.salonId || req.body.salonId;
 
     if (!salonId && req.params.id) {
-      const waitlistEntry = await Waitlist.findById(req.params.id)
+      if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid waitlist ID format',
+          code: 'INVALID_WAITLIST_ID'
+        });
+      }
+
+      const waitlistEntry = await Waitlist.findById(new mongoose.Types.ObjectId(req.params.id))
         .select('salonId')
         .lean();
       salonId = waitlistEntry?.salonId?.toString();
@@ -378,8 +386,12 @@ router.put('/:id', authMiddleware.protect, requireWaitlistActorRole, requireWait
       notes
     } = req.body;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid waitlist ID format' });
+    }
+
     // Find waitlist entry
-    const waitlistEntry = await Waitlist.findById(id);
+    const waitlistEntry = await Waitlist.findById(new mongoose.Types.ObjectId(id));
 
     if (!waitlistEntry) {
       return res.status(404).json({
@@ -431,8 +443,12 @@ router.delete('/:id', authMiddleware.protect, requireWaitlistActorRole, requireW
   try {
     const { id } = req.params;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid waitlist ID format' });
+    }
+
     // Find waitlist entry
-    const waitlistEntry = await Waitlist.findById(id);
+    const waitlistEntry = await Waitlist.findById(new mongoose.Types.ObjectId(id));
 
     if (!waitlistEntry) {
       return res.status(404).json({

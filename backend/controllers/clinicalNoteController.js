@@ -6,6 +6,42 @@ import mongoose from 'mongoose';
 
 const ALLOWED_NOTE_TYPES = ['assessment', 'treatment', 'follow_up', 'consultation', 'consent', 'progress', 'discharge', 'general'];
 
+const resolveScopedClinicalSalonId = (req, requestedSalonId) => {
+  if (['ceo', 'admin'].includes(req.user?.role)) {
+    if (!requestedSalonId || !mongoose.isValidObjectId(String(requestedSalonId))) {
+      return { error: { status: 400, message: 'Invalid salonId format' } };
+    }
+
+    return { salonId: new mongoose.Types.ObjectId(String(requestedSalonId)) };
+  }
+
+  const trustedSalonId = req.user?.salonId;
+  if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+    return { error: { status: 403, message: 'Access denied - No salon assigned to your account' } };
+  }
+
+  if (requestedSalonId && String(requestedSalonId) !== String(trustedSalonId)) {
+    return { error: { status: 403, message: 'Access denied - salonId must match authenticated tenant' } };
+  }
+
+  return { salonId: new mongoose.Types.ObjectId(String(trustedSalonId)) };
+};
+
+const buildScopedClinicalNoteFilter = (req, noteId) => {
+  const filter = { _id: noteId, deletedAt: null };
+
+  if (!['ceo', 'admin'].includes(req.user?.role)) {
+    const trustedSalonId = req.user?.salonId;
+    if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+      return { error: { status: 403, message: 'Access denied - No salon assigned to your account' } };
+    }
+
+    filter.salonId = new mongoose.Types.ObjectId(String(trustedSalonId));
+  }
+
+  return { filter };
+};
+
 /**
  * Clinical Notes Controller
  * For Medical Aesthetics / Physiotherapy
@@ -29,9 +65,12 @@ export const createClinicalNote = async (req, res) => {
 
     const userId = req.user.id;
 
-    if (!salonId || !mongoose.isValidObjectId(salonId)) {
-      return res.status(400).json({ success: false, message: 'Invalid salonId format' });
+    const salonScope = resolveScopedClinicalSalonId(req, salonId);
+    if (salonScope.error) {
+      return res.status(salonScope.error.status).json({ success: false, message: salonScope.error.message });
     }
+    const safeSalonId = salonScope.salonId;
+
     if (!customerId || !mongoose.isValidObjectId(customerId)) {
       return res.status(400).json({ success: false, message: 'Invalid customerId format' });
     }
@@ -42,7 +81,6 @@ export const createClinicalNote = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid consentFormId format' });
     }
 
-    const safeSalonId = new mongoose.Types.ObjectId(salonId);
     const safeCustomerId = new mongoose.Types.ObjectId(customerId);
     const safeBookingId = bookingId ? new mongoose.Types.ObjectId(bookingId) : null;
     const safeConsentFormId = consentFormId ? new mongoose.Types.ObjectId(consentFormId) : null;
@@ -135,7 +173,12 @@ export const getClinicalNote = async (req, res) => {
 
     const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
 
-    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId)
+    const noteFilterResult = buildScopedClinicalNoteFilter(req, safeClinicalNoteId);
+    if (noteFilterResult.error) {
+      return res.status(noteFilterResult.error.status).json({ success: false, message: noteFilterResult.error.message });
+    }
+
+    const clinicalNote = await ClinicalNote.findOne(noteFilterResult.filter)
       .populate('practitionerId', 'name email').maxTimeMS(5000)
       .populate('customerId', 'name email');
 
@@ -221,11 +264,11 @@ export const getPatientClinicalNotes = async (req, res) => {
     const rawSalonId = req.query.salonId;
     const noteType = req.query.noteType;
 
-    if (!rawSalonId || typeof rawSalonId !== 'string' || !mongoose.isValidObjectId(rawSalonId)) {
-      return res.status(400).json({ success: false, message: 'Invalid salonId' });
+    const salonScope = resolveScopedClinicalSalonId(req, rawSalonId);
+    if (salonScope.error) {
+      return res.status(salonScope.error.status).json({ success: false, message: salonScope.error.message });
     }
-    // Cast to ObjectId breaks taint chain — rawSalonId (user string) never enters the query
-    const salonId = new mongoose.Types.ObjectId(rawSalonId);
+    const salonId = salonScope.salonId;
 
     // Verify authorization
     const salon = await Salon.findById(salonId).maxTimeMS(5000);
@@ -298,7 +341,12 @@ export const updateClinicalNote = async (req, res) => {
 
     const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
 
-    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId).maxTimeMS(5000);
+    const noteFilterResult = buildScopedClinicalNoteFilter(req, safeClinicalNoteId);
+    if (noteFilterResult.error) {
+      return res.status(noteFilterResult.error.status).json({ success: false, message: noteFilterResult.error.message });
+    }
+
+    const clinicalNote = await ClinicalNote.findOne(noteFilterResult.filter).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
@@ -380,7 +428,12 @@ export const deleteClinicalNote = async (req, res) => {
 
     const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
 
-    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId).maxTimeMS(5000);
+    const noteFilterResult = buildScopedClinicalNoteFilter(req, safeClinicalNoteId);
+    if (noteFilterResult.error) {
+      return res.status(noteFilterResult.error.status).json({ success: false, message: noteFilterResult.error.message });
+    }
+
+    const clinicalNote = await ClinicalNote.findOne(noteFilterResult.filter).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }
@@ -445,7 +498,12 @@ export const shareClinicalNote = async (req, res) => {
     const safeClinicalNoteId = new mongoose.Types.ObjectId(id);
     const safeShareWithUserId = new mongoose.Types.ObjectId(shareWithUserId);
 
-    const clinicalNote = await ClinicalNote.findById(safeClinicalNoteId).maxTimeMS(5000);
+    const noteFilterResult = buildScopedClinicalNoteFilter(req, safeClinicalNoteId);
+    if (noteFilterResult.error) {
+      return res.status(noteFilterResult.error.status).json({ success: false, message: noteFilterResult.error.message });
+    }
+
+    const clinicalNote = await ClinicalNote.findOne(noteFilterResult.filter).maxTimeMS(5000);
     if (!clinicalNote) {
       return res.status(404).json({ success: false, message: 'Clinical note not found' });
     }

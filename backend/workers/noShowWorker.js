@@ -20,16 +20,36 @@ let cronTask = null;
 const getNoShowSettings = (salon) => {
   const settings = salon?.noShowSettings || {};
   const reminders = settings.reminders || {};
+  const remindersEnabled = settings.remindersEnabled !== false;
+
+  const enabled72h = remindersEnabled
+    ? (reminders.enabled72h !== undefined ? reminders.enabled72h !== false : settings.reminder72h !== false)
+    : false;
+  const enabled24h = remindersEnabled
+    ? (reminders.enabled24h !== undefined ? reminders.enabled24h !== false : settings.reminder24h !== false)
+    : false;
+  const enabled2h = remindersEnabled
+    ? (reminders.enabled2h !== undefined ? reminders.enabled2h !== false : settings.reminder2h !== false)
+    : false;
+
+  const parsedAutoMarkMinutes = Number(settings.autoMarkNoShowAfterMinutes);
+  const riskThresholdValue = settings.highRiskThreshold ?? settings.autoDepositThreshold;
+  const parsedRiskThreshold = Number(riskThresholdValue);
+  const parsedBlockBookingThreshold = Number(settings.blockBookingThreshold);
+  const parsedDepositPercentage = Number(settings.depositPercentage);
 
   return {
+    remindersEnabled,
     reminders: {
-      enabled72h: reminders.enabled72h !== false,
-      enabled24h: reminders.enabled24h !== false,
-      enabled2h: reminders.enabled2h !== false
+      enabled72h,
+      enabled24h,
+      enabled2h
     },
-    autoMarkNoShowAfterMinutes: Number(settings.autoMarkNoShowAfterMinutes) || 30,
-    highRiskThreshold: Number(settings.highRiskThreshold) || 3,
-    depositPercentage: Number(settings.depositPercentage) || 30
+    autoMarkNoShowAfterMinutes: Number.isFinite(parsedAutoMarkMinutes) ? parsedAutoMarkMinutes : 30,
+    autoDepositThreshold: Number.isFinite(parsedRiskThreshold) ? parsedRiskThreshold : 3,
+    highRiskThreshold: Number.isFinite(parsedRiskThreshold) ? parsedRiskThreshold : 3,
+    blockBookingThreshold: Number.isFinite(parsedBlockBookingThreshold) ? parsedBlockBookingThreshold : 5,
+    depositPercentage: Number.isFinite(parsedDepositPercentage) ? parsedDepositPercentage : 30
   };
 };
 

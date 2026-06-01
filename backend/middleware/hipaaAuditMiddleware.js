@@ -153,7 +153,7 @@ function extractPHIDetails(req, dataType, _options) {
   }
 
   // Extract salon ID
-  details.salonId = req.user?.salonId || req.params.salonId || req.body.salonId;
+  details.salonId = req.user?.salonId || req.params.salonId || req.query?.salonId || null;
   details.resourceId = req.params.id;
 
   return details;
@@ -436,10 +436,10 @@ export const generateComplianceReport = async (req, res) => {
     }
 
     // Aggregate statistics
-    const [totalAccesses, uniqueUsers, uniquePatients, breachAlerts, accessByType] = await Promise.all([
+    const [totalAccesses, uniqueUserIds, uniquePatientIds, breachAlerts, accessByType] = await Promise.all([
       AuditLog.countDocuments(query),
-      AuditLog.distinct('userId', query).then(arr => arr.length),
-      AuditLog.distinct('phiAccessDetails.patientId', query).then(arr => arr.length),
+      AuditLog.distinct('userId', query),
+      AuditLog.distinct('phiAccessDetails.patientId', query),
       AuditLog.countDocuments({ ...query, action: 'breach_alert' }),
       AuditLog.aggregate([
         { $match: query },
@@ -455,8 +455,8 @@ export const generateComplianceReport = async (req, res) => {
       },
       summary: {
         totalPHIAccesses: totalAccesses,
-        uniqueUsers,
-        uniquePatients,
+        uniqueUsers: uniqueUserIds.length,
+        uniquePatients: uniquePatientIds.length,
         breachAlerts
       },
       accessByType: accessByType.reduce((acc, item) => {

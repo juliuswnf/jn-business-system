@@ -164,10 +164,10 @@ const trackBookingConversions = async () => {
 
       if (booking) {
         conversionTasks.push(
-          recipient.markAsBooked(booking._id, booking.totalPrice || 0)
-            .then(() => {
-              logger.log(`[SUCCESS] Conversion tracked: ${recipient.discountCode} -> ${booking.totalPrice}€`);
-            })
+          (async () => {
+            await recipient.markAsBooked(booking._id, booking.totalPrice || 0);
+            logger.log(`[SUCCESS] Conversion tracked: ${recipient.discountCode} -> ${booking.totalPrice}€`);
+          })()
         );
       }
     }

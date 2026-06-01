@@ -27,7 +27,21 @@ router.post(
 );
 
 router.patch(
+  '/manual-reminder/:bookingId',
+  securityMiddleware.validateCSRFToken,
+  mutationLimiter,
+  noShowController.sendManualReminder
+);
+
+router.patch(
   '/mark/:bookingId',
+  securityMiddleware.validateCSRFToken,
+  mutationLimiter,
+  noShowController.markBookingNoShow
+);
+
+router.patch(
+  '/mark-no-show/:bookingId',
   securityMiddleware.validateCSRFToken,
   mutationLimiter,
   noShowController.markBookingNoShow

@@ -1,6 +1,7 @@
 import { tierHasFeature, getRequiredTierForFeature, compareTiers } from '../config/pricing.js';
 import Salon from '../models/Salon.js';
 import logger from '../utils/logger.js';
+import mongoose from 'mongoose';
 
 const isActiveSubscriptionStatus = (status) => {
   return ['active', 'trialing', 'trial'].includes(status);
@@ -8,6 +9,32 @@ const isActiveSubscriptionStatus = (status) => {
 
 const isCeoWithoutSalonContext = (req, salonId) => {
   return req.user?.role === 'ceo' && !salonId;
+};
+
+const resolveSalonScope = (req) => {
+  const requestedSalonId = req.params?.salonId || req.body?.salonId || null;
+  const trustedSalonId = req.user?.salonId || null;
+
+  if (req.user?.role === 'ceo') {
+    return { salonId: trustedSalonId || requestedSalonId || null, mismatch: false };
+  }
+
+  if (trustedSalonId) {
+    if (requestedSalonId && String(requestedSalonId) !== String(trustedSalonId)) {
+      return { salonId: null, mismatch: true };
+    }
+    return { salonId: trustedSalonId, mismatch: false };
+  }
+
+  return { salonId: requestedSalonId, mismatch: false };
+};
+
+const toSalonObjectId = (salonId) => {
+  if (!salonId || !mongoose.isValidObjectId(String(salonId))) {
+    return null;
+  }
+
+  return new mongoose.Types.ObjectId(String(salonId));
 };
 
 /**
@@ -23,7 +50,15 @@ export const checkFeatureAccess = (featureName, _options = {}) => {
   return async (req, res, next) => {
     try {
       // Get salon from database
-      const salonId = req.user.salonId || req.body.salonId || req.params.salonId;
+      const { salonId, mismatch } = resolveSalonScope(req);
+
+      if (mismatch) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied - salon scope mismatch',
+          code: 'SALON_SCOPE_MISMATCH'
+        });
+      }
 
       if (isCeoWithoutSalonContext(req, salonId)) {
         req.subscription = {
@@ -41,7 +76,16 @@ export const checkFeatureAccess = (featureName, _options = {}) => {
         });
       }
 
-      const salon = await Salon.findById(salonId)
+      const safeSalonId = toSalonObjectId(salonId);
+      if (!safeSalonId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid salon ID format',
+          code: 'SALON_ID_INVALID'
+        });
+      }
+
+      const salon = await Salon.findById(safeSalonId)
         .select('subscription businessName')
         .lean();
 
@@ -100,7 +144,7 @@ export const checkFeatureAccess = (featureName, _options = {}) => {
 
       // Feature check passed
       logger.info('Feature access granted', {
-        salonId,
+        salonId: String(salonId),
         feature: featureName,
         tier: currentTier
       });
@@ -131,7 +175,15 @@ export const checkFeatureAccess = (featureName, _options = {}) => {
 export const checkAnyFeatureAccess = (featureNames = [], _options = {}) => {
   return async (req, res, next) => {
     try {
-      const salonId = req.user.salonId || req.body.salonId || req.params.salonId;
+      const { salonId, mismatch } = resolveSalonScope(req);
+
+      if (mismatch) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied - salon scope mismatch',
+          code: 'SALON_SCOPE_MISMATCH'
+        });
+      }
 
       if (isCeoWithoutSalonContext(req, salonId)) {
         req.subscription = {
@@ -149,7 +201,16 @@ export const checkAnyFeatureAccess = (featureNames = [], _options = {}) => {
         });
       }
 
-      const salon = await Salon.findById(salonId)
+      const safeSalonId = toSalonObjectId(salonId);
+      if (!safeSalonId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid salon ID format',
+          code: 'SALON_ID_INVALID'
+        });
+      }
+
+      const salon = await Salon.findById(safeSalonId)
         .select('subscription businessName')
         .lean();
 

@@ -65,6 +65,24 @@ const buildTenantScopedConsentQuery = (req, customerId) => {
   return query;
 };
 
+const buildScopedConsentByIdQuery = (req, consentId) => {
+  const query = {
+    _id: consentId,
+    deletedAt: null
+  };
+
+  if (req.user?.role !== 'ceo') {
+    const trustedSalonId = req.user?.salonId;
+    if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
+      return null;
+    }
+
+    query.salonId = new mongoose.Types.ObjectId(String(trustedSalonId));
+  }
+
+  return query;
+};
+
 // ==================== CREATE CONSENT FORM ====================
 export const createConsentForm = async (req, res) => {
   try {
@@ -232,7 +250,12 @@ export const getConsentById = async (req, res) => {
 
     const safeConsentId = new mongoose.Types.ObjectId(id);
 
-    const consent = await ConsentForm.findById(safeConsentId)
+    const scopedQuery = buildScopedConsentByIdQuery(req, safeConsentId);
+    if (!scopedQuery) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const consent = await ConsentForm.findOne(scopedQuery)
       .populate('customerId', 'name email')
       .lean().maxTimeMS(5000);
 
@@ -274,7 +297,12 @@ export const revokeConsent = async (req, res) => {
 
     const safeConsentId = new mongoose.Types.ObjectId(id);
 
-    const consent = await ConsentForm.findById(safeConsentId).maxTimeMS(5000);
+    const scopedQuery = buildScopedConsentByIdQuery(req, safeConsentId);
+    if (!scopedQuery) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const consent = await ConsentForm.findOne(scopedQuery).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }
@@ -446,7 +474,12 @@ export const downloadConsentPDF = async (req, res) => {
 
     const safeConsentId = new mongoose.Types.ObjectId(id);
 
-    const consent = await ConsentForm.findById(safeConsentId)
+    const scopedQuery = buildScopedConsentByIdQuery(req, safeConsentId);
+    if (!scopedQuery) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const consent = await ConsentForm.findOne(scopedQuery)
       .populate('customerId', 'name email').maxTimeMS(5000);
 
     if (!consent) {
@@ -517,7 +550,12 @@ export const addWitnessSignature = async (req, res) => {
 
     const safeConsentId = new mongoose.Types.ObjectId(id);
 
-    const consent = await ConsentForm.findById(safeConsentId).maxTimeMS(5000);
+    const scopedQuery = buildScopedConsentByIdQuery(req, safeConsentId);
+    if (!scopedQuery) {
+      return res.status(403).json({ success: false, message: 'Tenant context required' });
+    }
+
+    const consent = await ConsentForm.findOne(scopedQuery).maxTimeMS(5000);
     if (!consent) {
       return res.status(404).json({ success: false, message: 'Consent form not found' });
     }

@@ -16,7 +16,9 @@ const resolveScopedSalon = async (req, res) => {
   let targetSalonId;
 
   if (req.user.role === 'ceo') {
-    const rawSalonId = req.query?.salonId;
+    const rawSalonId = typeof req.query?.salonId === 'string'
+      ? req.query.salonId.trim()
+      : null;
 
     if (!rawSalonId) {
       res.status(400).json({
@@ -26,7 +28,7 @@ const resolveScopedSalon = async (req, res) => {
       return null;
     }
 
-    if (!mongoose.isValidObjectId(rawSalonId)) {
+    if (!rawSalonId || !mongoose.isValidObjectId(rawSalonId)) {
       res.status(400).json({ success: false, message: 'Invalid salonId format' });
       return null;
     }
@@ -35,7 +37,7 @@ const resolveScopedSalon = async (req, res) => {
   } else {
     const trustedSalonId = req.user.salonId;
 
-    if (!trustedSalonId) {
+    if (!trustedSalonId || !mongoose.isValidObjectId(String(trustedSalonId))) {
       res.status(403).json({
         success: false,
         message: 'Access denied - No salon assigned to your account'

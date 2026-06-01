@@ -10,33 +10,97 @@ import {
 } from '../services/reminderService.js';
 
 const NO_SHOW_SETTING_KEYS = ['enabled72h', 'enabled24h', 'enabled2h'];
+const REMINDER_ALIAS_BY_KEY = {
+  enabled72h: 'reminder72h',
+  enabled24h: 'reminder24h',
+  enabled2h: 'reminder2h'
+};
+
+const clamp = (value, min, max) => {
+  return Math.min(max, Math.max(min, value));
+};
 
 const getDefaultNoShowSettings = () => {
   return {
+    remindersEnabled: true,
+    reminder72h: true,
+    reminder24h: true,
+    reminder2h: true,
     reminders: {
       enabled72h: true,
       enabled24h: true,
       enabled2h: true
     },
     autoMarkNoShowAfterMinutes: 30,
+    autoDepositThreshold: 3,
     highRiskThreshold: 3,
+    blockBookingThreshold: 5,
     depositPercentage: 30
   };
+};
+
+const readBooleanSetting = (primaryValue, aliasValue, fallback) => {
+  if (primaryValue !== undefined) {
+    return primaryValue !== false;
+  }
+
+  if (aliasValue !== undefined) {
+    return aliasValue !== false;
+  }
+
+  return fallback;
+};
+
+const readNumberSetting = (value, fallback) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : fallback;
 };
 
 const normalizeNoShowSettings = (settingsInput = {}) => {
   const defaults = getDefaultNoShowSettings();
   const remindersInput = settingsInput.reminders || {};
 
+  const remindersEnabled = readBooleanSetting(settingsInput.remindersEnabled, null, defaults.remindersEnabled);
+  const reminder72h = remindersEnabled
+    ? readBooleanSetting(remindersInput.enabled72h, settingsInput.reminder72h, defaults.reminder72h)
+    : false;
+  const reminder24h = remindersEnabled
+    ? readBooleanSetting(remindersInput.enabled24h, settingsInput.reminder24h, defaults.reminder24h)
+    : false;
+  const reminder2h = remindersEnabled
+    ? readBooleanSetting(remindersInput.enabled2h, settingsInput.reminder2h, defaults.reminder2h)
+    : false;
+
+  const highRiskInput = settingsInput.highRiskThreshold ?? settingsInput.autoDepositThreshold;
+  const highRiskThreshold = clamp(Math.round(readNumberSetting(highRiskInput, defaults.highRiskThreshold)), 1, 20);
+
   return {
+    remindersEnabled,
+    reminder72h,
+    reminder24h,
+    reminder2h,
     reminders: {
-      enabled72h: remindersInput.enabled72h !== false,
-      enabled24h: remindersInput.enabled24h !== false,
-      enabled2h: remindersInput.enabled2h !== false
+      enabled72h: reminder72h,
+      enabled24h: reminder24h,
+      enabled2h: reminder2h
     },
-    autoMarkNoShowAfterMinutes: Number(settingsInput.autoMarkNoShowAfterMinutes) || defaults.autoMarkNoShowAfterMinutes,
-    highRiskThreshold: Number(settingsInput.highRiskThreshold) || defaults.highRiskThreshold,
-    depositPercentage: Number(settingsInput.depositPercentage) || defaults.depositPercentage
+    autoMarkNoShowAfterMinutes: clamp(
+      Math.round(readNumberSetting(settingsInput.autoMarkNoShowAfterMinutes, defaults.autoMarkNoShowAfterMinutes)),
+      5,
+      240
+    ),
+    autoDepositThreshold: highRiskThreshold,
+    highRiskThreshold,
+    blockBookingThreshold: clamp(
+      Math.round(readNumberSetting(settingsInput.blockBookingThreshold, defaults.blockBookingThreshold)),
+      1,
+      50
+    ),
+    depositPercentage: clamp(
+      Math.round(readNumberSetting(settingsInput.depositPercentage, defaults.depositPercentage)),
+      0,
+      100
+    )
   };
 };
 
@@ -402,17 +466,34 @@ export const confirmBookingByToken = async (req, res) => {
 
     const hashedToken = hashConfirmationToken(token);
 
-    const booking = await Booking.findOne({
-      _id: new mongoose.Types.ObjectId(parsedToken.bookingId),
-      confirmationToken: hashedToken,
-      confirmationTokenExpiry: { $gt: new Date() }
-    })
+    const booking = await Booking.findById(new mongoose.Types.ObjectId(parsedToken.bookingId))
       .select('+confirmationToken')
       .populate('salonId', 'name')
       .populate('serviceId', 'name')
       .maxTimeMS(5000);
 
     if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Token invalid or expired'
+      });
+    }
+
+    if (booking.confirmationStatus === 'confirmed') {
+      return res.status(200).json({
+        success: true,
+        code: 'ALREADY_CONFIRMED',
+        message: 'Booking already confirmed',
+        booking: sanitizeBookingSummary(booking)
+      });
+    }
+
+    if (
+      !booking.confirmationToken ||
+      booking.confirmationToken !== hashedToken ||
+      !booking.confirmationTokenExpiry ||
+      booking.confirmationTokenExpiry.getTime() <= Date.now()
+    ) {
       return res.status(404).json({
         success: false,
         message: 'Token invalid, expired, or already used'
@@ -438,6 +519,7 @@ export const confirmBookingByToken = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      code: 'CONFIRMED',
       message: 'Booking confirmed successfully',
       booking: sanitizeBookingSummary(booking)
     });
@@ -502,11 +584,21 @@ export const updateNoShowSettings = async (req, res) => {
     const payload = req.body || {};
 
     const nextSettings = {
+      remindersEnabled: current.remindersEnabled,
+      reminder72h: current.reminder72h,
+      reminder24h: current.reminder24h,
+      reminder2h: current.reminder2h,
       reminders: { ...current.reminders },
       autoMarkNoShowAfterMinutes: current.autoMarkNoShowAfterMinutes,
+      autoDepositThreshold: current.autoDepositThreshold,
       highRiskThreshold: current.highRiskThreshold,
+      blockBookingThreshold: current.blockBookingThreshold,
       depositPercentage: current.depositPercentage
     };
+
+    if (payload.remindersEnabled !== undefined) {
+      nextSettings.remindersEnabled = Boolean(payload.remindersEnabled);
+    }
 
     if (payload.reminders !== undefined) {
       if (!payload.reminders || typeof payload.reminders !== 'object' || Array.isArray(payload.reminders)) {
@@ -516,8 +608,27 @@ export const updateNoShowSettings = async (req, res) => {
       for (const key of NO_SHOW_SETTING_KEYS) {
         if (payload.reminders[key] !== undefined) {
           nextSettings.reminders[key] = Boolean(payload.reminders[key]);
+          const aliasKey = REMINDER_ALIAS_BY_KEY[key];
+          if (aliasKey) {
+            nextSettings[aliasKey] = Boolean(payload.reminders[key]);
+          }
         }
       }
+    }
+
+    if (payload.reminder72h !== undefined) {
+      nextSettings.reminder72h = Boolean(payload.reminder72h);
+      nextSettings.reminders.enabled72h = Boolean(payload.reminder72h);
+    }
+
+    if (payload.reminder24h !== undefined) {
+      nextSettings.reminder24h = Boolean(payload.reminder24h);
+      nextSettings.reminders.enabled24h = Boolean(payload.reminder24h);
+    }
+
+    if (payload.reminder2h !== undefined) {
+      nextSettings.reminder2h = Boolean(payload.reminder2h);
+      nextSettings.reminders.enabled2h = Boolean(payload.reminder2h);
     }
 
     if (payload.autoMarkNoShowAfterMinutes !== undefined) {
@@ -540,6 +651,30 @@ export const updateNoShowSettings = async (req, res) => {
         });
       }
       nextSettings.highRiskThreshold = Math.round(threshold);
+      nextSettings.autoDepositThreshold = Math.round(threshold);
+    }
+
+    if (payload.autoDepositThreshold !== undefined) {
+      const threshold = Number(payload.autoDepositThreshold);
+      if (!Number.isFinite(threshold) || threshold < 1 || threshold > 20) {
+        return res.status(400).json({
+          success: false,
+          message: 'autoDepositThreshold must be between 1 and 20'
+        });
+      }
+      nextSettings.autoDepositThreshold = Math.round(threshold);
+      nextSettings.highRiskThreshold = Math.round(threshold);
+    }
+
+    if (payload.blockBookingThreshold !== undefined) {
+      const threshold = Number(payload.blockBookingThreshold);
+      if (!Number.isFinite(threshold) || threshold < 1 || threshold > 50) {
+        return res.status(400).json({
+          success: false,
+          message: 'blockBookingThreshold must be between 1 and 50'
+        });
+      }
+      nextSettings.blockBookingThreshold = Math.round(threshold);
     }
 
     if (payload.depositPercentage !== undefined) {
@@ -551,6 +686,19 @@ export const updateNoShowSettings = async (req, res) => {
         });
       }
       nextSettings.depositPercentage = Math.round(percentage);
+    }
+
+    if (nextSettings.remindersEnabled === false) {
+      nextSettings.reminder72h = false;
+      nextSettings.reminder24h = false;
+      nextSettings.reminder2h = false;
+      nextSettings.reminders.enabled72h = false;
+      nextSettings.reminders.enabled24h = false;
+      nextSettings.reminders.enabled2h = false;
+    } else {
+      nextSettings.reminders.enabled72h = Boolean(nextSettings.reminder72h);
+      nextSettings.reminders.enabled24h = Boolean(nextSettings.reminder24h);
+      nextSettings.reminders.enabled2h = Boolean(nextSettings.reminder2h);
     }
 
     salon.noShowSettings = nextSettings;

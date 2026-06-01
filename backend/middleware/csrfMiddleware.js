@@ -39,13 +39,14 @@ export const generateCSRFToken = (req, res, next) => {
   try {
     const token = crypto.randomBytes(32).toString('hex');
     const expiry = Date.now() + CSRF_TOKEN_EXPIRY;
+    const csrfSameSite = process.env.NODE_ENV === 'production' ? 'none' : 'lax';
     csrfTokens.set(token, expiry);
 
     // Set cookie (not HTTP-only, must be readable by JavaScript)
     res.cookie('XSRF-TOKEN', token, {
       httpOnly: false, // Must be readable by JavaScript for header
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: csrfSameSite,
       maxAge: CSRF_TOKEN_EXPIRY,
       path: '/'
     });

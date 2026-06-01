@@ -30,6 +30,7 @@ const customerSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 80,
       index: true
     },
 
@@ -37,6 +38,7 @@ const customerSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 80,
       index: true
     },
 
@@ -45,6 +47,7 @@ const customerSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
+      maxlength: 255,
       match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Valid email required']
     },
 
@@ -52,6 +55,7 @@ const customerSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 32,
       match: [PHONE_REGEX, 'Valid phone number required']
     },
 
@@ -88,13 +92,15 @@ const customerSchema = new mongoose.Schema(
 
     // ==================== Customer Details ====================
     notes: {
-      type: String
+      type: String,
+      maxlength: 2000
     },
 
     tags: [
       {
         type: String,
-        trim: true
+        trim: true,
+        maxlength: 40
       }
     ],
 
@@ -165,6 +171,7 @@ const customerSchema = new mongoose.Schema(
       default: null,
       sparse: true,
       index: true,
+      maxlength: 255,
       comment: 'Stripe Customer ID for payment method storage'
     },
 
@@ -172,11 +179,13 @@ const customerSchema = new mongoose.Schema(
     paymentMethods: [{
       paymentMethodId: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 255
       },
       last4: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 4
       },
       brand: {
         type: String,
